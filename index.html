@@ -36,6 +36,23 @@
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  /* Soft halo that breathes around the wax seal to invite the tap */
+  @keyframes sealPulse {
+    0%   { transform: translate(-50%, -50%) scale(0.9);  opacity: 0.55; }
+    70%  { transform: translate(-50%, -50%) scale(1.55); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1.55); opacity: 0; }
+  }
+  /* Staggered entrance for the cover */
+  [data-cover-anim] { animation: fadeUp 1s cubic-bezier(.2,.6,.2,1) both; }
+  /* Gentle lift when hovering the seal on desktop */
+  #wax-seal { transition: transform 0.35s cubic-bezier(.2,.6,.2,1); }
+  @media (hover: hover) {
+    #wax-seal:hover { transform: scale(1.05); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #seal-pulse { animation: none; opacity: 0; }
+    [data-cover-anim] { animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -69,10 +86,10 @@
     <!-- candle glow -->
     <div aria-hidden="true" style="position:absolute; left:50%; top:48%; width:min(120vw,760px); height:min(120vw,760px); transform:translate(-50%,-50%); pointer-events:none; background:radial-gradient(circle, rgba(214,168,96,0.22) 0%, rgba(176,141,87,0.10) 34%, transparent 66%); animation:flicker 5.5s ease-in-out infinite;"></div>
 
-    <div data-field="cover-label" style="position:relative; font-size:12px; letter-spacing:0.42em; text-transform:uppercase; color:var(--seal-light); opacity:0.9; margin-bottom:34px;">For Ava</div>
+    <div data-field="cover-label" data-cover-anim style="position:relative; font-size:12px; letter-spacing:0.42em; text-transform:uppercase; color:var(--seal-light); opacity:0.9; margin-bottom:34px;">For Ava</div>
 
     <!-- envelope -->
-    <div style="position:relative; perspective:1500px; z-index:4;">
+    <div data-cover-anim style="position:relative; perspective:1500px; z-index:4; animation-delay:0.14s;">
       <div id="envelope" style="position:relative; width:min(84vw, 452px); height:min(56vw, 300px); filter:drop-shadow(0 34px 46px rgba(0,0,0,0.6));">
 
         <!-- back panel -->
@@ -95,6 +112,7 @@
 
         <!-- wax seal -->
         <button id="wax-seal" type="button" aria-label="Open the letter" style="position:absolute; left:calc(50% - 47px); top:calc(56% - 47px); width:94px; height:94px; z-index:60; appearance:none; border:none; padding:0; cursor:pointer; background:transparent;">
+          <div id="seal-pulse" aria-hidden="true" style="position:absolute; left:50%; top:50%; width:94px; height:94px; z-index:-1; border-radius:50%; background:radial-gradient(circle, var(--seal-light) 0%, rgba(176,141,87,0.35) 45%, transparent 70%); transform:translate(-50%,-50%); animation:sealPulse 2.8s cubic-bezier(.25,.6,.3,1) infinite; pointer-events:none;"></div>
           <div id="seal-disc" style="position:relative; width:94px; height:94px; border-radius:49% 51% 52% 48% / 51% 49% 51% 49%; background:radial-gradient(circle at 36% 30%, var(--seal-light) 0%, var(--seal) 42%, var(--seal-dark) 100%); filter:url(#sealRidge); box-shadow:0 10px 18px rgba(0,0,0,0.5), 0 2px 3px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,246,225,0.5), inset 0 -8px 14px rgba(60,40,15,0.55); display:flex; align-items:center; justify-content:center;">
             <div id="seal-initials" style="font-family:'Cormorant Garamond',serif; font-weight:600; font-size:30px; letter-spacing:0.02em; color:rgba(70,48,20,0.9); text-shadow:0 1px 0 rgba(255,244,220,0.45), 0 -1px 1px rgba(40,26,8,0.6);"><span id="seal-i1" style="font-size:31px;">A</span><span style="font-size:19px; margin:0 3px; font-style:italic; vertical-align:2px;">&amp;</span><span id="seal-i2" style="font-size:31px;">J</span></div>
             <div aria-hidden="true" style="position:absolute; left:22%; top:16%; width:30%; height:24%; border-radius:50%; background:radial-gradient(circle, rgba(255,248,228,0.6), transparent 70%); filter:blur(2px);"></div>
@@ -103,9 +121,9 @@
       </div>
     </div>
 
-    <div data-field="cover-title" style="position:relative; margin-top:44px; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500; font-size:clamp(38px, 9vw, 66px); line-height:1; color:var(--paper); letter-spacing:0.01em;">Five years.</div>
+    <div data-field="cover-title" data-cover-anim style="position:relative; margin-top:44px; animation-delay:0.42s; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500; font-size:clamp(38px, 9vw, 66px); line-height:1; color:var(--paper); letter-spacing:0.01em;">Five years.</div>
 
-    <div id="seal-hint" style="position:relative; margin-top:30px; font-size:12.5px; letter-spacing:0.26em; text-transform:uppercase; color:rgba(243,234,216,0.42); transition:opacity 0.7s ease;">Tap the seal to open</div>
+    <div id="seal-hint" data-cover-anim style="position:relative; margin-top:30px; animation-delay:0.72s; font-size:12.5px; letter-spacing:0.26em; text-transform:uppercase; color:rgba(243,234,216,0.42); transition:opacity 0.7s ease;">Tap the seal to open</div>
   </section>
 
   <!-- ===================== OPENING LINE ===================== -->
@@ -443,8 +461,10 @@
     var letter = this.root.querySelector('#env-letter');
     var hint = this.root.querySelector('#seal-hint');
     var sealBtn = this.root.querySelector('#wax-seal');
+    var pulse = this.root.querySelector('#seal-pulse');
     sealBtn.style.pointerEvents = 'none';
     if (hint) hint.style.opacity = '0';
+    if (pulse) pulse.style.display = 'none';
 
     seal.style.animation = 'sealLift 0.85s cubic-bezier(.35,.1,.25,1) forwards';
     flap.style.animation = 'flapOpen 1.05s cubic-bezier(.4,.05,.2,1) 0.16s forwards';
@@ -467,7 +487,9 @@
     var letter = this.root.querySelector('#env-letter');
     var hint = this.root.querySelector('#seal-hint');
     this.root.querySelector('#wax-seal').style.pointerEvents = 'none';
+    var pulse = this.root.querySelector('#seal-pulse');
     if (hint) hint.style.opacity = '0';
+    if (pulse) pulse.style.display = 'none';
     seal.style.opacity = '0';
     flap.style.transform = 'rotateX(-169deg)';
     flap.style.zIndex = '4';
