@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>An Anniversary Letter — A Keepsake Website</title>
+<meta name="description" content="A private, hand-lettered anniversary keepsake website. Wax-sealed envelope, your story, your years, your photos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #1a140e; }
+  body { -webkit-font-smoothing: antialiased; }
+  [contenteditable]:focus { outline: none; }
+  @keyframes flicker {
+    0%, 100% { opacity: 0.9; transform: scale(1); }
+    45% { opacity: 1; transform: scale(1.03); }
+    70% { opacity: 0.82; transform: scale(0.99); }
+  }
+  @keyframes sealLift {
+    0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+    30% { transform: translateY(6px) scale(1.04) rotate(-2deg); opacity: 1; }
+    100% { transform: translateY(-190px) scale(1.16) rotate(-12deg); opacity: 0; }
+  }
+  @keyframes flapOpen {
+    0%   { transform: rotateX(0deg);   z-index: 30; }
+    44%  { transform: rotateX(-86deg); z-index: 30; }
+    56%  { transform: rotateX(-98deg); z-index: 4;  }
+    100% { transform: rotateX(-169deg);z-index: 4;  }
+  }
+  @keyframes letterRise {
+    0%   { transform: translateY(2%);  z-index: 40; }
+    100% { transform: translateY(-48%);z-index: 40; }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="deckle"><feTurbulence type="fractalNoise" baseFrequency="0.014 0.016" numOctaves="3" seed="8" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="deckleSoft"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.022" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="sealRidge"><feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="3" seed="11" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>
+
+<div id="root" style="--seal-light:#c9a879; --seal:#b08d57; --seal-dark:#7c5f34; --bg:#1f1912; --paper:#f3ead8; --paper-dim:#e6dabf; --ink:#4a3b2e; --sage:#8a9a7b; --pearl:#f4f0e6; position:relative; min-height:100vh; background:radial-gradient(150% 120% at 50% -10%, #2a2117 0%, #1f1912 42%, #17110b 100%); color:var(--paper); font-family:'EB Garamond', Georgia, serif; overflow-x:hidden;">
+
+  <!-- grain overlay -->
+  <div aria-hidden="true" style="position:fixed; inset:0; pointer-events:none; z-index:2; opacity:0.5; mix-blend-mode:soft-light; background-image:url(data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.8'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3C/filter%3E%3Crect%20width='160'%20height='160'%20filter='url%28%23n%29'/%3E%3C/svg%3E); background-size:160px 160px;"></div>
+  <!-- vignette -->
+  <div aria-hidden="true" style="position:fixed; inset:0; pointer-events:none; z-index:1; background:radial-gradient(120% 90% at 50% 30%, transparent 45%, rgba(10,7,4,0.55) 100%);"></div>
+
+  <!-- mode control -->
+  <div id="mode-ctrl" style="position:fixed; top:16px; right:16px; z-index:60; display:flex; gap:2px; padding:3px; border-radius:999px; background:rgba(31,25,18,0.72); border:1px solid rgba(176,141,87,0.35); backdrop-filter:blur(8px); box-shadow:0 6px 22px rgba(0,0,0,0.45); font-family:'EB Garamond',serif;">
+    <button id="btn-present" type="button" style="appearance:none; border:none; cursor:pointer; font-family:inherit; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; padding:7px 14px; border-radius:999px; background:transparent; color:rgba(243,234,216,0.62);">View</button>
+    <button id="btn-edit" type="button" style="appearance:none; border:none; cursor:pointer; font-family:inherit; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; padding:7px 14px; border-radius:999px; background:transparent; color:rgba(243,234,216,0.62);">Edit</button>
+  </div>
+
+  <!-- edit banner -->
+  <div id="edit-banner" data-edit-only style="display:none; position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:59; padding:8px 18px; border-radius:999px; background:rgba(31,25,18,0.8); border:1px solid rgba(176,141,87,0.3); backdrop-filter:blur(8px); color:rgba(243,234,216,0.8); font-size:12.5px; letter-spacing:0.04em; box-shadow:0 6px 22px rgba(0,0,0,0.4); text-align:center;">
+    Editing — tap any words to rewrite, tap a photo to replace. <span id="btn-reset" role="button" tabindex="0" style="cursor:pointer; margin-left:8px; padding-left:10px; border-left:1px solid rgba(176,141,87,0.35); color:var(--seal-light); letter-spacing:0.12em; text-transform:uppercase; font-size:11px;">Reset</span>
+  </div>
+
+  <!-- ===================== COVER ===================== -->
+  <section data-screen-label="Cover" style="position:relative; z-index:3; min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 24px; text-align:center;">
+    <!-- candle glow -->
+    <div aria-hidden="true" style="position:absolute; left:50%; top:48%; width:min(120vw,760px); height:min(120vw,760px); transform:translate(-50%,-50%); pointer-events:none; background:radial-gradient(circle, rgba(214,168,96,0.22) 0%, rgba(176,141,87,0.10) 34%, transparent 66%); animation:flicker 5.5s ease-in-out infinite;"></div>
+
+    <div data-field="cover-label" style="position:relative; font-size:12px; letter-spacing:0.42em; text-transform:uppercase; color:var(--seal-light); opacity:0.9; margin-bottom:34px;">For Ava</div>
+
+    <!-- envelope -->
+    <div style="position:relative; perspective:1500px; z-index:4;">
+      <div id="envelope" style="position:relative; width:min(84vw, 452px); height:min(56vw, 300px); filter:drop-shadow(0 34px 46px rgba(0,0,0,0.6));">
+
+        <!-- back panel -->
+        <div style="position:absolute; inset:0; z-index:1; border-radius:4px; background:linear-gradient(160deg,#d9cdaf,#c9bb98); filter:url(#deckleSoft);"></div>
+
+        <!-- letter inside -->
+        <div id="env-letter" style="position:absolute; left:6%; right:6%; top:8%; bottom:2%; z-index:2; border-radius:3px; background:linear-gradient(180deg,#f6efe0,#efe4cf); box-shadow:0 -2px 10px rgba(0,0,0,0.12) inset; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:16px;">
+          <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:15px; letter-spacing:0.14em; color:rgba(74,59,46,0.5);">our story</div>
+        </div>
+
+        <!-- front pocket -->
+        <div style="position:absolute; inset:0; z-index:10; border-radius:4px; background:linear-gradient(158deg,#f1e6cf 0%,#e7d9bb 100%); clip-path:polygon(0 17%, 50% 56%, 100% 17%, 100% 100%, 0 100%); box-shadow:0 1px 0 rgba(255,255,255,0.35) inset;"></div>
+        <!-- pocket seam shading -->
+        <div aria-hidden="true" style="position:absolute; inset:0; z-index:11; pointer-events:none; clip-path:polygon(0 17%, 50% 56%, 100% 17%, 100% 100%, 0 100%); background:linear-gradient(180deg, rgba(122,93,52,0.16), transparent 30%), radial-gradient(120% 80% at 50% 120%, rgba(122,93,52,0.14), transparent 55%);"></div>
+
+        <!-- flap -->
+        <div id="env-flap" style="position:absolute; inset:0; z-index:30; transform-origin:top center; will-change:transform; background:linear-gradient(180deg,#f3e8d2 0%,#e4d4b3 100%); clip-path:polygon(0 0, 100% 0, 50% 61%); box-shadow:0 8px 14px rgba(0,0,0,0.14);">
+          <div aria-hidden="true" style="position:absolute; inset:0; clip-path:polygon(0 0, 100% 0, 50% 61%); background:linear-gradient(180deg, rgba(255,255,255,0.28), transparent 40%);"></div>
+        </div>
+
+        <!-- wax seal -->
+        <button id="wax-seal" type="button" aria-label="Open the letter" style="position:absolute; left:calc(50% - 47px); top:calc(56% - 47px); width:94px; height:94px; z-index:60; appearance:none; border:none; padding:0; cursor:pointer; background:transparent;">
+          <div id="seal-disc" style="position:relative; width:94px; height:94px; border-radius:49% 51% 52% 48% / 51% 49% 51% 49%; background:radial-gradient(circle at 36% 30%, var(--seal-light) 0%, var(--seal) 42%, var(--seal-dark) 100%); filter:url(#sealRidge); box-shadow:0 10px 18px rgba(0,0,0,0.5), 0 2px 3px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,246,225,0.5), inset 0 -8px 14px rgba(60,40,15,0.55); display:flex; align-items:center; justify-content:center;">
+            <div id="seal-initials" style="font-family:'Cormorant Garamond',serif; font-weight:600; font-size:30px; letter-spacing:0.02em; color:rgba(70,48,20,0.9); text-shadow:0 1px 0 rgba(255,244,220,0.45), 0 -1px 1px rgba(40,26,8,0.6);"><span id="seal-i1" style="font-size:31px;">A</span><span style="font-size:19px; margin:0 3px; font-style:italic; vertical-align:2px;">&amp;</span><span id="seal-i2" style="font-size:31px;">J</span></div>
+            <div aria-hidden="true" style="position:absolute; left:22%; top:16%; width:30%; height:24%; border-radius:50%; background:radial-gradient(circle, rgba(255,248,228,0.6), transparent 70%); filter:blur(2px);"></div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div data-field="cover-title" style="position:relative; margin-top:44px; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500; font-size:clamp(38px, 9vw, 66px); line-height:1; color:var(--paper); letter-spacing:0.01em;">Five years.</div>
+
+    <div id="seal-hint" style="position:relative; margin-top:30px; font-size:12.5px; letter-spacing:0.26em; text-transform:uppercase; color:rgba(243,234,216,0.42); transition:opacity 0.7s ease;">Tap the seal to open</div>
+  </section>
+
+  <!-- ===================== OPENING LINE ===================== -->
+  <section id="story-start" data-screen-label="Opening" style="position:relative; z-index:3; min-height:92svh; display:flex; align-items:center; justify-content:center; padding:70px 26px;">
+    <div data-reveal style="opacity:0; transform:translateY(30px); transition:opacity 1.3s cubic-bezier(.2,.6,.2,1), transform 1.3s cubic-bezier(.2,.6,.2,1); max-width:660px; text-align:center;">
+      <svg width="44" height="60" viewBox="0 0 44 60" fill="none" stroke="#8a9a7b" stroke-width="1" opacity="0.6" style="display:block; margin:0 auto 30px;"><path d="M22 3 C22 20 22 42 22 58"/><path d="M22 15 C15 12 10 14 6 8"/><path d="M22 15 C29 12 34 14 38 8"/><path d="M22 28 C15 25 11 27 7 21"/><path d="M22 28 C29 25 33 27 37 21"/><path d="M22 41 C16 38 12 40 9 35"/><path d="M22 41 C28 38 32 40 35 35"/></svg>
+      <p data-field="open-line" style="margin:0; font-family:'Cormorant Garamond',serif; font-weight:500; font-size:clamp(26px, 5.4vw, 42px); line-height:1.34; color:var(--paper);">I've never been good at saying things out loud. So I wrote them down instead.</p>
+    </div>
+  </section>
+
+  <div aria-hidden="true" style="position:relative; z-index:3; width:120px; height:1px; margin:0 auto; background:linear-gradient(90deg,transparent,var(--seal),transparent); opacity:0.55;"></div>
+
+  <!-- ===================== CHAPTER ONE ===================== -->
+  <section data-screen-label="How we met" style="position:relative; z-index:3; min-height:96svh; display:flex; align-items:center; justify-content:center; padding:74px 26px;">
+    <div data-reveal style="opacity:0; transform:translateY(30px); transition:opacity 1.3s cubic-bezier(.2,.6,.2,1), transform 1.3s cubic-bezier(.2,.6,.2,1); max-width:600px;">
+      <div data-field="ch1-label" style="text-align:center; font-size:11.5px; letter-spacing:0.34em; text-transform:uppercase; color:var(--seal-light); margin-bottom:26px;">Chapter One — How We Met</div>
+      <p data-field="ch1-body" style="margin:0; font-family:'EB Garamond',serif; font-size:clamp(19px, 3.1vw, 24px); line-height:1.72; color:rgba(243,234,216,0.92); text-align:center; text-wrap:pretty;">The power went out at Sofia's dinner the night we met. Everyone else went home. You stayed — and we talked by candlelight until the sun took over the job. I've been trying to keep that conversation going ever since.</p>
+    </div>
+  </section>
+
+  <!-- ===================== TIMELINE ===================== -->
+  <section id="tl-section" data-screen-label="Timeline" style="position:relative; z-index:3; padding:96px 26px 108px;">
+    <div style="max-width:560px; margin:0 auto;">
+      <div data-reveal style="opacity:0; transform:translateY(30px); transition:opacity 1.2s ease, transform 1.2s ease; text-align:center; font-size:11.5px; letter-spacing:0.34em; text-transform:uppercase; color:var(--seal-light); margin-bottom:54px;">The Years</div>
+
+      <div style="position:relative; padding-left:44px;">
+        <!-- spine track -->
+        <div aria-hidden="true" style="position:absolute; left:11px; top:6px; bottom:6px; width:1.5px; background:rgba(176,141,87,0.2);"></div>
+        <!-- spine fill -->
+        <div id="spine-fill" aria-hidden="true" style="position:absolute; left:11px; top:6px; width:1.5px; height:0%; background:linear-gradient(180deg,var(--seal-light),var(--seal)); box-shadow:0 0 8px rgba(176,141,87,0.5);"></div>
+
+        <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease, transform 1s ease; position:relative; margin-bottom:46px;">
+          <div aria-hidden="true" style="position:absolute; left:-38px; top:5px; width:11px; height:11px; border-radius:50%; background:var(--seal); box-shadow:0 0 0 4px rgba(31,25,18,1), 0 0 10px rgba(176,141,87,0.6);"></div>
+          <div data-field="tl-y-1" style="font-family:'Cormorant Garamond',serif; font-size:24px; letter-spacing:0.18em; color:var(--seal-light); margin-bottom:7px;">2020</div>
+          <div data-field="tl-t-1" style="font-size:18px; line-height:1.6; color:rgba(243,234,216,0.9); font-style:italic; font-family:'Cormorant Garamond',serif;">a blackout, a dinner, a conversation with no ending.</div>
+        </div>
+
+        <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease, transform 1s ease; position:relative; margin-bottom:46px;">
+          <div aria-hidden="true" style="position:absolute; left:-38px; top:5px; width:11px; height:11px; border-radius:50%; background:var(--seal); box-shadow:0 0 0 4px rgba(31,25,18,1), 0 0 10px rgba(176,141,87,0.6);"></div>
+          <div data-field="tl-y-2" style="font-family:'Cormorant Garamond',serif; font-size:24px; letter-spacing:0.18em; color:var(--seal-light); margin-bottom:7px;">2021</div>
+          <div data-field="tl-t-2" style="font-size:18px; line-height:1.6; color:rgba(243,234,216,0.9); font-style:italic; font-family:'Cormorant Garamond',serif;">the tiny apartment, the radiator that sang all winter.</div>
+        </div>
+
+        <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease, transform 1s ease; position:relative; margin-bottom:46px;">
+          <div aria-hidden="true" style="position:absolute; left:-38px; top:5px; width:11px; height:11px; border-radius:50%; background:var(--seal); box-shadow:0 0 0 4px rgba(31,25,18,1), 0 0 10px rgba(176,141,87,0.6);"></div>
+          <div data-field="tl-y-3" style="font-family:'Cormorant Garamond',serif; font-size:24px; letter-spacing:0.18em; color:var(--seal-light); margin-bottom:7px;">2022</div>
+          <div data-field="tl-t-3" style="font-size:18px; line-height:1.6; color:rgba(243,234,216,0.9); font-style:italic; font-family:'Cormorant Garamond',serif;">Lisbon. The ferry we missed on purpose.</div>
+        </div>
+
+        <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease, transform 1s ease; position:relative; margin-bottom:46px;">
+          <div aria-hidden="true" style="position:absolute; left:-38px; top:5px; width:11px; height:11px; border-radius:50%; background:var(--seal); box-shadow:0 0 0 4px rgba(31,25,18,1), 0 0 10px rgba(176,141,87,0.6);"></div>
+          <div data-field="tl-y-4" style="font-family:'Cormorant Garamond',serif; font-size:24px; letter-spacing:0.18em; color:var(--seal-light); margin-bottom:7px;">2023</div>
+          <div data-field="tl-t-4" style="font-size:18px; line-height:1.6; color:rgba(243,234,216,0.9); font-style:italic; font-family:'Cormorant Garamond',serif;">"yes," on the kitchen floor, before I'd even found the ring.</div>
+        </div>
+
+        <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease, transform 1s ease; position:relative;">
+          <div aria-hidden="true" style="position:absolute; left:-38px; top:5px; width:11px; height:11px; border-radius:50%; background:var(--seal); box-shadow:0 0 0 4px rgba(31,25,18,1), 0 0 10px rgba(176,141,87,0.6);"></div>
+          <div data-field="tl-y-5" style="font-family:'Cormorant Garamond',serif; font-size:24px; letter-spacing:0.18em; color:var(--seal-light); margin-bottom:7px;">2024</div>
+          <div data-field="tl-t-5" style="font-size:18px; line-height:1.6; color:rgba(243,234,216,0.9); font-style:italic; font-family:'Cormorant Garamond',serif;">a hundred ordinary Tuesdays. Turns out those were the best part.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PHOTOS ===================== -->
+  <section data-screen-label="Photos" style="position:relative; z-index:3; padding:80px 26px 100px;">
+    <div style="max-width:860px; margin:0 auto; display:flex; flex-wrap:wrap; gap:52px 40px; justify-content:center;">
+
+      <figure data-reveal style="opacity:0; transform:translateY(30px); transition:opacity 1.2s ease, transform 1.2s ease; margin:0; width:min(88vw,320px);">
+        <div data-photo="ph1" style="position:relative; transform:rotate(-2deg); cursor:default;">
+          <div aria-hidden="true" style="position:absolute; inset:-14px; z-index:0; border-radius:3px; background:linear-gradient(160deg,#f1e6cf,#e3d5b5); filter:url(#deckle); box-shadow:0 26px 40px rgba(0,0,0,0.55);"></div>
+          <div style="position:relative; z-index:1; padding:14px 14px 0;">
+            <div style="position:relative; width:100%; aspect-ratio:4/5; overflow:hidden; background:linear-gradient(150deg,#cdbf9e,#b6a682); box-shadow:inset 0 0 0 1px rgba(122,93,52,0.4);">
+              <img data-photo-img alt="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none;">
+              <div data-photo-ph style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <span data-edit-only style="display:none; font-size:12.5px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(74,59,46,0.55);">Tap to add photo</span>
+              </div>
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply; opacity:0.34; background:linear-gradient(160deg, rgba(120,86,40,0.5), rgba(60,40,18,0.2)); "></div>
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; box-shadow:inset 0 0 46px rgba(40,26,10,0.5);"></div>
+            </div>
+          </div>
+          <input data-photo-input type="file" accept="image/*" style="display:none;">
+        </div>
+        <figcaption data-field="cap-1" style="margin-top:22px; text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; color:rgba(243,234,216,0.82); transform:rotate(-2deg);">This one. You didn't know I took it.</figcaption>
+      </figure>
+
+      <figure data-reveal style="opacity:0; transform:translateY(30px); transition:opacity 1.2s ease 0.12s, transform 1.2s ease 0.12s; margin:0; width:min(88vw,320px); margin-top:26px;">
+        <div data-photo="ph2" style="position:relative; transform:rotate(2.2deg); cursor:default;">
+          <div aria-hidden="true" style="position:absolute; inset:-14px; z-index:0; border-radius:3px; background:linear-gradient(160deg,#f1e6cf,#e3d5b5); filter:url(#deckle); box-shadow:0 26px 40px rgba(0,0,0,0.55);"></div>
+          <div style="position:relative; z-index:1; padding:14px 14px 0;">
+            <div style="position:relative; width:100%; aspect-ratio:4/5; overflow:hidden; background:linear-gradient(150deg,#cdbf9e,#b6a682); box-shadow:inset 0 0 0 1px rgba(122,93,52,0.4);">
+              <img data-photo-img alt="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none;">
+              <div data-photo-ph style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <span data-edit-only style="display:none; font-size:12.5px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(74,59,46,0.55);">Tap to add photo</span>
+              </div>
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply; opacity:0.34; background:linear-gradient(160deg, rgba(120,86,40,0.5), rgba(60,40,18,0.2));"></div>
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; box-shadow:inset 0 0 46px rgba(40,26,10,0.5);"></div>
+            </div>
+          </div>
+          <input data-photo-input type="file" accept="image/*" style="display:none;">
+        </div>
+        <figcaption data-field="cap-2" style="margin-top:22px; text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; color:rgba(243,234,216,0.82); transform:rotate(2.2deg);">The morning everything felt easy.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div aria-hidden="true" style="position:relative; z-index:3; width:120px; height:1px; margin:0 auto; background:linear-gradient(90deg,transparent,var(--seal),transparent); opacity:0.55;"></div>
+
+  <!-- ===================== CLOSING ===================== -->
+  <section data-screen-label="Closing" style="position:relative; z-index:3; min-height:100svh; display:flex; align-items:center; justify-content:center; padding:90px 28px 120px;">
+    <div data-reveal style="opacity:0; transform:translateY(30px); transition:opacity 1.4s ease, transform 1.4s ease; max-width:600px; text-align:center;">
+      <p data-field="closing-body" style="margin:0; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500; font-size:clamp(24px, 4.6vw, 36px); line-height:1.44; color:var(--paper); text-wrap:pretty;">I don't need another five years to be sure. But I'd like them anyway. Happy anniversary, my love.</p>
+      <div data-field="closing-sign" style="margin-top:26px; font-family:'Mrs Saint Delafield', cursive; font-size:clamp(56px, 13vw, 92px); line-height:0.9; color:var(--seal-light);">— James</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/*
+ * Keepsake — a standalone, self-contained anniversary letter website.
+ *
+ * Everything you'd normally change lives in the CONFIG block just below.
+ * All of the wording, the years, the photos and the signature can also be
+ * edited right in the browser: tap "Edit" (top-right), change anything, then
+ * tap "View". Your changes are saved on this device automatically.
+ */
+(function () {
+  "use strict";
+
+  var CONFIG = {
+    // Wax-seal color theme: 'gold' or 'oxblood' (deep red)
+    sealColor: 'gold',
+    // Which mode the page opens in: 'present' (read) or 'edit'
+    defaultMode: 'present',
+    // The two initials shown on the wax seal
+    initials: { left: 'A', right: 'J' },
+    // Storage key prefix — change this to keep multiple keepsakes separate
+    storageKey: 'keepsake_'
+  };
+
+  function Keepsake(root, config) {
+    this.root = root;
+    this.config = config;
+    this.LS = config.storageKey;
+    this.opened = false;
+    this.reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.mount();
+  }
+
+  Keepsake.prototype.mount = function () {
+    var root = this.root;
+
+    // seal color theme
+    if (this.config.sealColor === 'oxblood') {
+      root.style.setProperty('--seal-light', '#a8443a');
+      root.style.setProperty('--seal', '#7b2d26');
+      root.style.setProperty('--seal-dark', '#4f1a16');
+    }
+
+    // seal initials
+    var i1 = root.querySelector('#seal-i1');
+    var i2 = root.querySelector('#seal-i2');
+    if (i1 && this.config.initials && this.config.initials.left) i1.textContent = this.config.initials.left;
+    if (i2 && this.config.initials && this.config.initials.right) i2.textContent = this.config.initials.right;
+
+    this.hydrateText();
+    this.hydratePhotos();
+    this.wirePhotos();
+    this.wireFields();
+    this.setupReveal();
+    this.setupTimeline();
+    this.wireSeal();
+    this.wireMode();
+
+    // default mode: last used, else configured default
+    var mode = null;
+    try { mode = localStorage.getItem(this.LS + 'mode'); } catch (e) {}
+    if (!mode) mode = this.config.defaultMode || 'present';
+    this.setMode(mode, false);
+
+    if (this.reduce) {
+      this.openInstant();
+    } else {
+      this.lockScroll(true);
+    }
+  };
+
+  // ---------- persistence ----------
+  Keepsake.prototype.save = function (k, v) { try { localStorage.setItem(this.LS + k, v); } catch (e) {} };
+  Keepsake.prototype.load = function (k) { try { return localStorage.getItem(this.LS + k); } catch (e) { return null; } };
+
+  Keepsake.prototype.hydrateText = function () {
+    var self = this;
+    this.root.querySelectorAll('[data-field]').forEach(function (el) {
+      var v = self.load('t_' + el.getAttribute('data-field'));
+      if (v != null) el.innerHTML = v;
+    });
+  };
+  Keepsake.prototype.wireFields = function () {
+    var self = this;
+    this.root.querySelectorAll('[data-field]').forEach(function (el) {
+      el.addEventListener('input', function () {
+        self.save('t_' + el.getAttribute('data-field'), el.innerHTML);
+      });
+      el.addEventListener('paste', function (e) {
+        e.preventDefault();
+        var text = (e.clipboardData || window.clipboardData).getData('text');
+        document.execCommand('insertText', false, text);
+      });
+    });
+  };
+
+  Keepsake.prototype.hydratePhotos = function () {
+    var self = this;
+    this.root.querySelectorAll('[data-photo]').forEach(function (box) {
+      var id = box.getAttribute('data-photo');
+      var src = self.load('p_' + id);
+      if (src) self.applyPhoto(box, src);
+    });
+  };
+  Keepsake.prototype.applyPhoto = function (box, src) {
+    var img = box.querySelector('[data-photo-img]');
+    var ph = box.querySelector('[data-photo-ph]');
+    if (img) { img.src = src; img.style.display = 'block'; }
+    if (ph) ph.style.display = 'none';
+  };
+  Keepsake.prototype.wirePhotos = function () {
+    var self = this;
+    this.root.querySelectorAll('[data-photo]').forEach(function (box) {
+      var id = box.getAttribute('data-photo');
+      var input = box.querySelector('[data-photo-input]');
+      box.addEventListener('click', function () {
+        if (self.mode !== 'edit') return;
+        input.click();
+      });
+      input.addEventListener('change', function () {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          self.applyPhoto(box, reader.result);
+          self.save('p_' + id, reader.result);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  };
+
+  // ---------- mode ----------
+  Keepsake.prototype.wireMode = function () {
+    var self = this;
+    this.root.querySelector('#btn-edit').addEventListener('click', function () { self.setMode('edit', true); });
+    this.root.querySelector('#btn-present').addEventListener('click', function () { self.setMode('present', true); });
+    var reset = this.root.querySelector('#btn-reset');
+    if (reset) {
+      var doReset = function () {
+        if (!window.confirm('Reset this keepsake back to its original words and photos on this device?')) return;
+        try {
+          var keys = [];
+          for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (key && key.indexOf(self.LS) === 0) keys.push(key);
+          }
+          keys.forEach(function (k) { localStorage.removeItem(k); });
+        } catch (e) {}
+        window.location.reload();
+      };
+      reset.addEventListener('click', doReset);
+      reset.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doReset(); }
+      });
+    }
+  };
+  Keepsake.prototype.setMode = function (mode, persist) {
+    this.mode = mode;
+    if (persist) this.save('mode', mode);
+    var editing = mode === 'edit';
+
+    this.root.querySelectorAll('[data-field]').forEach(function (el) {
+      el.contentEditable = editing ? 'true' : 'false';
+      el.style.cursor = editing ? 'text' : '';
+      el.style.borderBottom = editing ? '1px dashed rgba(176,141,87,0.4)' : '';
+      el.style.paddingBottom = editing ? '2px' : '';
+      el.style.transition = 'border-color 0.3s ease';
+    });
+    this.root.querySelectorAll('[data-photo]').forEach(function (box) {
+      box.style.cursor = editing ? 'pointer' : 'default';
+    });
+    this.root.querySelectorAll('[data-edit-only]').forEach(function (el) {
+      el.style.display = editing ? '' : 'none';
+    });
+    // control active states
+    var on = function (b, active) {
+      b.style.background = active ? 'var(--seal)' : 'transparent';
+      b.style.color = active ? '#1f1912' : 'rgba(243,234,216,0.62)';
+    };
+    on(this.root.querySelector('#btn-edit'), editing);
+    on(this.root.querySelector('#btn-present'), !editing);
+    var ctrl = this.root.querySelector('#mode-ctrl');
+    ctrl.style.opacity = editing ? '1' : '0.55';
+  };
+
+  // ---------- envelope ----------
+  Keepsake.prototype.wireSeal = function () {
+    var self = this;
+    var seal = this.root.querySelector('#wax-seal');
+    seal.addEventListener('click', function (e) { e.stopPropagation(); self.open(); });
+    this._wheel = function (e) { if (!self.opened) { e.preventDefault(); self.open(); } };
+    this._touch = function (e) { if (!self.opened) { self.open(); } };
+    window.addEventListener('wheel', this._wheel, { passive: false });
+    window.addEventListener('touchmove', this._touch, { passive: true });
+    window.addEventListener('keydown', function (e) {
+      if (!self.opened && (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'Enter' || e.key === 'PageDown')) {
+        // don't hijack typing while editing
+        if (self.mode === 'edit') return;
+        self.open();
+      }
+    });
+  };
+  Keepsake.prototype.lockScroll = function (lock) {
+    document.documentElement.style.overflow = lock ? 'hidden' : '';
+    document.body.style.overflow = lock ? 'hidden' : '';
+  };
+  Keepsake.prototype.cleanupLockListeners = function () {
+    if (this._wheel) window.removeEventListener('wheel', this._wheel, { passive: false });
+    if (this._touch) window.removeEventListener('touchmove', this._touch, { passive: true });
+  };
+  Keepsake.prototype.open = function () {
+    if (this.opened) return;
+    this.opened = true;
+    this.cleanupLockListeners();
+    var seal = this.root.querySelector('#seal-disc');
+    var flap = this.root.querySelector('#env-flap');
+    var letter = this.root.querySelector('#env-letter');
+    var hint = this.root.querySelector('#seal-hint');
+    var sealBtn = this.root.querySelector('#wax-seal');
+    sealBtn.style.pointerEvents = 'none';
+    if (hint) hint.style.opacity = '0';
+
+    seal.style.animation = 'sealLift 0.85s cubic-bezier(.35,.1,.25,1) forwards';
+    flap.style.animation = 'flapOpen 1.05s cubic-bezier(.4,.05,.2,1) 0.16s forwards';
+    letter.style.animation = 'letterRise 1.15s cubic-bezier(.3,.5,.2,1) 0.5s forwards';
+
+    var self = this;
+    setTimeout(function () {
+      self.lockScroll(false);
+      var target = self.root.querySelector('#story-start');
+      if (target) {
+        var y = target.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 1250);
+  };
+  Keepsake.prototype.openInstant = function () {
+    this.opened = true;
+    var seal = this.root.querySelector('#seal-disc');
+    var flap = this.root.querySelector('#env-flap');
+    var letter = this.root.querySelector('#env-letter');
+    var hint = this.root.querySelector('#seal-hint');
+    this.root.querySelector('#wax-seal').style.pointerEvents = 'none';
+    if (hint) hint.style.opacity = '0';
+    seal.style.opacity = '0';
+    flap.style.transform = 'rotateX(-169deg)';
+    flap.style.zIndex = '4';
+    letter.style.transform = 'translateY(-48%)';
+    letter.style.zIndex = '40';
+    this.root.querySelectorAll('[data-reveal]').forEach(function (el) {
+      el.style.opacity = '1'; el.style.transform = 'translateY(0)';
+    });
+    var sf = this.root.querySelector('#spine-fill');
+    if (sf) sf.style.height = '100%';
+    this.lockScroll(false);
+  };
+
+  // ---------- reveals ----------
+  Keepsake.prototype.setupReveal = function () {
+    if (this.reduce) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+    this.root.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
+  };
+  Keepsake.prototype.setupTimeline = function () {
+    if (this.reduce) return;
+    var section = this.root.querySelector('#tl-section');
+    var fill = this.root.querySelector('#spine-fill');
+    if (!section || !fill) return;
+    var update = function () {
+      var rect = section.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var total = rect.height + vh * 0.4;
+      var scrolled = vh * 0.7 - rect.top;
+      var p = scrolled / total;
+      p = Math.max(0, Math.min(1, p));
+      fill.style.height = (p * 100) + '%';
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var root = document.getElementById('root');
+    if (root) new Keepsake(root, CONFIG);
+  });
+})();
+</script>
+</body>
+</html>
