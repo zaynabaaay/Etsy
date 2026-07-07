@@ -39,6 +39,8 @@ Tap **Edit**, then tap directly on any of these:
 | Chapter One | The section title and the "how we met" paragraph |
 | The Years | Five year markers and a one-line memory for each |
 | Photos | Two framed photos and their handwritten captions |
+| The Little Things | Five short lines — the small habits you love |
+| And Counting | The caption under the big "days together" number |
 | Closing | The final message and the signature |
 
 Photos and text are the whole story — most people never need the code below.
@@ -55,12 +57,16 @@ var CONFIG = {
   sealColor: 'gold',                 // 'gold' or 'oxblood' (deep red)
   defaultMode: 'present',            // 'present' (read) or 'edit'
   initials: { left: 'A', right: 'J' },// the two letters on the wax seal
+  startDate: '2020-06-14',           // powers the "days together" counter
   storageKey: 'keepsake_'            // keep separate copies from clashing
 };
 ```
 
 - **Seal color** — `'gold'` or `'oxblood'` for a deep oxblood-red wax.
 - **Seal initials** — the two letters pressed into the wax.
+- **Start date** — the day you're counting from (`YYYY-MM-DD`). The page
+  counts the days for you, live, every time it's opened. Set it to `''` to
+  hide the counter section entirely.
 - **Default mode** — leave as `'present'` so recipients see the sealed
   envelope first.
 

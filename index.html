@@ -49,9 +49,28 @@
   @media (hover: hover) {
     #wax-seal:hover { transform: scale(1.05); }
   }
+  /* Candlelit dust motes drifting up the cover */
+  @keyframes moteDrift {
+    0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+    12%  { opacity: var(--mote-o, 0.5); }
+    82%  { opacity: var(--mote-o, 0.5); }
+    100% { transform: translate3d(var(--mote-sway, 12px), -52vh, 0); opacity: 0; }
+  }
+  .mote {
+    position: absolute; border-radius: 50%; pointer-events: none; opacity: 0;
+    background: radial-gradient(circle, rgba(222,184,116,0.9) 0%, rgba(222,184,116,0) 70%);
+    animation: moteDrift linear infinite; will-change: transform, opacity;
+  }
+  /* Photos settle straight and lift slightly under the cursor */
+  [data-photo] { transition: transform 0.7s cubic-bezier(.2,.6,.2,1); }
+  @media (hover: hover) {
+    figure:hover [data-photo] { transform: rotate(0deg) translateY(-6px) !important; }
+  }
   @media (prefers-reduced-motion: reduce) {
     #seal-pulse { animation: none; opacity: 0; }
     [data-cover-anim] { animation: none; }
+    .mote { display: none; }
+    [data-photo] { transition: none; }
   }
 </style>
 </head>
@@ -64,6 +83,9 @@
 </defs></svg>
 
 <div id="root" style="--seal-light:#c9a879; --seal:#b08d57; --seal-dark:#7c5f34; --bg:#1f1912; --paper:#f3ead8; --paper-dim:#e6dabf; --ink:#4a3b2e; --sage:#8a9a7b; --pearl:#f4f0e6; position:relative; min-height:100vh; background:radial-gradient(150% 120% at 50% -10%, #2a2117 0%, #1f1912 42%, #17110b 100%); color:var(--paper); font-family:'EB Garamond', Georgia, serif; overflow-x:hidden;">
+
+  <!-- gold thread: reading progress -->
+  <div id="progress" aria-hidden="true" style="position:fixed; top:0; left:0; height:2px; width:0%; z-index:70; pointer-events:none; background:linear-gradient(90deg, var(--seal-dark), var(--seal) 60%, var(--seal-light)); box-shadow:0 0 10px rgba(176,141,87,0.55);"></div>
 
   <!-- grain overlay -->
   <div aria-hidden="true" style="position:fixed; inset:0; pointer-events:none; z-index:2; opacity:0.5; mix-blend-mode:soft-light; background-image:url(data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.8'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3C/filter%3E%3Crect%20width='160'%20height='160'%20filter='url%28%23n%29'/%3E%3C/svg%3E); background-size:160px 160px;"></div>
@@ -85,6 +107,8 @@
   <section data-screen-label="Cover" style="position:relative; z-index:3; min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 24px; text-align:center;">
     <!-- candle glow -->
     <div aria-hidden="true" style="position:absolute; left:50%; top:48%; width:min(120vw,760px); height:min(120vw,760px); transform:translate(-50%,-50%); pointer-events:none; background:radial-gradient(circle, rgba(214,168,96,0.22) 0%, rgba(176,141,87,0.10) 34%, transparent 66%); animation:flicker 5.5s ease-in-out infinite;"></div>
+    <!-- drifting candle dust -->
+    <div id="mote-layer" aria-hidden="true" style="position:absolute; inset:0; overflow:hidden; pointer-events:none;"></div>
 
     <div data-field="cover-label" data-cover-anim style="position:relative; font-size:12px; letter-spacing:0.42em; text-transform:uppercase; color:var(--seal-light); opacity:0.9; margin-bottom:34px;">For Ava</div>
 
@@ -230,6 +254,47 @@
     </div>
   </section>
 
+  <!-- ===================== THE LITTLE THINGS ===================== -->
+  <section data-screen-label="The little things" style="position:relative; z-index:3; padding:90px 26px 96px;">
+    <div style="max-width:540px; margin:0 auto; text-align:center;">
+      <div data-reveal style="opacity:0; transform:translateY(30px); transition:opacity 1.2s ease, transform 1.2s ease; font-size:11.5px; letter-spacing:0.34em; text-transform:uppercase; color:var(--seal-light); margin-bottom:44px;">The Little Things</div>
+
+      <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease 0.05s, transform 1s ease 0.05s; margin-bottom:30px;">
+        <div aria-hidden="true" style="font-size:12px; letter-spacing:0.3em; color:rgba(176,141,87,0.7); margin-bottom:8px;">I</div>
+        <div data-field="lt-1" style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(19px, 3.4vw, 23px); line-height:1.55; color:rgba(243,234,216,0.9);">the way you read the last page of a book first, "just in case."</div>
+      </div>
+
+      <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease 0.1s, transform 1s ease 0.1s; margin-bottom:30px;">
+        <div aria-hidden="true" style="font-size:12px; letter-spacing:0.3em; color:rgba(176,141,87,0.7); margin-bottom:8px;">II</div>
+        <div data-field="lt-2" style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(19px, 3.4vw, 23px); line-height:1.55; color:rgba(243,234,216,0.9);">your laugh from the other room, at something you'll never explain.</div>
+      </div>
+
+      <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease 0.15s, transform 1s ease 0.15s; margin-bottom:30px;">
+        <div aria-hidden="true" style="font-size:12px; letter-spacing:0.3em; color:rgba(176,141,87,0.7); margin-bottom:8px;">III</div>
+        <div data-field="lt-3" style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(19px, 3.4vw, 23px); line-height:1.55; color:rgba(243,234,216,0.9);">two coffees, one order — you never have to ask anymore.</div>
+      </div>
+
+      <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease 0.2s, transform 1s ease 0.2s; margin-bottom:30px;">
+        <div aria-hidden="true" style="font-size:12px; letter-spacing:0.3em; color:rgba(176,141,87,0.7); margin-bottom:8px;">IV</div>
+        <div data-field="lt-4" style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(19px, 3.4vw, 23px); line-height:1.55; color:rgba(243,234,216,0.9);">how you defend your terrible movies like they're family.</div>
+      </div>
+
+      <div data-reveal style="opacity:0; transform:translateY(24px); transition:opacity 1s ease 0.25s, transform 1s ease 0.25s;">
+        <div aria-hidden="true" style="font-size:12px; letter-spacing:0.3em; color:rgba(176,141,87,0.7); margin-bottom:8px;">V</div>
+        <div data-field="lt-5" style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(19px, 3.4vw, 23px); line-height:1.55; color:rgba(243,234,216,0.9);">the hand you reach across the seat without looking. Every time.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COUNTED IN DAYS ===================== -->
+  <section id="days-section" data-screen-label="Counted in days" style="position:relative; z-index:3; min-height:72svh; display:flex; align-items:center; justify-content:center; padding:80px 26px;">
+    <div data-reveal style="opacity:0; transform:translateY(30px); transition:opacity 1.3s ease, transform 1.3s ease; text-align:center;">
+      <div style="font-size:11.5px; letter-spacing:0.34em; text-transform:uppercase; color:var(--seal-light); margin-bottom:20px;">And counting</div>
+      <div id="days-count" style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:clamp(72px, 19vw, 132px); line-height:1; color:var(--paper); font-variant-numeric:tabular-nums; text-shadow:0 0 44px rgba(214,168,96,0.25);">0</div>
+      <div data-field="days-caption" style="margin-top:18px; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(18px, 3.4vw, 23px); color:rgba(243,234,216,0.78);">days of us — and I'd take every one of them again.</div>
+    </div>
+  </section>
+
   <div aria-hidden="true" style="position:relative; z-index:3; width:120px; height:1px; margin:0 auto; background:linear-gradient(90deg,transparent,var(--seal),transparent); opacity:0.55;"></div>
 
   <!-- ===================== CLOSING ===================== -->
@@ -261,6 +326,9 @@
     defaultMode: 'present',
     // The two initials shown on the wax seal
     initials: { left: 'A', right: 'J' },
+    // The day it all started (YYYY-MM-DD) — powers the "counted in days"
+    // number. Leave it as '' to hide that section entirely.
+    startDate: '2020-06-14',
     // Storage key prefix — change this to keep multiple keepsakes separate
     storageKey: 'keepsake_'
   };
@@ -296,6 +364,9 @@
     this.wireFields();
     this.setupReveal();
     this.setupTimeline();
+    this.setupMotes();
+    this.setupProgress();
+    this.setupDays();
     this.wireSeal();
     this.wireMode();
 
@@ -534,6 +605,73 @@
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     update();
+  };
+
+  // ---------- ambiance & interactive extras ----------
+  Keepsake.prototype.setupMotes = function () {
+    if (this.reduce) return;
+    var layer = this.root.querySelector('#mote-layer');
+    if (!layer) return;
+    for (var i = 0; i < 14; i++) {
+      var m = document.createElement('span');
+      m.className = 'mote';
+      var size = 2 + Math.random() * 3.5;
+      m.style.width = size + 'px';
+      m.style.height = size + 'px';
+      m.style.left = (4 + Math.random() * 92) + '%';
+      m.style.bottom = (Math.random() * 45) + '%';
+      m.style.setProperty('--mote-o', (0.25 + Math.random() * 0.45).toFixed(2));
+      m.style.setProperty('--mote-sway', (Math.random() * 56 - 28).toFixed(0) + 'px');
+      m.style.animationDuration = (9 + Math.random() * 10).toFixed(1) + 's';
+      m.style.animationDelay = (-Math.random() * 18).toFixed(1) + 's';
+      layer.appendChild(m);
+    }
+  };
+
+  Keepsake.prototype.setupProgress = function () {
+    var bar = this.root.querySelector('#progress');
+    if (!bar) return;
+    var update = function () {
+      var doc = document.documentElement;
+      var max = doc.scrollHeight - window.innerHeight;
+      var p = max > 0 ? window.pageYOffset / max : 0;
+      bar.style.width = (Math.max(0, Math.min(1, p)) * 100) + '%';
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  };
+
+  Keepsake.prototype.setupDays = function () {
+    var section = this.root.querySelector('#days-section');
+    var el = this.root.querySelector('#days-count');
+    if (!section || !el) return;
+    var days = NaN;
+    if (this.config.startDate) {
+      var start = new Date(this.config.startDate + 'T00:00:00');
+      days = Math.floor((Date.now() - start.getTime()) / 86400000);
+    }
+    if (isNaN(days) || days < 1) { section.style.display = 'none'; return; }
+    var fmt = function (n) { return n.toLocaleString('en-US'); };
+    if (this.reduce) { el.textContent = fmt(days); return; }
+    var started = false;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting || started) return;
+        started = true;
+        io.disconnect();
+        var t0 = null, dur = 1800;
+        var step = function (t) {
+          if (t0 == null) t0 = t;
+          var p = Math.min(1, (t - t0) / dur);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = fmt(Math.round(days * eased));
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.5 });
+    io.observe(el);
   };
 
   document.addEventListener('DOMContentLoaded', function () {

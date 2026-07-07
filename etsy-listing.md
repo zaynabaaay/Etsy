@@ -32,6 +32,8 @@ your story unfolds in warm candlelight:
 • "How we met"
 • A timeline of your years, revealed as you scroll
 • Two framed photos with handwritten captions
+• "The little things" — five small habits you love about them
+• A live "days together" counter that counts up as it scrolls into view
 • A closing message and your signature
 
 WHAT YOU GET
@@ -48,7 +50,8 @@ HOW IT WORKS
 FULLY YOURS TO CUSTOMIZE
 • Every word and both photos are editable — no coding needed
 • Choose a gold or deep oxblood-red wax seal
-• Set the two initials on the seal
+• Set the two initials on the seal and your "day one" date
+• The days-together number updates itself, every time it's opened
 • Works beautifully on phones, tablets, and computers
 
 PERFECT FOR
