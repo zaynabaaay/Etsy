@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>June &amp; Theo — Ten Years · Perihelion</title>
+<meta name="description" content="A love story, told in light. A digital keepsake by Studio Vesper.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:      #05060d;
+    --star:     #e9e5d8;
+    --star-dim: #a8a698;
+    --gold:     #d4af7a;
+    --rose:     #e8a087;
+    --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --sans:  'Inter', 'Helvetica Neue', Arial, sans-serif;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ background:var(--ink); }
+  body{
+    background:var(--ink);
+    color:var(--star);
+    font-family:var(--serif);
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  ::selection{ background:rgba(212,175,122,.25); }
+
+  /* ---------- the sky ---------- */
+  #sky{
+    position:fixed; inset:0;
+    width:100vw; height:100vh;
+    display:block;
+    z-index:0;
+  }
+  /* film grain + vignette */
+  .grain{
+    position:fixed; inset:-50%;
+    width:200%; height:200%;
+    z-index:3; pointer-events:none;
+    opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .vignette{
+    position:fixed; inset:0; z-index:2; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(2,3,8,.55) 100%);
+  }
+
+  /* ---------- fixed chrome ---------- */
+  .reel{
+    position:fixed; left:24px; bottom:22px; z-index:5;
+    font-family:var(--sans); font-weight:300;
+    font-size:.62rem; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--star-dim); opacity:0;
+    transition:opacity 1.4s ease;
+    pointer-events:none;
+  }
+  .reel.on{ opacity:.5; }
+
+  #soundBtn{
+    position:fixed; right:24px; top:22px; z-index:6;
+    font-family:var(--sans); font-weight:300;
+    font-size:.62rem; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--star-dim);
+    background:none; border:none; cursor:pointer;
+    padding:8px 4px; opacity:.55;
+    transition:opacity .6s ease, color .6s ease;
+  }
+  #soundBtn:hover{ opacity:1; }
+  #soundBtn .dot{
+    display:inline-block; width:5px; height:5px; border-radius:50%;
+    border:1px solid var(--star-dim); margin-right:8px;
+    vertical-align:1px;
+    transition:background .6s ease, border-color .6s ease;
+  }
+  #soundBtn.playing{ color:var(--gold); }
+  #soundBtn.playing .dot{ background:var(--gold); border-color:var(--gold); }
+
+  /* ---------- content ---------- */
+  main{ position:relative; z-index:4; }
+
+  section{ position:relative; }
+
+  .beat{
+    min-height:62vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:0 24px; text-align:center;
+  }
+  .beat p{
+    max-width:36ch;
+    font-size:clamp(1.15rem, 2.1vw, 1.5rem);
+    line-height:1.75;
+    font-weight:400;
+    color:var(--star);
+    text-shadow:0 0 24px rgba(5,6,13,.9);
+  }
+  .beat p em{ font-style:italic; color:var(--gold); }
+  .space-s{ height:22vh; } .space-m{ height:40vh; } .space-l{ height:70vh; }
+
+  /* text reveal */
+  .rv{
+    opacity:0; transform:translateY(14px);
+    filter:blur(6px);
+    transition:opacity 1.6s ease, transform 1.6s cubic-bezier(.22,.6,.2,1), filter 1.6s ease;
+  }
+  .rv.on{ opacity:1; transform:none; filter:blur(0); }
+  .rv.slow{ transition-duration:2.8s; }
+
+  /* chapter headers */
+  .chapter-head{
+    min-height:80vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:0 24px;
+  }
+  .ch-label{
+    font-family:var(--sans); font-weight:300;
+    font-size:.66rem; letter-spacing:.42em; text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:26px;
+  }
+  .ch-title{
+    font-size:clamp(2rem, 5vw, 3.4rem);
+    font-weight:500; font-style:italic;
+    letter-spacing:.02em;
+  }
+  .ch-rule{
+    width:1px; height:56px; margin-top:34px;
+    background:linear-gradient(to bottom, rgba(212,175,122,.6), transparent);
+  }
+
+  /* ---------- prologue ---------- */
+  #prologue{
+    height:130vh;
+  }
+  .pro-stage{
+    position:sticky; top:0; height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:0 24px;
+  }
+  .pro-line{
+    font-size:clamp(1.3rem, 2.6vw, 1.9rem);
+    font-weight:400; line-height:1.6;
+    opacity:0; transform:translateY(10px); filter:blur(5px);
+  }
+  .pro-line.two{ font-style:italic; color:var(--gold); margin-top:14px; }
+  .loaded .pro-line.one{ animation:breathe 2.6s ease .8s forwards; }
+  .loaded .pro-line.two{ animation:breathe 2.6s ease 3.2s forwards; }
+  @keyframes breathe{ to{ opacity:1; transform:none; filter:blur(0);} }
+
+  .cue{
+    position:absolute; bottom:44px; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    opacity:0; transition:opacity 1.2s ease;
+  }
+  .loaded .cue{ animation:cueIn 1.8s ease 5.4s forwards; }
+  @keyframes cueIn{ to{ opacity:.6; } }
+  .cue.gone{ animation:none; opacity:0 !important; }
+  .cue span{
+    font-family:var(--sans); font-weight:300;
+    font-size:.62rem; letter-spacing:.4em; text-transform:uppercase;
+    color:var(--star-dim);
+  }
+  .cue .thread{
+    width:1px; height:42px; overflow:hidden; position:relative;
+    background:rgba(233,229,216,.12);
+  }
+  .cue .thread::after{
+    content:''; position:absolute; left:0; top:-50%;
+    width:1px; height:50%;
+    background:linear-gradient(to bottom, transparent, var(--star));
+    animation:drip 2.6s cubic-bezier(.4,0,.3,1) infinite;
+  }
+  @keyframes drip{ 0%{ top:-50%; } 70%,100%{ top:110%; } }
+
+  /* ---------- perihelion date ---------- */
+  .definition{
+    font-family:var(--sans); font-weight:300;
+    font-size:clamp(.68rem, 1.4vw, .8rem);
+    letter-spacing:.18em; color:var(--star-dim);
+    line-height:2;
+  }
+  .definition i{ color:var(--gold); font-style:normal; }
+  .bigdate{
+    min-height:90vh;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:0 16px;
+  }
+  .bigdate h2{
+    font-size:clamp(2.6rem, 8.5vw, 6.4rem);
+    font-weight:500;
+    letter-spacing:.16em;
+    color:var(--star);
+    opacity:0; filter:blur(8px);
+    transition:opacity 2.4s ease, letter-spacing 2.8s cubic-bezier(.2,.6,.2,1), filter 2.4s ease;
+    text-shadow:0 0 60px rgba(232,160,135,.25);
+    white-space:nowrap;
+  }
+  .bigdate h2.on{ opacity:1; letter-spacing:.045em; filter:blur(0); }
+
+  /* ---------- memories ---------- */
+  .memory{
+    min-height:88vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:0 24px;
+  }
+  .memory .m-rule{
+    width:1px; height:44px; margin-bottom:26px;
+    background:linear-gradient(to bottom, transparent, rgba(212,175,122,.7));
+  }
+  .memory .m-year{
+    font-family:var(--sans); font-weight:300;
+    font-size:.64rem; letter-spacing:.42em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:20px;
+  }
+  .memory h3{
+    font-size:clamp(1.6rem, 3.6vw, 2.5rem);
+    font-weight:500; font-style:italic;
+    margin-bottom:18px; letter-spacing:.01em;
+  }
+  .memory .m-cap{
+    max-width:34ch;
+    font-size:clamp(1rem, 1.7vw, 1.18rem);
+    line-height:1.8; color:var(--star-dim);
+  }
+
+  /* ---------- silence ---------- */
+  #silence .beat p{
+    font-size:clamp(1.05rem, 1.9vw, 1.35rem);
+    color:var(--star-dim);
+  }
+  #silence .whisper p{
+    font-style:italic; color:var(--gold);
+    font-size:clamp(1rem, 1.7vw, 1.2rem);
+  }
+
+  /* ---------- finale ---------- */
+  #tonight .names{
+    font-size:clamp(2.6rem, 7vw, 5.2rem);
+    font-weight:500; letter-spacing:.03em;
+    text-align:center;
+  }
+  #tonight .names .amp{ font-style:italic; color:var(--gold); padding:0 .12em; }
+  #tonight .years-label{
+    font-family:var(--sans); font-weight:300;
+    font-size:.68rem; letter-spacing:.5em; text-transform:uppercase;
+    color:var(--star-dim); margin-top:30px; text-align:center;
+  }
+  .dedication p{
+    font-style:italic;
+    color:var(--star);
+  }
+
+  /* ---------- coda ---------- */
+  #coda{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:60px; padding:0 24px; }
+  #again{
+    font-family:var(--serif); font-style:italic;
+    font-size:clamp(1.1rem, 2vw, 1.35rem);
+    color:var(--star-dim);
+    background:none; border:none; cursor:pointer;
+    padding:12px 20px;
+    transition:color 1s ease;
+  }
+  #again:hover{ color:var(--gold); }
+  #again .u{
+    display:block; width:100%; height:1px; margin-top:8px;
+    background:linear-gradient(to right, transparent, rgba(212,175,122,.5), transparent);
+    transform:scaleX(.4); opacity:.5;
+    transition:transform 1.2s cubic-bezier(.2,.7,.2,1), opacity 1.2s ease;
+  }
+  #again:hover .u{ transform:scaleX(1); opacity:1; }
+  .credit{
+    font-family:var(--sans); font-weight:300;
+    font-size:.58rem; letter-spacing:.4em; text-transform:uppercase;
+    color:rgba(168,166,152,.45);
+    text-align:center; line-height:2.4;
+  }
+
+  noscript{ display:block; padding:40vh 24px; text-align:center; font-size:1.2rem; }
+
+  @media (prefers-reduced-motion: reduce){
+    .rv, .bigdate h2{ transition:none; }
+    .pro-line, .cue{ animation-duration:.01s !important; animation-delay:0s !important; }
+    .cue .thread::after{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="reel" id="reel" aria-hidden="true"></div>
+<button id="soundBtn" aria-pressed="false"><span class="dot"></span><span class="lbl">sound</span></button>
+
+<main>
+<noscript><p>Perihelion is a story told in light — it needs JavaScript to draw its sky.</p></noscript>
+
+<!-- ═══════════ PROLOGUE ═══════════ -->
+<section id="prologue" data-ch="">
+  <div class="pro-stage">
+    <p class="pro-line one">Every night sky holds a story.</p>
+    <p class="pro-line two">This one holds yours.</p>
+    <div class="cue" id="cue">
+      <div class="thread"></div>
+      <span>scroll, slowly</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ I · TWO SKIES ═══════════ -->
+<section id="ch1" data-ch="I · Two Skies">
+  <div class="chapter-head">
+    <div class="ch-label rv">Chapter One</div>
+    <h2 class="ch-title rv">Two Skies</h2>
+    <div class="ch-rule rv"></div>
+  </div>
+
+  <div class="beat"><p class="rv">Before there was an us, there were two lights that had never heard each other&rsquo;s names.</p></div>
+  <div class="space-m"></div>
+  <div class="beat"><p class="rv">One, over Maple Street, stayed on too late &mdash; reading past the sensible hour, always <em>one more chapter</em>.</p></div>
+  <div class="space-m"></div>
+  <div class="beat"><p class="rv">The other, across the river, kept guessing the endings of films out loud &mdash; to an apartment that never answered back.</p></div>
+  <div class="space-m"></div>
+  <div class="beat"><p class="rv">Nine miles apart. A thousand near-misses. The same rain on both their windows.</p></div>
+  <div class="space-m"></div>
+  <div class="beat"><p class="rv slow">They did not know it yet, but the sky was already rearranging.</p></div>
+  <div class="space-l"></div>
+</section>
+
+<!-- ═══════════ II · PERIHELION ═══════════ -->
+<section id="ch2" data-ch="II · Perihelion">
+  <div class="chapter-head">
+    <div class="ch-label rv">Chapter Two</div>
+    <h2 class="ch-title rv">Perihelion</h2>
+    <p class="definition rv" style="margin-top:26px">per&middot;i&middot;he&middot;li&middot;on &mdash; <i>the point at which two bodies are closest</i></p>
+  </div>
+
+  <div class="space-s"></div>
+  <div class="bigdate" id="meet-flare"><h2 id="dateReveal">October 14, 2015</h2></div>
+  <div class="space-s"></div>
+
+  <div class="beat"><p class="rv">A bookshop with a leaking roof. The rain came down like it had somewhere to be.</p></div>
+  <div class="beat"><p class="rv">Neither of them did.</p></div>
+  <div class="space-m"></div>
+  <div class="beat"><p class="rv">She was holding the last copy. He was holding the same book &mdash; older, annotated, falling apart at the spine.</p></div>
+  <div class="space-m"></div>
+  <div class="beat"><p class="rv">&ldquo;Mine has notes,&rdquo; he said. It wasn&rsquo;t a great line. It didn&rsquo;t need to be.</p></div>
+  <div class="space-m"></div>
+  <div class="beat"><p class="rv slow">The sky warmed that night. It never fully cooled again.</p></div>
+  <div class="space-l"></div>
+</section>
+
+<!-- ═══════════ III · THE SLOW DANCE ═══════════ -->
+<section id="ch3" data-ch="III · The Slow Dance">
+  <div class="chapter-head">
+    <div class="ch-label rv">Chapter Three</div>
+    <h2 class="ch-title rv">The Slow Dance</h2>
+    <div class="ch-rule rv"></div>
+  </div>
+  <div class="beat"><p class="rv">What follows is not everything. It is what the sky remembers.</p></div>
+  <div class="space-m"></div>
+  <div id="memories"><!-- memory beats are written here from STORY --></div>
+  <div class="space-l"></div>
+</section>
+
+<!-- ═══════════ IV · WEATHER ═══════════ -->
+<section id="ch4" data-ch="IV · Weather">
+  <div class="chapter-head">
+    <div class="ch-label rv">Chapter Four</div>
+    <h2 class="ch-title rv">Weather</h2>
+    <div class="ch-rule rv"></div>
+  </div>
+
+  <div class="beat"><p class="rv">No sky stays clear for ten years.</p></div>
+  <div class="space-m"></div>
+  <div class="beat"><p class="rv">There was the year the phone kept ringing with bad news. The winter that would not end. Months when the money was thin and the patience thinner.</p></div>
+  <div class="space-m"></div>
+  <div class="beat" id="storm-peak"><p class="rv">The lights dimmed.</p></div>
+  <div class="space-l"></div>
+  <div class="beat"><p class="rv slow">They did not go out.</p></div>
+  <div class="space-m"></div>
+  <div class="beat"><p class="rv">Look &mdash; you can still see them. Holding.</p></div>
+  <div class="space-l"></div>
+</section>
+
+<!-- ═══════════ THE SILENCE ═══════════ -->
+<section id="silence" data-ch="">
+  <div class="space-l"></div>
+  <div class="space-l"></div>
+  <div class="beat"><p class="rv slow">Some nights were nothing at all. A lamp. A book. Two people breathing in the same quiet.</p></div>
+  <div class="space-m"></div>
+  <div class="beat whisper"><p class="rv slow">Those were the best ones.</p></div>
+  <div class="space-l"></div>
+  <div class="space-l"></div>
+</section>
+
+<!-- ═══════════ V · TONIGHT ═══════════ -->
+<section id="tonight" data-ch="V · Tonight">
+  <div class="chapter-head">
+    <div class="ch-label rv">Chapter Five</div>
+    <h2 class="ch-title rv">Tonight</h2>
+    <div class="ch-rule rv"></div>
+  </div>
+
+  <div class="beat"><p class="rv">Point at ten years of nights, and this is what you&rsquo;d draw.</p></div>
+  <div class="space-l" id="constellation-start"></div>
+  <div class="space-l"></div>
+  <div class="beat" id="constellation-end"><p class="rv slow">Not a straight line. <em>A constellation.</em></p></div>
+  <div class="space-l"></div>
+
+  <div class="beat" style="flex-direction:column">
+    <h2 class="names rv" id="namesEl"></h2>
+    <div class="years-label rv" id="yearsEl"></div>
+  </div>
+  <div class="space-m"></div>
+  <div class="beat dedication"><p class="rv slow" id="dedicationEl"></p></div>
+  <div class="space-m"></div>
+</section>
+
+<!-- ═══════════ CODA ═══════════ -->
+<section id="coda" data-ch="">
+  <button id="again" class="rv">begin again<span class="u"></span></button>
+  <div class="credit rv">Perihelion<br>a keepsake by Studio Vesper</div>
+</section>
+
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   YOUR STORY — this is the only part you need to edit.
+   ═══════════════════════════════════════════════════════════════ */
+const STORY = {
+  names: ['June', 'Theo'],
+  yearsLabel: 'Ten Years · 2015 — 2025',
+  dedication: 'For every orbit so far, and every one still to come. Happy anniversary.',
+  memories: [
+    { year:'2015', title:'The coffee that went cold',            cap:'Nobody drank it. There was too much to say.' },
+    { year:'2016', title:'The wrong train',                      cap:'Four stops past hers, on purpose, both pretending not to notice.' },
+    { year:'2017', title:'The apartment with the crooked floor', cap:'Everything rolled to the same corner of the room. Eventually, so did they.' },
+    { year:'2018', title:'The kitchen dance',                    cap:'No music. Or none that anyone else could have heard.' },
+    { year:'2019', title:'The yes',                              cap:'Asked badly, at the wrong moment, in exactly the right life.' },
+    { year:'2021', title:'The vows',                             cap:'Forty guests, one borrowed suit, and — of course — rain again.' },
+    { year:'2023', title:'The small tyrant',                     cap:'A dog with a large opinion of himself. The house voted; the humans lost.' },
+  ],
+};
+
+/* ═══════════ setup ═══════════ */
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $  = s => document.querySelector(s);
+
+document.getElementById('namesEl').innerHTML =
+  STORY.names[0] + '<span class="amp">&amp;</span>' + STORY.names[1];
+document.getElementById('yearsEl').textContent = STORY.yearsLabel;
+document.getElementById('dedicationEl').textContent = STORY.dedication;
+
+const memWrap = document.getElementById('memories');
+STORY.memories.forEach((m, i) => {
+  const d = document.createElement('div');
+  d.className = 'memory';
+  d.id = 'mem-' + i;
+  d.innerHTML =
+    '<div class="m-rule rv"></div>' +
+    '<div class="m-year rv">' + m.year + '</div>' +
+    '<h3 class="rv">' + m.title + '</h3>' +
+    '<p class="m-cap rv">' + m.cap + '</p>';
+  memWrap.appendChild(d);
+});
+
+requestAnimationFrame(() => document.body.classList.add('loaded'));
+
+/* ═══════════ helpers ═══════════ */
+const clamp = (v,a,b) => v<a?a : v>b?b : v;
+const lerp  = (a,b,t) => a+(b-a)*t;
+const smooth = t => { t=clamp(t,0,1); return t*t*(3-2*t); };
+const gauss = (x,c,w) => Math.exp(-((x-c)*(x-c))/(2*w*w));
+function hexRGB(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+function mixRGB(a,b,t){ return [lerp(a[0],b[0],t), lerp(a[1],b[1],t), lerp(a[2],b[2],t)]; }
+function css(c,a=1){ return `rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`; }
+
+/* ═══════════ canvas ═══════════ */
+const cv = document.getElementById('sky');
+const ctx = cv.getContext('2d');
+let W=1, H=1, MIN=1;
+function sizeCanvas(){
+  const dpr = Math.min(devicePixelRatio||1, 2);
+  W = innerWidth; H = innerHeight; MIN = Math.min(W,H);
+  cv.width = W*dpr; cv.height = H*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+sizeCanvas();
+
+/* star field — three parallax layers */
+function makeStars(n, rMin, rMax){
+  const a=[];
+  for(let i=0;i<n;i++) a.push({
+    x:Math.random(), y:Math.random(),
+    r:rMin+Math.random()*(rMax-rMin),
+    ph:Math.random()*Math.PI*2,
+    sp:.3+Math.random()*.9,
+    mg:.35+Math.random()*.65,
+  });
+  return a;
+}
+const layers = [
+  { stars: makeStars(230,.4,.9),  par:.045, drift:.10 },
+  { stars: makeStars(120,.6,1.3), par:.11,  drift:.22 },
+  { stars: makeStars(45, .9,1.7), par:.20,  drift:.38 },
+];
+
+/* ═══════════ timeline — every mark is measured from the DOM ═══════════ */
+const T = {};
+function measure(){
+  const docH = document.documentElement.scrollHeight - innerHeight;
+  const at = (sel, anchor=.5) => {
+    const el = $(sel); if(!el) return 0;
+    const r = el.getBoundingClientRect();
+    const top = r.top + scrollY;
+    return clamp((top + r.height*anchor - innerHeight*.5) / docH, 0, 1);
+  };
+  T.ch1        = at('#ch1 .chapter-head');
+  T.ch2        = at('#ch2 .chapter-head');
+  T.meet       = at('#meet-flare');
+  T.ch3        = at('#ch3 .chapter-head');
+  T.storm      = at('#storm-peak', 1.6);
+  T.stormEnd   = at('#silence', 0.05);
+  T.silence    = at('#silence');
+  T.ch5        = at('#tonight .chapter-head');
+  T.constel    = at('#constellation-start');
+  T.constelEnd = at('#constellation-end');
+  T.coda       = at('#coda');
+  T.memBirth   = STORY.memories.map((_,i)=>at('#mem-'+i));
+  T.docH = docH;
+}
+
+/* final constellation layout (normalized sky coords) */
+const CONSTEL = [
+  [.30,.34],[.385,.235],[.50,.285],[.605,.215],[.715,.31],[.635,.44],[.475,.46],
+];
+
+/* ═══════════ the two lights ═══════════ */
+/* Everything is a pure function of scroll-time t — fully reversible. */
+function lightPositions(t, time){
+  const meetX=.5, meetY=.44;
+  let ax,ay,bx,by;
+
+  if (t < T.meet){
+    /* two separate wanderers, bending toward the meeting */
+    const wAx = .17 + .05*Math.sin(t*21+1.2) + t*.10;
+    const wAy = .30 + .06*Math.sin(t*13+0.4);
+    const wBx = .83 - .05*Math.sin(t*17+2.0) - t*.10;
+    const wBy = .60 + .05*Math.sin(t*15+3.1);
+    const p = smooth((t - T.ch1*.55) / Math.max(.001, T.meet - T.ch1*.55));
+    ax = lerp(wAx, meetX-.004, p); ay = lerp(wAy, meetY, p);
+    bx = lerp(wBx, meetX+.004, p); by = lerp(wBy, meetY, p);
+  } else {
+    /* the braid — a slow binary orbit whose centre drifts (kept above the text) */
+    const u = t - T.meet;
+    const settle = smooth((t - T.constel) / Math.max(.001, T.constelEnd - T.constel));
+    const rise = smooth(u/.05);                    /* drift up and out of the words */
+    let cx = .5 + .07*Math.sin(u*8.5)*(1-settle);
+    let cy = lerp(.44, .33, rise) + .04*Math.sin(u*6.2+2)*(1-settle);
+    cx = lerp(cx,.5,settle); cy = lerp(cy,.365,settle);
+    let r = lerp(.085, .034, smooth(u/Math.max(.001,1-T.meet)));
+    r = lerp(r,.030,settle);
+    /* the storm makes the orbit tremble and stretch */
+    const storm = gauss(t, T.storm, (T.stormEnd-T.storm)*.55);
+    const jx = storm*.016*Math.sin(t*230+time*.7);
+    const jy = storm*.013*Math.sin(t*310+2+time*.9);
+    r *= 1 + storm*.5*Math.sin(t*140);
+    const th = u*34 + (RM?0:time*.10*(.3+settle));
+    const rx = r*MIN/W, ry = r*MIN/H;
+    ax = cx + Math.cos(th)*rx + jx;      ay = cy + Math.sin(th)*ry + jy;
+    bx = cx + Math.cos(th+Math.PI)*rx - jx; by = cy + Math.sin(th+Math.PI)*ry - jy;
+  }
+  return { ax,ay,bx,by };
+}
+
+/* ═══════════ colour grade — the sky's temperature is the plot ═══════════ */
+const GRADE = () => [
+  { t:0,                       top:'#04050b', bot:'#0a0d19', glow:0   },
+  { t:T.ch1,                   top:'#05060d', bot:'#0d101f', glow:0   },
+  { t:Math.max(T.meet-.03,0),  top:'#0a0c1c', bot:'#141226', glow:.15 },
+  { t:T.meet,                  top:'#141024', bot:'#2a1c28', glow:.6  },
+  { t:T.meet+.05,              top:'#0d0f22', bot:'#1b1830', glow:.35 },
+  { t:T.ch3,                   top:'#0a0e20', bot:'#161a30', glow:.22 },
+  { t:T.storm,                 top:'#04060b', bot:'#0b0e13', glow:0   },
+  { t:T.silence,               top:'#020308', bot:'#06070e', glow:0   },
+  { t:T.ch5,                   top:'#0a0f22', bot:'#1a2440', glow:.18 },
+  { t:T.constelEnd,            top:'#0d1428', bot:'#243250', glow:.30 },
+  { t:1,                       top:'#0f172c', bot:'#2a3a5a', glow:.34 },
+];
+function grade(t){
+  const g = GRADE();
+  let i=0; while(i<g.length-2 && t>g[i+1].t) i++;
+  const a=g[i], b=g[i+1];
+  const f = smooth((t-a.t)/Math.max(.0001,b.t-a.t));
+  return {
+    top: mixRGB(hexRGB(a.top), hexRGB(b.top), f),
+    bot: mixRGB(hexRGB(a.bot), hexRGB(b.bot), f),
+    glow: lerp(a.glow, b.glow, f),
+  };
+}
+
+/* ═══════════ scroll state ═══════════ */
+let rawT=0, st=0;             /* target and smoothed scroll-time     */
+let prevSt=0;
+let mx=0, my=0;               /* pointer parallax                    */
+let shot=null, shotFired=false;
+measure();
+
+addEventListener('scroll', () => {
+  rawT = clamp(scrollY / Math.max(1, T.docH), 0, 1);
+  if (scrollY>40) $('#cue').classList.add('gone');
+}, {passive:true});
+
+addEventListener('mousemove', e => {
+  mx = (e.clientX/W-.5); my = (e.clientY/H-.5);
+}, {passive:true});
+
+addEventListener('resize', () => { sizeCanvas(); measure();
+  rawT = clamp(scrollY / Math.max(1,T.docH), 0, 1); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+setTimeout(measure, 600);
+
+/* ═══════════ draw ═══════════ */
+function drawTrail(t, time, which, col){
+  const span=.05, n=64;
+  let px=null, py=null;
+  for(let i=0;i<=n;i++){
+    const tt = t - span + span*i/n;
+    if (tt<=0){ continue; }
+    const p = lightPositions(tt, time);
+    const x = (which? p.bx : p.ax)*W, y = (which? p.by : p.ay)*H;
+    if (px!==null){
+      const f=i/n;
+      ctx.strokeStyle = css(col, f*f*.55);
+      ctx.lineWidth = .4 + 1.5*f;
+      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(x,y); ctx.stroke();
+    }
+    px=x; py=y;
+  }
+}
+
+function drawLight(x,y,col,glowR,coreR,alpha){
+  const g = ctx.createRadialGradient(x,y,0,x,y,glowR);
+  g.addColorStop(0, css(col, .55*alpha));
+  g.addColorStop(.35, css(col, .14*alpha));
+  g.addColorStop(1, css(col, 0));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x,y,glowR,0,7); ctx.fill();
+  ctx.fillStyle = css([255,252,240], alpha);
+  ctx.beginPath(); ctx.arc(x,y,coreR,0,7); ctx.fill();
+}
+
+const GOLD = hexRGB('#e8c98f'), BLUE = hexRGB('#9fb8d8'), ROSE = hexRGB('#e8a087');
+
+function frame(now){
+  const time = RM ? 0 : now*.001;
+  st += (rawT - st) * (RM ? 1 : .07);
+  if (Math.abs(rawT-st) < .00004) st = rawT;
+  const t = st;
+
+  const gr = grade(t);
+  const bg = ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0, css(gr.top));
+  bg.addColorStop(1, css(gr.bot));
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  /* warm horizon glow (the meeting's afterlight, and the pre-dawn) */
+  if (gr.glow>0.01){
+    const hg = ctx.createRadialGradient(W*.5,H*1.05,0, W*.5,H*1.05, H*.9);
+    hg.addColorStop(0, css(ROSE, .22*gr.glow));
+    hg.addColorStop(1, css(ROSE, 0));
+    ctx.fillStyle=hg; ctx.fillRect(0,0,W,H);
+  }
+
+  /* stars — dimmed by storm and silence, lifted at the end */
+  const stormDim = 1 - .55*gauss(t, T.storm, (T.stormEnd-T.storm)*.6);
+  const silDim   = 1 - .45*gauss(t, T.silence, .035);
+  const lift     = 1 + .25*smooth((t-T.ch5)/.06);
+  const starA    = stormDim * silDim * lift;
+  for (const L of layers){
+    for (const s of L.stars){
+      const tw = RM ? .75 : .55 + .45*Math.sin(time*s.sp + s.ph);
+      const x = ((s.x + time*.0008*L.drift + mx*L.par*.15) % 1 + 1) % 1 * W;
+      const y = ((s.y - (t*T.docH*L.par + my*L.par*40)/H) % 1 + 1) % 1 * H;
+      ctx.fillStyle = css([233,229,216], s.mg*tw*.6*starA);
+      ctx.beginPath(); ctx.arc(x,y,s.r,0,7); ctx.fill();
+    }
+  }
+
+  ctx.globalCompositeOperation = 'lighter';
+
+  /* ——— memory stars: born from the dance, migrating home ——— */
+  const lineP = clamp((t - T.constel)/Math.max(.001, T.constelEnd - T.constel), 0, 1)
+                * (CONSTEL.length-1);
+  const pts = [];
+  for (let i=0;i<STORY.memories.length && i<CONSTEL.length;i++){
+    const birth = T.memBirth[i];
+    if (t <= birth){ pts.push(null); continue; }
+    const born = clamp((t-birth)/.012, 0, 1);
+    const bp = lightPositions(birth, time);
+    const bx = (bp.ax+bp.bx)/2, by = (bp.ay+bp.by)/2 - .03;
+    const mig = smooth((t-birth)/Math.max(.001, T.constelEnd - birth));
+    const x = lerp(bx, CONSTEL[i][0], mig)*W;
+    const y = lerp(by, CONSTEL[i][1], mig)*H;
+    pts.push([x,y]);
+    const tw = RM ? 1 : 1 + .25*Math.sin(time*1.1+i*2.1);
+    drawLight(x,y, GOLD, (10+8*mig)*tw*(MIN/900+.6), 1.4+.7*mig, born*(.55+.45*mig)*starA);
+  }
+  /* the lacing of the constellation */
+  if (lineP>0){
+    ctx.lineWidth = .8;
+    for (let i=0;i<CONSTEL.length-1;i++){
+      const seg = clamp(lineP-i, 0, 1);
+      if (seg<=0 || !pts[i] || !pts[i+1]) continue;
+      ctx.strokeStyle = css(GOLD, .32*seg);
+      ctx.beginPath();
+      ctx.moveTo(pts[i][0], pts[i][1]);
+      ctx.lineTo(lerp(pts[i][0],pts[i+1][0],seg), lerp(pts[i][1],pts[i+1][1],seg));
+      ctx.stroke();
+    }
+  }
+
+  /* ——— the two lights ——— */
+  const appear = smooth((t - T.ch1*.35)/Math.max(.001,T.ch1*.5));
+  if (appear>0.01){
+    const warm = smooth((t-T.meet)/.06);
+    const bCol = mixRGB(BLUE, GOLD, warm);
+    const storm = gauss(t, T.storm, (T.stormEnd-T.storm)*.55);
+    const dim = 1 - .5*storm;
+    drawTrail(t, time, 0, GOLD);
+    drawTrail(t, time, 1, bCol);
+    const p = lightPositions(t, time);
+    const pulse = RM ? 1 : 1 + .07*Math.sin(time*1.3);
+    const pulse2 = RM ? 1 : 1 + .07*Math.sin(time*1.5+2);
+    const gR = MIN*.035;
+    drawLight(p.ax*W, p.ay*H, GOLD, gR*pulse,  2.1, appear*dim);
+    drawLight(p.bx*W, p.by*H, bCol, gR*pulse2, 2.1, appear*dim);
+  }
+
+  /* ——— the flare: the moment they meet ——— */
+  const f = gauss(t, T.meet, .011);
+  if (f>0.01){
+    const fx=W*.5, fy=H*.44, R=MIN*(.12+.38*f);
+    const fg = ctx.createRadialGradient(fx,fy,0,fx,fy,R);
+    fg.addColorStop(0, css([255,235,210], .30*f));
+    fg.addColorStop(.4, css(ROSE, .11*f));
+    fg.addColorStop(1, css(ROSE, 0));
+    ctx.fillStyle=fg; ctx.beginPath(); ctx.arc(fx,fy,R,0,7); ctx.fill();
+  }
+
+  /* ——— one shooting star, at the very end ——— */
+  if (!RM && !shotFired && t>.985){ shotFired=true; shot={t0:now}; }
+  if (shot){
+    const sp = (now-shot.t0)/1600;
+    if (sp>1){ shot=null; }
+    else{
+      const e = 1-Math.pow(1-sp,2.2);
+      const x0=W*.12,y0=H*.10, x1=W*.78,y1=H*.30;
+      const hx=lerp(x0,x1,e), hy=lerp(y0,y1,e);
+      const tail=.13*(1-sp*.4);
+      const txp=lerp(x0,x1,Math.max(0,e-tail)), typ=lerp(y0,y1,Math.max(0,e-tail));
+      const gtr=ctx.createLinearGradient(txp,typ,hx,hy);
+      gtr.addColorStop(0, css([255,250,235],0));
+      gtr.addColorStop(1, css([255,250,235],.8*(1-sp*.5)));
+      ctx.strokeStyle=gtr; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.moveTo(txp,typ); ctx.lineTo(hx,hy); ctx.stroke();
+      drawLight(hx,hy,[255,250,235],26,1.6,(1-sp)*.9);
+    }
+  }
+  if (t<.9) shotFired=false;
+
+  ctx.globalCompositeOperation = 'source-over';
+
+  /* memory-star bells */
+  if (soundOn){
+    for (let i=0;i<T.memBirth.length;i++){
+      if (prevSt < T.memBirth[i] && t >= T.memBirth[i]) bell(i);
+    }
+    if (prevSt < T.meet && t >= T.meet) bell(-1);
+  }
+  prevSt = t;
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ═══════════ reveals ═══════════ */
+const io = new IntersectionObserver(es => {
+  for (const e of es) if (e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); }
+}, { threshold:.4, rootMargin:'0px 0px -8% 0px' });
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+const dateEl = document.getElementById('dateReveal');
+new IntersectionObserver(es=>{
+  for (const e of es) if (e.isIntersecting){ dateEl.classList.add('on'); }
+},{threshold:.6}).observe(dateEl);
+
+/* chapter reel */
+const reel = document.getElementById('reel');
+let reelText='';
+const reelIO = new IntersectionObserver(es=>{
+  for (const e of es){
+    if (!e.isIntersecting) continue;
+    const ch = e.target.dataset.ch || '';
+    if (ch===reelText) continue;
+    reelText = ch;
+    reel.classList.remove('on');
+    setTimeout(()=>{ reel.textContent=reelText; if(reelText) reel.classList.add('on'); }, 700);
+  }
+},{ rootMargin:'-45% 0px -45% 0px' });
+document.querySelectorAll('section[data-ch]').forEach(s=>reelIO.observe(s));
+
+/* begin again */
+document.getElementById('again').addEventListener('click', ()=>{
+  scrollTo({ top:0, behavior: RM ? 'auto' : 'smooth' });
+});
+
+/* ═══════════ sound — one quiet chord, generated, opt-in ═══════════ */
+let ac=null, master=null, soundOn=false;
+const PENTA=[523.25,587.33,659.25,783.99,880,987.77,1046.5];
+function startDrone(){
+  ac = new (window.AudioContext||window.webkitAudioContext)();
+  master = ac.createGain(); master.gain.value=0;
+  const lp = ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=520;
+  master.connect(lp); lp.connect(ac.destination);
+  [[110,.5],[164.81,.28],[220,.16],[329.63,.06]].forEach(([f,v])=>{
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type='sine'; o.frequency.value=f; g.gain.value=v;
+    const o2=ac.createOscillator(), g2=ac.createGain();
+    o2.type='sine'; o2.frequency.value=f*1.003; g2.gain.value=v*.6;
+    o.connect(g); g.connect(master); o2.connect(g2); g2.connect(master);
+    o.start(); o2.start();
+  });
+  const lfo=ac.createOscillator(), lg=ac.createGain();
+  lfo.frequency.value=.05; lg.gain.value=.03;
+  lfo.connect(lg); lg.connect(master.gain); lfo.start();
+  master.gain.linearRampToValueAtTime(.085, ac.currentTime+2.5);
+}
+function bell(i){
+  if(!ac) return;
+  const f = i<0 ? 392 : PENTA[i%PENTA.length];
+  const t0 = ac.currentTime;
+  [[1,.09],[2.76,.02]].forEach(([m,v])=>{
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type='sine'; o.frequency.value=f*m;
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(v,t0+.02);
+    g.gain.exponentialRampToValueAtTime(.0001,t0+2.8);
+    o.connect(g); g.connect(ac.destination);
+    o.start(t0); o.stop(t0+3);
+  });
+}
+const btn = document.getElementById('soundBtn');
+btn.addEventListener('click', ()=>{
+  if (!ac){ startDrone(); soundOn=true; }
+  else if (soundOn){ master.gain.linearRampToValueAtTime(0, ac.currentTime+.8); soundOn=false; }
+  else { master.gain.linearRampToValueAtTime(.085, ac.currentTime+1.2); soundOn=true; }
+  btn.classList.toggle('playing', soundOn);
+  btn.setAttribute('aria-pressed', soundOn);
+});
+</script>
+</body>
+</html>
