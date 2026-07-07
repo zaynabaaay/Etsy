@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Open When — Letters for Later</title>
+<meta name="description" content="A bundle of digital 'open when…' letters: kraft air-mail envelopes that untie and unfold, letters on ruled paper, photographs under paperclips — and letters that stay locked until the date you choose.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  /* =====================================================================
+     OPEN WHEN — the design layer. This part is the product: the air-mail
+     palette, the typewriter lettering, the envelopes and their motion.
+     Buyers change only the words, the photographs and the lock dates
+     (see the CONFIG block in the script at the bottom).
+     ===================================================================== */
+  :root {
+    --blotter:     #ece0c8;
+    --blotter-lift:#f3e9d4;
+    --kraft:       #d8b98e;
+    --kraft-deep:  #c3a06f;
+    --kraft-shade: #a98753;
+    --paper:       #fbf5e5;
+    --ink:         #3b2f21;
+    --ink-soft:    rgba(59, 47, 33, 0.78);
+    --ink-faint:   rgba(59, 47, 33, 0.52);
+    --postal-red:  #b5442c;
+    --postal-blue: #3a5590;
+    --twine:       #86683f;
+    --tw:   'Special Elite', 'Courier New', monospace;
+    --serif:'Lora', Georgia, serif;
+    --hand: 'Caveat', 'Comic Sans MS', cursive;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--blotter);
+    color: var(--ink);
+    font-family: var(--serif);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  [contenteditable]:focus { outline: none; }
+  img { max-width: 100%; }
+
+  /* ---------- the desk ---------- */
+  .desk-tone, .desk-grain, .desk-vignette {
+    position: fixed; inset: 0; pointer-events: none;
+  }
+  .desk-tone {
+    z-index: 0;
+    background:
+      radial-gradient(120% 80% at 50% -10%, var(--blotter-lift) 0%, transparent 55%),
+      linear-gradient(180deg, #efe4cd 0%, var(--blotter) 55%, #e2d3b4 100%);
+  }
+  .desk-grain {
+    z-index: 1; opacity: 0.5; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.66 0 0 0 0 0.58 0 0 0 0 0.44 0 0 0 0.14 0'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 170px 170px;
+  }
+  .desk-vignette {
+    z-index: 2;
+    background: radial-gradient(120% 100% at 50% 40%, transparent 58%, rgba(107, 84, 48, 0.18) 100%);
+  }
+
+  /* ---------- mode control ---------- */
+  #mode-ctrl {
+    position: fixed; top: 16px; right: 16px; z-index: 60;
+    display: flex; gap: 2px; padding: 3px;
+    background: rgba(251, 245, 229, 0.9); border: 1px solid rgba(169, 135, 83, 0.4);
+    border-radius: 999px; backdrop-filter: blur(6px);
+    box-shadow: 0 5px 18px rgba(94, 70, 34, 0.22);
+  }
+  #mode-ctrl button {
+    appearance: none; border: none; cursor: pointer; font-family: var(--tw);
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 7px 14px; border-radius: 999px; background: transparent;
+    color: var(--ink-faint); transition: background 0.3s ease, color 0.3s ease;
+  }
+  #mode-ctrl button[aria-pressed="true"] { background: var(--postal-red); color: #fbf1e2; }
+  @media (min-width: 700px) { #mode-ctrl { top: 24px; right: 28px; } }
+
+  #edit-banner {
+    display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    z-index: 60; width: max-content; max-width: 92vw; padding: 9px 18px; text-align: center;
+    background: rgba(251, 245, 229, 0.95); border: 1px solid rgba(169, 135, 83, 0.4);
+    border-radius: 999px; box-shadow: 0 8px 22px rgba(94, 70, 34, 0.26);
+    font-size: 14px; color: var(--ink-soft);
+  }
+  body.writing #edit-banner { display: block; }
+  #btn-reset {
+    cursor: pointer; margin-left: 10px; padding-left: 12px;
+    border-left: 1px solid rgba(169, 135, 83, 0.4);
+    color: var(--postal-red); letter-spacing: 0.1em; text-transform: uppercase;
+    font-family: var(--tw); font-size: 11px;
+  }
+
+  body.writing [data-f] {
+    cursor: text;
+    box-shadow: 0 1.5px 0 0 rgba(181, 68, 44, 0.45);
+  }
+  .add-hint { display: none; }
+  body.writing .photo-slot.empty .add-hint { display: flex; }
+  body.writing .photo-slot { cursor: pointer; }
+
+  /* ---------- layout ---------- */
+  main { position: relative; z-index: 5; max-width: 680px; margin: 0 auto; padding: 0 5vw 18svh; }
+
+  .tw-label {
+    font-family: var(--tw); font-size: 12px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--postal-red);
+  }
+
+  [data-reveal] {
+    opacity: 0; transform: translateY(22px);
+    transition: opacity 1s cubic-bezier(.2,.6,.2,1), transform 1s cubic-bezier(.2,.6,.2,1);
+    transition-delay: var(--d, 0s);
+  }
+  [data-reveal].in { opacity: 1; transform: none; }
+
+  /* ---------- masthead ---------- */
+  header {
+    min-height: 74svh; display: flex; flex-direction: column;
+    justify-content: center; text-align: center; padding: 14svh 0 6svh;
+  }
+  .par-avion {
+    display: inline-flex; align-items: center; gap: 10px; margin: 0 auto 26px;
+    font-family: var(--tw); font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--postal-blue);
+  }
+  .par-avion::before, .par-avion::after {
+    content: ""; width: 44px; height: 6px;
+    background: repeating-linear-gradient(-45deg,
+      var(--postal-red) 0 6px, transparent 6px 12px,
+      var(--postal-blue) 12px 18px, transparent 18px 24px);
+    opacity: 0.75;
+  }
+  h1 {
+    margin: 0; font-family: var(--tw); font-weight: 400;
+    font-size: clamp(34px, 9vw, 58px); line-height: 1.15; color: var(--ink);
+    text-wrap: balance; min-height: 1.15em;
+  }
+  h1 .caret {
+    display: inline-block; width: 0.55em; height: 1em; margin-left: 2px;
+    background: var(--postal-red); vertical-align: -0.12em; opacity: 0.85;
+    animation: caretBlink 1.05s steps(1) infinite;
+  }
+  @keyframes caretBlink { 50% { opacity: 0; } }
+  h1.done .caret { display: none; }
+  .masthead-note {
+    max-width: 460px; margin: 26px auto 0;
+    font-size: clamp(17px, 3.4vw, 20px); line-height: 1.65; color: var(--ink-soft);
+    font-style: italic; text-wrap: pretty;
+  }
+  .masthead-from {
+    margin-top: 18px; font-family: var(--hand); font-weight: 600;
+    font-size: clamp(24px, 5.4vw, 30px); color: var(--postal-blue);
+  }
+  #bundle-count {
+    margin-top: 5svh; font-family: var(--tw); font-size: 12px;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint);
+  }
+
+  /* ---------- envelopes ---------- */
+  .stack { display: flex; flex-direction: column; gap: 34px; margin-top: 4svh; }
+
+  .env {
+    position: relative;
+    transform: rotate(var(--tilt, 0deg));
+    transition: transform 0.5s cubic-bezier(.2,.6,.2,1);
+  }
+  .env:nth-child(odd)  { --tilt: -0.7deg; }
+  .env:nth-child(even) { --tilt: 0.6deg; }
+  .env.open { --tilt: 0deg; }
+  @media (hover: hover) { .env:not(.open):hover { transform: rotate(0deg) translateY(-3px); } }
+
+  .env-face {
+    position: relative; width: 100%; cursor: pointer;
+    background:
+      linear-gradient(168deg, var(--kraft) 0%, var(--kraft-deep) 78%, var(--kraft-shade) 100%);
+    border-radius: 3px;
+    box-shadow:
+      0 14px 26px rgba(94, 70, 34, 0.28),
+      0 2px 6px rgba(94, 70, 34, 0.2),
+      inset 0 1px 0 rgba(255, 244, 220, 0.4);
+    padding: 20px 20px 18px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .env-face:focus-visible { outline: 3px solid var(--postal-blue); outline-offset: 3px; }
+  /* air-mail striped edges */
+  .env-face::before, .env-face::after {
+    content: ""; position: absolute; left: 0; right: 0; height: 7px; opacity: 0.85;
+    background: repeating-linear-gradient(-45deg,
+      var(--postal-red) 0 9px, rgba(251, 245, 229, 0.9) 9px 18px,
+      var(--postal-blue) 18px 27px, rgba(251, 245, 229, 0.9) 27px 36px);
+  }
+  .env-face::before { top: 0; border-radius: 3px 3px 0 0; }
+  .env-face::after { bottom: 0; border-radius: 0 0 3px 3px; }
+
+  .env-row { display: flex; align-items: flex-start; gap: 14px; margin-top: 8px; }
+  .env-address { flex: 1; min-width: 0; padding: 2px 0 4px; }
+  .env-kicker {
+    font-family: var(--tw); font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: rgba(59, 47, 33, 0.55); margin-bottom: 7px;
+  }
+  .env-label {
+    font-family: var(--tw); font-size: clamp(19px, 4.6vw, 26px);
+    line-height: 1.3; color: var(--ink); overflow-wrap: break-word;
+  }
+  .env-status {
+    margin-top: 10px; display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--tw); font-size: 10.5px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink-faint);
+  }
+  .env-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--twine); }
+  .env.opened-once .env-status .dot { background: var(--postal-blue); }
+  .env.locked .env-status .dot { background: var(--postal-red); }
+  .env.locked .env-status { color: var(--postal-red); }
+
+  /* postmark */
+  .postmark { flex: none; width: 74px; color: rgba(59, 47, 33, 0.5); }
+  .postmark svg { display: block; width: 100%; height: auto; transform: rotate(8deg); }
+  .env.opened-once .postmark { color: rgba(58, 85, 144, 0.62); }
+
+  /* string-and-button tie */
+  .tie { position: absolute; right: 18px; bottom: 14px; width: 52px; height: 30px; pointer-events: none; }
+  .tie svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .tie .loop {
+    stroke: var(--twine); stroke-width: 1.6; fill: none;
+    transition: stroke-dashoffset 0.7s cubic-bezier(.4,.2,.2,1), opacity 0.5s ease 0.15s;
+    stroke-dasharray: 1; stroke-dashoffset: 0;
+  }
+  .env.open .tie .loop { stroke-dashoffset: 1; opacity: 0; }
+  .tie .btn { fill: var(--kraft-shade); stroke: rgba(59, 47, 33, 0.5); stroke-width: 1; }
+
+  /* locked refusal */
+  @keyframes lockShake {
+    0%, 100% { transform: translateX(0) rotate(var(--tilt, 0deg)); }
+    20% { transform: translateX(-5px) rotate(var(--tilt, 0deg)); }
+    40% { transform: translateX(4px) rotate(var(--tilt, 0deg)); }
+    60% { transform: translateX(-3px) rotate(var(--tilt, 0deg)); }
+    80% { transform: translateX(2px) rotate(var(--tilt, 0deg)); }
+  }
+  .env.shake { animation: lockShake 0.45s ease; }
+  .lock-stamp {
+    position: absolute; top: 14px; right: 16px;
+    font-family: var(--tw); font-size: 10px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--postal-red);
+    border: 1.5px solid var(--postal-red); border-radius: 2px;
+    padding: 3px 7px; transform: rotate(-7deg); opacity: 0.85;
+    display: none;
+  }
+  .env.locked .lock-stamp { display: block; }
+
+  /* ---------- the unfolding letter ---------- */
+  .env-body {
+    display: grid; grid-template-rows: 0fr;
+    transition: grid-template-rows 0.85s cubic-bezier(.25,.6,.2,1);
+  }
+  .env.open .env-body { grid-template-rows: 1fr; }
+  .env-body > .env-body-inner { overflow: hidden; }
+  .letter {
+    margin: -4px 12px 0; padding: 34px 26px 30px 30px;
+    background:
+      linear-gradient(90deg, transparent 0 40px, rgba(181, 68, 44, 0.28) 40px 41px, transparent 41px),
+      repeating-linear-gradient(180deg, transparent 0 29px, rgba(59, 47, 33, 0.09) 29px 30px),
+      linear-gradient(180deg, var(--paper) 0%, #f4ecd8 100%);
+    border-radius: 0 0 3px 3px;
+    box-shadow:
+      0 18px 30px rgba(94, 70, 34, 0.24),
+      inset 0 0 0 1px rgba(169, 135, 83, 0.24);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.7s ease 0.25s, transform 0.7s cubic-bezier(.2,.6,.2,1) 0.25s;
+  }
+  .env.open .letter { opacity: 1; transform: none; }
+  .letter p {
+    margin: 0; font-size: clamp(17px, 3.4vw, 19px); line-height: 30px;
+    color: var(--ink-soft); text-wrap: pretty;
+  }
+  .letter p + p { margin-top: 30px; }
+  .letter .ps {
+    margin-top: 30px; font-family: var(--hand); font-weight: 500;
+    font-size: clamp(21px, 4.6vw, 25px); line-height: 30px; color: var(--postal-blue);
+  }
+  .letter .sig {
+    margin-top: 8px; text-align: right; font-family: var(--hand); font-weight: 600;
+    font-size: clamp(28px, 6.4vw, 36px); line-height: 1.2; color: var(--ink);
+  }
+
+  /* photo under a paperclip */
+  .photo-slot {
+    position: relative; width: min(62vw, 250px); margin: 30px auto 0;
+    background: #fdfaf1; padding: 10px 10px 14px;
+    box-shadow: 0 10px 20px rgba(94, 70, 34, 0.28), 0 2px 5px rgba(94, 70, 34, 0.2);
+    transform: rotate(-2deg);
+  }
+  .photo-slot .well {
+    position: relative; aspect-ratio: 4 / 5; overflow: hidden;
+    background: linear-gradient(160deg, #d9c7a4 0%, #c2ab7e 100%);
+    box-shadow: inset 0 0 0 1px rgba(169, 135, 83, 0.35), inset 0 0 34px rgba(94, 70, 34, 0.22);
+  }
+  .photo-slot img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: none;
+    filter: sepia(0.2) saturate(0.92) contrast(0.97);
+  }
+  .photo-slot.filled img { display: block; }
+  .photo-slot .add-hint {
+    position: absolute; inset: 0; align-items: center; justify-content: center;
+    font-family: var(--tw); font-size: 10.5px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: rgba(59, 47, 33, 0.55); text-align: center;
+  }
+  .photo-slot.filled .add-hint { display: none !important; }
+  /* paperclip */
+  .clip {
+    position: absolute; top: -14px; left: 22px; width: 16px; height: 40px;
+    border: 2.5px solid #9c9484; border-radius: 8px 8px 5px 5px;
+    border-bottom: none; opacity: 0.9;
+  }
+  .clip::after {
+    content: ""; position: absolute; inset: 5px 3.5px -6px;
+    border: 2.5px solid #b0a896; border-radius: 6px 6px 4px 4px; border-top: none;
+  }
+
+  /* ---------- sign-off ---------- */
+  footer { text-align: center; padding-top: 12svh; }
+  .foot-rule {
+    width: 130px; height: 6px; margin: 0 auto 26px;
+    background: repeating-linear-gradient(-45deg,
+      var(--postal-red) 0 6px, transparent 6px 12px,
+      var(--postal-blue) 12px 18px, transparent 18px 24px);
+    opacity: 0.7;
+  }
+  .foot-line {
+    margin: 0 auto; max-width: 440px;
+    font-style: italic; font-size: clamp(18px, 3.8vw, 22px);
+    line-height: 1.6; color: var(--ink-soft); text-wrap: pretty;
+  }
+
+  /* ---------- reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+    h1 .caret { animation: none; }
+    .env, .env-face, .env-body, .letter, .tie .loop { transition: none; }
+    .env.shake { animation: none; }
+  }
+</style>
+<noscript><style>
+  [data-reveal] { opacity: 1; transform: none; }
+  .env-body { grid-template-rows: 1fr; }
+  .letter { opacity: 1; transform: none; }
+  #mode-ctrl { display: none; }
+</style></noscript>
+</head>
+<body>
+
+<div class="desk-tone" aria-hidden="true"></div>
+<div class="desk-grain" aria-hidden="true"></div>
+<div class="desk-vignette" aria-hidden="true"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="postmark" viewBox="0 0 74 46">
+    <circle cx="23" cy="23" r="20" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    <circle cx="23" cy="23" r="15" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2.5 2.5"/>
+    <path d="M46 12 Q 54 9 62 12 T 74 12" fill="none" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M46 20 Q 54 17 62 20 T 74 20" fill="none" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M46 28 Q 54 25 62 28 T 74 28" fill="none" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M46 36 Q 54 33 62 36 T 74 36" fill="none" stroke="currentColor" stroke-width="1.3"/>
+  </symbol>
+</defs></svg>
+
+<div id="mode-ctrl" role="group" aria-label="Mode">
+  <button id="btn-gift" type="button" aria-pressed="true">Gift</button>
+  <button id="btn-write" type="button" aria-pressed="false">Write</button>
+</div>
+<div id="edit-banner">
+  Writing — tap any words to change them; tap a photo frame to fill it.
+  <span id="btn-reset" role="button" tabindex="0">Reset</span>
+</div>
+
+<main>
+
+  <!-- ================= MASTHEAD ================= -->
+  <header>
+    <div class="par-avion" data-reveal>Par avion — with love</div>
+    <h1 id="typed" aria-label="Open when…"><span id="typed-text"></span><span class="caret" aria-hidden="true"></span></h1>
+    <p class="masthead-note" data-reveal style="--d:0.2s" data-f="intro">Six letters, written ahead of time, for the moments I can't be there in person. You don't have to save them. You just have to open the right one at the right time.</p>
+    <div class="masthead-from" data-reveal style="--d:0.35s" data-f="from-line">— all my love, June</div>
+    <div id="bundle-count" data-reveal style="--d:0.5s">6 letters · 6 still sealed</div>
+  </header>
+
+  <!-- ================= THE LETTERS ================= -->
+  <div class="stack">
+
+    <article class="env" data-id="l1" data-reveal>
+      <div class="env-face" role="button" tabindex="0" aria-expanded="false">
+        <span class="lock-stamp">Sealed until</span>
+        <div class="env-row">
+          <div class="env-address">
+            <div class="env-kicker">Open when</div>
+            <div class="env-label" data-f="lbl-1">you miss me</div>
+            <div class="env-status"><span class="dot"></span><span class="env-status-text">sealed</span></div>
+          </div>
+          <div class="postmark"><svg viewBox="0 0 74 46"><use href="#postmark"/></svg></div>
+        </div>
+        <div class="tie"><svg viewBox="0 0 52 30"><circle class="btn" cx="10" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><circle class="btn" cx="42" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><path class="loop" pathLength="1" fill="none" stroke="#86683f" stroke-width="1.6" d="M10 15 C 20 4, 32 26, 42 15 C 32 4, 20 26, 10 15"/></svg></div>
+      </div>
+      <div class="env-body"><div class="env-body-inner">
+        <div class="letter">
+          <p data-f="let-1a">First: I miss you too. Whatever time it is, wherever you're reading this — that's still true. It's the most reliable thing about me.</p>
+          <p data-f="let-1b">Now look at this photograph and remember that we are ridiculous together, and that distance has never once known what to do with us.</p>
+          <div class="photo-slot empty" data-photo="ph-1">
+            <span class="clip" aria-hidden="true"></span>
+            <div class="well">
+              <img data-photo-img alt="">
+              <span class="add-hint">Tap to add<br>a photograph</span>
+            </div>
+            <input data-photo-input type="file" accept="image/*" style="display:none">
+          </div>
+          <div class="ps" data-f="ps-1">P.S. Check the freezer. I may have hidden something there before I left.</div>
+          <div class="sig" data-f="sig-1">— June</div>
+        </div>
+      </div></div>
+    </article>
+
+    <article class="env" data-id="l2" data-reveal>
+      <div class="env-face" role="button" tabindex="0" aria-expanded="false">
+        <span class="lock-stamp">Sealed until</span>
+        <div class="env-row">
+          <div class="env-address">
+            <div class="env-kicker">Open when</div>
+            <div class="env-label" data-f="lbl-2">you can't sleep</div>
+            <div class="env-status"><span class="dot"></span><span class="env-status-text">sealed</span></div>
+          </div>
+          <div class="postmark"><svg viewBox="0 0 74 46"><use href="#postmark"/></svg></div>
+        </div>
+        <div class="tie"><svg viewBox="0 0 52 30"><circle class="btn" cx="10" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><circle class="btn" cx="42" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><path class="loop" pathLength="1" fill="none" stroke="#86683f" stroke-width="1.6" d="M10 15 C 20 4, 32 26, 42 15 C 32 4, 20 26, 10 15"/></svg></div>
+      </div>
+      <div class="env-body"><div class="env-body-inner">
+        <div class="letter">
+          <p data-f="let-2a">Hey. Put the phone face-down after this one, deal?</p>
+          <p data-f="let-2b">Here is a boring story, as promised: the full saga of my grandmother's feud with the neighborhood association over one (1) garden gnome. Chapter one. The gnome's name was Reginald…</p>
+          <p data-f="let-2c">…to be continued in person, which is the whole trick. Now close your eyes and listen to me telling it. I talk slowly. You'll be asleep by chapter two.</p>
+          <div class="ps" data-f="ps-2">P.S. Left side of the bed misses you. It told me.</div>
+          <div class="sig" data-f="sig-2">— June</div>
+        </div>
+      </div></div>
+    </article>
+
+    <article class="env" data-id="l3" data-reveal>
+      <div class="env-face" role="button" tabindex="0" aria-expanded="false">
+        <span class="lock-stamp">Sealed until</span>
+        <div class="env-row">
+          <div class="env-address">
+            <div class="env-kicker">Open when</div>
+            <div class="env-label" data-f="lbl-3">we've had a fight</div>
+            <div class="env-status"><span class="dot"></span><span class="env-status-text">sealed</span></div>
+          </div>
+          <div class="postmark"><svg viewBox="0 0 74 46"><use href="#postmark"/></svg></div>
+        </div>
+        <div class="tie"><svg viewBox="0 0 52 30"><circle class="btn" cx="10" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><circle class="btn" cx="42" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><path class="loop" pathLength="1" fill="none" stroke="#86683f" stroke-width="1.6" d="M10 15 C 20 4, 32 26, 42 15 C 32 4, 20 26, 10 15"/></svg></div>
+      </div>
+      <div class="env-body"><div class="env-body-inner">
+        <div class="letter">
+          <p data-f="let-3a">I wrote this on a day we were fine, so you'd have proof such days exist and are, in fact, the usual kind.</p>
+          <p data-f="let-3b">Whatever it was — I'm not on the other side of it. I'm on your side of it, just standing badly. I'll say the first sorry if you'll say the second one.</p>
+          <div class="ps" data-f="ps-3">P.S. This letter counts as me knocking on the door.</div>
+          <div class="sig" data-f="sig-3">— June</div>
+        </div>
+      </div></div>
+    </article>
+
+    <article class="env" data-id="l4" data-reveal>
+      <div class="env-face" role="button" tabindex="0" aria-expanded="false">
+        <span class="lock-stamp">Sealed until</span>
+        <div class="env-row">
+          <div class="env-address">
+            <div class="env-kicker">Open when</div>
+            <div class="env-label" data-f="lbl-4">you need a laugh</div>
+            <div class="env-status"><span class="dot"></span><span class="env-status-text">sealed</span></div>
+          </div>
+          <div class="postmark"><svg viewBox="0 0 74 46"><use href="#postmark"/></svg></div>
+        </div>
+        <div class="tie"><svg viewBox="0 0 52 30"><circle class="btn" cx="10" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><circle class="btn" cx="42" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><path class="loop" pathLength="1" fill="none" stroke="#86683f" stroke-width="1.6" d="M10 15 C 20 4, 32 26, 42 15 C 32 4, 20 26, 10 15"/></svg></div>
+      </div>
+      <div class="env-body"><div class="env-body-inner">
+        <div class="letter">
+          <p data-f="let-4a">Exhibit A, attached: the single worst photograph ever taken of the two of us. I paid real money to print it. I regret nothing.</p>
+          <div class="photo-slot empty" data-photo="ph-2">
+            <span class="clip" aria-hidden="true"></span>
+            <div class="well">
+              <img data-photo-img alt="">
+              <span class="add-hint">Tap to add<br>a photograph</span>
+            </div>
+            <input data-photo-input type="file" accept="image/*" style="display:none">
+          </div>
+          <p data-f="let-4b">Also, for the record: the duck incident was your fault, I stand by my version, and I will be telling it at every dinner party until further notice.</p>
+          <div class="ps" data-f="ps-4">P.S. You're laughing. I can hear it from here.</div>
+          <div class="sig" data-f="sig-4">— June</div>
+        </div>
+      </div></div>
+    </article>
+
+    <article class="env" data-id="l5" data-reveal>
+      <div class="env-face" role="button" tabindex="0" aria-expanded="false">
+        <span class="lock-stamp">Sealed until</span>
+        <div class="env-row">
+          <div class="env-address">
+            <div class="env-kicker">Open when</div>
+            <div class="env-label" data-f="lbl-5">it's our anniversary</div>
+            <div class="env-status"><span class="dot"></span><span class="env-status-text">sealed</span></div>
+          </div>
+          <div class="postmark"><svg viewBox="0 0 74 46"><use href="#postmark"/></svg></div>
+        </div>
+        <div class="tie"><svg viewBox="0 0 52 30"><circle class="btn" cx="10" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><circle class="btn" cx="42" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><path class="loop" pathLength="1" fill="none" stroke="#86683f" stroke-width="1.6" d="M10 15 C 20 4, 32 26, 42 15 C 32 4, 20 26, 10 15"/></svg></div>
+      </div>
+      <div class="env-body"><div class="env-body-inner">
+        <div class="letter">
+          <p data-f="let-5a">Happy anniversary, love. This one was sealed for a reason: I wanted there to be something today that existed before today — proof that past-me was already sure.</p>
+          <p data-f="let-5b">Another year of you. However many of these letters you've opened by now, this is the one I meant the most.</p>
+          <div class="ps" data-f="ps-5">P.S. Yes, I planned tonight. No, I'm not telling. Wear the good shoes.</div>
+          <div class="sig" data-f="sig-5">— June</div>
+        </div>
+      </div></div>
+    </article>
+
+    <article class="env" data-id="l6" data-reveal>
+      <div class="env-face" role="button" tabindex="0" aria-expanded="false">
+        <span class="lock-stamp">Sealed until</span>
+        <div class="env-row">
+          <div class="env-address">
+            <div class="env-kicker">Open when</div>
+            <div class="env-label" data-f="lbl-6">you're doubting yourself</div>
+            <div class="env-status"><span class="dot"></span><span class="env-status-text">sealed</span></div>
+          </div>
+          <div class="postmark"><svg viewBox="0 0 74 46"><use href="#postmark"/></svg></div>
+        </div>
+        <div class="tie"><svg viewBox="0 0 52 30"><circle class="btn" cx="10" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><circle class="btn" cx="42" cy="15" r="6" fill="#a98753" stroke="rgba(59,47,33,0.5)" stroke-width="1"/><path class="loop" pathLength="1" fill="none" stroke="#86683f" stroke-width="1.6" d="M10 15 C 20 4, 32 26, 42 15 C 32 4, 20 26, 10 15"/></svg></div>
+      </div>
+      <div class="env-body"><div class="env-body-inner">
+        <div class="letter">
+          <p data-f="let-6a">Listen carefully, because I'm only going to write this down once and then defend it forever: you are the most capable person I know, and I have watched you talk yourself out of believing it a hundred times.</p>
+          <p data-f="let-6b">You don't need to feel ready. You've never once been as unready as you thought. Go do the thing. Then come home and tell me everything.</p>
+          <div class="ps" data-f="ps-6">P.S. I believe you. And also, unrelatedly, I believe IN you. Both. At once.</div>
+          <div class="sig" data-f="sig-6">— June</div>
+        </div>
+      </div></div>
+    </article>
+
+  </div>
+
+  <!-- ================= SIGN-OFF ================= -->
+  <footer>
+    <div class="foot-rule" data-reveal></div>
+    <p class="foot-line" data-reveal style="--d:0.15s" data-f="outro">There's no wrong order and no expiry date. When the letters run out, come find me — I'll write you more.</p>
+  </footer>
+
+</main>
+
+<script>
+/*
+ * OPEN WHEN — a single-file bundle of letters for later.
+ *
+ * You customize the WORDS, the PHOTOGRAPHS, and the LOCK DATES.
+ * Open this file in a browser, tap "Write" (top right), then tap any
+ * line to retype it, or tap a photo frame inside a letter to add a
+ * picture. Everything saves automatically in the browser you edit in.
+ * Tap "Gift" to see (and send) the finished bundle.
+ *
+ * The settings most people will change:
+ */
+var CONFIG = {
+  // Letters that stay sealed until a date you choose (YYYY-MM-DD).
+  // The envelope shows a live countdown and politely refuses to open
+  // early. Remove a line (or the date) to leave that letter unlocked.
+  // Letter ids run l1..l6, top to bottom.
+  locks: {
+    l5: '2027-06-14'
+  },
+  // 'gift' opens as the finished bundle; 'write' opens ready to edit.
+  defaultMode: 'gift',
+  // If you make more than one bundle, give each its own key here so
+  // their saved words and photos never mix.
+  storageKey: 'openwhen_'
+};
+
+(function () {
+  "use strict";
+
+  var LS = CONFIG.storageKey;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var save = function (k, v) { try { localStorage.setItem(LS + k, v); } catch (e) {} };
+  var load = function (k) { try { return localStorage.getItem(LS + k); } catch (e) { return null; } };
+  var mode = 'gift';
+
+  /* ---------- words ---------- */
+  var fields = Array.prototype.slice.call(document.querySelectorAll('[data-f]'));
+  fields.forEach(function (el) {
+    var key = 'w_' + el.getAttribute('data-f');
+    var saved = load(key);
+    if (saved != null) el.innerHTML = saved;
+    el.addEventListener('input', function () { save(key, el.innerHTML); });
+    el.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var text = (e.clipboardData || window.clipboardData).getData('text');
+      document.execCommand('insertText', false, text);
+    });
+  });
+
+  /* ---------- photographs ---------- */
+  Array.prototype.slice.call(document.querySelectorAll('[data-photo]')).forEach(function (slot) {
+    var key = 'p_' + slot.getAttribute('data-photo');
+    var input = slot.querySelector('[data-photo-input]');
+    var show = function (src) {
+      slot.querySelector('[data-photo-img]').src = src;
+      slot.classList.add('filled');
+      slot.classList.remove('empty');
+    };
+    var saved = load(key);
+    if (saved) show(saved);
+    slot.addEventListener('click', function (e) {
+      if (mode !== 'write') return;
+      e.stopPropagation();
+      input.click();
+    });
+    input.addEventListener('change', function () {
+      var file = input.files && input.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () { show(reader.result); save(key, reader.result); };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  /* ---------- gift / write modes ---------- */
+  var btnGift = document.getElementById('btn-gift');
+  var btnWrite = document.getElementById('btn-write');
+  var setMode = function (m, persist) {
+    mode = m;
+    if (persist) save('mode', m);
+    var writing = m === 'write';
+    document.body.classList.toggle('writing', writing);
+    fields.forEach(function (el) { el.contentEditable = writing ? 'true' : 'false'; });
+    btnGift.setAttribute('aria-pressed', String(!writing));
+    btnWrite.setAttribute('aria-pressed', String(writing));
+  };
+  btnGift.addEventListener('click', function () { setMode('gift', true); });
+  btnWrite.addEventListener('click', function () { setMode('write', true); });
+  var savedMode = load('mode');
+  setMode(savedMode === 'write' || savedMode === 'gift' ? savedMode : (CONFIG.defaultMode === 'write' ? 'write' : 'gift'), false);
+
+  var reset = document.getElementById('btn-reset');
+  var doReset = function () {
+    if (!window.confirm('Return the bundle to its original letters and photographs on this device? Opened letters will be re-sealed.')) return;
+    try {
+      var keys = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf(LS) === 0) keys.push(k);
+      }
+      keys.forEach(function (k) { localStorage.removeItem(k); });
+    } catch (e) {}
+    window.location.reload();
+  };
+  reset.addEventListener('click', doReset);
+  reset.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doReset(); }
+  });
+
+  /* ---------- the typewriter masthead ---------- */
+  (function typeTitle() {
+    var h = document.getElementById('typed');
+    var span = document.getElementById('typed-text');
+    var text = 'Open when…';
+    if (reduce) { span.textContent = text; h.classList.add('done'); return; }
+    var i = 0;
+    var tick = function () {
+      span.textContent = text.slice(0, ++i);
+      if (i < text.length) {
+        setTimeout(tick, 90 + Math.random() * 140);
+      } else {
+        setTimeout(function () { h.classList.add('done'); }, 1800);
+      }
+    };
+    setTimeout(tick, 500);
+  })();
+
+  /* ---------- envelopes ---------- */
+  var envs = Array.prototype.slice.call(document.querySelectorAll('.env'));
+  var countEl = document.getElementById('bundle-count');
+
+  var lockDateFor = function (id) {
+    var raw = CONFIG.locks && CONFIG.locks[id];
+    if (!raw) return null;
+    var d = new Date(raw + 'T00:00:00');
+    if (isNaN(d.getTime()) || d.getTime() <= Date.now()) return null; /* past locks are open */
+    return d;
+  };
+  var lockText = function (d) {
+    var ms = d.getTime() - Date.now();
+    var days = Math.ceil(ms / 86400000);
+    if (days > 1) return 'opens in ' + days + ' days';
+    var hours = Math.max(1, Math.ceil(ms / 3600000));
+    return 'opens in ' + hours + (hours === 1 ? ' hour' : ' hours');
+  };
+
+  var refreshCount = function () {
+    var sealed = 0;
+    envs.forEach(function (env) {
+      if (!env.classList.contains('opened-once')) sealed++;
+    });
+    var total = envs.length;
+    countEl.textContent = total + ' letters · ' +
+      (sealed === 0 ? 'all opened' : sealed + ' still sealed');
+  };
+
+  envs.forEach(function (env) {
+    var id = env.getAttribute('data-id');
+    var face = env.querySelector('.env-face');
+    var statusText = env.querySelector('.env-status-text');
+    var lockStamp = env.querySelector('.lock-stamp');
+    var lock = lockDateFor(id);
+
+    if (load('o_' + id) === '1') env.classList.add('opened-once');
+
+    var refreshStatus = function () {
+      lock = lockDateFor(id);
+      if (lock && mode !== 'write') {
+        env.classList.add('locked');
+        statusText.textContent = lockText(lock);
+        lockStamp.textContent = 'Sealed until ' + lock.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      } else {
+        env.classList.remove('locked');
+        statusText.textContent = env.classList.contains('open') ? 'reading' :
+          (env.classList.contains('opened-once') ? 'opened' : 'sealed');
+      }
+    };
+    refreshStatus();
+    env._refreshStatus = refreshStatus;
+
+    var toggle = function (e) {
+      /* while writing, taps on the words should edit, not fold the letter */
+      if (mode === 'write' && e && e.target && e.target.closest('[data-f]')) return;
+
+      if (env.classList.contains('locked')) {
+        env.classList.remove('shake');
+        void env.offsetWidth;
+        env.classList.add('shake');
+        return;
+      }
+      var opening = !env.classList.contains('open');
+      envs.forEach(function (other) {
+        if (other !== env && other.classList.contains('open')) {
+          other.classList.remove('open');
+          other.querySelector('.env-face').setAttribute('aria-expanded', 'false');
+          other._refreshStatus();
+        }
+      });
+      env.classList.toggle('open', opening);
+      face.setAttribute('aria-expanded', String(opening));
+      if (opening) {
+        env.classList.add('opened-once');
+        save('o_' + id, '1');
+        setTimeout(function () {
+          env.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
+        }, reduce ? 0 : 420);
+      }
+      refreshStatus();
+      refreshCount();
+    };
+    face.addEventListener('click', toggle);
+    face.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); }
+    });
+  });
+  refreshCount();
+
+  /* countdowns tick over and locks respect Write mode */
+  var refreshAllStatuses = function () { envs.forEach(function (env) { env._refreshStatus(); }); };
+  btnGift.addEventListener('click', refreshAllStatuses);
+  btnWrite.addEventListener('click', refreshAllStatuses);
+  setInterval(refreshAllStatuses, 60000);
+
+  /* ---------- reveals ---------- */
+  var revealables = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
+  if (reduce || !('IntersectionObserver' in window)) {
+    revealables.forEach(function (el) { el.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -5% 0px' });
+    revealables.forEach(function (el) { io.observe(el); });
+  }
+})();
+</script>
+</body>
+</html>

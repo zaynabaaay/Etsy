@@ -125,3 +125,11 @@ edit the text directly in `index.html` between the `>` and `</...>` of each
 | `preview/` | Preview images. |
 
 Made with love. Happy anniversary. ✦
+
+---
+
+## More templates in this repository
+
+| Folder | Template |
+| --- | --- |
+| `open-when/` | **Open When — Letters for Later**: six air-mail envelopes that untie and unfold, with letters that can stay sealed until a date you choose. |
