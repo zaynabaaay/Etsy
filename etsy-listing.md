@@ -1,40 +1,42 @@
 # Etsy listing copy (for the seller)
 
-Drop-in wording to help you list this template. Edit freely to match your shop
-voice. This file is for you, the seller — you may want to remove it before
-delivering the download to a buyer.
+Drop-in wording to help you list this template. Edit freely to match your
+shop voice. This file is for you, the seller — you may want to remove it
+before delivering the download to a buyer.
 
 ---
 
 ## Suggested titles
 
-- Personalized Anniversary Letter Website — Wax Seal Envelope Keepsake, Digital Love Letter, Editable, No Code
-- Digital Love Letter Website Template — Sealed Envelope Opens to Your Story | Anniversary, Wedding, Proposal Gift
-- Interactive Anniversary Keepsake Website — Editable "Our Story" Letter, Timeline & Photos, Instant Download
+- Personalized Anniversary Website — "Under the Same Sky" Star Map Keepsake, Your Years as a Constellation, No Code
+- Custom Star Constellation Anniversary Gift — Interactive Keepsake Website, Editable Words & Photos, Instant Download
+- Night Sky Love Story Website Template — Nights-Together Counter, Star Timeline & Photo Lockets | Anniversary Gift
 
 ## Short description (first lines shoppers see)
 
-A keepsake website that opens like a real wax-sealed letter. Tap the seal and
-the envelope unfolds into your story — your opening line, how you met, a
-timeline of your years together, your photos, and a signed goodbye. Fully
-editable right in the browser. No code, no subscriptions, instant download.
+An anniversary keepsake charted like an antique star atlas. Scroll, and your
+years connect star by star into a constellation of your own — your photos in
+gold lockets, a letter by starlight, and every night you've spent together,
+counted live. Fully editable right in the browser. No code, no
+subscriptions, instant download.
 
 ## Full description
 
-Some things are easier to write than to say.
+Every love story happens under the same sky. This one gets charted.
 
-This is a private, hand-lettered keepsake website — a love letter that opens
-like the real thing. It begins as a wax-sealed envelope with your initials
-pressed into the wax. Tap the seal, and the flap lifts, the letter rises, and
-your story unfolds in warm candlelight:
+This is a private keepsake website drawn like an 18th-century star atlas —
+midnight blue, engraved gold, a slowly turning planisphere bearing your two
+initials. Then it unfolds as they scroll:
 
-• An opening line
-• "How we met"
-• A timeline of your years, revealed as you scroll
-• Two framed photos with handwritten captions
-• "The little things" — five small habits you love about them
-• A live "days together" counter that counts up as it scrolls into view
-• A closing message and your signature
+• The night you met
+• Your photographs, set in oval gold lockets
+• Your years, drawn star-by-star into your own constellation as they scroll
+• A catalogue of small things — the little habits you love
+• A letter by starlight, signed in your hand
+• And finally: every night you've spent together, counted up live
+
+A small moon in the corner waxes as they read — new moon at the start, full
+moon by the last page. Now and then, a shooting star.
 
 WHAT YOU GET
 • One single file (index.html) — the whole keepsake, ready to open
@@ -43,28 +45,29 @@ WHAT YOU GET
 
 HOW IT WORKS
 • Open the file in any web browser
-• Tap "Edit" and type your own words — tap any photo to add yours
-• Tap "View" for the finished keepsake, seal and all
+• Tap "Write" and type your own words — tap a locket to add your photos
+• Tap "Gift" to see the finished keepsake
 • A one-tap "Reset" puts everything back if you change your mind
 
 FULLY YOURS TO CUSTOMIZE
-• Every word and both photos are editable — no coding needed
-• Choose a gold or deep oxblood-red wax seal
-• Set the two initials on the seal and your "day one" date
-• The days-together number updates itself, every time it's opened
+• Every word and both photographs are editable — no coding needed
+• Set your "night one" date; the nights-together number updates itself,
+  every time the page is opened
 • Works beautifully on phones, tablets, and computers
 
 PERFECT FOR
-Anniversaries • Weddings • Proposals • Valentine's Day • "just because"
+Anniversaries • Weddings • Proposals • Valentine's Day • long-distance
+love ("we're under the same sky") • "just because"
 
 INSTANT DOWNLOAD — nothing ships. Because this is a digital item, all sales
 are final; message me with any questions before buying and I'll gladly help.
 
 ## Tags (13)
 
-anniversary gift, love letter, digital keepsake, website template, our story,
-editable template, wedding gift, proposal gift, valentines gift, no code,
-romantic gift, personalized gift, instant download
+anniversary gift, star map gift, constellation gift, night sky print,
+digital keepsake, website template, love letter, editable template,
+wedding gift, valentines gift, long distance gift, personalized gift,
+instant download
 
 ## Materials
 
@@ -72,8 +75,9 @@ HTML, digital download, editable template
 
 ## Notes for photos to upload
 
-- The sealed-envelope cover (preview/cover.png)
-- The opened envelope with the letter rising (preview/opened.png)
+- The planisphere cover (preview/cover.png)
+- The constellation drawing itself between the years (preview/constellation.png)
+- The letter by starlight (preview/letter.png)
+- The nights-together counter (preview/nights.png)
 - A mockup on a phone screen
-- A close-up of the wax seal
-- A screenshot of Edit mode showing the dashed "tap to edit" fields
+- A screenshot of Write mode showing the gold "tap to edit" underlines
