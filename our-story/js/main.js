@@ -12,8 +12,13 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 if (prefersReducedMotion) {
   /* Accessibility: no pinning, no scrub — a calm, static page. */
   document.body.classList.add('reduced-motion');
+  /* polaroids still get their resting tilt */
+  gsap.utils.toArray('.polaroid').forEach((p) => {
+    gsap.set(p, { rotation: parseFloat(p.dataset.tilt || 0) });
+  });
 } else {
   initOpening();
+  initBeginning();
 }
 
 function initOpening() {
@@ -92,4 +97,65 @@ function initOpening() {
     .to('.opening-stage', { opacity: 0.18, y: '-9vh', ease: 'none' }, 0)
     .to('.opening-glow',  { opacity: 0.1, ease: 'none' }, 0)
     .to('.scroll-cue',    { opacity: 0, ease: 'none', duration: 0.35 }, 0);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Scene 02 — The Beginning
+   Free-scrolling (not pinned): the chapter head reveals, a gold
+   thread draws itself down the page, and each moment's polaroid
+   settles into place as it enters the viewport.
+   ══════════════════════════════════════════════════════════════════ */
+function initBeginning() {
+
+  /* chapter head */
+  gsap.timeline({
+    scrollTrigger: {
+      trigger: '.chapter-head',
+      start: 'top 88%',
+      end: 'top 42%',
+      scrub: 0.6,
+    },
+  })
+    .from('.chapter-ornament', { opacity: 0, y: 18 }, 0)
+    .from('.chapter-label', { opacity: 0, y: 14 }, 0.12)
+    .from('.chapter-title .mask-inner', { yPercent: 115, ease: 'power2.out' }, 0.18)
+    .from('.chapter-sub', { opacity: 0, y: 16 }, 0.5);
+
+  /* the thread draws downward as the section scrolls */
+  const threadPath = document.querySelector('.thread path');
+  if (threadPath) {
+    const len = threadPath.getTotalLength();
+    gsap.set(threadPath, { strokeDasharray: len, strokeDashoffset: len });
+    gsap.to(threadPath, {
+      strokeDashoffset: 0,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.moments',
+        start: 'top 72%',
+        end: 'bottom 65%',
+        scrub: 0.6,
+      },
+    });
+  }
+
+  /* each moment: date → polaroid settles (tilt easing to rest) → caption → text */
+  gsap.utils.toArray('.moment').forEach((moment) => {
+    const polaroid = moment.querySelector('.polaroid');
+    const tilt = parseFloat(polaroid.dataset.tilt || 0);
+
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: moment,
+        start: 'top 86%',
+        end: 'top 38%',
+        scrub: 0.6,
+      },
+    })
+      .from(moment.querySelector('.moment-date'), { opacity: 0, y: 16 }, 0)
+      .fromTo(polaroid,
+        { opacity: 0, y: 80, rotation: tilt * 2.6 },
+        { opacity: 1, y: 0, rotation: tilt, ease: 'power2.out' }, 0.08)
+      .from(moment.querySelector('.polaroid-caption'), { opacity: 0 }, 0.6)
+      .from(moment.querySelector('.moment-text'), { opacity: 0, y: 26 }, 0.55);
+  });
 }

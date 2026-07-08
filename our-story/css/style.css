@@ -305,12 +305,7 @@ body {
   z-index: 2;
   background: var(--cream);
   color: var(--ink);
-  min-height: 100vh;
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  padding: clamp(5rem, 14vw, 9rem) 0 clamp(6rem, 16vw, 11rem);
 }
 
 .torn-edge {
@@ -331,8 +326,16 @@ body {
      also shadow the svg's straight bottom edge, drawing a line artifact */
 }
 
-.beginning-inner {
-  padding: 4rem 2rem;
+/* ── chapter head ── */
+.chapter-head {
+  text-align: center;
+  padding: 0 clamp(1.5rem, 6vw, 4rem);
+  margin-bottom: clamp(4rem, 12vw, 8rem);
+}
+
+.chapter-ornament {
+  color: var(--gold-deep);
+  margin-bottom: 1.1rem;
 }
 
 .chapter-label {
@@ -341,22 +344,163 @@ body {
   font-size: 0.72rem;
   letter-spacing: 0.42em;
   text-transform: uppercase;
-  color: var(--gold-soft);
+  color: var(--gold-deep);
   padding-left: 0.42em;
   margin-bottom: 1.2rem;
 }
 
 .chapter-title {
   font-weight: 500;
-  font-size: clamp(2.2rem, 7vw, 3.6rem);
+  font-size: clamp(2.2rem, 8vw, 3.8rem);
+  line-height: 1.15;
   color: var(--ink);
 }
 
-.chapter-placeholder {
-  margin-top: 1.4rem;
+.chapter-title .mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.12em 0.1em;
+}
+
+.chapter-title .mask-inner { display: block; }
+
+.chapter-sub {
+  margin-top: 0.9rem;
   font-style: italic;
-  font-size: 1.05rem;
-  color: rgba(43, 33, 24, 0.45);
+  font-size: clamp(1.05rem, 3.4vw, 1.3rem);
+  color: rgba(43, 33, 24, 0.55);
+}
+
+/* ── the moments ── */
+.moments {
+  position: relative;
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 6vw, 4rem);
+}
+
+.thread {
+  position: absolute;
+  left: 50%;
+  top: -3rem;
+  transform: translateX(-50%);
+  width: min(56vw, 300px);
+  height: calc(100% + 3rem);
+  color: rgba(150, 112, 47, 0.5);
+  pointer-events: none;
+}
+
+.moment {
+  position: relative;
+  display: grid;
+  grid-template-areas: "date" "photo" "text";
+  justify-items: center;
+  text-align: center;
+}
+
+.moment-date { grid-area: date; }
+.moment .polaroid { grid-area: photo; }
+.moment .moment-text { grid-area: text; }
+
+.moment + .moment {
+  margin-top: clamp(5rem, 14vw, 9rem);
+}
+
+.moment-date {
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: clamp(0.66rem, 2.3vw, 0.78rem);
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  padding-left: 0.38em;
+  margin-bottom: 1.6rem;
+}
+
+/* ── polaroid ── */
+.polaroid {
+  position: relative;
+  width: min(78vw, 340px);
+  background: #fdfaf1;
+  padding: clamp(10px, 3vw, 14px);
+  padding-bottom: clamp(40px, 11vw, 52px);
+  box-shadow:
+    0 2px 6px rgba(60, 44, 22, 0.12),
+    0 16px 38px rgba(60, 44, 22, 0.18);
+}
+
+.polaroid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  filter: sepia(0.14) saturate(0.92);
+}
+
+.polaroid-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(6px, 2vw, 10px);
+  font-family: var(--font-script);
+  font-size: clamp(1.25rem, 4.4vw, 1.6rem);
+  color: var(--gold-deep);
+  transform: rotate(-2deg);
+}
+
+.tape {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  width: 92px;
+  height: 27px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: rgba(233, 222, 194, 0.62);
+  box-shadow: 0 1px 3px rgba(60, 44, 22, 0.12);
+  backdrop-filter: blur(1px);
+  z-index: 2;
+}
+
+.moment-text {
+  margin-top: 2rem;
+  max-width: 30ch;
+  font-size: clamp(1.15rem, 3.9vw, 1.4rem);
+  line-height: 1.65;
+  color: rgba(43, 33, 24, 0.85);
+}
+
+.moment-text em {
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* desktop: moments alternate around the thread */
+@media (min-width: 768px) {
+  .moment {
+    grid-template-areas:
+      "photo date"
+      "photo text";
+    grid-template-columns: auto minmax(0, 24rem);
+    grid-template-rows: auto auto;
+    align-items: start;
+    align-content: center;
+    column-gap: clamp(3rem, 7vw, 6rem);
+    text-align: left;
+    justify-items: start;
+  }
+
+  /* every other moment flips to the other side of the thread */
+  .moment:nth-of-type(even) {
+    grid-template-areas:
+      "date photo"
+      "text photo";
+    grid-template-columns: minmax(0, 24rem) auto;
+    text-align: right;
+    justify-items: end;
+  }
+
+  .moment-date { align-self: end; }
+  .moment-text { margin-top: 1.4rem; }
 }
 
 /* ══════════════════════════════════════════════

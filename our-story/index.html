@@ -78,8 +78,10 @@
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════
-       SCENE 02 · THE BEGINNING  (placeholder — next scene to be built)
-       Cream paper rises over the dark opening with a torn edge.
+       SCENE 02 · THE BEGINNING
+       The origin story: three moments, each a taped polaroid, a date,
+       a handwritten caption, and a few sentences — joined by a gold
+       thread that draws itself down the page as you scroll.
        ════════════════════════════════════════════════════════════════ -->
   <section class="scene-beginning" id="beginning">
     <div class="torn-edge" aria-hidden="true">
@@ -96,10 +98,70 @@
       </svg>
     </div>
 
-    <div class="beginning-inner">
+    <div class="chapter-head">
+      <div class="chapter-ornament" aria-hidden="true">
+        <svg viewBox="0 0 40 34" width="22" height="19" fill="none">
+          <path d="M20 30C20 30 3 19.5 3 9.8 3 4.9 7 2 11 2c4.3 0 7.4 3 9 6.2C21.6 5 24.7 2 29 2c4 0 8 2.9 8 7.8C37 19.5 20 30 20 30Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <!-- EDIT ME · Chapter label -->
       <p class="chapter-label">Chapter One</p>
-      <h2 class="chapter-title">The Beginning</h2>
-      <p class="chapter-placeholder">— next scene, coming soon —</p>
+      <!-- EDIT ME · Chapter title -->
+      <h2 class="chapter-title"><span class="mask"><span class="mask-inner">The Beginning</span></span></h2>
+      <!-- EDIT ME · Chapter subtitle -->
+      <p class="chapter-sub">Every story has a first page.</p>
+    </div>
+
+    <div class="moments">
+      <!-- the gold thread that draws itself down the page (decorative) -->
+      <svg class="thread" viewBox="0 0 100 1200" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M50,0 C58,60 40,120 50,180 S63,300 50,360 S37,480 50,540 S63,660 50,720 S37,840 50,900 S60,1010 50,1075 L50,1130" fill="none" stroke="currentColor" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+      </svg>
+
+      <!-- ── MOMENT 1 ─────────────────────────────────────────── -->
+      <article class="moment">
+        <!-- EDIT ME · Date -->
+        <p class="moment-date">May 23 · 2019</p>
+        <div class="polaroid" data-tilt="-3">
+          <span class="tape" aria-hidden="true"></span>
+          <!-- EDIT ME · Replace this photo: assets/photos/moment-1.jpg -->
+          <img src="assets/photos/moment-1.jpg" alt="The first hello" loading="lazy">
+          <!-- EDIT ME · Handwritten caption -->
+          <p class="polaroid-caption">the first hello</p>
+        </div>
+        <!-- EDIT ME · The story of this moment -->
+        <p class="moment-text">A crowded room, a borrowed pen, and a conversation that refused to end. I didn&rsquo;t know it yet, but everything after would be measured from that night.</p>
+      </article>
+
+      <!-- ── MOMENT 2 ─────────────────────────────────────────── -->
+      <article class="moment">
+        <!-- EDIT ME · Date -->
+        <p class="moment-date">June 14 · 2019</p>
+        <div class="polaroid" data-tilt="2.5">
+          <span class="tape" aria-hidden="true"></span>
+          <!-- EDIT ME · Replace this photo: assets/photos/moment-2.jpg -->
+          <img src="assets/photos/moment-2.jpg" alt="Our first date" loading="lazy">
+          <!-- EDIT ME · Handwritten caption -->
+          <p class="polaroid-caption">our first date</p>
+        </div>
+        <!-- EDIT ME · The story of this moment -->
+        <p class="moment-text">Coffee that turned into dinner, dinner that turned into a walk neither of us wanted to finish. You laughed at my worst joke, and I was done for.</p>
+      </article>
+
+      <!-- ── MOMENT 3 ─────────────────────────────────────────── -->
+      <article class="moment">
+        <!-- EDIT ME · Date -->
+        <p class="moment-date">August 2 · 2019</p>
+        <div class="polaroid" data-tilt="-2.5">
+          <span class="tape" aria-hidden="true"></span>
+          <!-- EDIT ME · Replace this photo: assets/photos/moment-3.jpg -->
+          <img src="assets/photos/moment-3.jpg" alt="The moment I knew" loading="lazy">
+          <!-- EDIT ME · Handwritten caption -->
+          <p class="polaroid-caption">when I knew</p>
+        </div>
+        <!-- EDIT ME · The story of this moment -->
+        <p class="moment-text">Nothing special was happening &mdash; that&rsquo;s how I knew. An ordinary Tuesday, your head on my shoulder, and the quiet thought: <em>this is home.</em></p>
+      </article>
     </div>
   </section>
 
