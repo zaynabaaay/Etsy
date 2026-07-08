@@ -1,0 +1,378 @@
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/CormorantGaramond-400-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/CormorantGaramond-500-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/CormorantGaramond-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/CormorantGaramond-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/CormorantGaramond-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Great Vibes';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/GreatVibes-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../assets/fonts/Jost-300.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/Jost-400.woff2') format('woff2');
+}
+/* ══════════════════════════════════════════════════════════════════
+   OUR STORY · A cinematic scrolling anniversary experience
+   ──────────────────────────────────────────────────────────────────
+   PALETTE — edit these variables to re-tint the whole experience
+   ══════════════════════════════════════════════════════════════════ */
+:root {
+  --espresso:        #171009;   /* deep warm near-black            */
+  --espresso-glow:   #3d2812;   /* candlelit center of the dark    */
+  --cream:           #f3ecdc;   /* aged paper                      */
+  --cream-text:      #f2e7d0;   /* light type on dark              */
+  --ink:             #2b2118;   /* dark type on cream              */
+  --gold:            #c9a15f;   /* antique gold accents            */
+  --gold-soft:       #b98f4e;   /* muted gold for small labels     */
+
+  --font-serif:  'Cormorant Garamond', 'Times New Roman', serif;
+  --font-script: 'Great Vibes', cursive;
+  --font-label:  'Jost', 'Helvetica Neue', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: auto; }
+
+body {
+  background: var(--espresso);
+  color: var(--cream-text);
+  font-family: var(--font-serif);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ──────────────────────────────────────────────
+   Film grain — a whisper of texture over everything
+   ────────────────────────────────────────────── */
+.grain {
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 1.2s steps(3) infinite;
+}
+@keyframes grain-shift {
+  0%   { transform: translate(0, 0); }
+  33%  { transform: translate(-2%, 1%); }
+  66%  { transform: translate(1%, -2%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ══════════════════════════════════════════════
+   SCENE 01 · THE OPENING
+   ══════════════════════════════════════════════ */
+.scene-opening {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 46%, rgba(84, 52, 22, 0.4), transparent 70%),
+    radial-gradient(ellipse 140% 100% at 50% 50%, var(--espresso) 55%, #0d0805 100%);
+}
+
+/* the candlelight behind the names — brightens as they arrive */
+.opening-glow {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(120vw, 900px);
+  aspect-ratio: 1.4;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center, rgba(160, 100, 40, 0.34), rgba(120, 72, 28, 0.12) 45%, transparent 70%);
+  opacity: 0.22;
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.opening-stage {
+  position: absolute;
+  inset: 0;
+}
+
+/* every moment owns the full screen, centered */
+.intro-screen,
+.opening-line,
+.names-group {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 clamp(1.5rem, 6vw, 4rem);
+}
+
+/* ── Moment 1 · intro ── */
+.intro-ornament {
+  color: var(--gold);
+  opacity: 0;
+  margin-bottom: 1.4rem;
+}
+
+.intro-label {
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: clamp(0.68rem, 2.4vw, 0.8rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  opacity: 0;
+  transform: translateY(14px);
+  /* compensate optical shift from tracking */
+  padding-left: 0.42em;
+}
+
+/* ── Moment 2 · the two lines ── */
+.opening-line {
+  visibility: hidden;
+}
+
+.opening-line .mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.18em 0.1em;
+}
+
+.opening-line .mask-inner {
+  display: block;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.55rem, 6vw, 3.1rem);
+  line-height: 1.35;
+  color: var(--cream-text);
+  max-width: 22ch;
+  /* initial offset is set by GSAP (js/main.js) — no CSS transform here,
+     the two would fight and the line would never reach center */
+}
+
+/* ── Moment 3 · the names ── */
+.names-script {
+  font-family: var(--font-script);
+  font-size: clamp(1.5rem, 5.4vw, 2.5rem);
+  color: var(--gold);
+  transform: rotate(-2.5deg) translateY(16px);
+  opacity: 0;
+  margin-bottom: clamp(0.4rem, 1.6vw, 1rem);
+}
+
+.names-title {
+  font-weight: 500;
+  font-variant-caps: small-caps;
+  text-transform: lowercase;
+  font-size: clamp(2.5rem, 10.5vw, 6.4rem);
+  line-height: 1.08;
+  letter-spacing: 0.3em;
+  color: var(--cream-text);
+  text-shadow: 0 0 60px rgba(210, 150, 70, 0.25);
+  opacity: 0;
+  /* compensate optical shift from tracking */
+  padding-left: 0.3em;
+  white-space: nowrap;
+}
+
+.names-title .amp {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gold);
+  font-size: 0.82em;
+}
+
+.names-rule {
+  width: clamp(90px, 22vw, 170px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 18%, var(--gold) 82%, transparent);
+  margin: clamp(1.1rem, 3vw, 1.8rem) 0;
+  transform: scaleX(0);
+  opacity: 0.9;
+}
+
+.names-date {
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: clamp(0.66rem, 2.3vw, 0.82rem);
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  opacity: 0;
+  transform: translateY(12px);
+  padding-left: 0.38em;
+}
+
+/* ── Scroll cue ── */
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  opacity: 0;
+}
+
+.scroll-cue-label {
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  padding-left: 0.4em;
+}
+
+.scroll-cue-line {
+  display: block;
+  width: 1px;
+  height: 52px;
+  overflow: hidden;
+  background: rgba(201, 161, 95, 0.18);
+}
+
+.scroll-cue-line-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+  transform: translateY(-100%);
+  animation: cue-drop 2.4s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+@keyframes cue-drop {
+  0%   { transform: translateY(-100%); }
+  60%  { transform: translateY(100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* ══════════════════════════════════════════════
+   SCENE 02 · handoff target (placeholder)
+   ══════════════════════════════════════════════ */
+.scene-beginning {
+  position: relative;
+  z-index: 2;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.torn-edge {
+  position: absolute;
+  top: 1px;
+  left: 0;
+  width: 100%;
+  transform: translateY(-100%);
+  line-height: 0;
+  pointer-events: none;
+}
+
+.torn-edge svg {
+  display: block;
+  width: 100%;
+  height: clamp(28px, 5vw, 70px);
+  filter: drop-shadow(0 -14px 24px rgba(13, 8, 5, 0.35));
+}
+
+.beginning-inner {
+  padding: 4rem 2rem;
+}
+
+.chapter-label {
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: 0.72rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  padding-left: 0.42em;
+  margin-bottom: 1.2rem;
+}
+
+.chapter-title {
+  font-weight: 500;
+  font-size: clamp(2.2rem, 7vw, 3.6rem);
+  color: var(--ink);
+}
+
+.chapter-placeholder {
+  margin-top: 1.4rem;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: rgba(43, 33, 24, 0.45);
+}
+
+/* ══════════════════════════════════════════════
+   Reduced motion — show everything, animate nothing
+   ══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; }
+  .scroll-cue-line-inner { animation: none; transform: translateY(0); }
+}
+
+body.reduced-motion .intro-screen,
+body.reduced-motion .opening-line { display: none; }
+
+body.reduced-motion .names-group .names-script,
+body.reduced-motion .names-group .names-title,
+body.reduced-motion .names-group .names-rule,
+body.reduced-motion .names-group .names-date,
+body.reduced-motion .scroll-cue {
+  opacity: 1;
+  transform: none;
+  letter-spacing: initial;
+}
