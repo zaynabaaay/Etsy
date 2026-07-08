@@ -67,6 +67,7 @@
   --ink:             #2b2118;   /* dark type on cream              */
   --gold:            #c9a15f;   /* antique gold accents            */
   --gold-soft:       #b98f4e;   /* muted gold for small labels     */
+  --gold-deep:       #96702f;   /* gold dark enough to read on cream */
 
   --font-serif:  'Cormorant Garamond', 'Times New Roman', serif;
   --font-script: 'Great Vibes', cursive;
@@ -78,8 +79,8 @@
 html { scroll-behavior: auto; }
 
 body {
-  background: var(--espresso);
-  color: var(--cream-text);
+  background: var(--cream);
+  color: var(--ink);
   font-family: var(--font-serif);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -115,12 +116,13 @@ body {
   height: 100vh;
   height: 100svh;
   overflow: hidden;
+  /* warm parchment, faintly darker toward the edges */
   background:
-    radial-gradient(ellipse 90% 60% at 50% 46%, rgba(84, 52, 22, 0.4), transparent 70%),
-    radial-gradient(ellipse 140% 100% at 50% 50%, var(--espresso) 55%, #0d0805 100%);
+    radial-gradient(ellipse 95% 70% at 50% 44%, rgba(255, 250, 238, 0.75), transparent 70%),
+    radial-gradient(ellipse 140% 110% at 50% 50%, #efe5cf 50%, #e3d5b4 100%);
 }
 
-/* the candlelight behind the names — brightens as they arrive */
+/* a soft wash of sunlight behind the names — warms as they arrive */
 .opening-glow {
   position: absolute;
   left: 50%;
@@ -128,8 +130,8 @@ body {
   width: min(120vw, 900px);
   aspect-ratio: 1.4;
   transform: translate(-50%, -50%);
-  background: radial-gradient(ellipse at center, rgba(160, 100, 40, 0.34), rgba(120, 72, 28, 0.12) 45%, transparent 70%);
-  opacity: 0.22;
+  background: radial-gradient(ellipse at center, rgba(214, 170, 100, 0.28), rgba(214, 170, 100, 0.1) 45%, transparent 70%);
+  opacity: 0.25;
   filter: blur(6px);
   pointer-events: none;
 }
@@ -155,7 +157,7 @@ body {
 
 /* ── Moment 1 · intro ── */
 .intro-ornament {
-  color: var(--gold);
+  color: var(--gold-deep);
   opacity: 0;
   margin-bottom: 1.4rem;
 }
@@ -166,7 +168,7 @@ body {
   font-size: clamp(0.68rem, 2.4vw, 0.8rem);
   letter-spacing: 0.42em;
   text-transform: uppercase;
-  color: var(--gold-soft);
+  color: var(--gold-deep);
   opacity: 0;
   transform: translateY(14px);
   /* compensate optical shift from tracking */
@@ -190,7 +192,7 @@ body {
   font-weight: 400;
   font-size: clamp(1.55rem, 6vw, 3.1rem);
   line-height: 1.35;
-  color: var(--cream-text);
+  color: var(--ink);
   max-width: 22ch;
   /* initial offset is set by GSAP (js/main.js) — no CSS transform here,
      the two would fight and the line would never reach center */
@@ -200,7 +202,7 @@ body {
 .names-script {
   font-family: var(--font-script);
   font-size: clamp(1.5rem, 5.4vw, 2.5rem);
-  color: var(--gold);
+  color: var(--gold-deep);
   transform: rotate(-2.5deg) translateY(16px);
   opacity: 0;
   margin-bottom: clamp(0.4rem, 1.6vw, 1rem);
@@ -213,8 +215,8 @@ body {
   font-size: clamp(2.5rem, 10.5vw, 6.4rem);
   line-height: 1.08;
   letter-spacing: 0.3em;
-  color: var(--cream-text);
-  text-shadow: 0 0 60px rgba(210, 150, 70, 0.25);
+  color: var(--ink);
+  text-shadow: 0 0 50px rgba(201, 161, 95, 0.35);
   opacity: 0;
   /* compensate optical shift from tracking */
   padding-left: 0.3em;
@@ -224,14 +226,14 @@ body {
 .names-title .amp {
   font-style: italic;
   font-weight: 400;
-  color: var(--gold);
+  color: var(--gold-deep);
   font-size: 0.82em;
 }
 
 .names-rule {
   width: clamp(90px, 22vw, 170px);
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold) 18%, var(--gold) 82%, transparent);
+  background: linear-gradient(90deg, transparent, var(--gold-deep) 18%, var(--gold-deep) 82%, transparent);
   margin: clamp(1.1rem, 3vw, 1.8rem) 0;
   transform: scaleX(0);
   opacity: 0.9;
@@ -243,7 +245,7 @@ body {
   font-size: clamp(0.66rem, 2.3vw, 0.82rem);
   letter-spacing: 0.38em;
   text-transform: uppercase;
-  color: var(--gold-soft);
+  color: var(--gold-deep);
   opacity: 0;
   transform: translateY(12px);
   padding-left: 0.38em;
@@ -268,7 +270,7 @@ body {
   font-size: 0.62rem;
   letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: var(--gold-soft);
+  color: var(--gold-deep);
   padding-left: 0.4em;
 }
 
@@ -277,14 +279,14 @@ body {
   width: 1px;
   height: 52px;
   overflow: hidden;
-  background: rgba(201, 161, 95, 0.18);
+  background: rgba(150, 112, 47, 0.22);
 }
 
 .scroll-cue-line-inner {
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+  background: linear-gradient(to bottom, transparent, var(--gold-deep), transparent);
   transform: translateY(-100%);
   animation: cue-drop 2.4s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
@@ -325,7 +327,7 @@ body {
   display: block;
   width: 100%;
   height: clamp(28px, 5vw, 70px);
-  filter: drop-shadow(0 -14px 24px rgba(13, 8, 5, 0.35));
+  filter: drop-shadow(0 -10px 18px rgba(90, 68, 35, 0.18));
 }
 
 .beginning-inner {
