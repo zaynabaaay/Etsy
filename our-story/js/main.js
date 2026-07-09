@@ -272,17 +272,17 @@ function initNumbers() {
    ══════════════════════════════════════════════════════════════════ */
 function initMontage() {
 
-  /* each photo flies in from its nearest screen edge and arcs down
-     into place. dir: -1 = from the left edge, 1 = from the right.
-     over/settle: how far past center momentum carries it, and the
-     over-rotation, varied per photo so it reads as thrown by hand. */
-  const flights = [
-    { dir: -1, over: -18, ra: -10, rb: 4 },
-    { dir: 1,  over: 26,  ra: 12,  rb: -5 },
-    { dir: -1, over: -10, ra: -6,  rb: 2.5 },
-    { dir: 1,  over: 18,  ra: 9,   rb: -4 },
-    { dir: 1,  over: 34,  ra: 14,  rb: -6 },   // the widest arc
-    { dir: -1, over: -22, ra: -8,  rb: 3 },
+  /* every photo falls from above the top of the screen. Most sway
+     down like paper (x0 = lateral entry, ra/rb = decaying rotation);
+     a couple tumble — spin = a full revolution that unwinds as they
+     fall, landing on their resting tilt. */
+  const falls = [
+    { x0: -60, ra: -8, rb: 3,  spin: 0 },
+    { x0: 70,  ra: 0,  rb: 0,  spin: 360 },   // flips clockwise
+    { x0: -35, ra: -5, rb: 2,  spin: 0 },
+    { x0: 55,  ra: 8,  rb: -3, spin: 0 },
+    { x0: 85,  ra: 13, rb: -5, spin: 0 },     // the widest sway
+    { x0: -50, ra: 0,  rb: 0,  spin: -360 },  // flips the other way
   ];
 
   gsap.utils.toArray('.mdrift').forEach((wrap, i) => {
@@ -290,7 +290,7 @@ function initMontage() {
     const photo = wrap.querySelector('.mphoto');
     const caption = wrap.querySelector('.mcap');
     const tilt = parseFloat(photo.dataset.tilt || 0);
-    const f = flights[i % flights.length];
+    const f = falls[i % falls.length];
 
     /* outer wrapper: parallax drift across the whole viewport journey */
     gsap.fromTo(wrap,
@@ -306,49 +306,58 @@ function initMontage() {
         },
       });
 
-    /* inner print: flies in from beyond the screen edge, high above
-       its spot, arcs past center, and settles back down onto the page */
+    /* inner print: the fall — appears near the top of the screen and
+       descends over a long stretch of scroll (unhurried on purpose) */
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: wrap,
-        start: 'top 98%',
-        end: 'top 48%',
-        scrub: 0.6,
-        invalidateOnRefresh: true, /* the edge/height offsets are viewport-based */
+        start: 'top 96%',
+        end: 'top 45%',
+        scrub: 0.8,
+        invalidateOnRefresh: true, /* height offset is viewport-based */
       },
     });
 
-    tl
-      /* leg 1 · the throw: from fully off-screen (side) and high up,
-         momentum carrying it slightly past its column */
-      .fromTo(photo,
-        {
-          x: () => f.dir * (window.innerWidth * 1.05),
-          y: () => -(window.innerHeight * 0.32 + depth * 1.5),
-          rotation: tilt + f.ra,
-          scale: 1.06,
-          '--lift': 1,
-        },
-        {
-          x: f.over,
-          y: () => -(window.innerHeight * 0.06),
-          rotation: tilt + f.rb,
-          scale: 1.02,
-          duration: 0.62,
-          ease: 'sine.out',
-        }, 0)
-      /* leg 2 · the settle: swings back to center and presses flat */
-      .to(photo, {
-        x: 0,
+    /* hidden until its fall begins — otherwise the pre-fall photo
+       would sit stacked over the content above it */
+    tl.fromTo(photo, { opacity: 0 }, { opacity: 1, duration: 0.08, ease: 'none' }, 0);
+
+    /* the descent: materializes just under the viewport top, falls
+       the full height of the screen down to its spot */
+    tl.fromTo(photo,
+      {
+        y: () => -(window.innerHeight * 0.9),
+        x: f.x0,
+        scale: 1.06,
+        '--lift': 1,
+      },
+      {
         y: 0,
-        rotation: tilt,
-        scale: 1,
-        '--lift': 0,
-        duration: 0.38,
-        ease: 'sine.inOut',
-      }, 0.62)
+        scale: 1.01,
+        duration: 1,
+        ease: 'sine.out',
+        immediateRender: true,
+      }, 0);
+
+    if (f.spin) {
+      /* tumbler: one full revolution unwinding onto the resting tilt */
+      tl.fromTo(photo,
+        { rotation: tilt + f.spin },
+        { rotation: tilt, duration: 1, ease: 'sine.out' }, 0);
+    } else {
+      /* swayer: drift out, correct, settle */
+      tl.fromTo(photo,
+        { rotation: tilt + f.ra },
+        { rotation: tilt + f.rb, duration: 0.6, ease: 'sine.inOut' }, 0)
+        .to(photo, { rotation: tilt, duration: 0.4, ease: 'sine.out' }, 0.6);
+    }
+
+    /* lateral sway back to center + the landing press */
+    tl.to(photo, { x: f.x0 * -0.35, duration: 0.55, ease: 'sine.inOut' }, 0)
+      .to(photo, { x: 0, duration: 0.45, ease: 'sine.out' }, 0.55)
+      .to(photo, { scale: 1, '--lift': 0, duration: 0.3, ease: 'sine.out' }, 0.7)
       /* the label is written once the print has landed */
-      .fromTo(caption, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'none' }, 0.88);
+      .fromTo(caption, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'none' }, 0.9);
   });
 
   /* the bridge line — slows the tempo back down */
