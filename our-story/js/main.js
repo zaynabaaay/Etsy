@@ -84,11 +84,15 @@ function initChapterHeads() {
 
 function initOpening() {
 
-  /* ── Load-in: the hushed first screen (time-based, not scroll) ── */
+  /* ── Load-in: the hushed first screen (time-based, not scroll) ──
+     the first line is "written" on, left to right, like a pen ── */
   gsap.timeline({ defaults: { ease: 'power2.out' } })
     .to('.intro-ornament', { opacity: 1, duration: 1.4, delay: 0.5 })
-    .to('.intro-label',    { opacity: 1, y: 0, duration: 1.2 }, '-=0.8')
-    .to('.scroll-cue',     { opacity: 1, duration: 1.2 }, '-=0.5');
+    .set('.intro-label', { opacity: 1 }, '-=0.6')
+    .fromTo('.intro-label',
+      { clipPath: 'inset(-30% 100% -30% 0)' },
+      { clipPath: 'inset(-30% 0% -30% 0)', duration: 1.7, ease: 'power1.out' }, '<')
+    .to('.scroll-cue',     { opacity: 1, duration: 1.2 }, '-=0.6');
 
   /* ── The master scrub: scrolling is the playhead ──
      The panel holds still via CSS sticky; this timeline is scrubbed
