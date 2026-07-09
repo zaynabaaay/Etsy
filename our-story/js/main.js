@@ -42,6 +42,7 @@ if (prefersReducedMotion) {
   initNumbers();
   initMontage();
   initQuiet();
+  initLetter();
 }
 
 /* shared: every chapter head reveals the same way — ornament, label,
@@ -433,4 +434,54 @@ function initQuiet() {
       { yPercent: 115, filter: 'blur(6px)' },
       { yPercent: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, 6.6)
     .to('.ql-final', { yPercent: 0, duration: 0.9 }, 7.5); /* held beat before release */
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Scene 06 — The Letter
+   The climax. Each part reveals tied to scroll, so the letter can
+   only be read at reading pace. The signature arrives last.
+   ══════════════════════════════════════════════════════════════════ */
+function initLetter() {
+
+  /* the head */
+  gsap.timeline({
+    scrollTrigger: {
+      trigger: '.letter-head',
+      start: 'top 90%',
+      end: 'top 55%',
+      scrub: 0.6,
+    },
+  })
+    .from('.letter-ornament', { opacity: 0, y: 16 }, 0)
+    .from('.letter-label', { opacity: 0, y: 12 }, 0.2);
+
+  /* each paragraph rises into clarity as it is scrolled through —
+     the pacing is the point, so the reveal spans real scroll distance */
+  gsap.utils.toArray('.letter .lp').forEach((p) => {
+    gsap.from(p, {
+      opacity: 0,
+      y: 26,
+      filter: 'blur(4px)',
+      ease: 'power1.out',
+      scrollTrigger: {
+        trigger: p,
+        start: 'top 88%',
+        end: 'top 58%',
+        scrub: 0.7,
+      },
+    });
+  });
+
+  /* the signature arrives last, with a little warmth */
+  gsap.timeline({
+    scrollTrigger: {
+      trigger: '.letter-sign',
+      start: 'top 90%',
+      end: 'top 55%',
+      scrub: 0.7,
+    },
+  })
+    .from('.sign-pre', { opacity: 0, y: 14 }, 0)
+    .from('.sign-name', { opacity: 0, y: 20, scale: 0.94, ease: 'power2.out' }, 0.2)
+    .fromTo('.letter-glow', { opacity: 0.45 }, { opacity: 1, ease: 'sine.out' }, 0);
 }
