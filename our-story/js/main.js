@@ -41,6 +41,7 @@ if (prefersReducedMotion) {
   initBeginning();
   initNumbers();
   initMontage();
+  initQuiet();
 }
 
 /* shared: every chapter head reveals the same way — ornament, label,
@@ -377,4 +378,59 @@ function initMontage() {
       scrub: 0.6,
     },
   });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Scene 05 — The Quiet
+   Pinned. Lines appear one beat at a time while evening falls on the
+   page: the background dims from cream through dusk to espresso, so
+   the scene ends already inside the dark world of the letter.
+   ══════════════════════════════════════════════════════════════════ */
+function initQuiet() {
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.scene-quiet',
+      start: 'top top',
+      end: '+=420%',
+      pin: true,
+      scrub: 0.7,
+      anticipatePin: 1,
+    },
+  });
+
+  /* evening falls — one continuous dimming, timed so each line sits
+     on a background it is readable against */
+  tl.fromTo('.scene-quiet',
+    { backgroundColor: '#f3ecdc' },
+    { backgroundColor: '#dccca9', duration: 3.2, ease: 'none' }, 0)
+    .to('.scene-quiet', { backgroundColor: '#6f5430', duration: 1.4, ease: 'none' }, 3.2)
+    .to('.scene-quiet', { backgroundColor: '#171009', duration: 2.0, ease: 'none' }, 4.6);
+
+  /* beat one */
+  tl.set('.ql-1', { visibility: 'visible' }, 0.2)
+    .fromTo('.ql-1 .mask-inner',
+      { yPercent: 115, filter: 'blur(6px)' },
+      { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 0.2)
+    .to('.ql-1', { opacity: 0, y: -50, duration: 0.6, ease: 'power1.in' }, 1.5);
+
+  /* beat two */
+  tl.set('.ql-2', { visibility: 'visible' }, 2.2)
+    .fromTo('.ql-2 .mask-inner',
+      { yPercent: 115, filter: 'blur(6px)' },
+      { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 2.2)
+    .to('.ql-2', { opacity: 0, y: -50, duration: 0.6, ease: 'power1.in' }, 3.4);
+
+  /* the remembered little things — quicker, gentler, accumulating */
+  tl.fromTo('.qs-1', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }, 4.2)
+    .fromTo('.qs-2', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }, 4.55)
+    .fromTo('.qs-3', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }, 4.9)
+    .to('.quiet-stack', { opacity: 0, duration: 0.5, ease: 'power1.in' }, 5.9);
+
+  /* the final line lands alone in the dark, and stays */
+  tl.set('.ql-final', { visibility: 'visible' }, 6.6)
+    .fromTo('.ql-final .mask-inner',
+      { yPercent: 115, filter: 'blur(6px)' },
+      { yPercent: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, 6.6)
+    .to('.ql-final', { yPercent: 0, duration: 0.9 }, 7.5); /* held beat before release */
 }

@@ -740,6 +740,69 @@ body {
 }
 
 /* ══════════════════════════════════════════════
+   SCENE 05 · THE QUIET
+   ══════════════════════════════════════════════ */
+.scene-quiet {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--cream); /* animated to espresso by the scroll */
+}
+
+.quiet-stage {
+  position: absolute;
+  inset: 0;
+}
+
+.quiet-line,
+.quiet-stack {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 clamp(1.5rem, 6vw, 4rem);
+}
+
+.quiet-line {
+  visibility: hidden;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 5.6vw, 2.9rem);
+  line-height: 1.4;
+}
+
+.quiet-line .mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.18em 0.1em;
+}
+
+.quiet-line .mask-inner {
+  display: block;
+  max-width: 22ch;
+}
+
+/* the first two lines live in daylight — ink on paper */
+.ql-1, .ql-2 { color: var(--ink); }
+
+/* the stack and the final line live in the dusk/dark — candlelit cream */
+.quiet-stack, .ql-final { color: var(--cream-text); }
+
+.quiet-stack { gap: clamp(0.9rem, 3vw, 1.5rem); }
+
+.quiet-small {
+  font-style: italic;
+  font-size: clamp(1.2rem, 4.4vw, 2rem);
+  line-height: 1.4;
+  opacity: 0; /* revealed by the scroll */
+}
+
+/* ══════════════════════════════════════════════
    Reduced motion — show everything, animate nothing
    ══════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
@@ -759,3 +822,9 @@ body.reduced-motion .scroll-cue {
   transform: none;
   letter-spacing: initial;
 }
+
+/* The Quiet, static: dark room, final line only */
+body.reduced-motion .scene-quiet { background: var(--espresso); }
+body.reduced-motion .ql-final { visibility: visible; }
+body.reduced-motion .quiet-small { opacity: 1; }
+body.reduced-motion .quiet-stack { display: none; }
