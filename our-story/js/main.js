@@ -138,24 +138,39 @@ function initBeginning() {
     });
   }
 
-  /* each moment: date → polaroid settles (tilt easing to rest) → caption → text */
+  /* each moment plays like a hand assembling the page:
+     the photo appears hovering above the paper (oversized, big soft
+     shadow), is pressed flat (scale + shadow tighten together), the
+     tape stamps on, and only then is the caption + story written in */
   gsap.utils.toArray('.moment').forEach((moment) => {
     const polaroid = moment.querySelector('.polaroid');
+    const tape = moment.querySelector('.tape');
     const tilt = parseFloat(polaroid.dataset.tilt || 0);
 
     gsap.timeline({
       scrollTrigger: {
         trigger: moment,
         start: 'top 86%',
-        end: 'top 38%',
+        end: 'top 30%',
         scrub: 0.6,
       },
     })
-      .from(moment.querySelector('.moment-date'), { opacity: 0, y: 16 }, 0)
+      .from(moment.querySelector('.moment-date'), { opacity: 0, y: 16, duration: 0.5 }, 0)
+      /* beat 1 · lifted: fades in hovering, barely any slide */
       .fromTo(polaroid,
-        { opacity: 0, y: 80, rotation: tilt * 2.6 },
-        { opacity: 1, y: 0, rotation: tilt, ease: 'power2.out' }, 0.08)
-      .from(moment.querySelector('.polaroid-caption'), { opacity: 0 }, 0.6)
-      .from(moment.querySelector('.moment-text'), { opacity: 0, y: 26 }, 0.55);
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3, ease: 'power1.out' }, 0.1)
+      /* beat 2 · pressed: shrinking to rest reads as moving down onto
+         the page; the shadows cross-fade from soft/far to tight/flat */
+      .fromTo(polaroid,
+        { y: 16, scale: 1.13, rotation: tilt * 2.2, '--lift': 1 },
+        { y: 0, scale: 1, rotation: tilt, '--lift': 0, duration: 1.1, ease: 'power2.inOut' }, 0.1)
+      /* beat 3 · taped: the strip stamps on once the photo is flat */
+      .fromTo(tape,
+        { opacity: 0, scaleY: 1.4, scaleX: 1.2 },
+        { opacity: 1, scaleY: 1, scaleX: 1, duration: 0.3, ease: 'power3.out' }, 1.15)
+      /* beat 4 · written: caption, then the story */
+      .from(moment.querySelector('.polaroid-caption'), { opacity: 0, duration: 0.4 }, 1.4)
+      .from(moment.querySelector('.moment-text'), { opacity: 0, y: 26, duration: 0.6 }, 1.35);
   });
 }

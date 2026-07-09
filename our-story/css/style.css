@@ -424,9 +424,33 @@ body {
   background: #fdfaf1;
   padding: clamp(10px, 3vw, 14px);
   padding-bottom: clamp(40px, 11vw, 52px);
+  /* --lift: 1 = hovering above the page, 0 = pressed flat.
+     Driven by GSAP; the two shadow layers below cross-fade on it. */
+  --lift: 0;
+}
+
+/* lifted shadow: big, soft, offset — a photo held above the desk */
+.polaroid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  box-shadow:
+    0 34px 60px rgba(60, 44, 22, 0.38),
+    0 14px 30px rgba(60, 44, 22, 0.22);
+  opacity: var(--lift);
+}
+
+/* resting shadow: tight, crisp — a photo pressed flat on paper */
+.polaroid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   box-shadow:
     0 2px 6px rgba(60, 44, 22, 0.12),
-    0 16px 38px rgba(60, 44, 22, 0.18);
+    0 14px 32px rgba(60, 44, 22, 0.16);
+  opacity: calc(1 - var(--lift));
 }
 
 .polaroid img {
