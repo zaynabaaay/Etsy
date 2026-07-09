@@ -620,6 +620,84 @@ body {
 }
 
 /* ══════════════════════════════════════════════
+   SCENE 04 · THE MOMENTS THAT MADE US
+   ══════════════════════════════════════════════ */
+.scene-montage {
+  position: relative;
+  z-index: 2;
+  background: var(--cream);
+  color: var(--ink);
+  padding: clamp(5rem, 14vw, 9rem) 0 clamp(5rem, 14vw, 8rem);
+  overflow: hidden; /* parallax drift must never cause sideways scroll */
+}
+
+.montage {
+  position: relative;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.2rem, 5vw, 3.5rem);
+}
+
+.mphoto {
+  position: relative;
+  background: #fdfaf1;
+  padding: clamp(6px, 1.6vw, 9px);
+  padding-bottom: 0;
+  box-shadow:
+    0 2px 5px rgba(60, 44, 22, 0.1),
+    0 12px 30px rgba(60, 44, 22, 0.14);
+}
+
+.mphoto img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: sepia(0.12) saturate(0.94);
+}
+
+.mcap {
+  padding: 0.75rem 0.2rem 0.85rem;
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: clamp(0.58rem, 2vw, 0.68rem);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+
+.mcap-script {
+  font-family: var(--font-script);
+  font-size: clamp(1.1rem, 3.8vw, 1.45rem);
+  letter-spacing: 0;
+  text-transform: none;
+  transform: rotate(-2deg);
+  padding-bottom: 0.6rem;
+}
+
+/* the cascade: sizes + offsets zigzag down the page, edges overlapping.
+   Percentages are of the .montage column, so the composition holds on
+   every screen size. */
+.mphoto-1 { width: 74%;  margin-left: 2%; }
+.mphoto-2 { width: 44%;  margin-left: 54%; margin-top: -9%; z-index: 2; }
+.mphoto-3 { width: 58%;  margin-left: 12%; margin-top: 9%; }
+.mphoto-4 { width: 38%;  margin-left: 58%; margin-top: -8%; z-index: 2; }
+.mphoto-5 { width: 72%;  margin-left: 24%; margin-top: 11%; }
+.mphoto-6 { width: 48%;  margin-left: 4%;  margin-top: -11%; z-index: 2; }
+
+.mphoto-2 .mcap, .mphoto-4 .mcap, .mphoto-5 .mcap { text-align: right; }
+
+.montage-exit {
+  margin: clamp(5rem, 14vw, 8rem) auto 0;
+  max-width: 26ch;
+  padding: 0 clamp(1.5rem, 6vw, 4rem);
+  text-align: center;
+  font-style: italic;
+  font-size: clamp(1.2rem, 4.2vw, 1.6rem);
+  line-height: 1.5;
+  color: rgba(43, 33, 24, 0.6);
+}
+
+/* ══════════════════════════════════════════════
    Reduced motion — show everything, animate nothing
    ══════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {

@@ -29,8 +29,29 @@ if (prefersReducedMotion) {
   });
 } else {
   initOpening();
+  initChapterHeads();
   initBeginning();
   initNumbers();
+  initMontage();
+}
+
+/* shared: every chapter head reveals the same way — ornament, label,
+   masked title, subtitle */
+function initChapterHeads() {
+  gsap.utils.toArray('.chapter-head').forEach((head) => {
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: head,
+        start: 'top 88%',
+        end: 'top 42%',
+        scrub: 0.6,
+      },
+    })
+      .from(head.querySelector('.chapter-ornament'), { opacity: 0, y: 18 }, 0)
+      .from(head.querySelector('.chapter-label'), { opacity: 0, y: 14 }, 0.12)
+      .from(head.querySelector('.chapter-title .mask-inner'), { yPercent: 115, ease: 'power2.out' }, 0.18)
+      .from(head.querySelector('.chapter-sub'), { opacity: 0, y: 16 }, 0.5);
+  });
 }
 
 function initOpening() {
@@ -118,20 +139,6 @@ function initOpening() {
    settles into place as it enters the viewport.
    ══════════════════════════════════════════════════════════════════ */
 function initBeginning() {
-
-  /* chapter head */
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: '.chapter-head',
-      start: 'top 88%',
-      end: 'top 42%',
-      scrub: 0.6,
-    },
-  })
-    .from('.chapter-ornament', { opacity: 0, y: 18 }, 0)
-    .from('.chapter-label', { opacity: 0, y: 14 }, 0.12)
-    .from('.chapter-title .mask-inner', { yPercent: 115, ease: 'power2.out' }, 0.18)
-    .from('.chapter-sub', { opacity: 0, y: 16 }, 0.5);
 
   /* the thread draws downward as the section scrolls */
   const threadPath = document.querySelector('.thread path');
@@ -245,5 +252,77 @@ function initNumbers() {
         scrollTrigger: { trigger: stat, start: 'top 80%', once: true },
       });
     }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Scene 04 — The Moments That Made Us
+   The montage. Every photo lives at its own depth: data-depth is how
+   many px it drifts against the scroll over its journey across the
+   screen. Big photos drift little (heavy, close); small ones drift a
+   lot (light, floating past). Captions trail their photo slightly.
+   ══════════════════════════════════════════════════════════════════ */
+function initMontage() {
+
+  gsap.utils.toArray('.mphoto').forEach((photo) => {
+    const depth = parseFloat(photo.dataset.depth || 40);
+    const caption = photo.querySelector('.mcap');
+
+    /* parallax drift across the whole journey through the viewport */
+    gsap.fromTo(photo,
+      { y: depth },
+      {
+        y: -depth,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: photo,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+        },
+      });
+
+    /* caption trails a touch behind its photo */
+    if (caption) {
+      gsap.fromTo(caption,
+        { y: depth * 0.35 },
+        {
+          y: -depth * 0.35,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: photo,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
+        });
+    }
+
+    /* soft arrival: already in place, just hushed — brightens as it
+       passes into view (opacity/scale only; y belongs to the parallax) */
+    gsap.from(photo, {
+      opacity: 0,
+      scale: 0.975,
+      ease: 'power1.out',
+      scrollTrigger: {
+        trigger: photo,
+        start: 'top 96%',
+        end: 'top 65%',
+        scrub: 0.6,
+      },
+    });
+  });
+
+  /* the bridge line — slows the tempo back down */
+  gsap.from('.montage-exit', {
+    opacity: 0,
+    y: 24,
+    ease: 'power1.out',
+    scrollTrigger: {
+      trigger: '.montage-exit',
+      start: 'top 90%',
+      end: 'top 60%',
+      scrub: 0.6,
+    },
   });
 }
