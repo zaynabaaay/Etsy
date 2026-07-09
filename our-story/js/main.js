@@ -272,15 +272,17 @@ function initNumbers() {
    ══════════════════════════════════════════════════════════════════ */
 function initMontage() {
 
-  /* each photo's fall is a little different — direction, width, and
-     over-rotation vary so it reads as gravity, not as an effect */
-  const sways = [
-    { xa: 22,  xb: -12, ra: 6,  rb: -3 },    // right-first
-    { xa: -26, xb: 14,  ra: -7, rb: 4 },     // left-first, wide
-    { xa: 8,   xb: -4,  ra: 3,  rb: -1.5 },  // almost straight down
-    { xa: -18, xb: 9,   ra: -5, rb: 2.5 },
-    { xa: 30,  xb: -16, ra: 7,  rb: -3.5 },  // the widest arc
-    { xa: -14, xb: 7,   ra: -4, rb: 2 },
+  /* each photo flies in from its nearest screen edge and arcs down
+     into place. dir: -1 = from the left edge, 1 = from the right.
+     over/settle: how far past center momentum carries it, and the
+     over-rotation, varied per photo so it reads as thrown by hand. */
+  const flights = [
+    { dir: -1, over: -18, ra: -10, rb: 4 },
+    { dir: 1,  over: 26,  ra: 12,  rb: -5 },
+    { dir: -1, over: -10, ra: -6,  rb: 2.5 },
+    { dir: 1,  over: 18,  ra: 9,   rb: -4 },
+    { dir: 1,  over: 34,  ra: 14,  rb: -6 },   // the widest arc
+    { dir: -1, over: -22, ra: -8,  rb: 3 },
   ];
 
   gsap.utils.toArray('.mdrift').forEach((wrap, i) => {
@@ -288,9 +290,7 @@ function initMontage() {
     const photo = wrap.querySelector('.mphoto');
     const caption = wrap.querySelector('.mcap');
     const tilt = parseFloat(photo.dataset.tilt || 0);
-    const sway = sways[i % sways.length];
-    /* lighter (smaller) photos fall from higher up */
-    const fall = 100 + depth;
+    const f = flights[i % flights.length];
 
     /* outer wrapper: parallax drift across the whole viewport journey */
     gsap.fromTo(wrap,
@@ -306,33 +306,49 @@ function initMontage() {
         },
       });
 
-    /* inner print: the fall — released above its spot, swaying down
-       through the air, landing with the shadow tightening */
+    /* inner print: flies in from beyond the screen edge, high above
+       its spot, arcs past center, and settles back down onto the page */
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: wrap,
         start: 'top 98%',
-        end: 'top 52%',
+        end: 'top 48%',
         scrub: 0.6,
+        invalidateOnRefresh: true, /* the edge/height offsets are viewport-based */
       },
     });
 
     tl
-      /* appear the instant the fall begins */
-      .fromTo(photo, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: 'none' }, 0)
-      /* the descent — one continuous drop */
+      /* leg 1 · the throw: from fully off-screen (side) and high up,
+         momentum carrying it slightly past its column */
       .fromTo(photo,
-        { y: -fall, scale: 1.04, '--lift': 1 },
-        { y: 0, scale: 1, '--lift': 0, duration: 1, ease: 'sine.out' }, 0)
-      /* the sway: out, correct, settle — decaying pendulum */
-      .fromTo(photo, { x: 0 }, { x: sway.xa, duration: 0.38, ease: 'sine.inOut' }, 0)
-      .to(photo, { x: sway.xb, duration: 0.34, ease: 'sine.inOut' }, 0.38)
-      .to(photo, { x: 0, duration: 0.28, ease: 'sine.out' }, 0.72)
-      /* rotation sways with it, landing on the resting tilt */
-      .fromTo(photo, { rotation: tilt + sway.ra }, { rotation: tilt + sway.rb, duration: 0.55, ease: 'sine.inOut' }, 0)
-      .to(photo, { rotation: tilt, duration: 0.45, ease: 'sine.out' }, 0.55)
+        {
+          x: () => f.dir * (window.innerWidth * 1.05),
+          y: () => -(window.innerHeight * 0.32 + depth * 1.5),
+          rotation: tilt + f.ra,
+          scale: 1.06,
+          '--lift': 1,
+        },
+        {
+          x: f.over,
+          y: () => -(window.innerHeight * 0.06),
+          rotation: tilt + f.rb,
+          scale: 1.02,
+          duration: 0.62,
+          ease: 'sine.out',
+        }, 0)
+      /* leg 2 · the settle: swings back to center and presses flat */
+      .to(photo, {
+        x: 0,
+        y: 0,
+        rotation: tilt,
+        scale: 1,
+        '--lift': 0,
+        duration: 0.38,
+        ease: 'sine.inOut',
+      }, 0.62)
       /* the label is written once the print has landed */
-      .fromTo(caption, { opacity: 0 }, { opacity: 1, duration: 0.18, ease: 'none' }, 0.86);
+      .fromTo(caption, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'none' }, 0.88);
   });
 
   /* the bridge line — slows the tempo back down */
