@@ -641,7 +641,9 @@ body.cinematic .scene-opening { height: 520vh; }
   background: var(--cream);
   color: var(--ink);
   padding: clamp(5rem, 14vw, 9rem) 0 clamp(5rem, 14vw, 8rem);
-  overflow: hidden; /* parallax drift must never cause sideways scroll */
+  /* NOT clipped: photos float in from above the section, so the section
+     must let them show past its top edge. Sideways drift is caught by
+     `body { overflow-x: hidden }`, so no horizontal scrollbar appears. */
 }
 
 .montage {
