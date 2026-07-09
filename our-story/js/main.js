@@ -9,6 +9,17 @@ gsap.registerPlugin(ScrollTrigger);
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/* live-computed stat: days since the date in data-count-from-date.
+   Runs first (and in all modes) so the number is right everywhere. */
+document.querySelectorAll('[data-count-from-date]').forEach((stat) => {
+  const from = new Date(stat.dataset.countFromDate + 'T00:00:00');
+  if (!isNaN(from)) {
+    const days = Math.max(0, Math.floor((Date.now() - from) / 86400000));
+    stat.dataset.count = days;
+    stat.querySelector('.stat-value').textContent = days.toLocaleString('en-US');
+  }
+});
+
 if (prefersReducedMotion) {
   /* Accessibility: no pinning, no scrub — a calm, static page. */
   document.body.classList.add('reduced-motion');
@@ -19,6 +30,7 @@ if (prefersReducedMotion) {
 } else {
   initOpening();
   initBeginning();
+  initNumbers();
 }
 
 function initOpening() {
@@ -172,5 +184,66 @@ function initBeginning() {
       /* beat 4 · written: caption, then the story */
       .from(moment.querySelector('.polaroid-caption'), { opacity: 0, duration: 0.4 }, 1.4)
       .from(moment.querySelector('.moment-text'), { opacity: 0, y: 26, duration: 0.6 }, 1.35);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Scene 03 — In Numbers
+   Counters play once on arrival (not scrubbed — a counter running
+   backwards reads as a machine, not a memory).
+   ══════════════════════════════════════════════════════════════════ */
+function initNumbers() {
+
+  /* section intro */
+  gsap.timeline({
+    scrollTrigger: {
+      trigger: '.numbers-head',
+      start: 'top 85%',
+      end: 'top 55%',
+      scrub: 0.6,
+    },
+  })
+    .from('.numbers-rule', { scaleX: 0, ease: 'power2.inOut' }, 0)
+    .from('.numbers-script', { opacity: 0, y: 14 }, 0.3);
+
+  gsap.utils.toArray('.stat').forEach((stat) => {
+    const valueEl = stat.querySelector('.stat-value');
+    const note = stat.querySelector('.stat-note');
+    const target = parseInt(stat.dataset.count, 10);
+
+    /* the stat block itself rises in */
+    gsap.from(stat, {
+      opacity: 0,
+      y: 34,
+      duration: 0.9,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: stat, start: 'top 85%', once: true },
+    });
+
+    /* the count-up — skipped for the ∞ stat */
+    if (!isNaN(target)) {
+      const counter = { val: 0 };
+      gsap.to(counter, {
+        val: target,
+        duration: 1.6,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: stat, start: 'top 80%', once: true },
+        onUpdate: () => {
+          valueEl.textContent = Math.round(counter.val).toLocaleString('en-US');
+        },
+      });
+    }
+
+    /* the handwritten aside lands a beat after its stat */
+    if (note) {
+      gsap.from(note, {
+        opacity: 0,
+        scale: 0.9,
+        duration: 0.6,
+        delay: 0.7,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: stat, start: 'top 80%', once: true },
+      });
+    }
   });
 }

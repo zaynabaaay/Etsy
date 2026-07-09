@@ -528,6 +528,98 @@ body {
 }
 
 /* ══════════════════════════════════════════════
+   SCENE 03 · IN NUMBERS
+   ══════════════════════════════════════════════ */
+.scene-numbers {
+  position: relative;
+  z-index: 2;
+  /* the paper deepens one shade for the interlude, then returns */
+  background: linear-gradient(
+    to bottom,
+    var(--cream) 0%,
+    #ebdfc2 18%,
+    #e9dcbd 82%,
+    var(--cream) 100%
+  );
+  color: var(--ink);
+  padding: clamp(6rem, 16vw, 10rem) clamp(1.5rem, 6vw, 4rem);
+  text-align: center;
+}
+
+.numbers-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: clamp(3.5rem, 10vw, 6rem);
+}
+
+.numbers-rule {
+  width: clamp(70px, 16vw, 120px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-deep) 18%, var(--gold-deep) 82%, transparent);
+  margin-bottom: 1.3rem;
+}
+
+.numbers-script {
+  font-family: var(--font-script);
+  font-size: clamp(1.5rem, 5.2vw, 2.2rem);
+  color: var(--gold-deep);
+  transform: rotate(-2deg);
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3.5rem, 10vw, 5rem);
+  max-width: 70rem;
+  margin: 0 auto;
+}
+
+.stat { position: relative; }
+
+.stat-value {
+  font-weight: 500;
+  font-size: clamp(4.2rem, 20vw, 7.5rem);
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: lining-nums;
+}
+
+.stat-label {
+  margin-top: 0.9rem;
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: clamp(0.68rem, 2.4vw, 0.8rem);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  padding-left: 0.4em;
+}
+
+.stat-note {
+  position: absolute;
+  top: -0.4em;
+  right: 50%;
+  transform: translateX(160%) rotate(6deg);
+  font-family: var(--font-script);
+  font-size: clamp(1.05rem, 3.6vw, 1.4rem);
+  color: var(--gold-deep);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .stats {
+    flex-direction: row;
+    justify-content: center;
+    align-items: baseline;
+    gap: clamp(3rem, 6vw, 5.5rem);
+  }
+  .stat { flex: 1; }
+  .stat-value { font-size: clamp(3.4rem, 6.5vw, 6rem); }
+  .stat-note { transform: translateX(120%) rotate(6deg); }
+}
+
+/* ══════════════════════════════════════════════
    Reduced motion — show everything, animate nothing
    ══════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
