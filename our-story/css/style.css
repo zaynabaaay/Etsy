@@ -640,6 +640,8 @@ body {
 
 .mdrift {
   position: relative;
+  /* gives the tumbling photos real 3D depth as they flip */
+  perspective: 900px;
 }
 
 .mphoto {
@@ -650,6 +652,20 @@ body {
   padding-bottom: 0;
   /* --lift: 1 = falling through the air, 0 = landed (see polaroids) */
   --lift: 0;
+  transform-style: preserve-3d;
+}
+
+/* mid-tumble, the photo shows its plain paper back: the image and
+   caption hide when facing away, leaving the white card */
+.mphoto img,
+.mphoto .mcap {
+  backface-visibility: hidden;
+  transform: translateZ(1px);
+}
+
+.mphoto::before,
+.mphoto::after {
+  transform: translateZ(-2px);
 }
 
 .mphoto::before {

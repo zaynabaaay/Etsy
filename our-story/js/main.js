@@ -340,9 +340,15 @@ function initMontage() {
       }, 0);
 
     if (f.spin) {
-      /* tumbler: one full revolution unwinding onto the resting tilt */
+      /* tumbler: flips end-over-end around its horizontal axis (the
+         way paper actually falls), showing its white back mid-turn,
+         finishing face-up as it lands */
       tl.fromTo(photo,
-        { rotation: tilt + f.spin },
+        { rotationX: f.spin },
+        { rotationX: 0, duration: 0.85, ease: 'sine.out' }, 0);
+      /* a whisper of in-plane settle so the landing isn't rigid */
+      tl.fromTo(photo,
+        { rotation: tilt + (f.x0 > 0 ? 5 : -5) },
         { rotation: tilt, duration: 1, ease: 'sine.out' }, 0);
     } else {
       /* swayer: drift out, correct, settle */
