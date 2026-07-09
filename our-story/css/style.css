@@ -169,20 +169,24 @@ body.cinematic .scene-opening { height: 520vh; }
 .intro-ornament {
   color: var(--gold-deep);
   opacity: 0;
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.7rem;
 }
+.intro-ornament svg { width: clamp(34px, 9vw, 44px); height: auto; }
 
 .intro-label {
   font-family: var(--font-label);
-  font-weight: 300;
-  font-size: clamp(0.68rem, 2.4vw, 0.8rem);
-  letter-spacing: 0.42em;
+  font-weight: 400;
+  font-size: clamp(1.15rem, 5.2vw, 1.9rem);
+  line-height: 1.5;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--gold-deep);
+  max-width: 15ch;
+  text-wrap: balance;
   opacity: 0;
   transform: translateY(14px);
   /* compensate optical shift from tracking */
-  padding-left: 0.42em;
+  padding-left: 0.3em;
 }
 
 /* ── Moment 2 · the two lines ── */
