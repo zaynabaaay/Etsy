@@ -290,25 +290,12 @@ function initNumbers() {
    ══════════════════════════════════════════════════════════════════ */
 function initMontage() {
 
-  /* every photo falls from above the top of the screen. Most sway
-     down like paper (x0 = lateral entry, ra/rb = decaying rotation);
-     a couple tumble — spin = a full revolution that unwinds as they
-     fall, landing on their resting tilt. */
-  const falls = [
-    { x0: -60, ra: -8, rb: 3,  spin: 0 },
-    { x0: 70,  ra: 0,  rb: 0,  spin: 180 },   // falls back-first, flips face-up
-    { x0: -35, ra: -5, rb: 2,  spin: 0 },
-    { x0: 55,  ra: 8,  rb: -3, spin: 0 },
-    { x0: 85,  ra: 13, rb: -5, spin: 0 },     // the widest sway
-    { x0: -50, ra: 0,  rb: 0,  spin: -180 },  // same, flipping the other way
-  ];
-
   gsap.utils.toArray('.mdrift').forEach((wrap, i) => {
     const depth = parseFloat(wrap.dataset.depth || 40);
     const photo = wrap.querySelector('.mphoto');
     const caption = wrap.querySelector('.mcap');
     const tilt = parseFloat(photo.dataset.tilt || 0);
-    const f = falls[i % falls.length];
+    const dir = (i % 2) ? 1 : -1; // a barely-there alternating drift
 
     /* outer wrapper: parallax drift across the whole viewport journey */
     gsap.fromTo(wrap,
@@ -324,63 +311,42 @@ function initMontage() {
         },
       });
 
-    /* inner print: the fall — appears near the top of the screen and
-       descends over a long stretch of scroll (unhurried on purpose) */
+    /* inner print: a slow, gentle float — it enters from above the top
+       of the screen and drifts all the way down into its place over a
+       long stretch of scroll. Heavy scrub + soft ease = weightless. */
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: wrap,
-        start: 'top 96%',
-        end: 'top 45%',
-        scrub: 0.8,
-        invalidateOnRefresh: true, /* height offset is viewport-based */
+        start: 'top bottom',   /* begins the moment its slot appears at the bottom */
+        end: 'top 32%',        /* lands high up — a long, unhurried descent */
+        scrub: 1.6,            /* smooth, floaty follow */
+        invalidateOnRefresh: true,
       },
     });
 
-    /* hidden until its fall begins — otherwise the pre-fall photo
-       would sit stacked over the content above it */
-    tl.fromTo(photo, { opacity: 0 }, { opacity: 1, duration: 0.08, ease: 'none' }, 0);
-
-    /* the descent: materializes just under the viewport top, falls
-       the full height of the screen down to its spot */
-    tl.fromTo(photo,
-      {
-        y: () => -(window.innerHeight * 0.9),
-        x: f.x0,
-        scale: 1.06,
-        '--lift': 1,
-      },
-      {
-        y: 0,
-        scale: 1.01,
-        duration: 1,
-        ease: 'sine.out',
-        immediateRender: true,
-      }, 0);
-
-    if (f.spin) {
-      /* flipper: falls showing its plain white back, then turns over
-         once — a single half-flip — landing face-up */
-      tl.fromTo(photo,
-        { rotationX: f.spin },
-        { rotationX: 0, duration: 0.85, ease: 'sine.out' }, 0);
-      /* a whisper of in-plane settle so the landing isn't rigid */
-      tl.fromTo(photo,
-        { rotation: tilt + (f.x0 > 0 ? 5 : -5) },
-        { rotation: tilt, duration: 1, ease: 'sine.out' }, 0);
-    } else {
-      /* swayer: drift out, correct, settle */
-      tl.fromTo(photo,
-        { rotation: tilt + f.ra },
-        { rotation: tilt + f.rb, duration: 0.6, ease: 'sine.inOut' }, 0)
-        .to(photo, { rotation: tilt, duration: 0.4, ease: 'sine.out' }, 0.6);
-    }
-
-    /* lateral sway back to center + the landing press */
-    tl.to(photo, { x: f.x0 * -0.35, duration: 0.55, ease: 'sine.inOut' }, 0)
-      .to(photo, { x: 0, duration: 0.45, ease: 'sine.out' }, 0.55)
-      .to(photo, { scale: 1, '--lift': 0, duration: 0.3, ease: 'sine.out' }, 0.7)
-      /* the label is written once the print has landed */
-      .fromTo(caption, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'none' }, 0.9);
+    tl.fromTo(photo, { opacity: 0 }, { opacity: 1, duration: 0.1, ease: 'none' }, 0)
+      /* the float: starts more than a screen above its spot (i.e. above
+         the top of the page), settles with a whisper of tilt + shadow */
+      .fromTo(photo,
+        {
+          y: () => -(window.innerHeight * 1.25),
+          x: dir * 16,
+          rotation: tilt + dir * 3,
+          scale: 1.03,
+          '--lift': 1,
+        },
+        {
+          y: 0,
+          x: 0,
+          rotation: tilt,
+          scale: 1,
+          '--lift': 0,
+          duration: 1,
+          ease: 'power1.out',
+          immediateRender: true,
+        }, 0)
+      /* the label is written once the print has settled */
+      .fromTo(caption, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'none' }, 0.85);
   });
 
   /* the bridge line — slows the tempo back down */
