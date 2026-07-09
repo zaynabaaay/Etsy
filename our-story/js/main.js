@@ -7,13 +7,18 @@
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* Lazy-loaded photos change the page height as they arrive, which
-   would leave every scroll trigger measured against a stale layout —
-   re-measure when the page and each image finish loading. */
+/* On phones the address bar hides/shows as you scroll, resizing the
+   viewport. Left alone, ScrollTrigger re-measures on every one of those
+   resizes and the pinned scenes can jump to the wrong scroll position —
+   which is what made the dusk panel paint over an earlier chapter.
+   Ignoring that resize keeps every pin locked where it belongs.
+   (Image space is reserved in CSS via aspect-ratio, so lazy photos no
+   longer shift the layout — no per-image re-measure needed.) */
+ScrollTrigger.config({ ignoreMobileResize: true });
+
+/* one safety re-measure once everything (fonts, above-the-fold imagery)
+   has settled */
 window.addEventListener('load', () => ScrollTrigger.refresh());
-document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
-  img.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
-});
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

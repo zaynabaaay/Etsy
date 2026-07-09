@@ -113,8 +113,11 @@ body {
    ══════════════════════════════════════════════ */
 .scene-opening {
   position: relative;
+  /* largest viewport height, so when pinned the panel always covers the
+     visible area even as a mobile address bar hides/shows — a smaller
+     unit (svh) leaves a strip that iOS paints stale content into */
   height: 100vh;
-  height: 100svh;
+  height: 100lvh;
   overflow: hidden;
   /* warm parchment, faintly darker toward the edges */
   background:
@@ -255,7 +258,10 @@ body {
 .scroll-cue {
   position: absolute;
   left: 50%;
-  bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px));
+  /* the panel is 100lvh tall; this lifts the cue up to the *small*
+     viewport's bottom edge so it stays visible while an address bar
+     is showing, and rests at 1.6rem once it hides */
+  bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px) + (100lvh - 100svh));
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -693,9 +699,21 @@ body {
 .mphoto img {
   display: block;
   width: 100%;
-  height: auto;
+  /* a reserved aspect-ratio (per slot below) keeps each photo's height
+     known BEFORE it loads — without it, lazy images add height as they
+     arrive, shifting the pinned scenes below onto the wrong scroll spot.
+     object-fit lets a buyer drop in any photo; it fills the slot. */
+  object-fit: cover;
   filter: sepia(0.12) saturate(0.94);
 }
+
+/* varied shapes, matching the demo photos (buyers' photos crop to fit) */
+.mphoto-1 img { aspect-ratio: 4 / 3; }
+.mphoto-2 img { aspect-ratio: 4 / 5; }
+.mphoto-3 img { aspect-ratio: 4 / 5; }
+.mphoto-4 img { aspect-ratio: 1 / 1; }
+.mphoto-5 img { aspect-ratio: 3 / 2; }
+.mphoto-6 img { aspect-ratio: 4 / 5; }
 
 .mcap {
   padding: 0.75rem 0.2rem 0.85rem;
@@ -745,8 +763,11 @@ body {
 .scene-quiet {
   position: relative;
   z-index: 2;
+  /* largest viewport height so the pinned panel always covers the
+     visible area — a smaller unit leaves a bottom strip that iOS
+     Safari fills with stale paint from an earlier scene */
   height: 100vh;
-  height: 100svh;
+  height: 100lvh;
   overflow: hidden;
   background: var(--cream); /* animated to espresso by the scroll */
 }
