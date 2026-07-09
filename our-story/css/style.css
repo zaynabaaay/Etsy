@@ -638,14 +638,40 @@ body {
   padding: 0 clamp(1.2rem, 5vw, 3.5rem);
 }
 
+.mdrift {
+  position: relative;
+}
+
 .mphoto {
   position: relative;
+  width: 100%;
   background: #fdfaf1;
   padding: clamp(6px, 1.6vw, 9px);
   padding-bottom: 0;
+  /* --lift: 1 = falling through the air, 0 = landed (see polaroids) */
+  --lift: 0;
+}
+
+.mphoto::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  box-shadow:
+    0 30px 52px rgba(60, 44, 22, 0.32),
+    0 12px 26px rgba(60, 44, 22, 0.18);
+  opacity: var(--lift);
+}
+
+.mphoto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   box-shadow:
     0 2px 5px rgba(60, 44, 22, 0.1),
     0 12px 30px rgba(60, 44, 22, 0.14);
+  opacity: calc(1 - var(--lift));
 }
 
 .mphoto img {

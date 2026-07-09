@@ -7,6 +7,14 @@
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* Lazy-loaded photos change the page height as they arrive, which
+   would leave every scroll trigger measured against a stale layout —
+   re-measure when the page and each image finish loading. */
+window.addEventListener('load', () => ScrollTrigger.refresh());
+document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+  img.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+});
+
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* live-computed stat: days since the date in data-count-from-date.
@@ -23,8 +31,8 @@ document.querySelectorAll('[data-count-from-date]').forEach((stat) => {
 if (prefersReducedMotion) {
   /* Accessibility: no pinning, no scrub — a calm, static page. */
   document.body.classList.add('reduced-motion');
-  /* polaroids still get their resting tilt */
-  gsap.utils.toArray('.polaroid').forEach((p) => {
+  /* polaroids and montage prints still get their resting tilt */
+  gsap.utils.toArray('[data-tilt]').forEach((p) => {
     gsap.set(p, { rotation: parseFloat(p.dataset.tilt || 0) });
   });
 } else {
@@ -264,53 +272,67 @@ function initNumbers() {
    ══════════════════════════════════════════════════════════════════ */
 function initMontage() {
 
-  gsap.utils.toArray('.mphoto').forEach((photo) => {
-    const depth = parseFloat(photo.dataset.depth || 40);
-    const caption = photo.querySelector('.mcap');
+  /* each photo's fall is a little different — direction, width, and
+     over-rotation vary so it reads as gravity, not as an effect */
+  const sways = [
+    { xa: 22,  xb: -12, ra: 6,  rb: -3 },    // right-first
+    { xa: -26, xb: 14,  ra: -7, rb: 4 },     // left-first, wide
+    { xa: 8,   xb: -4,  ra: 3,  rb: -1.5 },  // almost straight down
+    { xa: -18, xb: 9,   ra: -5, rb: 2.5 },
+    { xa: 30,  xb: -16, ra: 7,  rb: -3.5 },  // the widest arc
+    { xa: -14, xb: 7,   ra: -4, rb: 2 },
+  ];
 
-    /* parallax drift across the whole journey through the viewport */
-    gsap.fromTo(photo,
+  gsap.utils.toArray('.mdrift').forEach((wrap, i) => {
+    const depth = parseFloat(wrap.dataset.depth || 40);
+    const photo = wrap.querySelector('.mphoto');
+    const caption = wrap.querySelector('.mcap');
+    const tilt = parseFloat(photo.dataset.tilt || 0);
+    const sway = sways[i % sways.length];
+    /* lighter (smaller) photos fall from higher up */
+    const fall = 100 + depth;
+
+    /* outer wrapper: parallax drift across the whole viewport journey */
+    gsap.fromTo(wrap,
       { y: depth },
       {
         y: -depth,
         ease: 'none',
         scrollTrigger: {
-          trigger: photo,
+          trigger: wrap,
           start: 'top bottom',
           end: 'bottom top',
           scrub: true,
         },
       });
 
-    /* caption trails a touch behind its photo */
-    if (caption) {
-      gsap.fromTo(caption,
-        { y: depth * 0.35 },
-        {
-          y: -depth * 0.35,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: photo,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          },
-        });
-    }
-
-    /* soft arrival: already in place, just hushed — brightens as it
-       passes into view (opacity/scale only; y belongs to the parallax) */
-    gsap.from(photo, {
-      opacity: 0,
-      scale: 0.975,
-      ease: 'power1.out',
+    /* inner print: the fall — released above its spot, swaying down
+       through the air, landing with the shadow tightening */
+    const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: photo,
-        start: 'top 96%',
-        end: 'top 65%',
+        trigger: wrap,
+        start: 'top 98%',
+        end: 'top 52%',
         scrub: 0.6,
       },
     });
+
+    tl
+      /* appear the instant the fall begins */
+      .fromTo(photo, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: 'none' }, 0)
+      /* the descent — one continuous drop */
+      .fromTo(photo,
+        { y: -fall, scale: 1.04, '--lift': 1 },
+        { y: 0, scale: 1, '--lift': 0, duration: 1, ease: 'sine.out' }, 0)
+      /* the sway: out, correct, settle — decaying pendulum */
+      .fromTo(photo, { x: 0 }, { x: sway.xa, duration: 0.38, ease: 'sine.inOut' }, 0)
+      .to(photo, { x: sway.xb, duration: 0.34, ease: 'sine.inOut' }, 0.38)
+      .to(photo, { x: 0, duration: 0.28, ease: 'sine.out' }, 0.72)
+      /* rotation sways with it, landing on the resting tilt */
+      .fromTo(photo, { rotation: tilt + sway.ra }, { rotation: tilt + sway.rb, duration: 0.55, ease: 'sine.inOut' }, 0)
+      .to(photo, { rotation: tilt, duration: 0.45, ease: 'sine.out' }, 0.55)
+      /* the label is written once the print has landed */
+      .fromTo(caption, { opacity: 0 }, { opacity: 1, duration: 0.18, ease: 'none' }, 0.86);
   });
 
   /* the bridge line — slows the tempo back down */
