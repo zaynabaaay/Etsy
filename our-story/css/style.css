@@ -772,7 +772,9 @@ body {
   visibility: hidden;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(1.5rem, 5.6vw, 2.9rem);
+  /* sized so each beat sits on ONE line on a phone — every line then
+     lands at exactly the same center, beat after beat */
+  font-size: clamp(1.25rem, 4.4vw, 2.6rem);
   line-height: 1.4;
 }
 
@@ -784,7 +786,8 @@ body {
 
 .quiet-line .mask-inner {
   display: block;
-  max-width: 22ch;
+  /* if a buyer writes a longer line, it wraps evenly around center */
+  text-wrap: balance;
 }
 
 /* the first two lines live in daylight — ink on paper */
