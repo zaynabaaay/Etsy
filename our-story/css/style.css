@@ -113,9 +113,13 @@ body {
    ══════════════════════════════════════════════ */
 .scene-opening {
   position: relative;
-  /* largest viewport height, so when pinned the panel always covers the
-     visible area even as a mobile address bar hides/shows — a smaller
-     unit (svh) leaves a strip that iOS paints stale content into */
+}
+
+/* the opening panel holds still via CSS sticky (not JS pinning) while the
+   section scrolls past — the same iOS-safe technique used for The Quiet */
+.opening-sticky {
+  position: sticky;
+  top: 0;
   height: 100vh;
   height: 100lvh;
   overflow: hidden;
@@ -124,6 +128,9 @@ body {
     radial-gradient(ellipse 95% 70% at 50% 44%, rgba(255, 250, 238, 0.75), transparent 70%),
     radial-gradient(ellipse 140% 110% at 50% 50%, #efe5cf 50%, #e3d5b4 100%);
 }
+
+/* tall enough to scroll through only in the animated experience */
+body.cinematic .scene-opening { height: 520vh; }
 
 /* a soft wash of sunlight behind the names — warms as they arrive */
 .opening-glow {

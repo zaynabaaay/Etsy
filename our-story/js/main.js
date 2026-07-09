@@ -91,16 +91,14 @@ function initOpening() {
     .to('.scroll-cue',     { opacity: 1, duration: 1.2 }, '-=0.5');
 
   /* ── The master scrub: scrolling is the playhead ──
-     One pinned timeline drives every moment of the opening.
-     Duration units below are relative beats, not seconds.       */
+     The panel holds still via CSS sticky; this timeline is scrubbed
+     over the tall section's scroll. Durations are relative beats.   */
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: '.scene-opening',
       start: 'top top',
-      end: '+=420%',
-      pin: true,
+      end: 'bottom bottom',
       scrub: 0.6,
-      anticipatePin: 1,
     },
   });
 
