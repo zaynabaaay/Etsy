@@ -116,6 +116,66 @@ body.editing .ephoto:focus-within .ephoto-hint { opacity: 1; }
 /* a little "＋ your photo" affordance always faintly visible while editing */
 body.editing .ephoto .ephoto-hint { opacity: 0.001; }
 
+/* ── editable text ── */
+body.editing .etext {
+  cursor: text;
+  outline: 1px dashed rgba(150, 112, 47, 0.55);
+  outline-offset: 3px;
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+body.editing .etext:hover { background: rgba(201, 161, 95, 0.1); }
+body.editing .etext:focus {
+  outline: 2px solid var(--gold-deep, #96702f);
+  background: rgba(201, 161, 95, 0.14);
+}
+
+/* ── lay the animated scenes out flat so every line is visible & tappable ──
+   (these scenes normally stack their lines as overlapping full-screen
+   layers; in edit mode we drop them into ordinary flow) ── */
+
+/* The Opening */
+body.editing .scene-opening,
+body.editing .opening-sticky { position: static; height: auto; }
+body.editing .opening-stage { position: static; inset: auto; } /* let the flattened layers flow */
+body.editing .opening-glow,
+body.editing .scroll-cue { display: none; }
+body.editing .intro-screen,
+body.editing .opening-line,
+body.editing .names-group {
+  position: static;
+  inset: auto;
+  display: flex;
+  min-height: 0;
+  padding: 1.6rem clamp(1.5rem, 6vw, 4rem);
+}
+body.editing .intro-screen { display: flex; }        /* was hidden in still mode */
+body.editing .opening-line { visibility: visible; }  /* was hidden until animated */
+body.editing .opening-line .mask { overflow: visible; }
+body.editing .opening-line .mask-inner { transform: none; }
+body.editing .intro-ornament,
+body.editing .intro-label { opacity: 1; transform: none; }
+
+/* The Quiet */
+body.editing .scene-quiet,
+body.editing .quiet-sticky { position: static; height: auto; background: var(--cream); }
+body.editing .quiet-stage { position: static; inset: auto; }
+body.editing .quiet-line,
+body.editing .quiet-stack {
+  position: static;
+  inset: auto;
+  display: flex;
+  min-height: 0;
+  visibility: visible;
+  padding: 1.1rem clamp(1.5rem, 6vw, 4rem);
+}
+body.editing .quiet-line .mask { overflow: visible; }
+body.editing .quiet-line .mask-inner { transform: none; }
+body.editing .quiet-small { opacity: 1; }
+/* force readable dark text (some quiet lines are light for the dark finale) */
+body.editing .quiet-line, body.editing .quiet-line .mask-inner,
+body.editing .quiet-small { color: var(--ink); }
+
 @media (prefers-reduced-motion: reduce) {
   .edit-fab:hover { transform: none; }
 }

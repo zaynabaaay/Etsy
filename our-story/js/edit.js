@@ -57,6 +57,31 @@
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   }).catch(() => {});
 
+  /* ---- every editable piece of text (the element that holds the words;
+          for the masked/animated lines that's the inner span) ---- */
+  const TEXT_SELECTORS = [
+    '.intro-label',
+    '.opening-line .mask-inner',
+    '.names-script', '.names-title', '.names-date',
+    '.chapter-label', '.chapter-title .mask-inner', '.chapter-sub',
+    '.moment-date', '.polaroid-caption', '.moment-text',
+    '.numbers-script',
+    '.stat:not([data-count-from-date]) .stat-value', '.stat-label', '.stat-note',
+    '.mcap',
+    '.quiet-line .mask-inner', '.quiet-small',
+    '.letter-label', '.lp', '.sign-pre', '.sign-name',
+    '.close-line .mask-inner', '.close-script', '.close-title', '.close-date',
+  ];
+  const texts = Array.from(document.querySelectorAll(TEXT_SELECTORS.join(',')));
+  texts.forEach((el, i) => { el.dataset.textKey = 't' + i; }); // stable while HTML is unchanged
+
+  /* restore saved words in EVERY mode */
+  const TKEY = 'ourstory:text:';
+  texts.forEach((el) => {
+    const saved = localStorage.getItem(TKEY + el.dataset.textKey);
+    if (saved !== null) el.innerHTML = saved;
+  });
+
   /* ---- the always-present "Make it yours" button ---- */
   const fab = document.createElement('button');
   fab.className = 'edit-fab';
@@ -74,7 +99,7 @@
   const bar = document.createElement('div');
   bar.className = 'edit-bar';
   bar.innerHTML =
-    '<span class="edit-bar-msg"><strong>Editing</strong> · tap any photo to replace it</span>' +
+    '<span class="edit-bar-msg"><strong>Editing</strong> · tap any photo or words to change them</span>' +
     '<span class="edit-bar-actions">' +
       '<button class="edit-btn edit-btn-primary" id="ed-download" type="button">Download my site</button>' +
       '<button class="edit-btn" id="ed-done" type="button">Done</button>' +
@@ -98,6 +123,23 @@
     frame.appendChild(hint);
 
     frame.addEventListener('click', (e) => { e.preventDefault(); pickFor(img); });
+  });
+
+  /* make each piece of text tappable-to-edit */
+  texts.forEach((el) => {
+    el.classList.add('etext');
+    el.setAttribute('contenteditable', 'true');
+    el.setAttribute('spellcheck', 'false');
+
+    /* Enter finishes editing instead of inserting stray markup */
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
+    });
+    /* save on the way out */
+    el.addEventListener('blur', () => {
+      localStorage.setItem(TKEY + el.dataset.textKey, el.innerHTML.trim());
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    });
   });
 
   function pickFor(img) {
@@ -131,6 +173,11 @@
       if (!n.getAttribute('style')) n.removeAttribute('style');
     });
     doc.querySelectorAll('script[src*="edit.js"], link[href*="edit.css"]').forEach((n) => n.remove());
+    doc.querySelectorAll('[contenteditable]').forEach((n) => {
+      n.removeAttribute('contenteditable');
+      n.removeAttribute('spellcheck');
+      n.classList.remove('etext');
+    });
     const body = doc.querySelector('body');
     body.classList.remove('editing', 'reduced-motion');
 
