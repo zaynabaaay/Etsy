@@ -763,14 +763,23 @@ body {
 .scene-quiet {
   position: relative;
   z-index: 2;
-  /* largest viewport height so the pinned panel always covers the
-     visible area — a smaller unit leaves a bottom strip that iOS
-     Safari fills with stale paint from an earlier scene */
+}
+
+/* the sticky panel: holds still on screen while the section scrolls past.
+   CSS sticky is composited natively by iOS Safari, so — unlike JS pin —
+   it never leaves stale tiles of an earlier scene showing through. */
+.quiet-sticky {
+  position: sticky;
+  top: 0;
   height: 100vh;
   height: 100lvh;
   overflow: hidden;
   background: var(--cream); /* animated to espresso by the scroll */
 }
+
+/* the section is made tall (so there's scroll distance to animate over)
+   only in the animated experience; still/edit mode stays one screen */
+body.cinematic .scene-quiet { height: 520vh; }
 
 .quiet-stage {
   position: absolute;
@@ -1068,7 +1077,7 @@ body.reduced-motion .scroll-cue {
 }
 
 /* The Quiet, static: dark room, final line only */
-body.reduced-motion .scene-quiet { background: var(--espresso); }
+body.reduced-motion .quiet-sticky { background: var(--espresso); }
 body.reduced-motion .ql-final { visibility: visible; }
 body.reduced-motion .quiet-small { opacity: 1; }
 body.reduced-motion .quiet-stack { display: none; }

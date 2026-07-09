@@ -1,0 +1,121 @@
+/* ══════════════════════════════════════════════════════════════════
+   EDIT MODE · click-to-replace photos (and, later, click-to-edit text)
+   This file only styles the editing chrome. It does nothing to the
+   finished experience a visitor sees.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* the always-there invitation, bottom-right */
+.edit-fab {
+  position: fixed;
+  right: 1.1rem;
+  bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.25rem;
+  background: #2b2118;
+  color: #f2e7d0;
+  border: 1px solid rgba(201, 161, 95, 0.5);
+  border-radius: 100px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s, background 0.2s;
+}
+.edit-fab:hover { transform: translateY(-2px); background: #362a1d; }
+.edit-fab-heart { color: #c9a15f; font-size: 0.9rem; }
+body.editing .edit-fab { display: none; }
+
+/* the top bar while editing */
+.edit-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem calc(1rem + env(safe-area-inset-right, 0px)) 0.7rem calc(1rem + env(safe-area-inset-left, 0px));
+  padding-top: calc(0.7rem + env(safe-area-inset-top, 0px));
+  background: rgba(23, 16, 9, 0.96);
+  color: #f2e7d0;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+}
+body.editing .edit-bar { display: flex; }
+
+.edit-bar-msg {
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(242, 231, 208, 0.72);
+}
+.edit-bar-msg strong { color: #c9a15f; font-weight: 400; }
+
+.edit-bar-actions { display: flex; gap: 0.6rem; }
+
+.edit-btn {
+  padding: 0.6rem 1.1rem;
+  border-radius: 100px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid rgba(201, 161, 95, 0.5);
+  background: transparent;
+  color: #f2e7d0;
+  transition: background 0.2s;
+}
+.edit-btn:hover { background: rgba(201, 161, 95, 0.14); }
+.edit-btn-primary { background: #c9a15f; color: #2b2118; border-color: #c9a15f; }
+.edit-btn-primary:hover { background: #d7b273; }
+
+/* editing pushes the page down a touch so the bar doesn't cover the top */
+body.editing { padding-top: 3.2rem; }
+
+/* a photo you can replace: dashed ring + hover hint */
+body.editing .ephoto {
+  cursor: pointer;
+  outline: 2px dashed rgba(201, 161, 95, 0.75);
+  outline-offset: 4px;
+}
+.ephoto-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  background: rgba(23, 16, 9, 0.42);
+  color: #fff;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+body.editing .ephoto:hover .ephoto-hint,
+body.editing .ephoto:focus-within .ephoto-hint { opacity: 1; }
+
+/* a little "＋ your photo" affordance always faintly visible while editing */
+body.editing .ephoto .ephoto-hint { opacity: 0.001; }
+
+@media (prefers-reduced-motion: reduce) {
+  .edit-fab:hover { transform: none; }
+}

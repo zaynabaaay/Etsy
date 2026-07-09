@@ -22,6 +22,12 @@ window.addEventListener('load', () => ScrollTrigger.refresh());
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/* Edit Mode (js/edit.js) presents a calm, static, fully-revealed page
+   so photos and text are easy to click — same still layout as the
+   reduced-motion experience. */
+const editing = localStorage.getItem('ourstory:editing') === '1';
+const still = prefersReducedMotion || editing;
+
 /* live-computed stat: days since the date in data-count-from-date.
    Runs first (and in all modes) so the number is right everywhere. */
 document.querySelectorAll('[data-count-from-date]').forEach((stat) => {
@@ -33,14 +39,15 @@ document.querySelectorAll('[data-count-from-date]').forEach((stat) => {
   }
 });
 
-if (prefersReducedMotion) {
-  /* Accessibility: no pinning, no scrub — a calm, static page. */
+if (still) {
+  /* No pinning, no scrub — a calm, static page (accessibility + editing). */
   document.body.classList.add('reduced-motion');
   /* polaroids and montage prints still get their resting tilt */
   gsap.utils.toArray('[data-tilt]').forEach((p) => {
     gsap.set(p, { rotation: parseFloat(p.dataset.tilt || 0) });
   });
 } else {
+  document.body.classList.add('cinematic');
   initOpening();
   initChapterHeads();
   initBeginning();
@@ -53,7 +60,7 @@ if (prefersReducedMotion) {
 
 /* the replay control works in every mode */
 document.querySelector('.replay')?.addEventListener('click', () => {
-  window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  window.scrollTo({ top: 0, behavior: still ? 'auto' : 'smooth' });
 });
 
 /* shared: every chapter head reveals the same way — ornament, label,
@@ -394,9 +401,11 @@ function initMontage() {
 
 /* ══════════════════════════════════════════════════════════════════
    Scene 05 — The Quiet
-   Pinned. Lines appear one beat at a time while evening falls on the
-   page: the background dims from cream through dusk to espresso, so
-   the scene ends already inside the dark world of the letter.
+   The panel holds still via CSS sticky (not JS pinning) while the
+   section scrolls past; this timeline is scrubbed over that scroll.
+   Lines appear one beat at a time while evening falls on the page:
+   the background dims from cream through dusk to espresso, so the
+   scene ends already inside the dark world of the letter.
    ══════════════════════════════════════════════════════════════════ */
 function initQuiet() {
 
@@ -404,20 +413,18 @@ function initQuiet() {
     scrollTrigger: {
       trigger: '.scene-quiet',
       start: 'top top',
-      end: '+=420%',
-      pin: true,
+      end: 'bottom bottom',
       scrub: 0.7,
-      anticipatePin: 1,
     },
   });
 
   /* evening falls — one continuous dimming, timed so each line sits
      on a background it is readable against */
-  tl.fromTo('.scene-quiet',
+  tl.fromTo('.quiet-sticky',
     { backgroundColor: '#f3ecdc' },
     { backgroundColor: '#dccca9', duration: 3.2, ease: 'none' }, 0)
-    .to('.scene-quiet', { backgroundColor: '#6f5430', duration: 1.4, ease: 'none' }, 3.2)
-    .to('.scene-quiet', { backgroundColor: '#171009', duration: 2.0, ease: 'none' }, 4.6);
+    .to('.quiet-sticky', { backgroundColor: '#6f5430', duration: 1.4, ease: 'none' }, 3.2)
+    .to('.quiet-sticky', { backgroundColor: '#171009', duration: 2.0, ease: 'none' }, 4.6);
 
   /* beat one */
   tl.set('.ql-1', { visibility: 'visible' }, 0.2)
