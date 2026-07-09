@@ -278,11 +278,11 @@ function initMontage() {
      fall, landing on their resting tilt. */
   const falls = [
     { x0: -60, ra: -8, rb: 3,  spin: 0 },
-    { x0: 70,  ra: 0,  rb: 0,  spin: 360 },   // flips clockwise
+    { x0: 70,  ra: 0,  rb: 0,  spin: 180 },   // falls back-first, flips face-up
     { x0: -35, ra: -5, rb: 2,  spin: 0 },
     { x0: 55,  ra: 8,  rb: -3, spin: 0 },
     { x0: 85,  ra: 13, rb: -5, spin: 0 },     // the widest sway
-    { x0: -50, ra: 0,  rb: 0,  spin: -360 },  // flips the other way
+    { x0: -50, ra: 0,  rb: 0,  spin: -180 },  // same, flipping the other way
   ];
 
   gsap.utils.toArray('.mdrift').forEach((wrap, i) => {
@@ -340,9 +340,8 @@ function initMontage() {
       }, 0);
 
     if (f.spin) {
-      /* tumbler: flips end-over-end around its horizontal axis (the
-         way paper actually falls), showing its white back mid-turn,
-         finishing face-up as it lands */
+      /* flipper: falls showing its plain white back, then turns over
+         once — a single half-flip — landing face-up */
       tl.fromTo(photo,
         { rotationX: f.spin },
         { rotationX: 0, duration: 0.85, ease: 'sine.out' }, 0);
