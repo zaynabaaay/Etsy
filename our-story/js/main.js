@@ -43,7 +43,13 @@ if (prefersReducedMotion) {
   initMontage();
   initQuiet();
   initLetter();
+  initClose();
 }
+
+/* the replay control works in every mode */
+document.querySelector('.replay')?.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+});
 
 /* shared: every chapter head reveals the same way — ornament, label,
    masked title, subtitle */
@@ -484,4 +490,45 @@ function initLetter() {
     .from('.sign-pre', { opacity: 0, y: 14 }, 0)
     .from('.sign-name', { opacity: 0, y: 20, scale: 0.94, ease: 'power2.out' }, 0.2)
     .fromTo('.letter-glow', { opacity: 0.45 }, { opacity: 1, ease: 'sine.out' }, 0);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Scene 07 — The Close
+   Dawn has already lifted the dark to paper (CSS gradient). The final
+   photo, closing line, and names arrive, bookending the opening.
+   ══════════════════════════════════════════════════════════════════ */
+function initClose() {
+
+  /* the final photo settles in */
+  gsap.from('.close-photo', {
+    opacity: 0,
+    y: 50,
+    rotation: -8,
+    ease: 'power2.out',
+    scrollTrigger: { trigger: '.close-photo', start: 'top 88%', end: 'top 55%', scrub: 0.7 },
+  });
+
+  /* the closing line unmasks */
+  gsap.from('.close-line .mask-inner', {
+    yPercent: 115,
+    ease: 'power2.out',
+    scrollTrigger: { trigger: '.close-line', start: 'top 85%', end: 'top 55%', scrub: 0.7 },
+  });
+
+  /* the names bookend the opening */
+  gsap.timeline({
+    scrollTrigger: { trigger: '.close-names', start: 'top 85%', end: 'top 50%', scrub: 0.7 },
+  })
+    .from('.close-script', { opacity: 0, y: 14 }, 0)
+    .from('.close-title', { opacity: 0, y: 18 }, 0.15)
+    .from('.close-rule', { scaleX: 0, ease: 'power2.inOut' }, 0.3)
+    .from('.close-date', { opacity: 0, y: 12 }, 0.4);
+
+  /* the replay invitation */
+  gsap.from('.replay', {
+    opacity: 0,
+    y: 20,
+    ease: 'power1.out',
+    scrollTrigger: { trigger: '.replay', start: 'top 92%', end: 'top 72%', scrub: 0.6 },
+  });
 }
