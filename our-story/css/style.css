@@ -608,13 +608,19 @@ body.cinematic .opening-flowers { opacity: 0; }
 .montage { position: relative; }
 body.cinematic .montage { height: 840vh; }
 
-/* the pinned viewport the camera looks through */
+/* the pinned viewport the camera looks through. It carries its own paper
+   so the backdrop stays still behind the photos — otherwise the section's
+   texture scrolls past the pinned stage and the paper appears to move. */
 .montage-stage {
   position: sticky;
   top: 0;
   height: 100vh;
   height: 100lvh;
   overflow: hidden;
+  background-color: var(--cream);
+  background-image: var(--paper);
+  background-size: 600px;
+  background-blend-mode: multiply;
 }
 
 /* the memory table: a large surface the prints are scattered across.
