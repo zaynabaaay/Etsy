@@ -119,20 +119,20 @@ function initOpening() {
       { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
     .to('.line-2', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.9')
 
-    /* ── "Here is" — the last spoken beat, then it becomes the title ──
-       It arrives large (the same size and voice as the confession), is
-       held to be read, then shrinks and rises to sit above the title as
-       the candlelight warms and the title emerges beneath it. */
-    .fromTo('.intro-eyebrow',
-      { opacity: 0, scale: 2.0, y: 104, filter: 'blur(7px)' },
-      { opacity: 1, scale: 2.0, y: 104, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' }, '+=0.2')
-    .to('.intro-eyebrow', { duration: 0.7 })  // hold — let it be read
-    .to('.intro-eyebrow',
-      { scale: 1, y: 0, duration: 1.3, ease: 'power2.inOut' })
-    .to('.opening-glow', { opacity: 1, duration: 1.5, ease: 'sine.inOut' }, '<')
+    /* "Here is" — the last spoken beat, in the same spot as the others */
+    .set('.line-3', { visibility: 'visible' }, '+=0.15')
+    .fromTo('.line-3 .mask-inner',
+      { yPercent: 115, filter: 'blur(7px)' },
+      { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
+    .to('.line-3', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.7')
+
+    /* ── The reveal: the title emerges, warm and slow — the payoff ──
+       the candlelight warms, then the title rises and clears while its
+       letters breathe into place. */
+    .to('.opening-glow', { opacity: 1, duration: 1.5, ease: 'sine.inOut' }, '+=0.15')
     .fromTo('.intro-title .tline',
       { opacity: 0, y: 40, letterSpacing: '0.2em', filter: 'blur(9px)' },
-      { opacity: 1, y: 0, letterSpacing: '0.005em', filter: 'blur(0px)', duration: 1.4, stagger: 0.2, ease: 'power2.out' }, '<+0.15')
+      { opacity: 1, y: 0, letterSpacing: '0.005em', filter: 'blur(0px)', duration: 1.4, stagger: 0.2, ease: 'power2.out' }, '<+0.2')
     .to('.intro-title', { duration: 1.0 }); // hold on the title before the handoff
 
   /* ── The handoff: Chapter One's cream paper rises, the opening dims ── */

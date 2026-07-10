@@ -146,7 +146,7 @@ body {
 
 /* tall enough to scroll through: the confession plays out line by line,
    then the title emerges as the payoff before Chapter One */
-body.cinematic .scene-opening { height: 640vh; }
+body.cinematic .scene-opening { height: 600vh; }
 
 /* a soft wash of sunlight behind the names — warms as they arrive */
 .opening-glow {
@@ -179,18 +179,6 @@ body.cinematic .scene-opening { height: 640vh; }
   padding: 0 clamp(1.5rem, 6vw, 4rem);
 }
 
-/* "Here is" — the small line above the title. Same italic voice as the
-   confession, so it can shrink from a spoken beat straight into place. */
-.intro-eyebrow {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-weight: 500;
-  font-size: clamp(1.05rem, 3.6vw, 1.4rem);
-  letter-spacing: 0.02em;
-  color: var(--sepia-soft);
-  margin-bottom: clamp(0.9rem, 2.4vw, 1.4rem);
-}
-
 .intro-title {
   font-weight: 500;
   font-size: clamp(3rem, 13vw, 5.8rem);
@@ -202,17 +190,17 @@ body.cinematic .scene-opening { height: 640vh; }
 .intro-title .tline { display: block; }
 
 /* ── The confession · the spoken voice, emerging on scroll ──
-   Each beat is anchored so its first line always lands at the same
-   height — the lines never jump as they swap. */
+   Every beat is a single centered line landing at the exact same spot,
+   so the reader's eye never has to move between them. */
 .opening-line {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   text-align: center;
-  padding: 43vh clamp(1.5rem, 6vw, 4rem) 0;
+  padding: 0 clamp(1.5rem, 6vw, 4rem);
   visibility: hidden;
 }
 
@@ -222,16 +210,17 @@ body.cinematic .scene-opening { height: 640vh; }
   padding: 0.18em 0.1em;
 }
 
-/* an italic serif, like a letter in the writer's own hand */
+/* an italic serif, like a letter in the writer's own hand. No max-width:
+   each beat stays on one line so they all land at the same centred spot
+   (only the narrowest phones wrap, and then they stay centred). */
 .opening-line .mask-inner {
   display: block;
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.5rem, 5.6vw, 2.8rem);
+  font-size: clamp(1.4rem, 5vw, 2.5rem);
   line-height: 1.4;
   letter-spacing: 0.01em;
   color: var(--sepia-soft);
-  max-width: 24ch;
   /* initial offset is set by GSAP (js/main.js) — no CSS transform here,
      the two would fight and the line would never reach center */
 }
@@ -248,7 +237,6 @@ body.cinematic .scene-opening { height: 640vh; }
 
 /* pre-animation state — only while the cinematic experience is running, so
    the opening stays visible in reduced-motion, edit, and no-JS modes */
-body.cinematic .intro-eyebrow,
 body.cinematic .intro-title .tline,
 body.cinematic .opening-flowers { opacity: 0; }
 
