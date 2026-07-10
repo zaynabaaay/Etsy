@@ -25,7 +25,10 @@
 
   const grain = () => document.querySelector('.grain');
   const allSections = () => Array.from(document.querySelectorAll('body > section'));
-  const allPhotos = () => Array.from(document.querySelectorAll('section img'));
+  /* only real, replaceable photos — never the decorative art (the dried
+     flowers, thread, etc., which are also <img>/inline svg) */
+  const PHOTO_SEL = '.polaroid img, .mframe img, .close-photo img';
+  const allPhotos = () => Array.from(document.querySelectorAll(PHOTO_SEL));
 
   /* ── 1 · restore the saved structure + words (in EVERY mode) ──
      Runs synchronously, before main.js, so the animations bind to the
@@ -106,7 +109,7 @@
   function snapshotHTML() {
     const box = document.createElement('div');
     allSections().forEach((s) => box.appendChild(s.cloneNode(true)));
-    box.querySelectorAll('.ephoto-hint, .ed-sec-bar, .ed-add, .ed-del').forEach((n) => n.remove());
+    box.querySelectorAll('.ephoto-hint, .ed-add, .ed-del').forEach((n) => n.remove());
     box.querySelectorAll('[contenteditable]').forEach((n) => {
       n.removeAttribute('contenteditable'); n.removeAttribute('spellcheck'); n.classList.remove('etext');
     });
@@ -138,8 +141,9 @@
   const bar = document.createElement('div');
   bar.className = 'edit-bar';
   bar.innerHTML =
-    '<span class="edit-bar-msg"><strong>Editing</strong> · tap photos or words to change them · add or remove lines · remove sections</span>' +
+    '<span class="edit-bar-msg"><strong>Editing</strong> · tap anything to change it</span>' +
     '<span class="edit-bar-actions">' +
+      '<button class="edit-btn" id="ed-sections" type="button">Sections</button>' +
       '<button class="edit-btn edit-btn-primary" id="ed-download" type="button">Download my site</button>' +
       '<button class="edit-btn" id="ed-done" type="button">Done</button>' +
     '</span>';
@@ -149,7 +153,7 @@
 
   /* ── make each photo clickable-to-replace ── */
   function bindPhoto(img) {
-    const frame = img.closest('.polaroid, .mphoto, .close-photo') || img.parentElement;
+    const frame = img.closest('.polaroid, .mframe, .close-photo') || img.parentElement;
     frame.classList.add('ephoto');
     if (getComputedStyle(frame).position === 'static') frame.style.position = 'relative';
     if (!frame.querySelector('.ephoto-hint')) {
@@ -234,9 +238,13 @@
   const PHOTO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23e7ddc6'/%3E%3Ctext x='50%25' y='50%25' font-family='Georgia,serif' font-size='34' fill='%23a2906f' text-anchor='middle' dominant-baseline='middle'%3EYour photo%3C/text%3E%3C/svg%3E";
   let addedSeq = 0;
   const makeMoment = () => {
+    /* a clear tilt that alternates side to side like the originals
+       (-3, 2.5, -2.5…) — never landing near straight */
+    const n = document.querySelectorAll('.moments .moment').length;
+    const mag = 2.5 + Math.random();
+    const tilt = (n % 2 === 0 ? -mag : mag).toFixed(1);
     const art = document.createElement('article');
     art.className = 'moment';
-    const tilt = (Math.random() * 5 - 2.5).toFixed(1);
     art.innerHTML =
       '<p class="moment-date">Month 00 · Year</p>' +
       '<div class="polaroid" data-tilt="' + tilt + '">' +
@@ -259,29 +267,61 @@
   enableAddRemove(
     document.querySelectorAll('.moments .moment'), makeMoment,
     '＋ Add a memory', '× remove memory',
-    (el) => { el.querySelectorAll('img').forEach((img) => bindPhoto(img)); }
+    (el) => {
+      el.querySelectorAll('img').forEach((img) => bindPhoto(img));
+      /* angle it now too, so it matches the others while editing */
+      const pol = el.querySelector('.polaroid');
+      if (pol && window.gsap) gsap.set(pol, { rotation: parseFloat(pol.dataset.tilt || 0) });
+    }
   );
 
-  /* ── remove / restore a whole section ── */
+  /* ── show / hide whole sections, from one tidy panel in the top bar ──
+     (no controls cluttering the page; hidden sections simply don't appear
+     and are left out of the finished site) ── */
+  const panel = document.createElement('div');
+  panel.className = 'ed-panel';
+  panel.hidden = true;
+  panel.innerHTML = '<div class="ed-panel-head">Sections</div>';
+  const list = document.createElement('ul');
+  list.className = 'ed-panel-list';
   allSections().forEach((sec) => {
-    const barEl = document.createElement('div');
-    barEl.className = 'ed-sec-bar';
-    const label = document.createElement('span');
-    label.className = 'ed-sec-label';
-    label.textContent = sec.dataset.label || sec.id || 'Section';
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'ed-sec-btn';
-    function sync() {
-      const removed = sec.classList.contains('is-removed');
-      btn.textContent = removed ? 'Restore section' : 'Remove section';
-      barEl.classList.toggle('is-removed', removed);
-    }
-    btn.addEventListener('click', () => { sec.classList.toggle('is-removed'); sync(); save(); });
-    barEl.appendChild(label);
-    barEl.appendChild(btn);
-    sec.insertBefore(barEl, sec.firstChild);
+    const li = document.createElement('li');
+    li.className = 'ed-srow';
+    const name = document.createElement('span');
+    name.className = 'ed-srow-name';
+    name.textContent = sec.dataset.label || sec.id || 'Section';
+    const tog = document.createElement('button');
+    tog.type = 'button';
+    tog.className = 'ed-toggle';
+    tog.setAttribute('role', 'switch');
+    tog.setAttribute('aria-label', 'Show ' + name.textContent);
+    const sync = () => {
+      const shown = !sec.classList.contains('is-removed');
+      tog.setAttribute('aria-checked', shown ? 'true' : 'false');
+      li.classList.toggle('is-off', !shown);
+    };
+    tog.addEventListener('click', () => { sec.classList.toggle('is-removed'); sync(); save(); });
+    li.appendChild(name);
+    li.appendChild(tog);
+    list.appendChild(li);
     sync();
+  });
+  panel.appendChild(list);
+  const note = document.createElement('p');
+  note.className = 'ed-panel-note';
+  note.textContent = 'Turn a section off to leave it out of your finished site — turn it back on any time.';
+  panel.appendChild(note);
+  document.body.appendChild(panel);
+
+  const sectionsBtn = bar.querySelector('#ed-sections');
+  function togglePanel(open) {
+    panel.hidden = open === undefined ? !panel.hidden : !open;
+    sectionsBtn.classList.toggle('is-active', !panel.hidden);
+  }
+  sectionsBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePanel(); });
+  document.addEventListener('click', (e) => {
+    if (panel.hidden || panel.contains(e.target) || sectionsBtn.contains(e.target)) return;
+    togglePanel(false);
   });
 
   function pickFor(img) {
@@ -312,7 +352,7 @@
     doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
 
     /* strip every trace of edit mode */
-    doc.querySelectorAll('.edit-fab, .edit-bar, .ephoto-hint, .ed-sec-bar, .ed-add, .ed-del').forEach((n) => n.remove());
+    doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ephoto-hint, .ed-add, .ed-del').forEach((n) => n.remove());
     doc.querySelectorAll('.ephoto').forEach((n) => {
       n.classList.remove('ephoto');
       if (n.style.position === 'relative') n.style.position = '';

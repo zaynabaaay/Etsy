@@ -137,9 +137,14 @@ body.editing .etext:focus {
 /* The Opening */
 body.editing .scene-opening,
 body.editing .opening-sticky { position: static; height: auto; }
+/* keep the opening above the next section's torn edge (z-index:2) so its
+   bottom control — "Add a line" — is never painted over, and give it room */
+body.editing .scene-opening { position: relative; z-index: 3; }
+body.editing .opening-stage { padding-bottom: 3rem; }
 body.editing .opening-stage { position: static; inset: auto; } /* let the flattened layers flow */
 body.editing .opening-glow,
-body.editing .scroll-cue { display: none; }
+body.editing .scroll-cue,
+body.editing .opening-flowers { display: none; } /* decorative — hidden while editing so it can't overlap the words */
 body.editing .intro-screen,
 body.editing .opening-line,
 body.editing .names-group {
@@ -197,7 +202,7 @@ body.editing .quiet-small { color: var(--ink); }
 
 .ed-del {
   display: block;
-  margin: 0.15rem 0 1rem auto;
+  margin: 0.2rem auto 1.1rem;
   padding: 0.2rem 0.55rem;
   border: none;
   background: transparent;
@@ -211,54 +216,88 @@ body.editing .quiet-small { color: var(--ink); }
 }
 .ed-del:hover { color: #7a3f30; text-decoration: underline; }
 
-/* ── remove / restore a whole section ── */
-.ed-sec-bar {
+/* a hidden section is simply gone — from the page and the finished site.
+   It's brought back from the Sections panel (below). */
+section.is-removed { display: none; }
+
+/* ── the Sections panel (opened from the top bar) ── */
+.edit-btn.is-active { background: rgba(201, 161, 95, 0.2); }
+
+.ed-panel {
+  position: fixed;
+  top: calc(3.1rem + env(safe-area-inset-top, 0px));
+  right: calc(0.8rem + env(safe-area-inset-right, 0px));
+  z-index: 61;
+  width: min(320px, calc(100vw - 1.6rem));
+  max-height: 72vh;
+  overflow-y: auto;
+  background: rgba(23, 16, 9, 0.98);
+  color: #f2e7d0;
+  border: 1px solid rgba(201, 161, 95, 0.4);
+  border-radius: 14px;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.42);
+  padding: 0.4rem 0.5rem 0.5rem;
+  font-family: 'Jost', sans-serif;
+}
+.ed-panel[hidden] { display: none; }
+.ed-panel-head {
+  padding: 0.6rem 0.7rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c9a15f;
+}
+.ed-panel-list { list-style: none; margin: 0; padding: 0; }
+.ed-srow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin: 0 auto 0.5rem;
-  max-width: 40rem;
-  padding: 0.5rem 0.9rem;
-  background: rgba(23, 16, 9, 0.05);
-  border: 1px dashed rgba(150, 112, 47, 0.45);
+  padding: 0.6rem 0.7rem;
   border-radius: 8px;
-  font-family: 'Jost', sans-serif;
-  font-weight: 300;
-  font-size: 0.66rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
 }
-.ed-sec-label { color: #96702f; }
-.ed-sec-btn {
-  flex: none;
-  padding: 0.35rem 0.85rem;
-  border-radius: 100px;
-  border: 1px solid rgba(150, 112, 47, 0.5);
-  background: transparent;
-  font-family: inherit;
-  font-size: inherit;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #5d4936;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.ed-sec-btn:hover { background: rgba(201, 161, 95, 0.14); }
-.ed-sec-bar.is-removed { background: rgba(23, 16, 9, 0.03); }
-.ed-sec-bar.is-removed .ed-sec-label::after { content: ' · removed'; color: #a7906c; }
+.ed-srow + .ed-srow { border-top: 1px solid rgba(242, 231, 208, 0.08); }
+.ed-srow-name { font-weight: 300; font-size: 0.84rem; letter-spacing: 0.03em; }
+.ed-srow.is-off .ed-srow-name { opacity: 0.45; }
 
-/* a removed section: hidden for visitors; while editing, collapsed to just
-   its bar so it can be brought back */
-section.is-removed { display: none; }
-body.editing section.is-removed {
-  display: block;
-  position: static;
-  height: auto;
-  min-height: 0;
-  padding: 0.7rem clamp(1.5rem, 6vw, 4rem);
+/* the on/off switch */
+.ed-toggle {
+  flex: none;
+  width: 42px;
+  height: 24px;
+  border-radius: 100px;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid rgba(201, 161, 95, 0.5);
+  background: rgba(242, 231, 208, 0.12);
+  transition: background 0.2s, border-color 0.2s;
 }
-body.editing section.is-removed > *:not(.ed-sec-bar) { display: none !important; }
+.ed-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f2e7d0;
+  transition: transform 0.2s, background 0.2s;
+}
+.ed-toggle[aria-checked="true"] { background: #c9a15f; border-color: #c9a15f; }
+.ed-toggle[aria-checked="true"]::after { transform: translateX(18px); background: #2b2118; }
+.ed-panel-note {
+  padding: 0.7rem 0.7rem 0.3rem;
+  font-size: 0.66rem;
+  font-weight: 300;
+  line-height: 1.55;
+  color: rgba(242, 231, 208, 0.5);
+}
+
+/* on a phone the long "Editing" tip gives way to the buttons */
+@media (max-width: 640px) {
+  .edit-bar-msg { display: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .edit-fab:hover { transform: none; }
