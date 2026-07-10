@@ -197,18 +197,18 @@
     const sel = window.getSelection();
     sel.removeAllRanges(); sel.addRange(r);
   }
-  function addItemDelete(item, label) {
+  function addItemDelete(item, label, place) {
     const del = document.createElement('button');
     del.type = 'button';
     del.className = 'ed-del';
     del.textContent = label;
-    del.addEventListener('click', () => { del.remove(); item.remove(); save(); });
-    item.insertAdjacentElement('afterend', del);
+    del.addEventListener('click', (e) => { e.stopPropagation(); del.remove(); item.remove(); save(); });
+    if (place) place(del, item); else item.insertAdjacentElement('afterend', del);
   }
-  function enableAddRemove(items, makeItem, addLabel, delLabel, onNew) {
+  function enableAddRemove(items, makeItem, addLabel, delLabel, onNew, place) {
     items = Array.from(items);
     if (!items.length) return;
-    items.forEach((it) => addItemDelete(it, delLabel));
+    items.forEach((it) => addItemDelete(it, delLabel, place));
     const add = document.createElement('button');
     add.type = 'button';
     add.className = 'ed-add';
@@ -223,11 +223,18 @@
       add.insertAdjacentElement('beforebegin', el);
       bindTextTree(el);
       if (onNew) onNew(el);
-      addItemDelete(el, delLabel);
+      addItemDelete(el, delLabel, place);
       save();
       focusFirstEditable(el);
     });
   }
+
+  /* a memory's remove control sits as a small chip on its photo's corner,
+     so it clearly belongs to that photo instead of floating in the layout */
+  const placeMomentDelete = (del, moment) => {
+    del.classList.add('ed-del-corner');
+    (moment.querySelector('.polaroid') || moment).appendChild(del);
+  };
 
   const makeLp = () => { const p = document.createElement('p'); p.className = 'lp'; p.textContent = 'Write your next line here.'; return p; };
   const makeOpeningLine = () => { const d = document.createElement('div'); d.className = 'opening-line'; d.innerHTML = '<span class="mask"><span class="mask-inner">Write your next line here.</span></span>'; return d; };
@@ -266,13 +273,14 @@
   enableAddRemove(document.querySelectorAll('.quiet-stack .quiet-small'), makeQuietSmall, '＋ Add a little thing', '× remove');
   enableAddRemove(
     document.querySelectorAll('.moments .moment'), makeMoment,
-    '＋ Add a memory', '× remove memory',
+    '＋ Add a memory', '× Remove',
     (el) => {
       el.querySelectorAll('img').forEach((img) => bindPhoto(img));
       /* angle it now too, so it matches the others while editing */
       const pol = el.querySelector('.polaroid');
       if (pol && window.gsap) gsap.set(pol, { rotation: parseFloat(pol.dataset.tilt || 0) });
-    }
+    },
+    placeMomentDelete
   );
 
   /* ── show / hide whole sections, from one tidy panel in the top bar ──

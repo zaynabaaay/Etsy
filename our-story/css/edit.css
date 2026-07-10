@@ -216,6 +216,23 @@ body.editing .quiet-small { color: var(--ink); }
 }
 .ed-del:hover { color: #7a3f30; text-decoration: underline; }
 
+/* a memory's remove control: a small chip pinned to its photo's corner,
+   so it clearly belongs to that photo (not floating in the layout) */
+.ed-del-corner {
+  position: absolute;
+  top: -0.75rem;
+  right: -0.75rem;
+  z-index: 6;
+  margin: 0;
+  padding: 0.28rem 0.7rem;
+  border-radius: 100px;
+  background: rgba(23, 16, 9, 0.92);
+  color: #f2e7d0;
+  border: 1px solid rgba(201, 161, 95, 0.55);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+}
+.ed-del-corner:hover { color: #fff; text-decoration: none; background: rgba(40, 30, 20, 0.96); }
+
 /* a hidden section is simply gone — from the page and the finished site.
    It's brought back from the Sections panel (below). */
 section.is-removed { display: none; }

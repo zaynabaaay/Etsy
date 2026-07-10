@@ -165,21 +165,48 @@ function initOpening() {
    ══════════════════════════════════════════════════════════════════ */
 function initBeginning() {
 
-  /* the thread draws downward as the section scrolls */
-  const threadPath = document.querySelector('.thread path');
+  /* the thread draws downward as the section scrolls.
+     It's rebuilt in real pixel coordinates that span however tall the
+     moments end up (any number of memories), so the stroke-dash "draw"
+     always matches the true on-screen length — no broken/repeating
+     segments when the section grows. */
+  const thread = document.querySelector('.thread');
+  const threadPath = thread && thread.querySelector('path');
   if (threadPath) {
-    const len = threadPath.getTotalLength();
-    gsap.set(threadPath, { strokeDasharray: len, strokeDashoffset: len });
-    gsap.to(threadPath, {
-      strokeDashoffset: 0,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.moments',
-        start: 'top 72%',
-        end: 'bottom 65%',
-        scrub: 0.6,
-      },
-    });
+    const buildThread = () => {
+      const r = thread.getBoundingClientRect();
+      const w = Math.max(40, r.width), h = Math.max(40, r.height);
+      thread.setAttribute('viewBox', '0 0 ' + Math.round(w) + ' ' + Math.round(h));
+      threadPath.removeAttribute('vector-effect'); // 1:1 viewBox now — dash in real px
+      const cx = w / 2;
+      const amp = Math.min(w * 0.16, 24);
+      const n = Math.max(3, Math.round(h / 300)); // a gentle bend every ~300px
+      let d = 'M' + cx.toFixed(1) + ',0';
+      for (let i = 1; i <= n; i++) {
+        const y = h * i / n;
+        const ctrlY = y - (h / n) / 2;
+        const dir = (i % 2 === 1) ? 1 : -1;
+        const a = (i === n) ? amp * 0.25 : amp; // settle back to center at the end
+        d += ' Q' + (cx + dir * a).toFixed(1) + ',' + ctrlY.toFixed(1) + ' ' + cx.toFixed(1) + ',' + y.toFixed(1);
+      }
+      threadPath.setAttribute('d', d);
+    };
+    buildThread();
+    gsap.fromTo(threadPath,
+      { strokeDasharray: () => threadPath.getTotalLength(), strokeDashoffset: () => threadPath.getTotalLength() },
+      {
+        strokeDashoffset: 0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.moments',
+          start: 'top 72%',
+          end: 'bottom 65%',
+          scrub: 0.6,
+          invalidateOnRefresh: true,
+        },
+      });
+    /* re-measure the thread whenever the layout does (resize, images, edits) */
+    ScrollTrigger.addEventListener('refreshInit', buildThread);
   }
 
   /* each moment plays like a hand assembling the page:
