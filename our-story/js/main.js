@@ -268,8 +268,9 @@ function initMontage() {
   const TABLE_W = 1600, TABLE_H = 2200;
 
   /* the transform that frames a group of prints (one, or a pair), centred
-     and filling the screen — pairs sit a little looser than singles */
-  const frameGroup = (els) => {
+     and filling the screen. `zoom` lets a beat drift a touch closer while
+     it "holds", so the camera is never fully frozen (smoother, filmic). */
+  const frameGroup = (els, zoom = 1) => {
     let l = Infinity, t = Infinity, r = -Infinity, btm = -Infinity;
     els.forEach((el) => {
       l = Math.min(l, el.offsetLeft);
@@ -280,7 +281,7 @@ function initMontage() {
     const cx = (l + r) / 2, cy = (t + btm) / 2;
     const vw = window.innerWidth, vh = window.innerHeight;
     const pad = els.length > 1 ? 0.82 : 0.74;
-    const s = Math.min(vw * pad / (r - l), vh * pad / (btm - t));
+    const s = Math.min(vw * pad / (r - l), vh * pad / (btm - t)) * zoom;
     return { scale: s, x: vw / 2 - cx * s, y: vh / 2 - cy * s };
   };
   /* the pulled-back transform that fits the whole table on screen */
@@ -292,34 +293,28 @@ function initMontage() {
 
   /* the camera path: a mix of single prints and two-shots */
   const path = [[0], [1, 2], [3], [4, 5]].map((g) => g.map((i) => photos[i]));
+  const at = (g, z) => ({ x: () => frameGroup(g, z).x, y: () => frameGroup(g, z).y, scale: () => frameGroup(g, z).scale });
 
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: '.montage',
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 1.1,
+      scrub: 1.5,               /* floatier follow — smooths scroll jitter */
       invalidateOnRefresh: true,
     },
+    defaults: { ease: 'sine.inOut' },
   });
 
-  /* start framed on the first target, held for a beat */
-  const g0 = () => frameGroup(path[0]);
-  tl.fromTo(table,
-    { x: () => g0().x, y: () => g0().y, scale: () => g0().scale },
-    { x: () => g0().x, y: () => g0().y, scale: () => g0().scale, duration: 1.2, immediateRender: true }, 0);
+  /* start on the first target, then let it drift slowly closer (the breath) */
+  tl.fromTo(table, at(path[0], 1), { ...at(path[0], 1), duration: 0.001, immediateRender: true }, 0)
+    .to(table, { ...at(path[0], 1.06), duration: 1.4 });
 
-  /* fly slowly to each target (single or pair), holding on each */
+  /* glide to each target, then drift gently while it holds — the camera
+     never comes to a hard stop, so the motion stays smooth throughout */
   for (let k = 1; k < path.length; k++) {
-    const g = () => frameGroup(path[k]);
-    tl.to(table, {
-      x: () => g().x,
-      y: () => g().y,
-      scale: () => g().scale,
-      duration: 2.0,
-      ease: 'power1.inOut',
-    })
-      .to(table, { duration: 1.3 }); // hold — the breath
+    tl.to(table, { ...at(path[k], 1), duration: 2.1, ease: 'power2.inOut' })
+      .to(table, { ...at(path[k], 1.06), duration: 1.4 });
   }
 
   /* pull all the way back: the whole table of moments, together —
@@ -328,10 +323,10 @@ function initMontage() {
     x: () => framePull().x,
     y: () => framePull().y,
     scale: () => framePull().scale,
-    duration: 2.4,
+    duration: 2.6,
     ease: 'power2.inOut',
   })
-    .to(table, { duration: 2.5 });
+    .to(table, { duration: 2.3 });
 
   /* the bridge line — slows the tempo back down */
   gsap.from('.montage-exit', {
