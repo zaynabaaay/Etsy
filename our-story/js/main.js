@@ -100,13 +100,10 @@ function initOpening() {
     .fromTo('.intro-stem svg',
       { opacity: 0, scale: 0.3 },
       { opacity: 0.85, scale: 1, duration: 0.6, ease: 'back.out(2)' }, '-=0.15')
-    .fromTo('.intro-sub',
-      { opacity: 0, y: 16 },
-      { opacity: 1, y: 0, duration: 1.0 }, '-=0.35')
     .fromTo('.opening-flowers',
       { opacity: 0, y: 64, scale: 1.05 },
-      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, '-=1.5')
-    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.5');
+      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, '-=1.1')
+    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.7');
 
   /* ── The master scrub: scrolling is the playhead ──
      The panel holds still via CSS sticky; scrolling draws the title card

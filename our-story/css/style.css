@@ -221,16 +221,6 @@ body.cinematic .scene-opening { height: 460vh; }
 }
 .intro-stem svg { margin-top: 6px; opacity: 0.85; }
 
-.intro-sub {
-  font-style: italic;
-  font-weight: 500;
-  font-size: clamp(1rem, 3.7vw, 1.2rem);
-  line-height: 1.75;
-  letter-spacing: 0.03em;
-  color: var(--sepia-soft);
-  max-width: 42ch;
-}
-
 /* ── The confession · the spoken voice, emerging on scroll ── */
 .opening-line .mask {
   display: block;
@@ -266,7 +256,6 @@ body.cinematic .scene-opening { height: 460vh; }
    the opening stays visible in reduced-motion, edit, and no-JS modes */
 body.cinematic .intro-eyebrow,
 body.cinematic .intro-title .tline,
-body.cinematic .intro-sub,
 body.cinematic .opening-flowers { opacity: 0; }
 body.cinematic .intro-stem-line { transform: scaleY(0); }
 body.cinematic .intro-stem svg { opacity: 0; }

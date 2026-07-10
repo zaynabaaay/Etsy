@@ -60,7 +60,7 @@
   /* ---- every editable piece of text (the element that holds the words;
           for the masked/animated lines that's the inner span) ---- */
   const TEXT_SELECTORS = [
-    '.intro-eyebrow', '.intro-title .tline', '.intro-sub',
+    '.intro-eyebrow', '.intro-title .tline',
     '.opening-line .mask-inner',
     '.chapter-label', '.chapter-title .mask-inner', '.chapter-sub',
     '.moment-date', '.polaroid-caption', '.moment-text',
