@@ -84,31 +84,75 @@ function initChapterHeads() {
 
 function initOpening() {
 
-  /* ── The confession, auto-played (time-based, not scroll) ──
-     Two lines in the speaker's own voice. The first rises in, is read,
-     then lifts away; the second rises in and stays as the resting screen.
-     The flowers settle into the corner and a scroll cue invites the reader
-     onward — an ordinary scroll then carries it all into Chapter One. */
+  /* ── Load-in: the title card settles onto the page (time-based) ──
+     the small line breathes in, the title rises and clears, a thread
+     draws down to the subtitle, and the flowers settle into the corner. */
   gsap.timeline({ defaults: { ease: 'power2.out' } })
+    .fromTo('.intro-eyebrow',
+      { opacity: 0, y: 14 },
+      { opacity: 1, y: 0, duration: 1.1, delay: 0.4 })
+    .fromTo('.intro-title .tline',
+      { opacity: 0, y: 42, filter: 'blur(7px)' },
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, stagger: 0.16 }, '-=0.55')
+    .fromTo('.intro-stem-line',
+      { scaleY: 0 },
+      { scaleY: 1, transformOrigin: 'top center', duration: 0.85 }, '-=0.5')
+    .fromTo('.intro-stem svg',
+      { opacity: 0, scale: 0.3 },
+      { opacity: 0.85, scale: 1, duration: 0.6, ease: 'back.out(2)' }, '-=0.15')
+    .fromTo('.intro-sub',
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: 1.0 }, '-=0.35')
     .fromTo('.opening-flowers',
-      { opacity: 0, y: 60, scale: 1.05 },
-      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, 0.2)
+      { opacity: 0, y: 64, scale: 1.05 },
+      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, '-=1.5')
+    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.5');
 
-    /* line one — in, held for reading, then lifts away */
-    .set('.line-1', { visibility: 'visible' }, 0.7)
+  /* ── The master scrub: scrolling is the playhead ──
+     The panel holds still via CSS sticky; scrolling draws the title card
+     up and away, then the two confession lines emerge one at a time. */
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.scene-opening',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.6,
+    },
+  });
+
+  /* the title card dissolves — text lifts up, the flowers (nearest layer)
+     sink down and away, giving the scene depth */
+  tl.to('.opening-flowers', { opacity: 0, y: 90, duration: 1.0, ease: 'power1.in' }, 0)
+    .to('.intro-screen', { opacity: 0, y: -70, duration: 1.0, ease: 'power1.in' }, 0)
+    .set('.intro-screen', { visibility: 'hidden' })
+
+    /* line one emerges, unmasking upward with the blur clearing, holds for
+       a reading beat, then dissolves up */
+    .set('.line-1', { visibility: 'visible' }, '+=0.25')
     .fromTo('.line-1 .mask-inner',
       { yPercent: 115, filter: 'blur(7px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 1.2 }, 0.7)
-    .to('.line-1', { opacity: 0, y: -34, duration: 0.9, ease: 'power1.in' }, '+=1.7')
+      { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
+    .to('.line-1', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.9')
 
-    /* line two — in, and it stays */
-    .set('.line-2', { visibility: 'visible' }, '+=0.25')
+    /* line two emerges the same way */
+    .set('.line-2', { visibility: 'visible' }, '+=0.2')
     .fromTo('.line-2 .mask-inner',
       { yPercent: 115, filter: 'blur(7px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 1.2 })
+      { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
+    .to('.line-2', { duration: 1.2 }); // a held beat before the handoff
 
-    /* the cue to scroll on into Chapter One */
-    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.4');
+  /* ── The handoff: Chapter One's cream paper rises, the opening dims ── */
+  gsap.timeline({
+    scrollTrigger: {
+      trigger: '.scene-beginning',
+      start: 'top bottom',
+      end: 'top 25%',
+      scrub: 0.6,
+    },
+  })
+    .to('.opening-stage', { opacity: 0.18, y: '-9vh', ease: 'none' }, 0)
+    .to('.opening-glow',  { opacity: 0.1, ease: 'none' }, 0)
+    .to('.scroll-cue',    { opacity: 0, ease: 'none', duration: 0.35 }, 0);
 }
 
 /* ══════════════════════════════════════════════════════════════════

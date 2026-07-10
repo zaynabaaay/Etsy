@@ -144,8 +144,9 @@ body {
   background-blend-mode: multiply, normal, normal;
 }
 
-/* the opening is a single screen — the confession plays in place, then
-   an ordinary scroll carries it away into Chapter One */
+/* tall enough to scroll through: the title card holds, then scrolling
+   draws the confession up line by line before Chapter One */
+body.cinematic .scene-opening { height: 460vh; }
 
 /* a soft wash of sunlight behind the names — warms as they arrive */
 .opening-glow {
@@ -166,7 +167,8 @@ body {
   inset: 0;
 }
 
-/* each confession line owns the full screen, centered */
+/* the landing card and each confession line own the full screen, centered */
+.intro-screen,
 .opening-line {
   position: absolute;
   inset: 0;
@@ -176,16 +178,67 @@ body {
   justify-content: center;
   text-align: center;
   padding: 0 clamp(1.5rem, 6vw, 4rem);
-  visibility: hidden;
+}
+.opening-line { visibility: hidden; }
+
+/* ── The landing · the keepsake's title ──
+   A small line, the title, a thread that draws the eye down, and one
+   quiet sentence — in warm sepia inks on paper. */
+.intro-eyebrow {
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: clamp(0.72rem, 2.9vw, 0.9rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--sepia);
+  padding-left: 0.42em; /* optical centering against the tracking */
+  margin-bottom: clamp(1.1rem, 3vw, 1.7rem);
 }
 
+.intro-title {
+  font-weight: 500;
+  font-size: clamp(3rem, 13vw, 5.8rem);
+  line-height: 1.02;
+  letter-spacing: 0.005em;
+  color: var(--sepia-deep);
+  text-shadow: 0 0 60px rgba(201, 161, 95, 0.25);
+}
+.intro-title .tline { display: block; }
+
+/* the thread + its terminal glint */
+.intro-stem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: clamp(1.3rem, 4vh, 2rem) 0;
+  color: var(--sepia);
+}
+.intro-stem-line {
+  width: 1px;
+  height: clamp(38px, 6vh, 58px);
+  background: linear-gradient(to bottom, transparent, currentColor 32%, currentColor);
+  opacity: 0.8;
+}
+.intro-stem svg { margin-top: 6px; opacity: 0.85; }
+
+.intro-sub {
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1rem, 3.7vw, 1.2rem);
+  line-height: 1.75;
+  letter-spacing: 0.03em;
+  color: var(--sepia-soft);
+  max-width: 42ch;
+}
+
+/* ── The confession · the spoken voice, emerging on scroll ── */
 .opening-line .mask {
   display: block;
   overflow: hidden;
   padding: 0.18em 0.1em;
 }
 
-/* the spoken voice — an italic serif, like a letter in the writer's hand */
+/* an italic serif, like a letter in the writer's own hand */
 .opening-line .mask-inner {
   display: block;
   font-style: italic;
@@ -211,7 +264,12 @@ body {
 
 /* pre-animation state — only while the cinematic experience is running, so
    the opening stays visible in reduced-motion, edit, and no-JS modes */
+body.cinematic .intro-eyebrow,
+body.cinematic .intro-title .tline,
+body.cinematic .intro-sub,
 body.cinematic .opening-flowers { opacity: 0; }
+body.cinematic .intro-stem-line { transform: scaleY(0); }
+body.cinematic .intro-stem svg { opacity: 0; }
 
 /* ── Scroll cue ── */
 .scroll-cue {
@@ -1037,10 +1095,9 @@ body.cinematic .scene-quiet { height: 520vh; }
   .scroll-cue-line-inner { animation: none; transform: translateY(0); }
 }
 
-/* still modes show the opening's resting line (the second one); the first
-   line only exists mid-animation, so it's hidden to avoid stacking */
-body.reduced-motion .line-1 { display: none; }
-body.reduced-motion .line-2 { visibility: visible; }
+/* still modes show the title card as the opening; the confession lines
+   only exist mid-scroll, so they're hidden to avoid stacking */
+body.reduced-motion .opening-line { display: none; }
 
 body.reduced-motion .scroll-cue {
   opacity: 1;
