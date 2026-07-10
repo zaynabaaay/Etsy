@@ -606,7 +606,7 @@ body.cinematic .opening-flowers { opacity: 0; }
 
 /* the tall track that gives the camera its scroll distance */
 .montage { position: relative; }
-body.cinematic .montage { height: 720vh; }
+body.cinematic .montage { height: 840vh; }
 
 /* the pinned viewport the camera looks through */
 .montage-stage {
@@ -638,13 +638,14 @@ body.cinematic .montage { height: 720vh; }
   padding-bottom: 60px;
   box-shadow: 0 30px 60px rgba(60, 44, 22, 0.30), 0 10px 22px rgba(60, 44, 22, 0.16);
 }
-/* left / top / width in table px, plus a resting tilt */
-.mp-1 { left: 120px;  top: 170px;  width: 560px; transform: rotate(-3deg); }
-.mp-2 { left: 980px;  top: 360px;  width: 470px; transform: rotate(2.6deg); }
-.mp-3 { left: 300px;  top: 730px;  width: 610px; transform: rotate(-1.8deg); }
-.mp-4 { left: 1010px; top: 1150px; width: 430px; transform: rotate(3.4deg); }
-.mp-5 { left: 170px;  top: 1440px; width: 560px; transform: rotate(-2.6deg); }
-.mp-6 { left: 850px;  top: 1660px; width: 520px; transform: rotate(2deg); }
+/* left / top / width in table px, plus a resting tilt.
+   Some sit in overlapping clusters so the camera can frame two at once. */
+.mp-1 { left: 140px;  top: 190px;  width: 540px; transform: rotate(-3deg); }
+.mp-2 { left: 780px;  top: 170px;  width: 470px; transform: rotate(2.6deg); }   /* pair with 3 */
+.mp-3 { left: 1070px; top: 500px;  width: 420px; transform: rotate(-2.2deg); }  /* pair with 2 */
+.mp-4 { left: 250px;  top: 830px;  width: 620px; transform: rotate(2deg); }
+.mp-5 { left: 210px;  top: 1470px; width: 540px; transform: rotate(-2.6deg); }  /* pair with 6 */
+.mp-6 { left: 730px;  top: 1660px; width: 560px; transform: rotate(2.2deg); }   /* pair with 5 */
 
 .mframe { overflow: hidden; position: relative; }
 

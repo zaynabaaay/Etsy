@@ -267,12 +267,20 @@ function initMontage() {
 
   const TABLE_W = 1600, TABLE_H = 2200;
 
-  /* the transform that frames one print, centered and filling the screen */
-  const frameFor = (el) => {
-    const cx = el.offsetLeft + el.offsetWidth / 2;
-    const cy = el.offsetTop + el.offsetHeight / 2;
+  /* the transform that frames a group of prints (one, or a pair), centred
+     and filling the screen — pairs sit a little looser than singles */
+  const frameGroup = (els) => {
+    let l = Infinity, t = Infinity, r = -Infinity, btm = -Infinity;
+    els.forEach((el) => {
+      l = Math.min(l, el.offsetLeft);
+      t = Math.min(t, el.offsetTop);
+      r = Math.max(r, el.offsetLeft + el.offsetWidth);
+      btm = Math.max(btm, el.offsetTop + el.offsetHeight);
+    });
+    const cx = (l + r) / 2, cy = (t + btm) / 2;
     const vw = window.innerWidth, vh = window.innerHeight;
-    const s = Math.min(vw * 0.74 / el.offsetWidth, vh * 0.8 / el.offsetHeight);
+    const pad = els.length > 1 ? 0.82 : 0.74;
+    const s = Math.min(vw * pad / (r - l), vh * pad / (btm - t));
     return { scale: s, x: vw / 2 - cx * s, y: vh / 2 - cy * s };
   };
   /* the pulled-back transform that fits the whole table on screen */
@@ -282,31 +290,36 @@ function initMontage() {
     return { scale: s, x: vw / 2 - (TABLE_W / 2) * s, y: vh / 2 - (TABLE_H / 2) * s };
   };
 
+  /* the camera path: a mix of single prints and two-shots */
+  const path = [[0], [1, 2], [3], [4, 5]].map((g) => g.map((i) => photos[i]));
+
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: '.montage',
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 0.9,
+      scrub: 1.1,
       invalidateOnRefresh: true,
     },
   });
 
-  /* start framed on the first print, held for a beat */
+  /* start framed on the first target, held for a beat */
+  const g0 = () => frameGroup(path[0]);
   tl.fromTo(table,
-    { x: () => frameFor(photos[0]).x, y: () => frameFor(photos[0]).y, scale: () => frameFor(photos[0]).scale },
-    { x: () => frameFor(photos[0]).x, y: () => frameFor(photos[0]).y, scale: () => frameFor(photos[0]).scale, duration: 0.7, immediateRender: true }, 0);
+    { x: () => g0().x, y: () => g0().y, scale: () => g0().scale },
+    { x: () => g0().x, y: () => g0().y, scale: () => g0().scale, duration: 1.2, immediateRender: true }, 0);
 
-  /* fly to each subsequent print, holding on each */
-  for (let i = 1; i < photos.length; i++) {
+  /* fly slowly to each target (single or pair), holding on each */
+  for (let k = 1; k < path.length; k++) {
+    const g = () => frameGroup(path[k]);
     tl.to(table, {
-      x: () => frameFor(photos[i]).x,
-      y: () => frameFor(photos[i]).y,
-      scale: () => frameFor(photos[i]).scale,
-      duration: 1.2,
+      x: () => g().x,
+      y: () => g().y,
+      scale: () => g().scale,
+      duration: 2.0,
       ease: 'power1.inOut',
     })
-      .to(table, { duration: 0.7 }); // hold — the breath
+      .to(table, { duration: 1.3 }); // hold — the breath
   }
 
   /* pull all the way back: the whole table of moments, together —
@@ -315,7 +328,7 @@ function initMontage() {
     x: () => framePull().x,
     y: () => framePull().y,
     scale: () => framePull().scale,
-    duration: 1.8,
+    duration: 2.4,
     ease: 'power2.inOut',
   })
     .to(table, { duration: 2.5 });
