@@ -73,6 +73,8 @@
   --sepia:           #6f5638;   /* eyebrow, thread                  */
   --sepia-soft:      #5d4936;   /* the cover subtitle               */
 
+  --candle:          #e7d0a0;   /* warm candlelit parchment — the quiet + letter */
+
   /* handmade-paper grain — a mostly-white tile of soft mottling; laid over
      any warm surface with background-blend-mode:multiply so the paper reads
      as real stock. Tints the background only, never the text. */
@@ -749,6 +751,19 @@ body.cinematic .scene-quiet { height: 520vh; }
   inset: 0;
 }
 
+/* a warm wash of candlelight that comes up as the scene settles */
+.quiet-glow {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: min(125vw, 860px);
+  aspect-ratio: 1.4;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center, rgba(224, 168, 86, 0.32), rgba(224, 168, 86, 0.12) 44%, transparent 70%);
+  opacity: 0; /* grows with the scroll (js/main.js) */
+  pointer-events: none;
+}
+
 .quiet-line,
 .quiet-stack {
   position: absolute;
@@ -783,18 +798,17 @@ body.cinematic .scene-quiet { height: 520vh; }
   text-wrap: balance;
 }
 
-/* the first two lines live in daylight — ink on paper */
-.ql-1, .ql-2 { color: var(--ink); }
+/* warm ink throughout — this scene stays on paper, lit by candlelight */
+.quiet-line { color: var(--sepia-deep); }
 
-/* the stack and the final line live in the dusk/dark — candlelit cream */
-.quiet-stack, .ql-final { color: var(--cream-text); }
+.quiet-stack { gap: clamp(1rem, 3.4vw, 1.7rem); }
 
-.quiet-stack { gap: clamp(0.9rem, 3vw, 1.5rem); }
-
+/* the little things, in a warm hand */
 .quiet-small {
-  font-style: italic;
-  font-size: clamp(1.2rem, 4.4vw, 2rem);
-  line-height: 1.4;
+  font-family: var(--font-script);
+  font-size: clamp(1.5rem, 5.6vw, 2.4rem);
+  line-height: 1.35;
+  color: var(--gold-deep);
   opacity: 0; /* revealed by the scroll */
 }
 
@@ -804,9 +818,13 @@ body.cinematic .scene-quiet { height: 520vh; }
 .scene-letter {
   position: relative;
   z-index: 2;
-  /* same espresso The Quiet fades to — the darkness is the transition */
-  background: var(--espresso);
-  color: var(--cream-text);
+  /* the same warm candlelit paper The Quiet settles into — a letter
+     written by lamplight, on aged paper */
+  background-color: var(--candle);
+  background-image: var(--paper);
+  background-size: 600px;
+  background-blend-mode: multiply;
+  color: var(--ink);
   padding: clamp(5rem, 16vw, 10rem) clamp(1.5rem, 6vw, 4rem) clamp(7rem, 20vw, 12rem);
   overflow: hidden;
 }
@@ -815,11 +833,11 @@ body.cinematic .scene-quiet { height: 520vh; }
 .letter-glow {
   position: absolute;
   left: 50%;
-  bottom: 8%;
+  bottom: 6%;
   width: min(130vw, 820px);
   aspect-ratio: 1.5;
   transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, rgba(190, 130, 60, 0.16), transparent 68%);
+  background: radial-gradient(ellipse at center, rgba(224, 168, 86, 0.22), transparent 68%);
   pointer-events: none;
 }
 
@@ -835,7 +853,7 @@ body.cinematic .scene-quiet { height: 520vh; }
 }
 
 .letter-ornament {
-  color: var(--gold);
+  color: var(--gold-deep);
   margin-bottom: 1rem;
 }
 
@@ -845,7 +863,7 @@ body.cinematic .scene-quiet { height: 520vh; }
   font-size: clamp(0.66rem, 2.3vw, 0.78rem);
   letter-spacing: 0.42em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--gold-deep);
   padding-left: 0.42em;
 }
 
@@ -858,14 +876,14 @@ body.cinematic .scene-quiet { height: 520vh; }
 .lp {
   font-size: clamp(1.15rem, 4vw, 1.4rem);
   line-height: 1.8;
-  color: rgba(242, 231, 208, 0.86);
+  color: var(--sepia-deep);
   margin-bottom: 1.6rem;
 }
 
 .lp-salutation {
   font-style: italic;
   font-size: clamp(1.5rem, 5.4vw, 2.1rem);
-  color: var(--cream-text);
+  color: var(--sepia-deep);
   margin-bottom: 2rem;
 }
 
@@ -877,7 +895,7 @@ body.cinematic .scene-quiet { height: 520vh; }
 .sign-pre {
   font-style: italic;
   font-size: clamp(1.1rem, 4vw, 1.35rem);
-  color: rgba(242, 231, 208, 0.8);
+  color: var(--sepia-soft);
   margin-bottom: 0.2rem;
 }
 
@@ -885,7 +903,7 @@ body.cinematic .scene-quiet { height: 520vh; }
   font-family: var(--font-script);
   font-size: clamp(2.6rem, 11vw, 4rem);
   line-height: 1.1;
-  color: var(--gold);
+  color: var(--gold-deep);
 }
 
 /* ══════════════════════════════════════════════
@@ -904,12 +922,12 @@ body.cinematic .scene-quiet { height: 520vh; }
   overflow: hidden;
 }
 
-/* dawn: the dark lifts back to paper as this scene begins */
+/* the warm candlelight settles gently back to daylight paper */
 .dawn {
-  height: 90vh;
-  height: 90svh;
+  height: 70vh;
+  height: 70svh;
   margin: 0 calc(-1 * clamp(1.5rem, 6vw, 4rem));
-  background: linear-gradient(to bottom, var(--espresso) 0%, #4a381f 34%, #a98c56 62%, var(--cream) 100%);
+  background: linear-gradient(to bottom, var(--candle) 0%, #ecdcbb 46%, var(--cream) 100%);
 }
 
 .close-inner {
@@ -1039,8 +1057,7 @@ body.reduced-motion .scroll-cue {
   letter-spacing: initial;
 }
 
-/* The Quiet, static: dark room, final line only */
-body.reduced-motion .quiet-sticky { background: var(--espresso); }
+/* The Quiet, static: warm candlelit paper, final line only */
+body.reduced-motion .quiet-sticky { background: var(--candle); }
 body.reduced-motion .ql-final { visibility: visible; }
-body.reduced-motion .quiet-small { opacity: 1; }
 body.reduced-motion .quiet-stack { display: none; }

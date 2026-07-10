@@ -361,13 +361,14 @@ function initQuiet() {
     },
   });
 
-  /* evening falls — one continuous dimming, timed so each line sits
-     on a background it is readable against */
+  /* the light warms — the paper deepens toward candlelight and a soft
+     glow comes up, so the scene settles into an intimate, lit hush */
   tl.fromTo('.quiet-sticky',
     { backgroundColor: '#f3ecdc' },
-    { backgroundColor: '#dccca9', duration: 3.2, ease: 'none' }, 0)
-    .to('.quiet-sticky', { backgroundColor: '#6f5430', duration: 1.4, ease: 'none' }, 3.2)
-    .to('.quiet-sticky', { backgroundColor: '#171009', duration: 2.0, ease: 'none' }, 4.6);
+    { backgroundColor: '#e7d0a0', duration: 5.2, ease: 'none' }, 0)
+    .fromTo('.quiet-glow',
+      { opacity: 0 },
+      { opacity: 1, duration: 4.4, ease: 'sine.inOut' }, 1.4);
 
   /* beat one */
   tl.set('.ql-1', { visibility: 'visible' }, 0.2)
