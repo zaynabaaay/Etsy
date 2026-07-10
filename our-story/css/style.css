@@ -76,6 +76,15 @@
   --gold-soft:       #b98f4e;   /* muted gold for small labels     */
   --gold-deep:       #96702f;   /* gold dark enough to read on cream */
 
+  --sepia-deep:      #4e3a28;   /* the cover title — warm ink       */
+  --sepia:           #6f5638;   /* eyebrow, thread                  */
+  --sepia-soft:      #5d4936;   /* the cover subtitle               */
+
+  /* handmade-paper grain — a mostly-white tile of soft mottling; laid over
+     any warm surface with background-blend-mode:multiply so the paper reads
+     as real stock. Tints the background only, never the text. */
+  --paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014' numOctaves='3' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23ffffff'/%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.09'/%3E%3C/svg%3E");
+
   --font-serif:  'Cormorant Garamond', 'Times New Roman', serif;
   --font-script: 'Great Vibes', cursive;
   --font-label:  'Jost', 'Helvetica Neue', sans-serif;
@@ -86,7 +95,10 @@
 html { scroll-behavior: auto; }
 
 body {
-  background: var(--cream);
+  background-color: var(--cream);
+  background-image: var(--paper);
+  background-size: 600px;
+  background-blend-mode: multiply;
   color: var(--ink);
   font-family: var(--font-serif);
   overflow-x: hidden;
@@ -130,10 +142,13 @@ body {
   height: 100vh;
   height: 100lvh;
   overflow: hidden;
-  /* warm parchment, faintly darker toward the edges */
+  /* warm parchment with a handmade-paper grain, faintly darker toward the edges */
   background:
+    var(--paper),
     radial-gradient(ellipse 95% 70% at 50% 44%, rgba(255, 250, 238, 0.75), transparent 70%),
     radial-gradient(ellipse 140% 110% at 50% 50%, #efe5cf 50%, #e3d5b4 100%);
+  background-size: 600px, auto, auto;
+  background-blend-mode: multiply, normal, normal;
 }
 
 /* tall enough to scroll through only in the animated experience */
@@ -172,23 +187,74 @@ body.cinematic .scene-opening { height: 520vh; }
   padding: 0 clamp(1.5rem, 6vw, 4rem);
 }
 
-/* ── Moment 1 · intro ── */
-.intro-ornament {
-  color: var(--gold-deep);
-  opacity: 0;
-  margin-bottom: 1.7rem;
+/* ── Moment 1 · the cover ──
+   A keepsake title spread: a small line, the title, a thread that draws
+   the eye down, and one quiet sentence — in warm sepia inks on paper. */
+.intro-eyebrow {
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: clamp(0.72rem, 2.9vw, 0.9rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--sepia);
+  padding-left: 0.42em; /* optical centering against the tracking */
+  margin-bottom: clamp(1.1rem, 3vw, 1.7rem);
 }
-.intro-ornament svg { width: clamp(34px, 9vw, 44px); height: auto; }
 
-.intro-label {
-  font-family: 'Parisienne', cursive;
-  font-weight: 400;
-  font-size: clamp(1.9rem, 8vw, 3.4rem);
-  line-height: 1.3;
-  color: var(--gold-deep);
-  white-space: nowrap;
-  opacity: 0; /* the JS "writes" it on left-to-right */
+.intro-title {
+  font-weight: 500;
+  font-size: clamp(3rem, 13vw, 5.8rem);
+  line-height: 1.02;
+  letter-spacing: 0.005em;
+  color: var(--sepia-deep);
+  text-shadow: 0 0 60px rgba(201, 161, 95, 0.25);
 }
+.intro-title .tline { display: block; }
+
+/* the thread + its terminal glint */
+.intro-stem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: clamp(1.3rem, 4vh, 2rem) 0;
+  color: var(--sepia);
+}
+.intro-stem-line {
+  width: 1px;
+  height: clamp(38px, 6vh, 58px);
+  background: linear-gradient(to bottom, transparent, currentColor 32%, currentColor);
+  opacity: 0.8;
+}
+.intro-stem svg { margin-top: 6px; opacity: 0.85; }
+
+.intro-sub {
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1rem, 3.7vw, 1.2rem);
+  line-height: 1.75;
+  letter-spacing: 0.03em;
+  color: var(--sepia-soft);
+  max-width: 42ch;
+}
+
+/* the dried-flower sprig in the lower corner (the near/foreground layer) */
+.opening-flowers {
+  position: absolute;
+  right: -4%;
+  bottom: -2%;
+  width: clamp(230px, 52vw, 480px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* pre-animation state — only while the cinematic experience is running, so
+   the cover stays visible in reduced-motion, edit, and no-JS modes */
+body.cinematic .intro-eyebrow,
+body.cinematic .intro-title .tline,
+body.cinematic .intro-sub,
+body.cinematic .opening-flowers { opacity: 0; }
+body.cinematic .intro-stem-line { transform: scaleY(0); }
+body.cinematic .intro-stem svg { opacity: 0; }
 
 /* ── Moment 2 · the two lines ── */
 .opening-line {
@@ -321,7 +387,10 @@ body.cinematic .scene-opening { height: 520vh; }
 .scene-beginning {
   position: relative;
   z-index: 2;
-  background: var(--cream);
+  background-color: var(--cream);
+  background-image: var(--paper);
+  background-size: 600px;
+  background-blend-mode: multiply;
   color: var(--ink);
   padding: clamp(5rem, 14vw, 9rem) 0 clamp(6rem, 16vw, 11rem);
 }
@@ -552,13 +621,17 @@ body.cinematic .scene-opening { height: 520vh; }
   position: relative;
   z-index: 2;
   /* the paper deepens one shade for the interlude, then returns */
-  background: linear-gradient(
-    to bottom,
-    var(--cream) 0%,
-    #ebdfc2 18%,
-    #e9dcbd 82%,
-    var(--cream) 100%
-  );
+  background:
+    var(--paper),
+    linear-gradient(
+      to bottom,
+      var(--cream) 0%,
+      #ebdfc2 18%,
+      #e9dcbd 82%,
+      var(--cream) 100%
+    );
+  background-size: 600px, auto;
+  background-blend-mode: multiply, normal;
   color: var(--ink);
   padding: clamp(6rem, 16vw, 10rem) clamp(1.5rem, 6vw, 4rem);
   text-align: center;
@@ -643,7 +716,10 @@ body.cinematic .scene-opening { height: 520vh; }
 .scene-montage {
   position: relative;
   z-index: 2;
-  background: var(--cream);
+  background-color: var(--cream);
+  background-image: var(--paper);
+  background-size: 600px;
+  background-blend-mode: multiply;
   color: var(--ink);
   padding: clamp(5rem, 14vw, 9rem) 0 clamp(5rem, 14vw, 8rem);
   /* NOT clipped: photos float in from above the section, so the section
@@ -945,7 +1021,10 @@ body.cinematic .scene-quiet { height: 520vh; }
 .scene-close {
   position: relative;
   z-index: 2;
-  background: var(--cream);
+  background-color: var(--cream);
+  background-image: var(--paper);
+  background-size: 600px;
+  background-blend-mode: multiply;
   color: var(--ink);
   padding: 0 clamp(1.5rem, 6vw, 4rem) clamp(5rem, 14vw, 8rem);
   text-align: center;
@@ -1077,13 +1156,11 @@ body.cinematic .scene-quiet { height: 520vh; }
   .scroll-cue-line-inner { animation: none; transform: translateY(0); }
 }
 
-body.reduced-motion .intro-screen,
-body.reduced-motion .opening-line { display: none; }
+/* still modes show the cover as the opening; the mid-scroll beats
+   (the two lines, the names arrival) are hidden so nothing stacks */
+body.reduced-motion .opening-line,
+body.reduced-motion .names-group { display: none; }
 
-body.reduced-motion .names-group .names-script,
-body.reduced-motion .names-group .names-title,
-body.reduced-motion .names-group .names-rule,
-body.reduced-motion .names-group .names-date,
 body.reduced-motion .scroll-cue {
   opacity: 1;
   transform: none;

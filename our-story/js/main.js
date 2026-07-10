@@ -84,15 +84,29 @@ function initChapterHeads() {
 
 function initOpening() {
 
-  /* ── Load-in: the hushed first screen (time-based, not scroll) ──
-     the first line is "written" on, left to right, like a pen ── */
+  /* ── Load-in: the cover assembles, placed by hand (time-based) ──
+     the small line breathes in, the title rises and clears, a thread
+     draws down to the subtitle, and the flowers settle into the corner. */
   gsap.timeline({ defaults: { ease: 'power2.out' } })
-    .to('.intro-ornament', { opacity: 1, duration: 1.4, delay: 0.5 })
-    .set('.intro-label', { opacity: 1 }, '-=0.6')
-    .fromTo('.intro-label',
-      { clipPath: 'inset(-30% 100% -30% 0)' },
-      { clipPath: 'inset(-30% 0% -30% 0)', duration: 1.7, ease: 'power1.out' }, '<')
-    .to('.scroll-cue',     { opacity: 1, duration: 1.2 }, '-=0.6');
+    .fromTo('.intro-eyebrow',
+      { opacity: 0, y: 14 },
+      { opacity: 1, y: 0, duration: 1.1, delay: 0.4 })
+    .fromTo('.intro-title .tline',
+      { opacity: 0, y: 42, filter: 'blur(7px)' },
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, stagger: 0.16 }, '-=0.55')
+    .fromTo('.intro-stem-line',
+      { scaleY: 0 },
+      { scaleY: 1, transformOrigin: 'top center', duration: 0.85 }, '-=0.5')
+    .fromTo('.intro-stem svg',
+      { opacity: 0, scale: 0.3 },
+      { opacity: 0.85, scale: 1, duration: 0.6, ease: 'back.out(2)' }, '-=0.15')
+    .fromTo('.intro-sub',
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: 1.0 }, '-=0.35')
+    .fromTo('.opening-flowers',
+      { opacity: 0, y: 64, scale: 1.05 },
+      { opacity: 1, y: 0, scale: 1, duration: 1.7, ease: 'power2.out' }, '-=1.5')
+    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.5');
 
   /* ── The master scrub: scrolling is the playhead ──
      The panel holds still via CSS sticky; this timeline is scrubbed
@@ -106,9 +120,12 @@ function initOpening() {
     },
   });
 
-  /* Moment 1 → out: the intro screen dissolves upward */
-  tl.to('.intro-screen', { opacity: 0, y: -70, duration: 1.0, ease: 'power1.in' })
+  /* Moment 1 → out: the cover dissolves — text lifts up, the flowers
+     (nearest layer) sink down and away, giving the scene depth */
+  tl.to('.opening-flowers', { opacity: 0, y: 90, duration: 1.0, ease: 'power1.in' }, 0)
+    .to('.intro-screen', { opacity: 0, y: -70, duration: 1.0, ease: 'power1.in' }, 0)
     .set('.intro-screen', { visibility: 'hidden' })
+    .set('.opening-flowers', { visibility: 'hidden' })
 
     /* Moment 2a: line one unmasks upward, blur clearing as it lands,
        then a reading hold (the '+=0.8' gap) before it dissolves up */
