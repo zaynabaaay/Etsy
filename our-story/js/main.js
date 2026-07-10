@@ -391,34 +391,52 @@ function initQuiet() {
 
 /* ══════════════════════════════════════════════════════════════════
    Scene 06 — The Letter
-   The whole card arrives together when it comes into view, with a gentle
-   stagger down the page, then stays fully legible. It is NOT scrubbed to
-   scroll — on a tall screen the entire letter is visible at once, and a
-   scrubbed reveal would leave the lower lines stuck half-faded.
+   Two devices, two rules (gsap.matchMedia cleans up + re-runs on resize):
+
+   · PHONE — the card is taller than the screen, so the letter is read a
+     paragraph at a time, each rising into clarity as it's scrolled past.
+   · TABLET / DESKTOP — the whole card fits on screen at once, so a
+     scrubbed reveal would leave the lower lines stuck half-faded. Here it
+     arrives as one piece when it enters view, then stays fully legible.
    ══════════════════════════════════════════════════════════════════ */
 function initLetter() {
+  const mm = gsap.matchMedia();
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.letter',
-      start: 'top 80%',
-      toggleActions: 'play none none none', // play once, then leave it clear
-    },
-    defaults: { ease: 'power2.out' },
+  /* PHONE — reveal at reading pace, tied to scroll */
+  mm.add('(max-width: 767px)', () => {
+    gsap.timeline({
+      scrollTrigger: { trigger: '.letter-head', start: 'top 90%', end: 'top 55%', scrub: 0.6 },
+    })
+      .from('.letter-ornament', { opacity: 0, y: 16 }, 0)
+      .from('.letter-label', { opacity: 0, y: 12 }, 0.2);
+
+    gsap.utils.toArray('.letter .lp').forEach((p) => {
+      gsap.from(p, {
+        opacity: 0, y: 26, filter: 'blur(4px)', ease: 'power1.out',
+        scrollTrigger: { trigger: p, start: 'top 88%', end: 'top 58%', scrub: 0.7 },
+      });
+    });
+
+    gsap.timeline({
+      scrollTrigger: { trigger: '.letter-sign', start: 'top 90%', end: 'top 55%', scrub: 0.7 },
+    })
+      .from('.sign-pre', { opacity: 0, y: 14 }, 0)
+      .from('.sign-name', { opacity: 0, y: 20, scale: 0.94, ease: 'power2.out' }, 0.2);
   });
 
-  /* the card settles onto the surface */
-  tl.from('.letter', { opacity: 0, y: 42, duration: 0.9 }, 0)
-    /* the head */
-    .from('.letter-ornament', { opacity: 0, y: 14, duration: 0.6 }, 0.2)
-    .from('.letter-label', { opacity: 0, y: 12, duration: 0.6 }, 0.32)
-    /* the body, one paragraph after another */
-    .from('.letter-body .lp', {
-      opacity: 0, y: 20, filter: 'blur(3px)', duration: 0.7, stagger: 0.16,
-    }, 0.46)
-    /* the signature, last */
-    .from('.sign-pre', { opacity: 0, y: 12, duration: 0.6 }, '-=0.15')
-    .from('.sign-name', { opacity: 0, y: 18, scale: 0.96, duration: 0.85 }, '-=0.3');
+  /* TABLET / DESKTOP — arrive as one piece, then hold clear */
+  mm.add('(min-width: 768px)', () => {
+    gsap.timeline({
+      scrollTrigger: { trigger: '.letter', start: 'top 80%', toggleActions: 'play none none none' },
+      defaults: { ease: 'power2.out' },
+    })
+      .from('.letter', { opacity: 0, y: 42, duration: 0.9 }, 0)
+      .from('.letter-ornament', { opacity: 0, y: 14, duration: 0.6 }, 0.2)
+      .from('.letter-label', { opacity: 0, y: 12, duration: 0.6 }, 0.32)
+      .from('.letter-body .lp', { opacity: 0, y: 20, filter: 'blur(3px)', duration: 0.7, stagger: 0.16 }, 0.46)
+      .from('.sign-pre', { opacity: 0, y: 12, duration: 0.6 }, '-=0.15')
+      .from('.sign-name', { opacity: 0, y: 18, scale: 0.96, duration: 0.85 }, '-=0.3');
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════════
