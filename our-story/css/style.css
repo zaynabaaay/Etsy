@@ -144,9 +144,9 @@ body {
   background-blend-mode: multiply, normal, normal;
 }
 
-/* tall enough to scroll through: the title card holds, then scrolling
-   draws the confession up line by line before Chapter One */
-body.cinematic .scene-opening { height: 460vh; }
+/* tall enough to scroll through: the confession plays out line by line,
+   then the title emerges as the payoff before Chapter One */
+body.cinematic .scene-opening { height: 560vh; }
 
 /* a soft wash of sunlight behind the names — warms as they arrive */
 .opening-glow {

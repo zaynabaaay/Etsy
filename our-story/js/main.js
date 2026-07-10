@@ -84,30 +84,22 @@ function initChapterHeads() {
 
 function initOpening() {
 
-  /* ── Load-in: the title card settles onto the page (time-based) ──
-     the small line breathes in, the title rises and clears, a thread
-     draws down to the subtitle, and the flowers settle into the corner. */
+  /* ── Load-in: the first confession line settles onto the page ──
+     (time-based) It unmasks upward, the blur clearing as it lands, while
+     the flowers settle into the corner and the scroll cue invites you on. */
   gsap.timeline({ defaults: { ease: 'power2.out' } })
-    .fromTo('.intro-eyebrow',
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: 1.1, delay: 0.4 })
-    .fromTo('.intro-title .tline',
-      { opacity: 0, y: 42, filter: 'blur(7px)' },
-      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, stagger: 0.16 }, '-=0.55')
-    .fromTo('.intro-stem-line',
-      { scaleY: 0 },
-      { scaleY: 1, transformOrigin: 'top center', duration: 0.85 }, '-=0.5')
-    .fromTo('.intro-stem svg',
-      { opacity: 0, scale: 0.3 },
-      { opacity: 0.85, scale: 1, duration: 0.6, ease: 'back.out(2)' }, '-=0.15')
     .fromTo('.opening-flowers',
       { opacity: 0, y: 64, scale: 1.05 },
-      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, '-=1.1')
-    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.7');
+      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, 0.3)
+    .set('.line-1', { visibility: 'visible' }, 0.6)
+    .fromTo('.line-1 .mask-inner',
+      { yPercent: 115, filter: 'blur(7px)' },
+      { yPercent: 0, filter: 'blur(0px)', duration: 1.3 }, 0.6)
+    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.6');
 
   /* ── The master scrub: scrolling is the playhead ──
-     The panel holds still via CSS sticky; scrolling draws the title card
-     up and away, then the two confession lines emerge one at a time. */
+     The panel holds still via CSS sticky. Scrolling lifts the confession
+     away line by line, then the title emerges as the payoff. */
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: '.scene-opening',
@@ -117,26 +109,34 @@ function initOpening() {
     },
   });
 
-  /* the title card dissolves — text lifts up, the flowers (nearest layer)
-     sink down and away, giving the scene depth */
-  tl.to('.opening-flowers', { opacity: 0, y: 90, duration: 1.0, ease: 'power1.in' }, 0)
-    .to('.intro-screen', { opacity: 0, y: -70, duration: 1.0, ease: 'power1.in' }, 0)
-    .set('.intro-screen', { visibility: 'hidden' })
+  /* line one lifts away */
+  tl.to('.line-1', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, 0)
 
-    /* line one emerges, unmasking upward with the blur clearing, holds for
-       a reading beat, then dissolves up */
-    .set('.line-1', { visibility: 'visible' }, '+=0.25')
-    .fromTo('.line-1 .mask-inner',
-      { yPercent: 115, filter: 'blur(7px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
-    .to('.line-1', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.9')
-
-    /* line two emerges the same way */
-    .set('.line-2', { visibility: 'visible' }, '+=0.2')
+    /* line two emerges the same way, holds, then lifts away */
+    .set('.line-2', { visibility: 'visible' }, '+=0.15')
     .fromTo('.line-2 .mask-inner',
       { yPercent: 115, filter: 'blur(7px)' },
       { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
-    .to('.line-2', { duration: 1.2 }); // a held beat before the handoff
+    .to('.line-2', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.9')
+
+    /* ── The reveal: the title emerges, warm and slow — the payoff ──
+       the candlelight warms, the small line arrives, then the title rises
+       and clears while its letters breathe into place, and the thread
+       draws down to its glint. */
+    .to('.opening-glow', { opacity: 1, duration: 1.5, ease: 'sine.inOut' }, '+=0.2')
+    .fromTo('.intro-eyebrow',
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: 0.9 }, '<+0.15')
+    .fromTo('.intro-title .tline',
+      { opacity: 0, y: 44, letterSpacing: '0.2em', filter: 'blur(9px)' },
+      { opacity: 1, y: 0, letterSpacing: '0.005em', filter: 'blur(0px)', duration: 1.5, stagger: 0.2, ease: 'power2.out' }, '<+0.25')
+    .fromTo('.intro-stem-line',
+      { scaleY: 0 },
+      { scaleY: 1, transformOrigin: 'top center', duration: 0.9 }, '<+0.6')
+    .fromTo('.intro-stem svg',
+      { opacity: 0, scale: 0.3 },
+      { opacity: 0.85, scale: 1, duration: 0.6, ease: 'back.out(2)' }, '<+0.35')
+    .to('.intro-title', { duration: 1.2 }); // hold on the title before the handoff
 
   /* ── The handoff: Chapter One's cream paper rises, the opening dims ── */
   gsap.timeline({
