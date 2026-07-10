@@ -119,23 +119,20 @@ function initOpening() {
       { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
     .to('.line-2', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.9')
 
+    /* "Here is" — the last spoken beat, by itself, then it lifts away */
+    .set('.line-3', { visibility: 'visible' }, '+=0.15')
+    .fromTo('.line-3 .mask-inner',
+      { yPercent: 115, filter: 'blur(7px)' },
+      { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
+    .to('.line-3', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.7')
+
     /* ── The reveal: the title emerges, warm and slow — the payoff ──
-       the candlelight warms, the small line arrives, then the title rises
-       and clears while its letters breathe into place, and the thread
-       draws down to its glint. */
-    .to('.opening-glow', { opacity: 1, duration: 1.5, ease: 'sine.inOut' }, '+=0.2')
-    .fromTo('.intro-eyebrow',
-      { opacity: 0, y: 16 },
-      { opacity: 1, y: 0, duration: 0.9 }, '<+0.15')
+       the candlelight warms, then the title rises and clears while its
+       letters breathe into place. */
+    .to('.opening-glow', { opacity: 1, duration: 1.5, ease: 'sine.inOut' }, '+=0.15')
     .fromTo('.intro-title .tline',
       { opacity: 0, y: 44, letterSpacing: '0.2em', filter: 'blur(9px)' },
-      { opacity: 1, y: 0, letterSpacing: '0.005em', filter: 'blur(0px)', duration: 1.5, stagger: 0.2, ease: 'power2.out' }, '<+0.25')
-    .fromTo('.intro-stem-line',
-      { scaleY: 0 },
-      { scaleY: 1, transformOrigin: 'top center', duration: 0.9 }, '<+0.6')
-    .fromTo('.intro-stem svg',
-      { opacity: 0, scale: 0.3 },
-      { opacity: 0.85, scale: 1, duration: 0.6, ease: 'back.out(2)' }, '<+0.35')
+      { opacity: 1, y: 0, letterSpacing: '0.005em', filter: 'blur(0px)', duration: 1.5, stagger: 0.2, ease: 'power2.out' }, '<+0.2')
     .to('.intro-title', { duration: 1.2 }); // hold on the title before the handoff
 
   /* ── The handoff: Chapter One's cream paper rises, the opening dims ── */
