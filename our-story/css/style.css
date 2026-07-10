@@ -73,8 +73,6 @@
   --sepia:           #6f5638;   /* eyebrow, thread                  */
   --sepia-soft:      #5d4936;   /* the cover subtitle               */
 
-  --candle:          #e7d0a0;   /* warm candlelit parchment — the quiet + letter */
-
   /* handmade-paper grain — a mostly-white tile of soft mottling; laid over
      any warm surface with background-blend-mode:multiply so the paper reads
      as real stock. Tints the background only, never the text. */
@@ -739,7 +737,7 @@ body.reduced-motion .mcap-script { font-size: clamp(1.2rem, 4vw, 1.55rem); }
   height: 100vh;
   height: 100lvh;
   overflow: hidden;
-  background: var(--cream); /* animated to espresso by the scroll */
+  background: var(--cream);
 }
 
 /* the section is made tall (so there's scroll distance to animate over)
@@ -749,19 +747,6 @@ body.cinematic .scene-quiet { height: 520vh; }
 .quiet-stage {
   position: absolute;
   inset: 0;
-}
-
-/* a warm wash of candlelight that comes up as the scene settles */
-.quiet-glow {
-  position: absolute;
-  left: 50%;
-  top: 52%;
-  width: min(125vw, 860px);
-  aspect-ratio: 1.4;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(ellipse at center, rgba(224, 168, 86, 0.32), rgba(224, 168, 86, 0.12) 44%, transparent 70%);
-  opacity: 0; /* grows with the scroll (js/main.js) */
-  pointer-events: none;
 }
 
 .quiet-line,
@@ -798,7 +783,7 @@ body.cinematic .scene-quiet { height: 520vh; }
   text-wrap: balance;
 }
 
-/* warm ink throughout — this scene stays on paper, lit by candlelight */
+/* warm ink throughout — this scene stays on the same paper */
 .quiet-line { color: var(--sepia-deep); }
 
 .quiet-stack { gap: clamp(1rem, 3.4vw, 1.7rem); }
@@ -815,56 +800,74 @@ body.cinematic .scene-quiet { height: 520vh; }
 /* ══════════════════════════════════════════════
    SCENE 06 · THE LETTER
    ══════════════════════════════════════════════ */
+/* the surface the letter rests on — a plain, slightly deeper linen than
+   the rest of the story, so the pale note-card lifts off it as a real
+   object. Warm neutral, never yellow. */
+/* the deckle filter lives in an out-of-flow svg */
+.svg-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
 .scene-letter {
   position: relative;
   z-index: 2;
-  /* the same warm candlelit paper The Quiet settles into — a letter
-     written by lamplight, on aged paper */
-  background-color: var(--candle);
+  background-color: #e4d9c3;
   background-image: var(--paper);
   background-size: 600px;
   background-blend-mode: multiply;
   color: var(--ink);
-  padding: clamp(5rem, 16vw, 10rem) clamp(1.5rem, 6vw, 4rem) clamp(7rem, 20vw, 12rem);
+  padding: clamp(4.5rem, 14vw, 9rem) clamp(1.5rem, 7vw, 4rem) clamp(6rem, 18vw, 11rem);
   overflow: hidden;
 }
 
-/* a low, warm wash of candlelight that lifts toward the signature */
-.letter-glow {
-  position: absolute;
-  left: 50%;
-  bottom: 6%;
-  width: min(130vw, 820px);
-  aspect-ratio: 1.5;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, rgba(224, 168, 86, 0.22), transparent 68%);
-  pointer-events: none;
-}
-
+/* THE CARD — an actual note-card of handmade paper, lying on the surface.
+   A portrait card, pale ivory, with torn deckled edges and a soft shadow
+   so it reads as a physical thing you could pick up. The ::before is the
+   paper itself (roughened at the edge by the #deckle SVG filter); the
+   words sit above it, crisp. */
 .letter {
   position: relative;
-  max-width: 34rem;
+  max-width: 30rem;
   margin: 0 auto;
+  padding: clamp(2.75rem, 8vw, 4.25rem) clamp(2.25rem, 7vw, 3.5rem) clamp(3rem, 9vw, 4.5rem);
+}
+
+.letter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #f8f3e7;
+  background-image: var(--paper);
+  background-size: 340px;
+  background-blend-mode: multiply;
+  /* the torn edge + the shadow it casts on the linen */
+  filter: url(#deckle) drop-shadow(0 20px 42px rgba(58, 42, 26, 0.26));
+}
+
+.letter-head,
+.letter-body,
+.letter-sign {
+  position: relative;
+  z-index: 1;
 }
 
 .letter-head {
   text-align: center;
-  margin-bottom: clamp(2.5rem, 8vw, 4rem);
+  margin-bottom: clamp(2.25rem, 7vw, 3.25rem);
 }
 
 .letter-ornament {
-  color: var(--gold-deep);
-  margin-bottom: 1rem;
+  color: var(--sepia);
+  margin-bottom: 0.9rem;
 }
 
 .letter-label {
   font-family: var(--font-label);
   font-weight: 300;
-  font-size: clamp(0.66rem, 2.3vw, 0.78rem);
-  letter-spacing: 0.42em;
+  font-size: clamp(0.62rem, 2.2vw, 0.74rem);
+  letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: var(--gold-deep);
-  padding-left: 0.42em;
+  color: var(--sepia);
+  padding-left: 0.4em;
 }
 
 /* a real letter reads left-aligned — a deliberate change of rhythm
@@ -873,37 +876,40 @@ body.cinematic .scene-quiet { height: 520vh; }
   text-align: left;
 }
 
+/* the ink sits pressed into the paper — a faint letterpress deboss */
 .lp {
-  font-size: clamp(1.15rem, 4vw, 1.4rem);
-  line-height: 1.8;
+  font-size: clamp(1.05rem, 3.6vw, 1.28rem);
+  line-height: 1.78;
   color: var(--sepia-deep);
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.4rem;
+  text-shadow: 0 1px 0 rgba(255, 252, 244, 0.6);
 }
 
 .lp-salutation {
   font-style: italic;
-  font-size: clamp(1.5rem, 5.4vw, 2.1rem);
+  font-size: clamp(1.45rem, 5vw, 1.95rem);
   color: var(--sepia-deep);
-  margin-bottom: 2rem;
+  margin-bottom: 1.7rem;
 }
 
 .letter-sign {
-  margin-top: clamp(2.5rem, 8vw, 3.5rem);
+  margin-top: clamp(2rem, 7vw, 3rem);
   text-align: right;
 }
 
 .sign-pre {
   font-style: italic;
-  font-size: clamp(1.1rem, 4vw, 1.35rem);
+  font-size: clamp(1.05rem, 3.6vw, 1.28rem);
   color: var(--sepia-soft);
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.15rem;
 }
 
+/* signed by hand, in the same warm ink — no gilt */
 .sign-name {
   font-family: var(--font-script);
-  font-size: clamp(2.6rem, 11vw, 4rem);
+  font-size: clamp(2.4rem, 10vw, 3.6rem);
   line-height: 1.1;
-  color: var(--gold-deep);
+  color: var(--sepia-deep);
 }
 
 /* ══════════════════════════════════════════════
@@ -922,12 +928,12 @@ body.cinematic .scene-quiet { height: 520vh; }
   overflow: hidden;
 }
 
-/* the warm candlelight settles gently back to daylight paper */
+/* the linen the letter rested on settles gently back to daylight paper */
 .dawn {
   height: 70vh;
   height: 70svh;
   margin: 0 calc(-1 * clamp(1.5rem, 6vw, 4rem));
-  background: linear-gradient(to bottom, var(--candle) 0%, #ecdcbb 46%, var(--cream) 100%);
+  background: linear-gradient(to bottom, #e4d9c3 0%, #ece2ce 48%, var(--cream) 100%);
 }
 
 .close-inner {
@@ -1057,7 +1063,6 @@ body.reduced-motion .scroll-cue {
   letter-spacing: initial;
 }
 
-/* The Quiet, static: warm candlelit paper, final line only */
-body.reduced-motion .quiet-sticky { background: var(--candle); }
+/* The Quiet, static: paper, final line only */
 body.reduced-motion .ql-final { visibility: visible; }
 body.reduced-motion .quiet-stack { display: none; }

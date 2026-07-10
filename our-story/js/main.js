@@ -361,15 +361,6 @@ function initQuiet() {
     },
   });
 
-  /* the light warms — the paper deepens toward candlelight and a soft
-     glow comes up, so the scene settles into an intimate, lit hush */
-  tl.fromTo('.quiet-sticky',
-    { backgroundColor: '#f3ecdc' },
-    { backgroundColor: '#e7d0a0', duration: 5.2, ease: 'none' }, 0)
-    .fromTo('.quiet-glow',
-      { opacity: 0 },
-      { opacity: 1, duration: 4.4, ease: 'sine.inOut' }, 1.4);
-
   /* beat one */
   tl.set('.ql-1', { visibility: 'visible' }, 0.2)
     .fromTo('.ql-1 .mask-inner',
@@ -444,8 +435,7 @@ function initLetter() {
     },
   })
     .from('.sign-pre', { opacity: 0, y: 14 }, 0)
-    .from('.sign-name', { opacity: 0, y: 20, scale: 0.94, ease: 'power2.out' }, 0.2)
-    .fromTo('.letter-glow', { opacity: 0.45 }, { opacity: 1, ease: 'sine.out' }, 0);
+    .from('.sign-name', { opacity: 0, y: 20, scale: 0.94, ease: 'power2.out' }, 0.2);
 }
 
 /* ══════════════════════════════════════════════════════════════════
