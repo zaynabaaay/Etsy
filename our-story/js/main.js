@@ -251,70 +251,48 @@ function initNumbers() {
 
 /* ══════════════════════════════════════════════════════════════════
    Scene 04 — The Moments That Made Us
-   The montage. Every photo lives at its own depth: data-depth is how
-   many px it drifts against the scroll over its journey across the
-   screen. Big photos drift little (heavy, close); small ones drift a
-   lot (light, floating past). Captions trail their photo slightly.
+   A slideshow: the stage pins, and one print at a time fades in and
+   holds while it slowly zooms (Ken Burns), then cross-fades into the
+   next — a breath between each, so every memory can be looked at.
    ══════════════════════════════════════════════════════════════════ */
 function initMontage() {
 
-  gsap.utils.toArray('.mdrift').forEach((wrap, i) => {
-    const depth = parseFloat(wrap.dataset.depth || 40);
-    const photo = wrap.querySelector('.mphoto');
-    const caption = wrap.querySelector('.mcap');
-    const tilt = parseFloat(photo.dataset.tilt || 0);
-    const dir = (i % 2) ? 1 : -1; // a barely-there alternating drift
+  /* One print at a time. A single scrubbed timeline gives each photo an
+     equal segment of scroll: it fades in, holds while it slowly zooms
+     (Ken Burns), then cross-fades into the next — a breath between each. */
+  const photos = gsap.utils.toArray('.mphoto');
 
-    /* outer wrapper: parallax drift across the whole viewport journey */
-    gsap.fromTo(wrap,
-      { y: depth },
-      {
-        y: -depth,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: wrap,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true,
-        },
-      });
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.montage',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.8,
+    },
+  });
 
-    /* inner print: a slow, gentle float — it enters from above the top
-       of the screen and drifts all the way down into its place over a
-       long stretch of scroll. Heavy scrub + soft ease = weightless. */
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: wrap,
-        start: 'top bottom',   /* begins the moment its slot appears at the bottom */
-        end: 'top 32%',        /* lands high up — a long, unhurried descent */
-        scrub: 1.6,            /* smooth, floaty follow */
-        invalidateOnRefresh: true,
-      },
-    });
+  photos.forEach((photo, i) => {
+    const img = photo.querySelector('img');
+    const caption = photo.querySelector('.mcap');
+    const dir = (i % 2) ? 1 : -1; // alternate the pan direction
 
-    tl.fromTo(photo, { opacity: 0 }, { opacity: 1, duration: 0.1, ease: 'none' }, 0)
-      /* the float: starts more than a screen above its spot (i.e. above
-         the top of the page), settles with a whisper of tilt + shadow */
-      .fromTo(photo,
-        {
-          y: () => -(window.innerHeight * 1.25),
-          x: dir * 16,
-          rotation: tilt + dir * 3,
-          scale: 1.03,
-          '--lift': 1,
-        },
-        {
-          y: 0,
-          x: 0,
-          rotation: tilt,
-          scale: 1,
-          '--lift': 0,
-          duration: 1,
-          ease: 'power1.out',
-          immediateRender: true,
-        }, 0)
-      /* the label is written once the print has settled */
-      .fromTo(caption, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'none' }, 0.85);
+    /* fade in at the start of this photo's segment */
+    tl.fromTo(photo, { opacity: 0 }, { opacity: 1, duration: 0.32, ease: 'power1.out' }, i);
+
+    /* the slow zoom + drift runs across the whole segment */
+    tl.fromTo(img,
+      { scale: 1.02, xPercent: dir * -2.4, yPercent: -1.8 },
+      { scale: 1.16, xPercent: dir * 2.4, yPercent: 1.8, duration: 1.0, ease: 'none' }, i);
+
+    /* the caption fades in under the photo, then out before it leaves */
+    tl.fromTo(caption, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, i + 0.22)
+      .to(caption, { opacity: 0, duration: 0.25 }, i + 0.8);
+
+    /* cross-fade out toward the end of the segment (last one stays,
+       then simply scrolls away as the section ends) */
+    if (i < photos.length - 1) {
+      tl.to(photo, { opacity: 0, duration: 0.34, ease: 'power1.in' }, i + 0.8);
+    }
   });
 
   /* the bridge line — slows the tempo back down */

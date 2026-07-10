@@ -14,8 +14,8 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=34">
-  <link rel="stylesheet" href="css/edit.css?v=34">
+  <link rel="stylesheet" href="css/style.css?v=35">
+  <link rel="stylesheet" href="css/edit.css?v=35">
 </head>
 <body>
 
@@ -215,50 +215,38 @@
     </div>
 
     <div class="montage">
-      <!-- Two nested motions per photo:
-           · .mdrift (outer)  — parallax: data-depth px of drift while
-             crossing the screen (small photos = bigger depth = lighter)
-           · .mphoto (inner)  — the fall: flutters down into place with
-             a decaying sway; data-tilt is its resting angle
-           EDIT ME · replace photos + captions. -->
-      <div class="mdrift mphoto-1" data-depth="22">
-        <figure class="mphoto" data-tilt="-1.5">
-          <img src="assets/photos/montage-1.jpg" alt="" loading="lazy">
+      <!-- The slideshow: one print at a time. Each holds on screen with a
+           slow zoom as you scroll, then cross-fades to the next, so every
+           memory can actually be looked at.
+           EDIT ME · replace the photos + captions below. -->
+      <div class="montage-stage">
+        <figure class="mphoto">
+          <div class="mframe"><img src="assets/photos/montage-1.jpg" alt="" loading="lazy"></div>
           <figcaption class="mcap">Santorini &middot; 2022</figcaption>
         </figure>
-      </div>
 
-      <div class="mdrift mphoto-2" data-depth="70">
-        <figure class="mphoto" data-tilt="2">
-          <img src="assets/photos/montage-2.jpg" alt="" loading="lazy">
+        <figure class="mphoto">
+          <div class="mframe"><img src="assets/photos/montage-2.jpg" alt="" loading="lazy"></div>
           <figcaption class="mcap mcap-script">your favorite day</figcaption>
         </figure>
-      </div>
 
-      <div class="mdrift mphoto-3" data-depth="40">
-        <figure class="mphoto" data-tilt="-1">
-          <img src="assets/photos/montage-3.jpg" alt="" loading="lazy">
+        <figure class="mphoto">
+          <div class="mframe"><img src="assets/photos/montage-3.jpg" alt="" loading="lazy"></div>
           <figcaption class="mcap">The kitchen dance &middot; 2021</figcaption>
         </figure>
-      </div>
 
-      <div class="mdrift mphoto-4" data-depth="80">
-        <figure class="mphoto" data-tilt="2.5">
-          <img src="assets/photos/montage-4.jpg" alt="" loading="lazy">
+        <figure class="mphoto">
+          <div class="mframe"><img src="assets/photos/montage-4.jpg" alt="" loading="lazy"></div>
           <figcaption class="mcap">Sunday, no plans &middot; 2023</figcaption>
         </figure>
-      </div>
 
-      <div class="mdrift mphoto-5" data-depth="26">
-        <figure class="mphoto" data-tilt="-2">
-          <img src="assets/photos/montage-5.jpg" alt="" loading="lazy">
+        <figure class="mphoto">
+          <div class="mframe"><img src="assets/photos/montage-5.jpg" alt="" loading="lazy"></div>
           <figcaption class="mcap mcap-script">the trip we almost missed</figcaption>
         </figure>
-      </div>
 
-      <div class="mdrift mphoto-6" data-depth="55">
-        <figure class="mphoto" data-tilt="1.5">
-          <img src="assets/photos/montage-6.jpg" alt="" loading="lazy">
+        <figure class="mphoto">
+          <div class="mframe"><img src="assets/photos/montage-6.jpg" alt="" loading="lazy"></div>
           <figcaption class="mcap">Home &middot; every year</figcaption>
         </figure>
       </div>
@@ -399,7 +387,7 @@
 
   <script src="js/vendor/gsap.min.js"></script>
   <script src="js/vendor/ScrollTrigger.min.js"></script>
-  <script src="js/main.js?v=34"></script>
-  <script src="js/edit.js?v=34"></script>
+  <script src="js/main.js?v=35"></script>
+  <script src="js/edit.js?v=35"></script>
 </body>
 </html>
