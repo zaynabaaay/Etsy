@@ -144,8 +144,8 @@ body {
   background-blend-mode: multiply, normal, normal;
 }
 
-/* tall enough to scroll through only in the animated experience */
-body.cinematic .scene-opening { height: 520vh; }
+/* the opening is a single screen — the confession plays in place, then
+   an ordinary scroll carries it away into Chapter One */
 
 /* a soft wash of sunlight behind the names — warms as they arrive */
 .opening-glow {
@@ -166,10 +166,8 @@ body.cinematic .scene-opening { height: 520vh; }
   inset: 0;
 }
 
-/* every moment owns the full screen, centered */
-.intro-screen,
-.opening-line,
-.names-group {
+/* each confession line owns the full screen, centered */
+.opening-line {
   position: absolute;
   inset: 0;
   display: flex;
@@ -178,56 +176,27 @@ body.cinematic .scene-opening { height: 520vh; }
   justify-content: center;
   text-align: center;
   padding: 0 clamp(1.5rem, 6vw, 4rem);
+  visibility: hidden;
 }
 
-/* ── Moment 1 · the cover ──
-   A keepsake title spread: a small line, the title, a thread that draws
-   the eye down, and one quiet sentence — in warm sepia inks on paper. */
-.intro-eyebrow {
-  font-family: var(--font-label);
-  font-weight: 300;
-  font-size: clamp(0.72rem, 2.9vw, 0.9rem);
-  letter-spacing: 0.42em;
-  text-transform: uppercase;
-  color: var(--sepia);
-  padding-left: 0.42em; /* optical centering against the tracking */
-  margin-bottom: clamp(1.1rem, 3vw, 1.7rem);
+.opening-line .mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.18em 0.1em;
 }
 
-.intro-title {
-  font-weight: 500;
-  font-size: clamp(3rem, 13vw, 5.8rem);
-  line-height: 1.02;
-  letter-spacing: 0.005em;
-  color: var(--sepia-deep);
-  text-shadow: 0 0 60px rgba(201, 161, 95, 0.25);
-}
-.intro-title .tline { display: block; }
-
-/* the thread + its terminal glint */
-.intro-stem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: clamp(1.3rem, 4vh, 2rem) 0;
-  color: var(--sepia);
-}
-.intro-stem-line {
-  width: 1px;
-  height: clamp(38px, 6vh, 58px);
-  background: linear-gradient(to bottom, transparent, currentColor 32%, currentColor);
-  opacity: 0.8;
-}
-.intro-stem svg { margin-top: 6px; opacity: 0.85; }
-
-.intro-sub {
+/* the spoken voice — an italic serif, like a letter in the writer's hand */
+.opening-line .mask-inner {
+  display: block;
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1rem, 3.7vw, 1.2rem);
-  line-height: 1.75;
-  letter-spacing: 0.03em;
+  font-size: clamp(1.5rem, 5.6vw, 2.8rem);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
   color: var(--sepia-soft);
-  max-width: 42ch;
+  max-width: 24ch;
+  /* initial offset is set by GSAP (js/main.js) — no CSS transform here,
+     the two would fight and the line would never reach center */
 }
 
 /* the dried-flower sprig in the lower corner (the near/foreground layer) */
@@ -241,89 +210,8 @@ body.cinematic .scene-opening { height: 520vh; }
 }
 
 /* pre-animation state — only while the cinematic experience is running, so
-   the cover stays visible in reduced-motion, edit, and no-JS modes */
-body.cinematic .intro-eyebrow,
-body.cinematic .intro-title .tline,
-body.cinematic .intro-sub,
+   the opening stays visible in reduced-motion, edit, and no-JS modes */
 body.cinematic .opening-flowers { opacity: 0; }
-body.cinematic .intro-stem-line { transform: scaleY(0); }
-body.cinematic .intro-stem svg { opacity: 0; }
-
-/* ── Moment 2 · the two lines ── */
-.opening-line {
-  visibility: hidden;
-}
-
-.opening-line .mask {
-  display: block;
-  overflow: hidden;
-  padding: 0.18em 0.1em;
-}
-
-.opening-line .mask-inner {
-  display: block;
-  font-style: italic;
-  font-weight: 400;
-  font-size: clamp(1.55rem, 6vw, 3.1rem);
-  line-height: 1.35;
-  color: var(--ink);
-  max-width: 22ch;
-  /* initial offset is set by GSAP (js/main.js) — no CSS transform here,
-     the two would fight and the line would never reach center */
-}
-
-/* ── Moment 3 · the names ── */
-.names-script {
-  font-family: var(--font-script);
-  font-size: clamp(1.5rem, 5.4vw, 2.5rem);
-  color: var(--gold-deep);
-  transform: rotate(-2.5deg) translateY(16px);
-  opacity: 0;
-  margin-bottom: clamp(0.4rem, 1.6vw, 1rem);
-}
-
-.names-title {
-  font-weight: 500;
-  font-variant-caps: small-caps;
-  text-transform: lowercase;
-  font-size: clamp(2.5rem, 10.5vw, 6.4rem);
-  line-height: 1.08;
-  letter-spacing: 0.3em;
-  color: var(--ink);
-  text-shadow: 0 0 50px rgba(201, 161, 95, 0.35);
-  opacity: 0;
-  /* compensate optical shift from tracking */
-  padding-left: 0.3em;
-  white-space: nowrap;
-}
-
-.names-title .amp {
-  font-style: italic;
-  font-weight: 400;
-  color: var(--gold-deep);
-  font-size: 0.82em;
-}
-
-.names-rule {
-  width: clamp(90px, 22vw, 170px);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold-deep) 18%, var(--gold-deep) 82%, transparent);
-  margin: clamp(1.1rem, 3vw, 1.8rem) 0;
-  transform: scaleX(0);
-  opacity: 0.9;
-}
-
-.names-date {
-  font-family: var(--font-label);
-  font-weight: 300;
-  font-size: clamp(0.66rem, 2.3vw, 0.82rem);
-  letter-spacing: 0.38em;
-  text-transform: uppercase;
-  color: var(--gold-deep);
-  opacity: 0;
-  transform: translateY(12px);
-  padding-left: 0.38em;
-}
 
 /* ── Scroll cue ── */
 .scroll-cue {
@@ -1149,10 +1037,10 @@ body.cinematic .scene-quiet { height: 520vh; }
   .scroll-cue-line-inner { animation: none; transform: translateY(0); }
 }
 
-/* still modes show the cover as the opening; the mid-scroll beats
-   (the two lines, the names arrival) are hidden so nothing stacks */
-body.reduced-motion .opening-line,
-body.reduced-motion .names-group { display: none; }
+/* still modes show the opening's resting line (the second one); the first
+   line only exists mid-animation, so it's hidden to avoid stacking */
+body.reduced-motion .line-1 { display: none; }
+body.reduced-motion .line-2 { visibility: visible; }
 
 body.reduced-motion .scroll-cue {
   opacity: 1;

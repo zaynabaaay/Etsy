@@ -84,99 +84,31 @@ function initChapterHeads() {
 
 function initOpening() {
 
-  /* ── Load-in: the cover assembles, placed by hand (time-based) ──
-     the small line breathes in, the title rises and clears, a thread
-     draws down to the subtitle, and the flowers settle into the corner. */
+  /* ── The confession, auto-played (time-based, not scroll) ──
+     Two lines in the speaker's own voice. The first rises in, is read,
+     then lifts away; the second rises in and stays as the resting screen.
+     The flowers settle into the corner and a scroll cue invites the reader
+     onward — an ordinary scroll then carries it all into Chapter One. */
   gsap.timeline({ defaults: { ease: 'power2.out' } })
-    .fromTo('.intro-eyebrow',
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: 1.1, delay: 0.4 })
-    .fromTo('.intro-title .tline',
-      { opacity: 0, y: 42, filter: 'blur(7px)' },
-      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, stagger: 0.16 }, '-=0.55')
-    .fromTo('.intro-stem-line',
-      { scaleY: 0 },
-      { scaleY: 1, transformOrigin: 'top center', duration: 0.85 }, '-=0.5')
-    .fromTo('.intro-stem svg',
-      { opacity: 0, scale: 0.3 },
-      { opacity: 0.85, scale: 1, duration: 0.6, ease: 'back.out(2)' }, '-=0.15')
-    .fromTo('.intro-sub',
-      { opacity: 0, y: 16 },
-      { opacity: 1, y: 0, duration: 1.0 }, '-=0.35')
     .fromTo('.opening-flowers',
-      { opacity: 0, y: 64, scale: 1.05 },
-      { opacity: 1, y: 0, scale: 1, duration: 1.7, ease: 'power2.out' }, '-=1.5')
-    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.5');
+      { opacity: 0, y: 60, scale: 1.05 },
+      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, 0.2)
 
-  /* ── The master scrub: scrolling is the playhead ──
-     The panel holds still via CSS sticky; this timeline is scrubbed
-     over the tall section's scroll. Durations are relative beats.   */
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.scene-opening',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.6,
-    },
-  });
-
-  /* Moment 1 → out: the cover dissolves — text lifts up, the flowers
-     (nearest layer) sink down and away, giving the scene depth */
-  tl.to('.opening-flowers', { opacity: 0, y: 90, duration: 1.0, ease: 'power1.in' }, 0)
-    .to('.intro-screen', { opacity: 0, y: -70, duration: 1.0, ease: 'power1.in' }, 0)
-    .set('.intro-screen', { visibility: 'hidden' })
-    .set('.opening-flowers', { visibility: 'hidden' })
-
-    /* Moment 2a: line one unmasks upward, blur clearing as it lands,
-       then a reading hold (the '+=0.8' gap) before it dissolves up */
-    .set('.line-1', { visibility: 'visible' }, '+=0.25')
+    /* line one — in, held for reading, then lifts away */
+    .set('.line-1', { visibility: 'visible' }, 0.7)
     .fromTo('.line-1 .mask-inner',
       { yPercent: 115, filter: 'blur(7px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
-    .to('.line-1', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.8')
+      { yPercent: 0, filter: 'blur(0px)', duration: 1.2 }, 0.7)
+    .to('.line-1', { opacity: 0, y: -34, duration: 0.9, ease: 'power1.in' }, '+=1.7')
 
-    /* Moment 2b: line two */
-    .set('.line-2', { visibility: 'visible' }, '+=0.2')
+    /* line two — in, and it stays */
+    .set('.line-2', { visibility: 'visible' }, '+=0.25')
     .fromTo('.line-2 .mask-inner',
       { yPercent: 115, filter: 'blur(7px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
-    .to('.line-2', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.8')
+      { yPercent: 0, filter: 'blur(0px)', duration: 1.2 })
 
-    /* Moment 3: the arrival of the names */
-    /* the candlelight warms first */
-    .to('.opening-glow', { opacity: 1, duration: 1.6, ease: 'sine.inOut' }, '+=0.2')
-    /* the script word */
-    .to('.names-script',
-      { opacity: 1, rotate: -2.5, y: 0, duration: 0.9, ease: 'power2.out' }, '<+0.2')
-    /* the names: fade in while the letterspacing breathes into place */
-    .fromTo('.names-title',
-      { opacity: 0, letterSpacing: '0.3em', y: 24 },
-      { opacity: 1, letterSpacing: '0.12em', y: 0, duration: 1.5, ease: 'power2.out' }, '<+0.35')
-    /* the gold rule draws outward from center */
-    .fromTo('.names-rule',
-      { scaleX: 0 },
-      { scaleX: 1, duration: 0.9, ease: 'power2.inOut' }, '<+0.55')
-    /* the date settles in last */
-    .to('.names-date', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '<+0.45')
-
-    /* hold with depth: layers drift at slightly different speeds */
-    .to('.names-script', { yPercent: -34, duration: 2.2, ease: 'none' }, '+=0.3')
-    .to('.names-title',  { yPercent: -14, duration: 2.2, ease: 'none' }, '<')
-    .to('.names-rule',   { yPercent: -8,  duration: 2.2, ease: 'none' }, '<')
-    .to('.names-date',   { yPercent: -4,  duration: 2.2, ease: 'none' }, '<');
-
-  /* ── The handoff: cream paper rises, the dark scene dims beneath it ── */
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: '.scene-beginning',
-      start: 'top bottom',
-      end: 'top 25%',
-      scrub: 0.6,
-    },
-  })
-    .to('.opening-stage', { opacity: 0.18, y: '-9vh', ease: 'none' }, 0)
-    .to('.opening-glow',  { opacity: 0.1, ease: 'none' }, 0)
-    .to('.scroll-cue',    { opacity: 0, ease: 'none', duration: 0.35 }, 0);
+    /* the cue to scroll on into Chapter One */
+    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.4');
 }
 
 /* ══════════════════════════════════════════════════════════════════
