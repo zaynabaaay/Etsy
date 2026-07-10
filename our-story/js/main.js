@@ -218,48 +218,35 @@ function initBeginning() {
    ══════════════════════════════════════════════════════════════════ */
 function initNumbers() {
 
-  /* the note settles onto the desk */
-  gsap.from('.numbers-note', {
-    opacity: 0,
-    y: 44,
-    rotate: -4,
-    duration: 1.0,
-    ease: 'power2.out',
-    scrollTrigger: { trigger: '.numbers-note', start: 'top 82%', once: true },
-  });
+  const counter = document.querySelector('.counter');
+  if (!counter) return;
 
-  /* the numbers tally up when the note arrives */
-  gsap.utils.toArray('.stat').forEach((stat) => {
-    const valueEl = stat.querySelector('.stat-value');
-    const note = stat.querySelector('.stat-note');
-    const target = parseInt(stat.dataset.count, 10);
+  /* the beat reveals: script, then the number, its label, and the aside */
+  gsap.timeline({
+    scrollTrigger: { trigger: counter, start: 'top 72%', once: true },
+    defaults: { ease: 'power2.out' },
+  })
+    .from('.counter-script', { opacity: 0, y: 16, duration: 0.9 })
+    .from('.counter .stat-value', { opacity: 0, y: 26, duration: 1.0 }, '-=0.5')
+    .from('.counter-label', { opacity: 0, y: 14, duration: 0.8 }, '-=0.45')
+    .from('.counter-note', { opacity: 0, scale: 0.9, rotate: -7, duration: 0.7 }, '-=0.3');
 
-    /* the count-up — skipped for the ∞ stat */
-    if (!isNaN(target)) {
-      const counter = { val: 0 };
-      gsap.to(counter, {
-        val: target,
-        duration: 1.6,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: '.numbers-note', start: 'top 70%', once: true },
-        onUpdate: () => {
-          valueEl.textContent = Math.round(counter.val).toLocaleString('en-US');
-        },
-      });
-    }
-
-    /* the handwritten aside lands a beat after the tally */
-    if (note) {
-      gsap.from(note, {
-        opacity: 0,
-        scale: 0.9,
-        duration: 0.6,
-        delay: 1.1,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: '.numbers-note', start: 'top 70%', once: true },
-      });
-    }
-  });
+  /* the number counts itself up from zero */
+  const stat = counter.querySelector('.stat');
+  const valueEl = stat && stat.querySelector('.stat-value');
+  const target = parseInt(stat && stat.dataset.count, 10);
+  if (valueEl && !isNaN(target)) {
+    const c = { val: 0 };
+    gsap.to(c, {
+      val: target,
+      duration: 1.9,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: counter, start: 'top 66%', once: true },
+      onUpdate: () => {
+        valueEl.textContent = Math.round(c.val).toLocaleString('en-US');
+      },
+    });
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════

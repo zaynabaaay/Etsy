@@ -73,8 +73,6 @@
   --sepia:           #6f5638;   /* eyebrow, thread                  */
   --sepia-soft:      #5d4936;   /* the cover subtitle               */
 
-  --desk:            #c8b68e;   /* warmer "desk" sheet for the interlude */
-
   /* handmade-paper grain — a mostly-white tile of soft mottling; laid over
      any warm surface with background-blend-mode:multiply so the paper reads
      as real stock. Tints the background only, never the text. */
@@ -527,102 +525,69 @@ body.cinematic .opening-flowers { opacity: 0; }
 /* ══════════════════════════════════════════════
    SCENE 03 · IN NUMBERS
    ══════════════════════════════════════════════ */
-/* a warmer "desk" sheet — a different page from the cream story chapters */
+/* A single held beat on the cream, with a soft warm spotlight behind the
+   number — a quiet breath between the story chapters, not a new page. */
 .scene-numbers {
   position: relative;
   z-index: 2;
-  background-color: var(--desk);
+  background-color: var(--cream);
   background-image: var(--paper);
   background-size: 600px;
   background-blend-mode: multiply;
   color: var(--ink);
-  padding: clamp(6.5rem, 15vw, 9.5rem) clamp(1.5rem, 6vw, 4rem);
+  padding: clamp(8rem, 22vw, 13rem) clamp(1.5rem, 6vw, 4rem);
   text-align: center;
+  overflow: hidden;
 }
-
-/* the stats kept on a torn page of graph paper, taped to the desk —
-   a tally jotted in a notebook */
-.numbers-note {
-  position: relative;
-  width: min(90vw, 470px);
-  margin: 0 auto;
-  padding: clamp(2.1rem, 5.5vw, 2.9rem) clamp(1.9rem, 5vw, 2.7rem) clamp(2.4rem, 6vw, 3rem);
-  transform: rotate(-1.4deg);
-  border-radius: 2px;
-  background-color: #f4efe0;
-  background-image:
-    repeating-linear-gradient(0deg, transparent 0 23px, rgba(96, 116, 138, 0.15) 23px 24px),
-    repeating-linear-gradient(90deg, transparent 0 23px, rgba(96, 116, 138, 0.15) 23px 24px);
-  box-shadow: 0 20px 44px rgba(60, 44, 22, 0.30), 0 5px 14px rgba(60, 44, 22, 0.18);
-}
-
-/* two strips of tape holding the note to the desk */
-.note-tape {
+.scene-numbers::before {
+  content: '';
   position: absolute;
-  width: clamp(66px, 15vw, 92px);
-  height: 25px;
-  background: rgba(233, 222, 194, 0.6);
-  box-shadow: 0 1px 3px rgba(60, 44, 22, 0.12);
-  backdrop-filter: blur(1px);
-  z-index: 3;
+  left: 50%;
+  top: 50%;
+  width: min(92vw, 660px);
+  aspect-ratio: 1.5;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center, rgba(214, 170, 100, 0.18), transparent 68%);
+  pointer-events: none;
 }
-.note-tape.tl { top: -11px; left: 7%; transform: rotate(-25deg); }
-.note-tape.tr { top: -11px; right: 7%; transform: rotate(25deg); }
 
-.numbers-script {
+.counter { position: relative; }
+
+.counter-script {
   font-family: var(--font-script);
-  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-size: clamp(1.4rem, 5vw, 2rem);
   color: var(--gold-deep);
-  transform: rotate(-1.5deg);
-  margin-bottom: clamp(1.6rem, 4.5vw, 2.3rem);
+  transform: rotate(-2deg);
+  margin-bottom: clamp(0.8rem, 2.5vw, 1.4rem);
 }
 
-/* the stats as a hand-tallied ledger: label left, number right */
-.stats {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1.05rem, 3.4vw, 1.6rem);
-  text-align: left;
-}
-
-.stat {
-  position: relative;
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-}
-
-.stat-label {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
+.counter .stat-value {
   font-weight: 500;
-  font-size: clamp(1.02rem, 3.6vw, 1.28rem);
-  color: var(--sepia);
-  white-space: nowrap;
-}
-
-.stat-value {
-  margin-left: auto;
-  font-weight: 600;
-  font-size: clamp(1.7rem, 6.2vw, 2.5rem);
+  font-size: clamp(4.5rem, 20vw, 9rem);
   line-height: 1;
   color: var(--ink);
   font-variant-numeric: lining-nums;
-  white-space: nowrap;
+  text-shadow: 0 0 50px rgba(201, 161, 95, 0.28);
 }
 
-.stat-infinity .stat-value { font-weight: 500; }
-
-.stat-note {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  margin-top: 0.15rem;
-  font-family: var(--font-script);
-  font-size: clamp(0.9rem, 3vw, 1.1rem);
+.counter-label {
+  margin-top: clamp(1rem, 3vw, 1.6rem);
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: clamp(0.72rem, 2.6vw, 0.9rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
   color: var(--gold-deep);
-  transform: rotate(-4deg);
-  white-space: nowrap;
+  padding-left: 0.42em;
+}
+
+.counter-note {
+  margin-top: clamp(1.2rem, 3.5vw, 1.9rem);
+  font-family: var(--font-script);
+  font-size: clamp(1.2rem, 4vw, 1.7rem);
+  color: var(--gold-deep);
+  transform: rotate(-3deg);
+  opacity: 0.9;
 }
 
 /* ══════════════════════════════════════════════
