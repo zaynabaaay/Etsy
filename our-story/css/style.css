@@ -604,38 +604,49 @@ body.cinematic .opening-flowers { opacity: 0; }
   padding: clamp(5rem, 14vw, 9rem) 0 clamp(5rem, 14vw, 8rem);
 }
 
-/* the tall track that gives the slideshow its scroll distance */
+/* the tall track that gives the camera its scroll distance */
 .montage { position: relative; }
-body.cinematic .montage { height: 660vh; }
+body.cinematic .montage { height: 720vh; }
 
-/* the pinned stage the prints cross-fade through, one at a time */
+/* the pinned viewport the camera looks through */
 .montage-stage {
   position: sticky;
   top: 0;
   height: 100vh;
   height: 100lvh;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* each print, stacked and centered; only one is visible at a time */
+/* the memory table: a large surface the prints are scattered across.
+   The "camera" (JS transforms) travels and zooms across it as you
+   scroll, framing one print at a time, then pulls back to show all. */
+.table {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1600px;
+  height: 2200px;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* each print, scattered across the table at its own spot + angle */
 .mphoto {
   position: absolute;
-  width: min(86vw, 600px);
   background: #fdfaf1;
-  padding: clamp(9px, 1.5vw, 14px);
-  padding-bottom: clamp(42px, 6vw, 60px);
-  box-shadow: 0 26px 60px rgba(60, 44, 22, 0.30), 0 8px 20px rgba(60, 44, 22, 0.16);
+  padding: 16px;
+  padding-bottom: 60px;
+  box-shadow: 0 30px 60px rgba(60, 44, 22, 0.30), 0 10px 22px rgba(60, 44, 22, 0.16);
 }
-body.cinematic .mphoto { opacity: 0; }
+/* left / top / width in table px, plus a resting tilt */
+.mp-1 { left: 120px;  top: 170px;  width: 560px; transform: rotate(-3deg); }
+.mp-2 { left: 980px;  top: 360px;  width: 470px; transform: rotate(2.6deg); }
+.mp-3 { left: 300px;  top: 730px;  width: 610px; transform: rotate(-1.8deg); }
+.mp-4 { left: 1010px; top: 1150px; width: 430px; transform: rotate(3.4deg); }
+.mp-5 { left: 170px;  top: 1440px; width: 560px; transform: rotate(-2.6deg); }
+.mp-6 { left: 850px;  top: 1660px; width: 520px; transform: rotate(2deg); }
 
-/* clips the zooming image so the white border stays put */
-.mframe {
-  overflow: hidden;
-  position: relative;
-}
+.mframe { overflow: hidden; position: relative; }
 
 .mphoto img {
   display: block;
@@ -643,42 +654,53 @@ body.cinematic .mphoto { opacity: 0; }
   aspect-ratio: 4 / 3;
   object-fit: cover;
   filter: sepia(0.12) saturate(0.94);
-  will-change: transform;
 }
 
+/* captions live on the prints, so their size is in table px */
 .mcap {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: clamp(0.7rem, 2vw, 1.05rem);
+  bottom: 20px;
   text-align: center;
   font-family: var(--font-label);
   font-weight: 300;
-  font-size: clamp(0.6rem, 2vw, 0.7rem);
+  font-size: 20px;
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--gold-deep);
 }
-
 .mcap-script {
   font-family: var(--font-script);
-  font-size: clamp(1.2rem, 4vw, 1.55rem);
+  font-size: 34px;
   letter-spacing: 0;
   text-transform: none;
-  bottom: clamp(0.4rem, 1.6vw, 0.8rem);
+  bottom: 12px;
 }
 
-/* still / reduced-motion: a simple centered stack of prints, all visible */
+/* still / reduced-motion: a simple centered stack of the prints */
 body.reduced-motion .montage { height: auto; }
-body.reduced-motion .montage-stage {
+body.reduced-motion .montage-stage { position: static; height: auto; overflow: visible; }
+body.reduced-motion .table {
   position: static;
+  width: auto;
   height: auto;
-  overflow: visible;
+  transform: none;
+  display: flex;
   flex-direction: column;
+  align-items: center;
   gap: clamp(3rem, 8vw, 5rem);
   padding: clamp(2rem, 7vw, 4rem) clamp(1.5rem, 6vw, 4rem);
 }
-body.reduced-motion .mphoto { position: relative; }
+body.reduced-motion .mphoto {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: min(86vw, 520px);
+  transform: rotate(0deg);
+}
+body.reduced-motion .mcap { font-size: clamp(0.6rem, 2vw, 0.7rem); }
+body.reduced-motion .mcap-script { font-size: clamp(1.2rem, 4vw, 1.55rem); }
 
 .montage-exit {
   margin: clamp(5rem, 14vw, 8rem) auto 0;

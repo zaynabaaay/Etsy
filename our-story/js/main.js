@@ -257,43 +257,68 @@ function initNumbers() {
    ══════════════════════════════════════════════════════════════════ */
 function initMontage() {
 
-  /* One print at a time. A single scrubbed timeline gives each photo an
-     equal segment of scroll: it fades in, holds while it slowly zooms
-     (Ken Burns), then cross-fades into the next — a breath between each. */
+  /* The camera travels across the table. A single scrubbed timeline moves
+     the table under a fixed viewport: it frames the first print, then
+     flies to each in turn (holding on each — the breath), then pulls all
+     the way back to reveal the whole table of moments together. */
+  const table = document.querySelector('.table');
   const photos = gsap.utils.toArray('.mphoto');
+  if (!table || !photos.length) return;
+
+  const TABLE_W = 1600, TABLE_H = 2200;
+
+  /* the transform that frames one print, centered and filling the screen */
+  const frameFor = (el) => {
+    const cx = el.offsetLeft + el.offsetWidth / 2;
+    const cy = el.offsetTop + el.offsetHeight / 2;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const s = Math.min(vw * 0.74 / el.offsetWidth, vh * 0.8 / el.offsetHeight);
+    return { scale: s, x: vw / 2 - cx * s, y: vh / 2 - cy * s };
+  };
+  /* the pulled-back transform that fits the whole table on screen */
+  const framePull = () => {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const s = Math.min(vw * 0.9 / TABLE_W, vh * 0.9 / TABLE_H);
+    return { scale: s, x: vw / 2 - (TABLE_W / 2) * s, y: vh / 2 - (TABLE_H / 2) * s };
+  };
 
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: '.montage',
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 0.8,
+      scrub: 0.9,
+      invalidateOnRefresh: true,
     },
   });
 
-  photos.forEach((photo, i) => {
-    const img = photo.querySelector('img');
-    const caption = photo.querySelector('.mcap');
-    const dir = (i % 2) ? 1 : -1; // alternate the pan direction
+  /* start framed on the first print, held for a beat */
+  tl.fromTo(table,
+    { x: () => frameFor(photos[0]).x, y: () => frameFor(photos[0]).y, scale: () => frameFor(photos[0]).scale },
+    { x: () => frameFor(photos[0]).x, y: () => frameFor(photos[0]).y, scale: () => frameFor(photos[0]).scale, duration: 0.7, immediateRender: true }, 0);
 
-    /* fade in at the start of this photo's segment */
-    tl.fromTo(photo, { opacity: 0 }, { opacity: 1, duration: 0.32, ease: 'power1.out' }, i);
+  /* fly to each subsequent print, holding on each */
+  for (let i = 1; i < photos.length; i++) {
+    tl.to(table, {
+      x: () => frameFor(photos[i]).x,
+      y: () => frameFor(photos[i]).y,
+      scale: () => frameFor(photos[i]).scale,
+      duration: 1.2,
+      ease: 'power1.inOut',
+    })
+      .to(table, { duration: 0.7 }); // hold — the breath
+  }
 
-    /* the slow zoom + drift runs across the whole segment */
-    tl.fromTo(img,
-      { scale: 1.02, xPercent: dir * -2.4, yPercent: -1.8 },
-      { scale: 1.16, xPercent: dir * 2.4, yPercent: 1.8, duration: 1.0, ease: 'none' }, i);
-
-    /* the caption fades in under the photo, then out before it leaves */
-    tl.fromTo(caption, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, i + 0.22)
-      .to(caption, { opacity: 0, duration: 0.25 }, i + 0.8);
-
-    /* cross-fade out toward the end of the segment (last one stays,
-       then simply scrolls away as the section ends) */
-    if (i < photos.length - 1) {
-      tl.to(photo, { opacity: 0, duration: 0.34, ease: 'power1.in' }, i + 0.8);
-    }
-  });
+  /* pull all the way back: the whole table of moments, together —
+     then hold it there (the payoff) before the section releases */
+  tl.to(table, {
+    x: () => framePull().x,
+    y: () => framePull().y,
+    scale: () => framePull().scale,
+    duration: 1.8,
+    ease: 'power2.inOut',
+  })
+    .to(table, { duration: 2.5 });
 
   /* the bridge line — slows the tempo back down */
   gsap.from('.montage-exit', {
