@@ -176,6 +176,90 @@ body.editing .quiet-small { opacity: 1; }
 body.editing .quiet-line, body.editing .quiet-line .mask-inner,
 body.editing .quiet-small { color: var(--ink); }
 
+/* ── add / remove a line (The Letter) ── */
+.ed-add {
+  display: block;
+  margin: 1rem 0 0;
+  padding: 0.5rem 1.1rem;
+  border: 1px dashed rgba(150, 112, 47, 0.55);
+  border-radius: 100px;
+  background: transparent;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5d4936;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.ed-add:hover { background: rgba(201, 161, 95, 0.14); }
+
+.ed-del {
+  display: block;
+  margin: 0.15rem 0 1rem auto;
+  padding: 0.2rem 0.55rem;
+  border: none;
+  background: transparent;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a06a5a;
+  cursor: pointer;
+}
+.ed-del:hover { color: #7a3f30; text-decoration: underline; }
+
+/* ── remove / restore a whole section ── */
+.ed-sec-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 auto 0.5rem;
+  max-width: 40rem;
+  padding: 0.5rem 0.9rem;
+  background: rgba(23, 16, 9, 0.05);
+  border: 1px dashed rgba(150, 112, 47, 0.45);
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.ed-sec-label { color: #96702f; }
+.ed-sec-btn {
+  flex: none;
+  padding: 0.35rem 0.85rem;
+  border-radius: 100px;
+  border: 1px solid rgba(150, 112, 47, 0.5);
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5d4936;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.ed-sec-btn:hover { background: rgba(201, 161, 95, 0.14); }
+.ed-sec-bar.is-removed { background: rgba(23, 16, 9, 0.03); }
+.ed-sec-bar.is-removed .ed-sec-label::after { content: ' · removed'; color: #a7906c; }
+
+/* a removed section: hidden for visitors; while editing, collapsed to just
+   its bar so it can be brought back */
+section.is-removed { display: none; }
+body.editing section.is-removed {
+  display: block;
+  position: static;
+  height: auto;
+  min-height: 0;
+  padding: 0.7rem clamp(1.5rem, 6vw, 4rem);
+}
+body.editing section.is-removed > *:not(.ed-sec-bar) { display: none !important; }
+
 @media (prefers-reduced-motion: reduce) {
   .edit-fab:hover { transform: none; }
 }

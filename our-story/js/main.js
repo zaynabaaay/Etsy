@@ -84,22 +84,34 @@ function initChapterHeads() {
 
 function initOpening() {
 
-  /* ── Load-in: the first confession line settles onto the page ──
+  /* every spoken line, in order — however many the owner kept or added.
+     The first is the greeting (it loads in); the rest are the confession,
+     each emerging then lifting away in turn before the title. */
+  const lines = gsap.utils.toArray('.opening-line');
+
+  /* give the section scroll room in proportion to how many lines there are,
+     so the pacing stays the same whether there's one line or ten */
+  const stage = document.querySelector('.scene-opening');
+  if (stage) stage.style.height = Math.round((1.5 + Math.max(lines.length, 1) * 1.3) * 100) + 'vh';
+
+  /* ── Load-in: the greeting settles onto the page ──
      (time-based) It unmasks upward, the blur clearing as it lands, while
      the flowers settle into the corner and the scroll cue invites you on. */
-  gsap.timeline({ defaults: { ease: 'power2.out' } })
+  const loadIn = gsap.timeline({ defaults: { ease: 'power2.out' } })
     .fromTo('.opening-flowers',
       { opacity: 0, y: 64, scale: 1.05 },
-      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, 0.3)
-    .set('.line-1', { visibility: 'visible' }, 0.6)
-    .fromTo('.line-1 .mask-inner',
-      { yPercent: 115, filter: 'blur(7px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 1.3 }, 0.6)
-    .to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.6');
+      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, 0.3);
+  if (lines[0]) {
+    loadIn.set(lines[0], { visibility: 'visible' }, 0.6)
+      .fromTo(lines[0].querySelector('.mask-inner'),
+        { yPercent: 115, filter: 'blur(7px)' },
+        { yPercent: 0, filter: 'blur(0px)', duration: 1.3 }, 0.6);
+  }
+  loadIn.to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.6');
 
   /* ── The master scrub: scrolling is the playhead ──
-     The panel holds still via CSS sticky. Scrolling lifts the confession
-     away line by line, then the title emerges as the payoff. */
+     The panel holds still via CSS sticky. Scrolling lifts the greeting
+     away, plays the confession line by line, then the title emerges. */
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: '.scene-opening',
@@ -109,27 +121,23 @@ function initOpening() {
     },
   });
 
-  /* line one lifts away */
-  tl.to('.line-1', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, 0)
+  /* the greeting lifts away */
+  if (lines[0]) tl.to(lines[0], { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, 0);
 
-    /* line two emerges the same way, holds, then lifts away */
-    .set('.line-2', { visibility: 'visible' }, '+=0.15')
-    .fromTo('.line-2 .mask-inner',
-      { yPercent: 115, filter: 'blur(7px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
-    .to('.line-2', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.9')
+  /* every following line emerges the same way, holds, then lifts away */
+  for (let i = 1; i < lines.length; i++) {
+    const ln = lines[i];
+    tl.set(ln, { visibility: 'visible' }, '+=0.15')
+      .fromTo(ln.querySelector('.mask-inner'),
+        { yPercent: 115, filter: 'blur(7px)' },
+        { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
+      .to(ln, { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.85');
+  }
 
-    /* "Here is" — the last spoken beat, in the same spot as the others */
-    .set('.line-3', { visibility: 'visible' }, '+=0.15')
-    .fromTo('.line-3 .mask-inner',
-      { yPercent: 115, filter: 'blur(7px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
-    .to('.line-3', { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.7')
-
-    /* ── The reveal: the title emerges, warm and slow — the payoff ──
-       the candlelight warms, then the title rises and clears while its
-       letters breathe into place. */
-    .to('.opening-glow', { opacity: 1, duration: 1.5, ease: 'sine.inOut' }, '+=0.15')
+  /* ── The reveal: the title emerges, warm and slow — the payoff ──
+     the candlelight warms, then the title rises and clears while its
+     letters breathe into place. */
+  tl.to('.opening-glow', { opacity: 1, duration: 1.5, ease: 'sine.inOut' }, '+=0.15')
     .fromTo('.intro-title .tline',
       { opacity: 0, y: 40, letterSpacing: '0.2em', filter: 'blur(9px)' },
       { opacity: 1, y: 0, letterSpacing: '0.005em', filter: 'blur(0px)', duration: 1.4, stagger: 0.2, ease: 'power2.out' }, '<+0.2')
@@ -375,18 +383,28 @@ function initQuiet() {
       { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 2.2)
     .to('.ql-2', { opacity: 0, y: -50, duration: 0.6, ease: 'power1.in' }, 3.4);
 
-  /* the remembered little things — quicker, gentler, accumulating */
-  tl.fromTo('.qs-1', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }, 4.2)
-    .fromTo('.qs-2', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }, 4.55)
-    .fromTo('.qs-3', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }, 4.9)
-    .to('.quiet-stack', { opacity: 0, duration: 0.5, ease: 'power1.in' }, 5.9);
+  /* the remembered little things — quicker, gentler, accumulating.
+     Built from however many the owner kept or added (not a fixed three). */
+  const smalls = gsap.utils.toArray('.quiet-small');
+  const base = 4.2, step = 0.35;
+  smalls.forEach((el, i) => {
+    tl.fromTo(el, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }, base + i * step);
+  });
+  const stackEnd = base + smalls.length * step + 0.65;
+  tl.to('.quiet-stack', { opacity: 0, duration: 0.5, ease: 'power1.in' }, stackEnd);
 
-  /* the final line lands alone in the dark, and stays */
-  tl.set('.ql-final', { visibility: 'visible' }, 6.6)
+  /* the section is made taller when there are more little things, so the
+     extra beats don't speed the whole scene up */
+  const quiet = document.querySelector('.scene-quiet');
+  if (quiet) quiet.style.height = Math.max(360, Math.round(520 + (smalls.length - 3) * 60)) + 'vh';
+
+  /* the final line lands alone, and stays */
+  const finalAt = stackEnd + 0.7;
+  tl.set('.ql-final', { visibility: 'visible' }, finalAt)
     .fromTo('.ql-final .mask-inner',
       { yPercent: 115, filter: 'blur(6px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, 6.6)
-    .to('.ql-final', { yPercent: 0, duration: 0.9 }, 7.5); /* held beat before release */
+      { yPercent: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, finalAt)
+    .to('.ql-final', { yPercent: 0, duration: 0.9 }, finalAt + 0.9); /* held beat before release */
 }
 
 /* ══════════════════════════════════════════════════════════════════

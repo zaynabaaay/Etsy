@@ -1,8 +1,18 @@
 /* ══════════════════════════════════════════════════════════════════
    OUR STORY · Edit Mode
-   Lets a non-technical owner replace every photo by clicking it — no
-   files, no code. Replaced photos are remembered on this device and
-   can be baked into a finished page with "Download my site".
+   Lets a non-technical owner make the story their own — replace photos,
+   rewrite any words, add or remove lines, and remove whole sections they
+   don't want — with nothing but clicks. Every change is remembered on
+   this device and can be baked into a finished page with "Download my
+   site".
+
+   How it's remembered: the story's structure + words are saved as ONE
+   clean HTML snapshot, so adding or removing elements can never scramble
+   things. Photos, which are large, live separately in IndexedDB keyed by
+   their filename.
+
+   This file loads BEFORE js/main.js, so the snapshot is restored before
+   the animations are bound to the final DOM.
 
    Nothing in here needs editing to use the template.
    ══════════════════════════════════════════════════════════════════ */
@@ -10,9 +20,24 @@
   'use strict';
 
   const FLAG = 'ourstory:editing';
+  const SNAP = 'ourstory:snapshot';
   const editing = localStorage.getItem(FLAG) === '1';
 
-  /* ---- tiny IndexedDB store (photos can be large, so not localStorage) ---- */
+  const grain = () => document.querySelector('.grain');
+  const allSections = () => Array.from(document.querySelectorAll('body > section'));
+  const allPhotos = () => Array.from(document.querySelectorAll('section img'));
+
+  /* ── 1 · restore the saved structure + words (in EVERY mode) ──
+     Runs synchronously, before main.js, so the animations bind to the
+     owner's final page — their added lines, their removed sections. */
+  const savedSnap = localStorage.getItem(SNAP);
+  if (savedSnap) {
+    const host = grain();
+    allSections().forEach((s) => s.remove());
+    if (host) host.insertAdjacentHTML('afterend', savedSnap);
+  }
+
+  /* ── tiny IndexedDB store (photos can be large, so not localStorage) ── */
   const DB = 'ourstory', STORE = 'photos';
   function openDB() {
     return new Promise((res, rej) => {
@@ -41,24 +66,30 @@
     });
   }
 
-  /* ---- every photo in the story, with a stable key from its filename ---- */
-  const photos = Array.from(document.querySelectorAll('section img'));
-  photos.forEach((img) => {
-    const m = (img.getAttribute('src') || '').match(/([^/]+)\.(jpg|jpeg|png|webp|gif)$/i);
-    img.dataset.photoKey = m ? m[1] : 'photo-' + Math.random().toString(36).slice(2, 8);
-  });
+  /* ── every photo gets a stable key from its filename, and remembers its
+        original src so the snapshot can stay small ── */
+  function keyPhotos() {
+    allPhotos().forEach((img) => {
+      if (!img.dataset.origSrc) img.dataset.origSrc = img.getAttribute('src') || '';
+      if (!img.dataset.photoKey) {
+        const m = img.dataset.origSrc.match(/([^/]+)\.(jpg|jpeg|png|webp|gif)$/i);
+        img.dataset.photoKey = m ? m[1] : 'photo-' + Math.random().toString(36).slice(2, 8);
+      }
+    });
+  }
+  keyPhotos();
 
-  /* ---- restore saved photos in EVERY mode, so the finished experience
-          shows the owner's pictures too ---- */
+  /* ── restore saved photos in EVERY mode, so the finished experience
+        shows the owner's pictures too ── */
   const restored = dbAll().then((saved) => {
-    photos.forEach((img) => {
+    allPhotos().forEach((img) => {
       if (saved[img.dataset.photoKey]) img.src = saved[img.dataset.photoKey];
     });
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   }).catch(() => {});
 
-  /* ---- every editable piece of text (the element that holds the words;
-          for the masked/animated lines that's the inner span) ---- */
+  /* ── the editable pieces of text (the element that holds the words;
+        for masked/animated lines that's the inner span) ── */
   const TEXT_SELECTORS = [
     '.intro-title .tline',
     '.opening-line .mask-inner',
@@ -70,17 +101,27 @@
     '.letter-label', '.lp', '.sign-pre', '.sign-name',
     '.close-line .mask-inner', '.close-script', '.close-title', '.close-date',
   ];
-  const texts = Array.from(document.querySelectorAll(TEXT_SELECTORS.join(',')));
-  texts.forEach((el, i) => { el.dataset.textKey = 't' + i; }); // stable while HTML is unchanged
 
-  /* restore saved words in EVERY mode */
-  const TKEY = 'ourstory:text:';
-  texts.forEach((el) => {
-    const saved = localStorage.getItem(TKEY + el.dataset.textKey);
-    if (saved !== null) el.innerHTML = saved;
-  });
+  /* ── build ONE clean HTML snapshot of every section (no edit chrome) ── */
+  function snapshotHTML() {
+    const box = document.createElement('div');
+    allSections().forEach((s) => box.appendChild(s.cloneNode(true)));
+    box.querySelectorAll('.ephoto-hint, .ed-sec-bar, .ed-add, .ed-del').forEach((n) => n.remove());
+    box.querySelectorAll('[contenteditable]').forEach((n) => {
+      n.removeAttribute('contenteditable'); n.removeAttribute('spellcheck'); n.classList.remove('etext');
+    });
+    box.querySelectorAll('.ephoto').forEach((n) => {
+      n.classList.remove('ephoto');
+      if (n.style.position === 'relative') n.style.position = '';
+      if (!n.getAttribute('style')) n.removeAttribute('style');
+    });
+    /* photos revert to their filename — the real picture lives in IndexedDB */
+    box.querySelectorAll('img[data-orig-src]').forEach((img) => { img.setAttribute('src', img.dataset.origSrc); });
+    return box.innerHTML;
+  }
+  function save() { try { localStorage.setItem(SNAP, snapshotHTML()); } catch (e) {} }
 
-  /* ---- the always-present "Make it yours" button ---- */
+  /* ── the always-present "Make it yours" button ── */
   const fab = document.createElement('button');
   fab.className = 'edit-fab';
   fab.type = 'button';
@@ -88,7 +129,7 @@
   fab.addEventListener('click', () => { localStorage.setItem(FLAG, '1'); location.reload(); });
   document.body.appendChild(fab);
 
-  if (!editing) return; // view mode: just the button + restored photos
+  if (!editing) return; // view mode: just the button + restored edits
 
   /* ═══════════════ editing mode ═══════════════ */
   document.body.classList.add('editing');
@@ -97,47 +138,150 @@
   const bar = document.createElement('div');
   bar.className = 'edit-bar';
   bar.innerHTML =
-    '<span class="edit-bar-msg"><strong>Editing</strong> · tap any photo or words to change them</span>' +
+    '<span class="edit-bar-msg"><strong>Editing</strong> · tap photos or words to change them · add or remove lines · remove sections</span>' +
     '<span class="edit-bar-actions">' +
       '<button class="edit-btn edit-btn-primary" id="ed-download" type="button">Download my site</button>' +
       '<button class="edit-btn" id="ed-done" type="button">Done</button>' +
     '</span>';
   document.body.appendChild(bar);
-
-  bar.querySelector('#ed-done').addEventListener('click', () => {
-    localStorage.removeItem(FLAG); location.reload();
-  });
+  bar.querySelector('#ed-done').addEventListener('click', () => { localStorage.removeItem(FLAG); location.reload(); });
   bar.querySelector('#ed-download').addEventListener('click', exportSite);
 
-  /* make each photo clickable-to-replace */
-  photos.forEach((img) => {
+  /* ── make each photo clickable-to-replace ── */
+  function bindPhoto(img) {
     const frame = img.closest('.polaroid, .mphoto, .close-photo') || img.parentElement;
     frame.classList.add('ephoto');
     if (getComputedStyle(frame).position === 'static') frame.style.position = 'relative';
-
-    const hint = document.createElement('div');
-    hint.className = 'ephoto-hint';
-    hint.textContent = '＋  Tap to add your photo';
-    frame.appendChild(hint);
-
+    if (!frame.querySelector('.ephoto-hint')) {
+      const hint = document.createElement('div');
+      hint.className = 'ephoto-hint';
+      hint.textContent = '＋  Tap to add your photo';
+      frame.appendChild(hint);
+    }
     frame.addEventListener('click', (e) => { e.preventDefault(); pickFor(img); });
-  });
+  }
+  allPhotos().forEach(bindPhoto);
 
-  /* make each piece of text tappable-to-edit */
-  texts.forEach((el) => {
+  /* ── make each piece of text tappable-to-edit ── */
+  function bindText(el) {
+    if (el.classList.contains('etext')) return;
     el.classList.add('etext');
     el.setAttribute('contenteditable', 'true');
     el.setAttribute('spellcheck', 'false');
-
-    /* Enter finishes editing instead of inserting stray markup */
     el.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
     });
-    /* save on the way out */
-    el.addEventListener('blur', () => {
-      localStorage.setItem(TKEY + el.dataset.textKey, el.innerHTML.trim());
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    el.addEventListener('blur', () => { save(); if (window.ScrollTrigger) ScrollTrigger.refresh(); });
+  }
+  document.querySelectorAll(TEXT_SELECTORS.join(',')).forEach(bindText);
+
+  /* ── add / remove repeatable lines ──
+     The Letter's paragraphs, the opening confession, and The Quiet's
+     little-things are all lists the owner can grow or trim. The reveals
+     in main.js are built from whatever lines exist, so any count works. */
+  function bindTextTree(root) {
+    const sel = TEXT_SELECTORS.join(',');
+    if (root.matches(sel)) bindText(root);
+    root.querySelectorAll(sel).forEach(bindText);
+  }
+  function focusFirstEditable(root) {
+    const el = root.matches('.etext') ? root : root.querySelector('.etext');
+    if (!el) return;
+    el.focus();
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(r);
+  }
+  function addItemDelete(item, label) {
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'ed-del';
+    del.textContent = label;
+    del.addEventListener('click', () => { del.remove(); item.remove(); save(); });
+    item.insertAdjacentElement('afterend', del);
+  }
+  function enableAddRemove(items, makeItem, addLabel, delLabel, onNew) {
+    items = Array.from(items);
+    if (!items.length) return;
+    items.forEach((it) => addItemDelete(it, delLabel));
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'ed-add';
+    add.textContent = addLabel;
+    /* sit after the last item's delete control, so "Add" is always last */
+    const last = items[items.length - 1];
+    const lastDel = last.nextElementSibling && last.nextElementSibling.classList.contains('ed-del')
+      ? last.nextElementSibling : last;
+    lastDel.insertAdjacentElement('afterend', add);
+    add.addEventListener('click', () => {
+      const el = makeItem();
+      add.insertAdjacentElement('beforebegin', el);
+      bindTextTree(el);
+      if (onNew) onNew(el);
+      addItemDelete(el, delLabel);
+      save();
+      focusFirstEditable(el);
     });
+  }
+
+  const makeLp = () => { const p = document.createElement('p'); p.className = 'lp'; p.textContent = 'Write your next line here.'; return p; };
+  const makeOpeningLine = () => { const d = document.createElement('div'); d.className = 'opening-line'; d.innerHTML = '<span class="mask"><span class="mask-inner">Write your next line here.</span></span>'; return d; };
+  const makeQuietSmall = () => { const p = document.createElement('p'); p.className = 'quiet-small'; p.textContent = 'another little thing,'; return p; };
+
+  /* a soft placeholder photo for a freshly-added memory (the owner taps it
+     to drop in their own picture) */
+  const PHOTO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23e7ddc6'/%3E%3Ctext x='50%25' y='50%25' font-family='Georgia,serif' font-size='34' fill='%23a2906f' text-anchor='middle' dominant-baseline='middle'%3EYour photo%3C/text%3E%3C/svg%3E";
+  let addedSeq = 0;
+  const makeMoment = () => {
+    const art = document.createElement('article');
+    art.className = 'moment';
+    const tilt = (Math.random() * 5 - 2.5).toFixed(1);
+    art.innerHTML =
+      '<p class="moment-date">Month 00 · Year</p>' +
+      '<div class="polaroid" data-tilt="' + tilt + '">' +
+        '<span class="tape" aria-hidden="true"></span>' +
+        '<img alt="" loading="lazy">' +
+        '<p class="polaroid-caption">a caption</p>' +
+      '</div>' +
+      '<p class="moment-text">Tell the story of this moment.</p>';
+    const img = art.querySelector('img');
+    img.dataset.photoKey = 'added-' + Date.now() + '-' + (addedSeq++);
+    img.dataset.origSrc = PHOTO_PLACEHOLDER;
+    img.src = PHOTO_PLACEHOLDER;
+    return art;
+  };
+
+  const letterBody = document.querySelector('.letter-body');
+  if (letterBody) enableAddRemove(letterBody.querySelectorAll('.lp'), makeLp, '＋ Add a line', '× remove line');
+  enableAddRemove(document.querySelectorAll('.opening-line'), makeOpeningLine, '＋ Add a line', '× remove line');
+  enableAddRemove(document.querySelectorAll('.quiet-stack .quiet-small'), makeQuietSmall, '＋ Add a little thing', '× remove');
+  enableAddRemove(
+    document.querySelectorAll('.moments .moment'), makeMoment,
+    '＋ Add a memory', '× remove memory',
+    (el) => { el.querySelectorAll('img').forEach((img) => bindPhoto(img)); }
+  );
+
+  /* ── remove / restore a whole section ── */
+  allSections().forEach((sec) => {
+    const barEl = document.createElement('div');
+    barEl.className = 'ed-sec-bar';
+    const label = document.createElement('span');
+    label.className = 'ed-sec-label';
+    label.textContent = sec.dataset.label || sec.id || 'Section';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ed-sec-btn';
+    function sync() {
+      const removed = sec.classList.contains('is-removed');
+      btn.textContent = removed ? 'Restore section' : 'Remove section';
+      barEl.classList.toggle('is-removed', removed);
+    }
+    btn.addEventListener('click', () => { sec.classList.toggle('is-removed'); sync(); save(); });
+    barEl.appendChild(label);
+    barEl.appendChild(btn);
+    sec.insertBefore(barEl, sec.firstChild);
+    sync();
   });
 
   function pickFor(img) {
@@ -151,6 +295,7 @@
       reader.onload = async () => {
         img.src = reader.result;
         try { await dbSet(img.dataset.photoKey, reader.result); } catch (e) {}
+        save();
         if (window.ScrollTrigger) ScrollTrigger.refresh();
       };
       reader.readAsDataURL(file);
@@ -158,13 +303,16 @@
     inp.click();
   }
 
-  /* ---- build a finished, shareable copy with the photos baked in ---- */
+  /* ── build a finished, shareable copy with the photos baked in ── */
   async function exportSite() {
     await restored;
     const doc = document.documentElement.cloneNode(true);
 
-    // strip every trace of edit mode
-    doc.querySelectorAll('.edit-fab, .edit-bar, .ephoto-hint').forEach((n) => n.remove());
+    /* sections the owner removed are gone for good in the finished site */
+    doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
+
+    /* strip every trace of edit mode */
+    doc.querySelectorAll('.edit-fab, .edit-bar, .ephoto-hint, .ed-sec-bar, .ed-add, .ed-del').forEach((n) => n.remove());
     doc.querySelectorAll('.ephoto').forEach((n) => {
       n.classList.remove('ephoto');
       if (n.style.position === 'relative') n.style.position = '';
@@ -172,16 +320,20 @@
     });
     doc.querySelectorAll('script[src*="edit.js"], link[href*="edit.css"]').forEach((n) => n.remove());
     doc.querySelectorAll('[contenteditable]').forEach((n) => {
-      n.removeAttribute('contenteditable');
-      n.removeAttribute('spellcheck');
-      n.classList.remove('etext');
+      n.removeAttribute('contenteditable'); n.removeAttribute('spellcheck'); n.classList.remove('etext');
     });
     const body = doc.querySelector('body');
     body.classList.remove('editing', 'reduced-motion');
 
-    // carry the current (possibly replaced) photo into the exported markup
-    const outImgs = doc.querySelectorAll('section img');
-    photos.forEach((img, i) => { if (outImgs[i]) outImgs[i].setAttribute('src', img.src); });
+    /* bake the current (possibly replaced) photo into each img */
+    const liveByKey = {};
+    allPhotos().forEach((img) => { liveByKey[img.dataset.photoKey] = img.src; });
+    doc.querySelectorAll('section img[data-photo-key]').forEach((img) => {
+      const src = liveByKey[img.dataset.photoKey];
+      if (src) img.setAttribute('src', src);
+      img.removeAttribute('data-orig-src');
+      img.removeAttribute('data-photo-key');
+    });
 
     const html = '<!DOCTYPE html>\n' + doc.outerHTML;
     const blob = new Blob([html], { type: 'text/html' });

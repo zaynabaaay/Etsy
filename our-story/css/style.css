@@ -146,7 +146,7 @@ body {
 
 /* tall enough to scroll through: the confession plays out line by line,
    then the title emerges as the payoff before Chapter One */
-body.cinematic .scene-opening { height: 600vh; }
+body.cinematic .scene-opening { height: 700vh; }
 
 /* a soft wash of sunlight behind the names — warms as they arrive */
 .opening-glow {
