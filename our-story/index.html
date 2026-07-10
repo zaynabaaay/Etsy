@@ -14,8 +14,8 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=41">
-  <link rel="stylesheet" href="css/edit.css?v=41">
+  <link rel="stylesheet" href="css/style.css?v=42">
+  <link rel="stylesheet" href="css/edit.css?v=42">
 </head>
 <body>
 
@@ -303,14 +303,6 @@
        scroll, so it can only be read slowly, and is signed in script.
        ════════════════════════════════════════════════════════════════ -->
   <section class="scene-letter" id="letter">
-    <!-- the torn/deckled edge of the note-card is drawn by displacing the
-         card's rectangle with this filter (see .letter::before in the CSS) -->
-    <svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
-      <filter id="deckle" x="-6%" y="-6%" width="112%" height="112%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.016 0.022" numOctaves="3" seed="7" result="noise"/>
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="11" xChannelSelector="R" yChannelSelector="G"/>
-      </filter>
-    </svg>
 
     <div class="letter">
       <div class="letter-head">
@@ -396,7 +388,7 @@
 
   <script src="js/vendor/gsap.min.js"></script>
   <script src="js/vendor/ScrollTrigger.min.js"></script>
-  <script src="js/main.js?v=41"></script>
-  <script src="js/edit.js?v=41"></script>
+  <script src="js/main.js?v=42"></script>
+  <script src="js/edit.js?v=42"></script>
 </body>
 </html>
