@@ -391,51 +391,34 @@ function initQuiet() {
 
 /* ══════════════════════════════════════════════════════════════════
    Scene 06 — The Letter
-   The climax. Each part reveals tied to scroll, so the letter can
-   only be read at reading pace. The signature arrives last.
+   The whole card arrives together when it comes into view, with a gentle
+   stagger down the page, then stays fully legible. It is NOT scrubbed to
+   scroll — on a tall screen the entire letter is visible at once, and a
+   scrubbed reveal would leave the lower lines stuck half-faded.
    ══════════════════════════════════════════════════════════════════ */
 function initLetter() {
 
-  /* the head */
-  gsap.timeline({
+  const tl = gsap.timeline({
     scrollTrigger: {
-      trigger: '.letter-head',
-      start: 'top 90%',
-      end: 'top 55%',
-      scrub: 0.6,
+      trigger: '.letter',
+      start: 'top 80%',
+      toggleActions: 'play none none none', // play once, then leave it clear
     },
-  })
-    .from('.letter-ornament', { opacity: 0, y: 16 }, 0)
-    .from('.letter-label', { opacity: 0, y: 12 }, 0.2);
-
-  /* each paragraph rises into clarity as it is scrolled through —
-     the pacing is the point, so the reveal spans real scroll distance */
-  gsap.utils.toArray('.letter .lp').forEach((p) => {
-    gsap.from(p, {
-      opacity: 0,
-      y: 26,
-      filter: 'blur(4px)',
-      ease: 'power1.out',
-      scrollTrigger: {
-        trigger: p,
-        start: 'top 88%',
-        end: 'top 58%',
-        scrub: 0.7,
-      },
-    });
+    defaults: { ease: 'power2.out' },
   });
 
-  /* the signature arrives last, with a little warmth */
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: '.letter-sign',
-      start: 'top 90%',
-      end: 'top 55%',
-      scrub: 0.7,
-    },
-  })
-    .from('.sign-pre', { opacity: 0, y: 14 }, 0)
-    .from('.sign-name', { opacity: 0, y: 20, scale: 0.94, ease: 'power2.out' }, 0.2);
+  /* the card settles onto the surface */
+  tl.from('.letter', { opacity: 0, y: 42, duration: 0.9 }, 0)
+    /* the head */
+    .from('.letter-ornament', { opacity: 0, y: 14, duration: 0.6 }, 0.2)
+    .from('.letter-label', { opacity: 0, y: 12, duration: 0.6 }, 0.32)
+    /* the body, one paragraph after another */
+    .from('.letter-body .lp', {
+      opacity: 0, y: 20, filter: 'blur(3px)', duration: 0.7, stagger: 0.16,
+    }, 0.46)
+    /* the signature, last */
+    .from('.sign-pre', { opacity: 0, y: 12, duration: 0.6 }, '-=0.15')
+    .from('.sign-name', { opacity: 0, y: 18, scale: 0.96, duration: 0.85 }, '-=0.3');
 }
 
 /* ══════════════════════════════════════════════════════════════════
