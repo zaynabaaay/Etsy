@@ -218,31 +218,21 @@ function initBeginning() {
    ══════════════════════════════════════════════════════════════════ */
 function initNumbers() {
 
-  /* section intro */
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: '.numbers-head',
-      start: 'top 85%',
-      end: 'top 55%',
-      scrub: 0.6,
-    },
-  })
-    .from('.numbers-rule', { scaleX: 0, ease: 'power2.inOut' }, 0)
-    .from('.numbers-script', { opacity: 0, y: 14 }, 0.3);
+  /* the note settles onto the desk */
+  gsap.from('.numbers-note', {
+    opacity: 0,
+    y: 44,
+    rotate: -4,
+    duration: 1.0,
+    ease: 'power2.out',
+    scrollTrigger: { trigger: '.numbers-note', start: 'top 82%', once: true },
+  });
 
+  /* the numbers tally up when the note arrives */
   gsap.utils.toArray('.stat').forEach((stat) => {
     const valueEl = stat.querySelector('.stat-value');
     const note = stat.querySelector('.stat-note');
     const target = parseInt(stat.dataset.count, 10);
-
-    /* the stat block itself rises in */
-    gsap.from(stat, {
-      opacity: 0,
-      y: 34,
-      duration: 0.9,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: stat, start: 'top 85%', once: true },
-    });
 
     /* the count-up — skipped for the ∞ stat */
     if (!isNaN(target)) {
@@ -251,22 +241,22 @@ function initNumbers() {
         val: target,
         duration: 1.6,
         ease: 'power2.out',
-        scrollTrigger: { trigger: stat, start: 'top 80%', once: true },
+        scrollTrigger: { trigger: '.numbers-note', start: 'top 70%', once: true },
         onUpdate: () => {
           valueEl.textContent = Math.round(counter.val).toLocaleString('en-US');
         },
       });
     }
 
-    /* the handwritten aside lands a beat after its stat */
+    /* the handwritten aside lands a beat after the tally */
     if (note) {
       gsap.from(note, {
         opacity: 0,
         scale: 0.9,
         duration: 0.6,
-        delay: 0.7,
+        delay: 1.1,
         ease: 'power2.out',
-        scrollTrigger: { trigger: stat, start: 'top 80%', once: true },
+        scrollTrigger: { trigger: '.numbers-note', start: 'top 70%', once: true },
       });
     }
   });
