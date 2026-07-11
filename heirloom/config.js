@@ -61,8 +61,9 @@ window.HEIRLOOM_CONFIG = {
      3. WORDING (the small fixed lines around the site)
      -------------------------------------------------------------------- */
   wording: {
-    envelopeLine: "You are invited",             // printed on the envelope
-    tapHint: "Touch the seal to open",           // hint under the envelope
+    envelopeLine: "A private invitation",        // headline above the envelope
+    envelopeLine2: "Prepared for you",           // small line beneath it
+    tapHint: "Tap the seal to open",             // hint under the envelope
     inviteLine: "Together with their families",  // above the names
     inviteLine2: "joyfully invite you to celebrate their marriage",
     scrollHint: "scroll",

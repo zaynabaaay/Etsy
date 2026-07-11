@@ -95,7 +95,9 @@
   document.title = C.couple.firstName + ' & ' + C.couple.secondName;
   document.querySelectorAll('.seal-init.i1').forEach(function (el) { el.textContent = i1; });
   document.querySelectorAll('.seal-init.i2').forEach(function (el) { el.textContent = i2; });
-  $('#envAddress').textContent = C.wording.envelopeLine;
+  $('#kick1').textContent = C.wording.envelopeLine;
+  $('#kick2').textContent = C.wording.envelopeLine2 || 'Prepared for you';
+  $('#introDate').textContent = C.wedding.shortDate.day + ' · ' + C.wedding.shortDate.month + ' · ' + C.wedding.year;
   $('#tapHint').textContent = C.wording.tapHint;
   $('#fcInviteLine').textContent = C.wording.inviteLine;
   $('#fcName1').textContent = C.couple.firstName;
