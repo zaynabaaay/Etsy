@@ -55,7 +55,7 @@
     </linearGradient>
     <filter id="paperGrain">
       <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="8" stitchTiles="stitch"/>
-      <feColorMatrix values="0 0 0 0 0.40  0 0 0 0 0.34  0 0 0 0 0.24  0 0 0 0.09 0"/>
+      <feColorMatrix values="0 0 0 0 0.40  0 0 0 0 0.34  0 0 0 0 0.24  0 0 0 0.06 0"/>
       <feComposite operator="in" in2="SourceGraphic"/>
     </filter>
     <filter id="paperFiber">
@@ -114,17 +114,11 @@
       <!-- rolled-rim lighting following the lobes -->
       <path fill="none" stroke="url(#rimTL)" stroke-width="5" filter="url(#soft1)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
       <path fill="none" stroke="url(#rimBR)" stroke-width="5.5" filter="url(#soft1)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
-      <!-- wax texture -->
-      <path fill="#000" filter="url(#sealGrain)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
-      <!-- channel between rim and ring -->
-      <ellipse cx="60" cy="60" rx="41.5" ry="43.5" fill="none" stroke="#2E100C" stroke-width="3" opacity="0.4" filter="url(#soft2)"/>
       <!-- raised ring ridge -->
-      <ellipse cx="59.3" cy="59.2" rx="38.5" ry="40.5" fill="none" stroke="#8A4A40" stroke-width="1.3" opacity="0.75"/>
-      <ellipse cx="60.7" cy="60.9" rx="38.5" ry="40.5" fill="none" stroke="#260C08" stroke-width="1.4" opacity="0.6"/>
+      <ellipse cx="59.4" cy="59.3" rx="38.5" ry="40.5" fill="none" stroke="#8A4A40" stroke-width="1.2" opacity="0.6"/>
+      <ellipse cx="60.6" cy="60.8" rx="38.5" ry="40.5" fill="none" stroke="#260C08" stroke-width="1.2" opacity="0.45"/>
       <!-- plateau -->
       <ellipse cx="60" cy="60" rx="36" ry="38" fill="url(#plateauG)"/>
-      <ellipse cx="60" cy="60" rx="36" ry="38" fill="#000" filter="url(#waxMottle)"/>
-      <ellipse cx="60" cy="60" rx="35.6" ry="37.6" fill="none" stroke="#2A0E0A" stroke-width="1.6" opacity="0.35" filter="url(#soft1)"/>
     </g>
 
     <!-- Orchid petal tones -->
@@ -295,7 +289,6 @@
         <path d="M998 2 L495 845" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity="0.5"/>
         <!-- paper grain & edge treatment -->
         <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="#000" filter="url(#paperGrain)"/>
-        <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="#000" filter="url(#paperFiber)"/>
         <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity="0.22"/>
         <rect x="2" y="838" width="996" height="20" fill="#6E5836" opacity="0.06"/>
       </svg>
@@ -305,7 +298,6 @@
         <svg class="flap-face" viewBox="0 0 1000 560" aria-hidden="true">
           <path d="M2 0 H998 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0 Z" fill="url(#flapG)"/>
           <path d="M2 0 H998 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0 Z" fill="#000" filter="url(#paperGrain)"/>
-          <path d="M2 0 H998 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0 Z" fill="#000" filter="url(#paperFiber)"/>
           <path d="M998 0 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0" fill="none" stroke="#FFFFFF" stroke-width="1.6" opacity="0.5"/>
           <rect x="2" width="996" height="7" fill="#FFFFFF" opacity="0.25"/>
         </svg>
