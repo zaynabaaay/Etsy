@@ -44,18 +44,23 @@
 
     <!-- == The envelope & chocolate wax seal ================================ -->
     <linearGradient id="paperG" x1="0" y1="0" x2="0.25" y2="1">
-      <stop offset="0%"  stop-color="#F3EEE3"/>
-      <stop offset="55%" stop-color="#EDE7D9"/>
-      <stop offset="100%" stop-color="#E6DFCE"/>
+      <stop offset="0%"  stop-color="#F0E9DA"/>
+      <stop offset="55%" stop-color="#EAE2CF"/>
+      <stop offset="100%" stop-color="#E1D7C0"/>
     </linearGradient>
     <linearGradient id="flapG" x1="0" y1="0" x2="0.2" y2="1">
-      <stop offset="0%"  stop-color="#F6F1E7"/>
-      <stop offset="70%" stop-color="#EFE9DB"/>
-      <stop offset="100%" stop-color="#EAE3D3"/>
+      <stop offset="0%"  stop-color="#F3EDDF"/>
+      <stop offset="70%" stop-color="#ECE5D2"/>
+      <stop offset="100%" stop-color="#E5DCC7"/>
     </linearGradient>
     <filter id="paperGrain">
       <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="8" stitchTiles="stitch"/>
-      <feColorMatrix values="0 0 0 0 0.40  0 0 0 0 0.34  0 0 0 0 0.24  0 0 0 0.06 0"/>
+      <feColorMatrix values="0 0 0 0 0.40  0 0 0 0 0.34  0 0 0 0 0.24  0 0 0 0.09 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <filter id="paperFiber">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.28" numOctaves="2" seed="14" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 0.98  0 0 0 0 0.92  0 0 0 0.07 0"/>
       <feComposite operator="in" in2="SourceGraphic"/>
     </filter>
     <linearGradient id="mouthShade" x1="0" y1="0" x2="0" y2="1">
@@ -64,38 +69,62 @@
       <stop offset="100%" stop-color="#3B2E1C" stop-opacity="0"/>
     </linearGradient>
 
-    <radialGradient id="waxG" cx="0.40" cy="0.34" r="0.8">
-      <stop offset="0%"  stop-color="#8B5836"/>
-      <stop offset="48%" stop-color="#6C3E23"/>
-      <stop offset="82%" stop-color="#54301A"/>
-      <stop offset="100%" stop-color="#432512"/>
+    <radialGradient id="waxG" cx="0.40" cy="0.34" r="0.82">
+      <stop offset="0%"  stop-color="#7A3B33"/>
+      <stop offset="42%" stop-color="#632B26"/>
+      <stop offset="80%" stop-color="#4C1F1B"/>
+      <stop offset="100%" stop-color="#3A1613"/>
     </radialGradient>
-    <radialGradient id="plateauG" cx="0.38" cy="0.30" r="0.85">
-      <stop offset="0%"  stop-color="#71431F"/>
-      <stop offset="60%" stop-color="#63381E"/>
-      <stop offset="100%" stop-color="#552F18"/>
+    <radialGradient id="plateauG" cx="0.42" cy="0.36" r="0.85">
+      <stop offset="0%"  stop-color="#6B302B"/>
+      <stop offset="55%" stop-color="#5C2622"/>
+      <stop offset="100%" stop-color="#451C18"/>
     </radialGradient>
+    <linearGradient id="rimTL" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#A56455" stop-opacity="0.6"/>
+      <stop offset="45%" stop-color="#A56455" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#A56455" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="rimBR" x1="1" y1="1" x2="0" y2="0">
+      <stop offset="0%"  stop-color="#1F0906" stop-opacity="0.55"/>
+      <stop offset="45%" stop-color="#1F0906" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#1F0906" stop-opacity="0"/>
+    </linearGradient>
     <linearGradient id="goldG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"  stop-color="#E9C983"/>
-      <stop offset="55%" stop-color="#C99E5C"/>
+      <stop offset="0%"  stop-color="#EAD196"/>
+      <stop offset="50%" stop-color="#CBA35E"/>
       <stop offset="100%" stop-color="#A87F42"/>
     </linearGradient>
     <filter id="sealGrain">
       <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="2" seed="4" stitchTiles="stitch"/>
-      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.14 0"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"/>
       <feComposite operator="in" in2="SourceGraphic"/>
     </filter>
+    <filter id="waxMottle">
+      <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="3" seed="17" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 0.10  0 0 0 0 0.03  0 0 0 0 0.02  0 0 0 0.13 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <filter id="soft1"><feGaussianBlur stdDeviation="1.1"/></filter>
     <filter id="soft2"><feGaussianBlur stdDeviation="2.2"/></filter>
 
-    <!-- Scalloped wax disc, shared by the whole seal and its broken halves -->
+    <!-- Poured oxblood wax disc: rolled rim, ring ridge, mottled plateau -->
     <g id="waxDisc">
-      <path fill="url(#waxG)" d="M58.4 4.5 C62.9 4.4 68.9 9.3 73.8 10.7 C78.8 12.0 84.7 10.2 88.3 12.4 C91.9 14.7 92.3 20.5 95.3 24.1 C98.4 27.6 104.3 29.6 106.5 33.6 C108.6 37.7 107.0 43.7 108.2 48.2 C109.4 52.8 113.6 56.7 113.5 61.0 C113.5 65.3 109.2 69.4 107.9 73.8 C106.6 78.3 107.8 84.0 105.5 87.9 C103.2 91.8 97.1 93.8 94.1 97.2 C91.1 100.6 91.0 106.4 87.3 108.3 C83.7 110.2 76.4 107.3 72.1 108.5 C67.9 109.7 65.6 115.6 61.6 115.8 C57.6 115.9 52.8 110.6 48.1 109.2 C43.5 107.8 37.8 109.7 33.8 107.4 C29.8 105.1 27.5 98.8 24.1 95.5 C20.7 92.3 15.5 91.7 13.6 88.0 C11.7 84.2 14.0 77.3 12.7 72.8 C11.5 68.3 5.9 65.5 5.9 60.9 C5.8 56.4 11.3 50.3 12.4 45.7 C13.6 41.0 10.7 36.6 12.7 33.0 C14.8 29.4 21.4 27.7 24.7 24.1 C28.0 20.5 29.1 13.7 32.8 11.6 C36.4 9.5 42.2 12.5 46.4 11.3 C50.7 10.1 53.8 4.6 58.4 4.5 Z"/>
-      <path fill="#000" filter="url(#sealGrain)" d="M58.4 4.5 C62.9 4.4 68.9 9.3 73.8 10.7 C78.8 12.0 84.7 10.2 88.3 12.4 C91.9 14.7 92.3 20.5 95.3 24.1 C98.4 27.6 104.3 29.6 106.5 33.6 C108.6 37.7 107.0 43.7 108.2 48.2 C109.4 52.8 113.6 56.7 113.5 61.0 C113.5 65.3 109.2 69.4 107.9 73.8 C106.6 78.3 107.8 84.0 105.5 87.9 C103.2 91.8 97.1 93.8 94.1 97.2 C91.1 100.6 91.0 106.4 87.3 108.3 C83.7 110.2 76.4 107.3 72.1 108.5 C67.9 109.7 65.6 115.6 61.6 115.8 C57.6 115.9 52.8 110.6 48.1 109.2 C43.5 107.8 37.8 109.7 33.8 107.4 C29.8 105.1 27.5 98.8 24.1 95.5 C20.7 92.3 15.5 91.7 13.6 88.0 C11.7 84.2 14.0 77.3 12.7 72.8 C11.5 68.3 5.9 65.5 5.9 60.9 C5.8 56.4 11.3 50.3 12.4 45.7 C13.6 41.0 10.7 36.6 12.7 33.0 C14.8 29.4 21.4 27.7 24.7 24.1 C28.0 20.5 29.1 13.7 32.8 11.6 C36.4 9.5 42.2 12.5 46.4 11.3 C50.7 10.1 53.8 4.6 58.4 4.5 Z"/>
-      <path d="M22 36 A44 45 0 0 1 46 12" fill="none" stroke="#9A7048" stroke-width="4" opacity="0.22" stroke-linecap="round" filter="url(#soft2)"/>
-      <path d="M98 86 A45 46 0 0 1 74 108" fill="none" stroke="#2A1405" stroke-width="4" opacity="0.22" stroke-linecap="round" filter="url(#soft2)"/>
-      <ellipse cx="60" cy="60" rx="37.5" ry="39.5" fill="url(#plateauG)"/>
-      <ellipse cx="60" cy="60" rx="37.5" ry="39.5" fill="none" stroke="#31180A" stroke-width="1.7" opacity="0.42"/>
-      <ellipse cx="60" cy="61.6" rx="37.5" ry="39.5" fill="none" stroke="#9A7048" stroke-width="0.8" opacity="0.3"/>
+      <path fill="url(#waxG)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
+      <!-- rolled-rim lighting following the lobes -->
+      <path fill="none" stroke="url(#rimTL)" stroke-width="5" filter="url(#soft1)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
+      <path fill="none" stroke="url(#rimBR)" stroke-width="5.5" filter="url(#soft1)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
+      <!-- wax texture -->
+      <path fill="#000" filter="url(#sealGrain)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
+      <!-- channel between rim and ring -->
+      <ellipse cx="60" cy="60" rx="41.5" ry="43.5" fill="none" stroke="#2E100C" stroke-width="3" opacity="0.4" filter="url(#soft2)"/>
+      <!-- raised ring ridge -->
+      <ellipse cx="59.3" cy="59.2" rx="38.5" ry="40.5" fill="none" stroke="#8A4A40" stroke-width="1.3" opacity="0.75"/>
+      <ellipse cx="60.7" cy="60.9" rx="38.5" ry="40.5" fill="none" stroke="#260C08" stroke-width="1.4" opacity="0.6"/>
+      <!-- plateau -->
+      <ellipse cx="60" cy="60" rx="36" ry="38" fill="url(#plateauG)"/>
+      <ellipse cx="60" cy="60" rx="36" ry="38" fill="#000" filter="url(#waxMottle)"/>
+      <ellipse cx="60" cy="60" rx="35.6" ry="37.6" fill="none" stroke="#2A0E0A" stroke-width="1.6" opacity="0.35" filter="url(#soft1)"/>
     </g>
 
     <!-- Orchid petal tones -->
@@ -259,13 +288,15 @@
         <path d="M62 4 L500 468 L938 4 Z" fill="url(#linerPat)"/>
         <path d="M62 4 L500 468 L938 4 Z" fill="url(#mouthShade)"/>
         <path d="M62 4 L500 468 L938 4 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
-        <!-- bottom fold over the side folds -->
-        <path d="M2 858 L500 528 L998 858 Z" fill="#FFFFFF" opacity="0.14"/>
-        <path d="M4 856 L500 530 L996 856" fill="none" stroke="#8A7250" stroke-width="2.6" opacity="0.22" transform="translate(0 3)"/>
-        <path d="M4 856 L500 530 L996 856" fill="none" stroke="#FFFFFF" stroke-width="1.6" opacity="0.7"/>
+        <!-- side-fold edges: the flap diagonals continued to the bottom centre -->
+        <path d="M2 2 L505 845" fill="none" stroke="#8A7250" stroke-width="2.4" opacity="0.18" transform="translate(2.5 1.5)"/>
+        <path d="M2 2 L505 845" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity="0.5"/>
+        <path d="M998 2 L495 845" fill="none" stroke="#8A7250" stroke-width="2.4" opacity="0.18" transform="translate(2.5 1.5)"/>
+        <path d="M998 2 L495 845" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity="0.5"/>
         <!-- paper grain & edge treatment -->
         <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="#000" filter="url(#paperGrain)"/>
-        <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="none" stroke="#FFFFFF" stroke-width="1.6" opacity="0.4"/>
+        <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="#000" filter="url(#paperFiber)"/>
+        <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity="0.22"/>
         <rect x="2" y="838" width="996" height="20" fill="#6E5836" opacity="0.06"/>
       </svg>
 
@@ -274,6 +305,7 @@
         <svg class="flap-face" viewBox="0 0 1000 560" aria-hidden="true">
           <path d="M2 0 H998 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0 Z" fill="url(#flapG)"/>
           <path d="M2 0 H998 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0 Z" fill="#000" filter="url(#paperGrain)"/>
+          <path d="M2 0 H998 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0 Z" fill="#000" filter="url(#paperFiber)"/>
           <path d="M998 0 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0" fill="none" stroke="#FFFFFF" stroke-width="1.6" opacity="0.5"/>
           <rect x="2" width="996" height="7" fill="#FFFFFF" opacity="0.25"/>
         </svg>
@@ -290,28 +322,30 @@
           <svg viewBox="0 0 120 120">
             <use href="#waxDisc"/>
             <g class="engrave">
-              <text class="seal-init i1 sh" x="60" y="54">O</text>
-              <text class="seal-init i1" x="60" y="53">O</text>
-              <line x1="38" y1="62" x2="82" y2="62" stroke="#C79C58" stroke-width="1" opacity="0.9"/>
-              <rect x="58.2" y="60.2" width="3.6" height="3.6" fill="#DDB76B" transform="rotate(45 60 62)"/>
-              <text class="seal-init i2 sh" x="60" y="93">A</text>
-              <text class="seal-init i2" x="60" y="92">A</text>
+              <text class="seal-init i1 sh" x="60.9" y="56.1">O</text>
+              <text class="seal-init i1 hl" x="59.5" y="54.4">O</text>
+              <text class="seal-init i1" x="60" y="55">O</text>
+              <line x1="37" y1="63" x2="83" y2="63" stroke="#D5B172" stroke-width="0.9" opacity="0.95"/>
+              <rect x="58.4" y="61.4" width="3.2" height="3.2" fill="#E6CD8C" transform="rotate(45 60 63)"/>
+              <text class="seal-init i2 sh" x="60.9" y="99.1">A</text>
+              <text class="seal-init i2 hl" x="59.5" y="97.4">A</text>
+              <text class="seal-init i2" x="60" y="98">A</text>
             </g>
           </svg>
         </span>
         <span class="seal-half left" aria-hidden="true">
           <svg viewBox="0 0 120 120">
             <use href="#waxDisc"/>
-            <text class="seal-init i1 sh" x="60" y="54">O</text>
-            <text class="seal-init i1" x="60" y="53">O</text>
-            <line x1="38" y1="62" x2="82" y2="62" stroke="#C79C58" stroke-width="1" opacity="0.9"/>
+            <text class="seal-init i1 sh" x="60.9" y="56.1">O</text>
+            <text class="seal-init i1" x="60" y="55">O</text>
+            <line x1="37" y1="63" x2="83" y2="63" stroke="#D5B172" stroke-width="0.9" opacity="0.95"/>
           </svg>
         </span>
         <span class="seal-half right" aria-hidden="true">
           <svg viewBox="0 0 120 120">
             <use href="#waxDisc"/>
-            <text class="seal-init i2 sh" x="60" y="93">A</text>
-            <text class="seal-init i2" x="60" y="92">A</text>
+            <text class="seal-init i2 sh" x="60.9" y="99.1">A</text>
+            <text class="seal-init i2" x="60" y="98">A</text>
           </svg>
         </span>
       </button>
