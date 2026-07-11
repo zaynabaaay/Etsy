@@ -44,14 +44,18 @@
 
     <!-- == The envelope & chocolate wax seal ================================ -->
     <linearGradient id="paperG" x1="0" y1="0" x2="0.25" y2="1">
-      <stop offset="0%"  stop-color="#F0E9DA"/>
-      <stop offset="55%" stop-color="#EAE2CF"/>
-      <stop offset="100%" stop-color="#E1D7C0"/>
+      <stop offset="0%"  stop-color="#EAE1CE"/>
+      <stop offset="55%" stop-color="#E2D8C2"/>
+      <stop offset="100%" stop-color="#D8CCB2"/>
     </linearGradient>
     <linearGradient id="flapG" x1="0" y1="0" x2="0.2" y2="1">
-      <stop offset="0%"  stop-color="#F3EDDF"/>
-      <stop offset="70%" stop-color="#ECE5D2"/>
-      <stop offset="100%" stop-color="#E5DCC7"/>
+      <stop offset="0%"  stop-color="#EDE5D4"/>
+      <stop offset="70%" stop-color="#E6DDC8"/>
+      <stop offset="100%" stop-color="#DFD4BC"/>
+    </linearGradient>
+    <linearGradient id="bottomShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6E5836" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#6E5836" stop-opacity="0.06"/>
     </linearGradient>
     <filter id="paperGrain">
       <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="8" stitchTiles="stitch"/>
@@ -65,7 +69,7 @@
     </filter>
     <linearGradient id="mouthShade" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#3B2E1C" stop-opacity="0.55"/>
-      <stop offset="30%" stop-color="#3B2E1C" stop-opacity="0.18"/>
+      <stop offset="30%" stop-color="#3B2E1C" stop-opacity="0.18""/>
       <stop offset="100%" stop-color="#3B2E1C" stop-opacity="0"/>
     </linearGradient>
 
@@ -279,13 +283,13 @@
       <svg class="env-body" viewBox="0 0 1000 860" aria-hidden="true">
         <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="url(#paperG)"/>
         <!-- interior (revealed when the flap lifts): liner + mouth shadow -->
-        <path d="M62 4 L500 468 L938 4 Z" fill="url(#linerPat)"/>
-        <path d="M62 4 L500 468 L938 4 Z" fill="url(#mouthShade)"/>
-        <path d="M62 4 L500 468 L938 4 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
-        <!-- bottom flap, folded up over the side flaps -->
-        <path d="M1.5 430 L500 800 L998.5 430 L998.5 850.5 Q998.5 858.5 990.5 858.5 L9.5 858.5 Q1.5 858.5 1.5 850.5 Z" fill="#FFFFFF" opacity="0.055"/>
-        <path d="M1.5 430 L500 800 L998.5 430" fill="none" stroke="#6E5836" stroke-width="1.5" opacity="0.22"/>
-        <path d="M1.5 432.5 L500 802.5 L998.5 432.5" fill="none" stroke="#FFFFFF" stroke-width="1.1" opacity="0.5"/>
+        <path d="M62 4 L500 545 L938 4 Z" fill="url(#linerPat)"/>
+        <path d="M62 4 L500 545 L938 4 Z" fill="url(#mouthShade)"/>
+        <path d="M62 4 L500 545 L938 4 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
+        <!-- side folds, converging at the flap tip like the reference -->
+        <path d="M2 500 L500 850" fill="none" stroke="#6E5836" stroke-width="1.6" opacity="0.18"/>
+        <path d="M998 478 L500 850" fill="none" stroke="#6E5836" stroke-width="1.6" opacity="0.18"/>
+        <rect x="2" y="560" width="996" height="298" fill="url(#bottomShade)"/>
         <!-- paper grain & edge treatment -->
         <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="#000" filter="url(#paperGrain)"/>
         <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity="0.22"/>
@@ -294,15 +298,15 @@
 
       <!-- The flap -->
       <div class="env-flap" id="envFlap">
-        <svg class="flap-face" viewBox="0 0 1000 560" aria-hidden="true">
-          <path d="M2 0 H998 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0 Z" fill="url(#flapG)"/>
-          <path d="M2 0 H998 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0 Z" fill="#000" filter="url(#paperGrain)"/>
+        <svg class="flap-face" viewBox="0 0 1000 660" aria-hidden="true">
+          <path d="M2 2 H998 C992 85 935 175 839 258 C786 315 734 372 682 430 C625 495 560 580 500 630 C440 580 375 495 318 430 C266 372 214 315 161 258 C65 175 8 85 2 2 Z" fill="url(#flapG)"/>
+          <path d="M2 2 H998 C992 85 935 175 839 258 C786 315 734 372 682 430 C625 495 560 580 500 630 C440 580 375 495 318 430 C266 372 214 315 161 258 C65 175 8 85 2 2 Z" fill="#000" filter="url(#paperGrain)"/>
           <rect x="2" width="996" height="7" fill="#FFFFFF" opacity="0.2"/>
         </svg>
-        <svg class="flap-under" viewBox="0 0 1000 560" aria-hidden="true">
-          <path d="M2 0 H998 C918 86 638 322 513 534 Q500 556 487 534 C362 322 82 86 2 0 Z" fill="url(#paperG)"/>
-          <path d="M40 18 H960 C880 100 625 312 512 505 Q500 525 488 505 C375 312 120 100 40 18 Z" fill="url(#linerPat)"/>
-          <path d="M40 18 H960 C880 100 625 312 512 505 Q500 525 488 505 C375 312 120 100 40 18 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
+        <svg class="flap-under" viewBox="0 0 1000 660" aria-hidden="true">
+          <path d="M2 2 H998 C992 85 935 175 839 258 C786 315 734 372 682 430 C625 495 560 580 500 630 C440 580 375 495 318 430 C266 372 214 315 161 258 C65 175 8 85 2 2 Z" fill="url(#paperG)"/>
+          <path d="M44 16 H956 C930 70 884 166 806 254 C756 308 706 362 656 418 C592 490 540 552 500 592 C460 552 408 490 344 418 C294 362 244 308 194 254 C116 166 70 70 44 16 Z" fill="url(#linerPat)"/>
+          <path d="M44 16 H956 C930 70 884 166 806 254 C756 308 706 362 656 418 C592 490 540 552 500 592 C460 552 408 490 344 418 C294 362 244 308 194 254 C116 166 70 70 44 16 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
         </svg>
       </div>
 

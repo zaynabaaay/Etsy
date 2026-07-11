@@ -146,7 +146,7 @@ img { max-width: 100%; display: block; }
 /* ---- envelope construction --------------------------------------------- */
 .envelope {
   --env-w: min(88vw, 56svh, 500px);
-  --env-h: calc(var(--env-w) * 0.86);
+  --env-h: calc(var(--env-w) * 0.88);
   position: relative;
   width: var(--env-w);
   height: var(--env-h);
@@ -285,7 +285,7 @@ img { max-width: 100%; display: block; }
   position: absolute;
   left: 0; top: 0;
   width: 100%;
-  height: 63.4%;
+  height: 73.3%;
   transform-origin: 50% 0;
   transform-style: preserve-3d;
   transition: transform 0.9s cubic-bezier(0.55, 0, 0.2, 1);
@@ -299,15 +299,15 @@ img { max-width: 100%; display: block; }
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
-.flap-face { filter: drop-shadow(0 7px 8px rgba(92, 68, 40, 0.32)) drop-shadow(0 1px 2px rgba(92, 68, 40, 0.24)); }
+.flap-face { filter: drop-shadow(0 10px 14px rgba(92, 68, 40, 0.28)) drop-shadow(0 3px 5px rgba(92, 68, 40, 0.20)); }
 .flap-under { transform: rotateX(180deg); }
 
 /* ---- the wax seal ------------------------------------------------------- */
 .seal {
-  --seal-w: calc(var(--env-w) * 0.235);
+  --seal-w: calc(var(--env-w) * 0.225);
   position: absolute;
   left: calc(50% - var(--seal-w) / 2);
-  top: calc(61.5% - var(--seal-w) / 2);
+  top: calc(59.5% - var(--seal-w) / 2);
   width: var(--seal-w);
   height: var(--seal-w);
   background: none; border: none;
