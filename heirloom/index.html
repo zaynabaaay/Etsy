@@ -48,10 +48,10 @@
       <stop offset="55%" stop-color="#E2D8C2"/>
       <stop offset="100%" stop-color="#D8CCB2"/>
     </linearGradient>
-    <linearGradient id="flapG" x1="0" y1="0" x2="0.2" y2="1">
-      <stop offset="0%"  stop-color="#EDE5D4"/>
-      <stop offset="70%" stop-color="#E6DDC8"/>
-      <stop offset="100%" stop-color="#DFD4BC"/>
+    <linearGradient id="flapG" x1="0" y1="0" x2="0.18" y2="1">
+      <stop offset="0%"  stop-color="#EFE7D7"/>
+      <stop offset="60%" stop-color="#E7DEC9"/>
+      <stop offset="100%" stop-color="#DCD1B9"/>
     </linearGradient>
     <linearGradient id="bottomShade" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#6E5836" stop-opacity="0"/>
@@ -280,33 +280,33 @@
       </div>
 
       <!-- Back of the envelope: panels, folds, interior -->
-      <svg class="env-body" viewBox="0 0 1000 860" aria-hidden="true">
-        <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="url(#paperG)"/>
+      <svg class="env-body" viewBox="0 0 1000 872" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="997" height="869" rx="13" fill="url(#paperG)"/>
         <!-- interior (revealed when the flap lifts): liner + mouth shadow -->
         <path d="M62 4 L500 545 L938 4 Z" fill="url(#linerPat)"/>
         <path d="M62 4 L500 545 L938 4 Z" fill="url(#mouthShade)"/>
         <path d="M62 4 L500 545 L938 4 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
         <!-- side folds, converging at the flap tip like the reference -->
-        <path d="M2 500 L500 850" fill="none" stroke="#6E5836" stroke-width="1.6" opacity="0.18"/>
-        <path d="M998 478 L500 850" fill="none" stroke="#6E5836" stroke-width="1.6" opacity="0.18"/>
-        <rect x="2" y="560" width="996" height="298" fill="url(#bottomShade)"/>
+        <path d="M274 376 L2 868" fill="none" stroke="#6E5836" stroke-width="1.6" opacity="0.17"/>
+        <path d="M726 376 L998 868" fill="none" stroke="#6E5836" stroke-width="1.6" opacity="0.10"/>
+        <rect x="2" y="560" width="996" height="310" fill="url(#bottomShade)"/>
         <!-- paper grain & edge treatment -->
-        <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="#000" filter="url(#paperGrain)"/>
-        <rect x="1.5" y="1.5" width="997" height="857" rx="8" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity="0.22"/>
-        <rect x="2" y="838" width="996" height="20" fill="#6E5836" opacity="0.06"/>
+        <rect x="1.5" y="1.5" width="997" height="869" rx="13" fill="#000" filter="url(#paperGrain)"/>
+        <rect x="1.5" y="1.5" width="997" height="869" rx="13" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity="0.22"/>
+        <rect x="2" y="850" width="996" height="20" fill="#6E5836" opacity="0.06"/>
       </svg>
 
       <!-- The flap -->
       <div class="env-flap" id="envFlap">
-        <svg class="flap-face" viewBox="0 0 1000 660" aria-hidden="true">
-          <path d="M2 2 H998 C992 85 935 175 839 258 C786 315 734 372 682 430 C625 495 560 580 500 630 C440 580 375 495 318 430 C266 372 214 315 161 258 C65 175 8 85 2 2 Z" fill="url(#flapG)"/>
-          <path d="M2 2 H998 C992 85 935 175 839 258 C786 315 734 372 682 430 C625 495 560 580 500 630 C440 580 375 495 318 430 C266 372 214 315 161 258 C65 175 8 85 2 2 Z" fill="#000" filter="url(#paperGrain)"/>
+        <svg class="flap-face" viewBox="0 0 1000 655" aria-hidden="true">
+          <path d="M2 2 H998 L977 77 L975 86 L970 101 L963 115 L952 129 L939 144 L926 158 L913 172 L900 187 L887 201 L874 216 L861 230 L848 244 L836 259 L823 273 L810 287 L797 302 L784 316 L771 331 L759 345 L746 359 L733 374 L721 388 L708 402 L696 417 L684 431 L679 437 L504 638 L377 494 L375 491 L364 478 L351 463 L339 449 L325 435 L311 420 L301 406 L289 392 L276 377 L263 363 L251 349 L238 334 L225 320 L212 305 L200 291 L187 277 L174 262 L161 248 L148 234 L135 219 L122 205 L109 190 L96 176 L83 162 L69 147 L51 131 L37 115 L30 101 L25 86 L23 77 Z" fill="url(#flapG)"/>
+          <path d="M2 2 H998 L977 77 L975 86 L970 101 L963 115 L952 129 L939 144 L926 158 L913 172 L900 187 L887 201 L874 216 L861 230 L848 244 L836 259 L823 273 L810 287 L797 302 L784 316 L771 331 L759 345 L746 359 L733 374 L721 388 L708 402 L696 417 L684 431 L679 437 L504 638 L377 494 L375 491 L364 478 L351 463 L339 449 L325 435 L311 420 L301 406 L289 392 L276 377 L263 363 L251 349 L238 334 L225 320 L212 305 L200 291 L187 277 L174 262 L161 248 L148 234 L135 219 L122 205 L109 190 L96 176 L83 162 L69 147 L51 131 L37 115 L30 101 L25 86 L23 77 Z" fill="#000" filter="url(#paperGrain)"/>
           <rect x="2" width="996" height="7" fill="#FFFFFF" opacity="0.2"/>
         </svg>
-        <svg class="flap-under" viewBox="0 0 1000 660" aria-hidden="true">
-          <path d="M2 2 H998 C992 85 935 175 839 258 C786 315 734 372 682 430 C625 495 560 580 500 630 C440 580 375 495 318 430 C266 372 214 315 161 258 C65 175 8 85 2 2 Z" fill="url(#paperG)"/>
-          <path d="M44 16 H956 C930 70 884 166 806 254 C756 308 706 362 656 418 C592 490 540 552 500 592 C460 552 408 490 344 418 C294 362 244 308 194 254 C116 166 70 70 44 16 Z" fill="url(#linerPat)"/>
-          <path d="M44 16 H956 C930 70 884 166 806 254 C756 308 706 362 656 418 C592 490 540 552 500 592 C460 552 408 490 344 418 C294 362 244 308 194 254 C116 166 70 70 44 16 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
+        <svg class="flap-under" viewBox="0 0 1000 655" aria-hidden="true">
+          <path d="M2 2 H998 L977 77 L975 86 L970 101 L963 115 L952 129 L939 144 L926 158 L913 172 L900 187 L887 201 L874 216 L861 230 L848 244 L836 259 L823 273 L810 287 L797 302 L784 316 L771 331 L759 345 L746 359 L733 374 L721 388 L708 402 L696 417 L684 431 L679 437 L504 638 L377 494 L375 491 L364 478 L351 463 L339 449 L325 435 L311 420 L301 406 L289 392 L276 377 L263 363 L251 349 L238 334 L225 320 L212 305 L200 291 L187 277 L174 262 L161 248 L148 234 L135 219 L122 205 L109 190 L96 176 L83 162 L69 147 L51 131 L37 115 L30 101 L25 86 L23 77 Z" fill="url(#paperG)"/>
+          <path d="M44 16 H956 L944 86 L941 94 L937 108 L931 121 L921 134 L908 148 L896 161 L884 175 L872 188 L860 201 L848 215 L836 228 L824 241 L812 255 L800 268 L788 281 L776 295 L764 308 L752 322 L740 335 L729 348 L717 362 L705 375 L694 388 L683 402 L671 415 L666 420 L504 607 L385 474 L383 471 L374 459 L362 445 L350 432 L338 418 L325 405 L315 392 L303 378 L292 365 L280 352 L268 338 L256 325 L244 312 L232 298 L221 285 L209 271 L197 258 L185 245 L173 231 L161 218 L149 205 L137 191 L124 178 L112 164 L99 151 L83 136 L69 121 L63 108 L59 94 L56 86 Z" fill="url(#linerPat)"/>
+          <path d="M44 16 H956 L944 86 L941 94 L937 108 L931 121 L921 134 L908 148 L896 161 L884 175 L872 188 L860 201 L848 215 L836 228 L824 241 L812 255 L800 268 L788 281 L776 295 L764 308 L752 322 L740 335 L729 348 L717 362 L705 375 L694 388 L683 402 L671 415 L666 420 L504 607 L385 474 L383 471 L374 459 L362 445 L350 432 L338 418 L325 405 L315 392 L303 378 L292 365 L280 352 L268 338 L256 325 L244 312 L232 298 L221 285 L209 271 L197 258 L185 245 L173 231 L161 218 L149 205 L137 191 L124 178 L112 164 L99 151 L83 136 L69 121 L63 108 L59 94 L56 86 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
         </svg>
       </div>
 
