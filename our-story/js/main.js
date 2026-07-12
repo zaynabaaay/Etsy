@@ -339,42 +339,45 @@ function initQuiet() {
     },
   });
 
+  /* every beat begins while the one before it is still lifting away —
+     the only pauses left are short reading beats, never dead scroll */
+
   /* beat one */
-  tl.set('.ql-1', { visibility: 'visible' }, 0.2)
+  tl.set('.ql-1', { visibility: 'visible' }, 0.1)
     .fromTo('.ql-1 .mask-inner',
       { yPercent: 115, filter: 'blur(6px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 0.2)
-    .to('.ql-1', { opacity: 0, y: -50, duration: 0.6, ease: 'power1.in' }, 1.2);
+      { yPercent: 0, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, 0.1)
+    .to('.ql-1', { opacity: 0, y: -50, duration: 0.5, ease: 'power1.in' }, 1.0);
 
-  /* beat two — starts as beat one lifts, so there's no dead scroll between */
-  tl.set('.ql-2', { visibility: 'visible' }, 1.7)
+  /* beat two */
+  tl.set('.ql-2', { visibility: 'visible' }, 1.4)
     .fromTo('.ql-2 .mask-inner',
       { yPercent: 115, filter: 'blur(6px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 1.7)
-    .to('.ql-2', { opacity: 0, y: -50, duration: 0.6, ease: 'power1.in' }, 2.7);
+      { yPercent: 0, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, 1.4)
+    .to('.ql-2', { opacity: 0, y: -50, duration: 0.5, ease: 'power1.in' }, 2.3);
 
   /* the remembered little things — quicker, gentler, accumulating.
      Built from however many the owner kept or added (not a fixed three). */
   const smalls = gsap.utils.toArray('.quiet-small');
-  const base = 3.2, step = 0.3;
+  const base = 2.7, step = 0.25;
   smalls.forEach((el, i) => {
-    tl.fromTo(el, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }, base + i * step);
+    tl.fromTo(el, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power1.out' }, base + i * step);
   });
-  const stackEnd = base + smalls.length * step + 0.5;
-  tl.to('.quiet-stack', { opacity: 0, duration: 0.5, ease: 'power1.in' }, stackEnd);
+  const stackEnd = base + smalls.length * step + 0.35;
+  tl.to('.quiet-stack', { opacity: 0, duration: 0.45, ease: 'power1.in' }, stackEnd);
 
   /* the section is made taller when there are more little things, so the
      extra beats don't speed the whole scene up */
   const quiet = document.querySelector('.scene-quiet');
-  if (quiet) quiet.style.height = Math.max(260, Math.round(340 + (smalls.length - 3) * 40)) + 'vh';
+  if (quiet) quiet.style.height = Math.max(220, Math.round(280 + (smalls.length - 3) * 35)) + 'vh';
 
-  /* the final line lands alone, and stays */
-  const finalAt = stackEnd + 0.45;
+  /* the final line lands alone (emerging as the stack fades), and stays */
+  const finalAt = stackEnd + 0.2;
   tl.set('.ql-final', { visibility: 'visible' }, finalAt)
     .fromTo('.ql-final .mask-inner',
       { yPercent: 115, filter: 'blur(6px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, finalAt)
-    .to('.ql-final', { yPercent: 0, duration: 0.4 }, finalAt + 0.9); /* short held beat before release */
+      { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, finalAt)
+    .to('.ql-final', { yPercent: 0, duration: 0.25 }, finalAt + 0.8); /* brief held beat before release */
 }
 
 /* ══════════════════════════════════════════════════════════════════

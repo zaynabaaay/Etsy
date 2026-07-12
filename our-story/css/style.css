@@ -681,7 +681,7 @@ body.cinematic .intro-title .tline { opacity: 0; }
 
 /* the section is made tall (so there's scroll distance to animate over)
    only in the animated experience; still/edit mode stays one screen */
-body.cinematic .scene-quiet { height: 340vh; }
+body.cinematic .scene-quiet { height: 280vh; }
 
 .quiet-stage {
   position: absolute;
