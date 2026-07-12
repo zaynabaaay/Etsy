@@ -38,7 +38,13 @@ if (!editing) {
      'auto' and re-applies the stored position for its pins) — this is
      the API that clears its memory AND sets restoration to manual */
   ScrollTrigger.clearScrollMemory('manual');
-  const toTop = () => window.scrollTo(0, 0);
+  /* …but never fight the reader: once they've scrolled, tapped or typed,
+     the late re-pins (load fires after slow photos/fonts) must not yank
+     the page back up */
+  let reading = false;
+  ['wheel', 'touchstart', 'keydown'].forEach((ev) =>
+    window.addEventListener(ev, () => { reading = true; }, { once: true, passive: true }));
+  const toTop = () => { if (!reading) window.scrollTo(0, 0); };
   toTop();
   window.addEventListener('load', toTop);
   window.addEventListener('pageshow', toTop);
