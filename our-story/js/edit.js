@@ -217,18 +217,22 @@
     const sel = window.getSelection();
     sel.removeAllRanges(); sel.addRange(r);
   }
-  function addItemDelete(item, label, place) {
+  function addItemDelete(item, label, place, onChange) {
     const del = document.createElement('button');
     del.type = 'button';
     del.className = 'ed-del';
     del.textContent = label;
-    del.addEventListener('click', (e) => { e.stopPropagation(); del.remove(); item.remove(); save(); });
+    del.addEventListener('click', (e) => {
+      e.stopPropagation(); del.remove(); item.remove();
+      if (onChange) onChange();
+      save();
+    });
     if (place) place(del, item); else item.insertAdjacentElement('afterend', del);
   }
-  function enableAddRemove(items, makeItem, addLabel, delLabel, onNew, place) {
+  function enableAddRemove(items, makeItem, addLabel, delLabel, onNew, place, onChange) {
     items = Array.from(items);
     if (!items.length) return;
-    items.forEach((it) => addItemDelete(it, delLabel, place));
+    items.forEach((it) => addItemDelete(it, delLabel, place, onChange));
     const add = document.createElement('button');
     add.type = 'button';
     add.className = 'ed-add';
@@ -243,7 +247,8 @@
       add.insertAdjacentElement('beforebegin', el);
       bindTextTree(el);
       if (onNew) onNew(el);
-      addItemDelete(el, delLabel, place);
+      addItemDelete(el, delLabel, place, onChange);
+      if (onChange) onChange();
       save();
       focusFirstEditable(el);
     });
@@ -357,7 +362,50 @@
   const letterBody = document.querySelector('.letter-body');
   if (letterBody) enableAddRemove(letterBody.querySelectorAll('.lp'), makeLp, '＋ Add a line', '× remove line');
   enableAddRemove(document.querySelectorAll('.opening-line'), makeOpeningLine, '＋ Add a line', '× remove line');
-  enableAddRemove(document.querySelectorAll('.quiet-stack .quiet-small'), makeQuietSmall, '＋ Add a little thing', '× remove');
+
+  /* ── Words pages (the layout The Quiet uses) — a reusable section.
+        Each page's lines and little things are owner-growable, and the
+        last line is kept tagged as the one that stays on screen. ── */
+  const makeQuietLine = () => {
+    const d = document.createElement('div');
+    d.className = 'quiet-line';
+    d.innerHTML = '<span class="mask"><span class="mask-inner">Write your next line here.</span></span>';
+    return d;
+  };
+  function retagWordsPage(sec) {
+    const lines = sec.querySelectorAll('.quiet-line');
+    lines.forEach((l) => l.classList.remove('ql-final'));
+    if (lines.length) lines[lines.length - 1].classList.add('ql-final');
+  }
+  function bindWordsPage(sec) {
+    enableAddRemove(sec.querySelectorAll('.quiet-line'), makeQuietLine,
+      '＋ Add a line', '× remove line', null, null, () => retagWordsPage(sec));
+    enableAddRemove(sec.querySelectorAll('.quiet-stack .quiet-small'), makeQuietSmall,
+      '＋ Add a little thing', '× remove');
+  }
+  document.querySelectorAll('.scene-quiet').forEach(bindWordsPage);
+
+  /* a fresh Words page: today's Quiet structure with placeholder words */
+  function makeWordsSection() {
+    const src = document.querySelector('.scene-quiet');
+    if (!src) return null;
+    const sec = src.cloneNode(true);
+    sec.querySelectorAll('.ephoto-hint, .ed-add, .ed-del').forEach((n) => n.remove());
+    sec.querySelectorAll('[contenteditable]').forEach((n) => {
+      n.removeAttribute('contenteditable'); n.removeAttribute('spellcheck'); n.classList.remove('etext');
+    });
+    sec.classList.remove('is-removed');
+    sec.removeAttribute('style');
+    sec.id = 'words-' + Date.now().toString(36);
+    sec.dataset.label = 'Words';
+    const inners = sec.querySelectorAll('.quiet-line .mask-inner');
+    inners.forEach((n, i) => { n.textContent = i === inners.length - 1 ? 'And this line stays.' : 'Write a line here.'; });
+    sec.querySelectorAll('.quiet-small').forEach((n, i) => {
+      n.textContent = ['a little thing,', 'another,', 'and one more.'][i] || 'another little thing,';
+    });
+    retagWordsPage(sec);
+    return sec;
+  }
   enableAddRemove(
     document.querySelectorAll('.moments .moment'), makeMoment,
     '＋ Add a memory', '× Remove',
@@ -370,7 +418,7 @@
     placeMomentDelete
   );
 
-  /* ── show / hide whole sections, from one tidy panel in the top bar ──
+  /* ── the Sections panel: show/hide, reorder, and add sections ──
      (no controls cluttering the page; hidden sections simply don't appear
      and are left out of the finished site) ── */
   const panel = document.createElement('div');
@@ -379,32 +427,83 @@
   panel.innerHTML = '<div class="ed-panel-head">Sections</div>';
   const list = document.createElement('ul');
   list.className = 'ed-panel-list';
-  allSections().forEach((sec) => {
-    const li = document.createElement('li');
-    li.className = 'ed-srow';
-    const name = document.createElement('span');
-    name.className = 'ed-srow-name';
-    name.textContent = sec.dataset.label || sec.id || 'Section';
-    const tog = document.createElement('button');
-    tog.type = 'button';
-    tog.className = 'ed-toggle';
-    tog.setAttribute('role', 'switch');
-    tog.setAttribute('aria-label', 'Show ' + name.textContent);
-    const sync = () => {
-      const shown = !sec.classList.contains('is-removed');
-      tog.setAttribute('aria-checked', shown ? 'true' : 'false');
-      li.classList.toggle('is-off', !shown);
-    };
-    tog.addEventListener('click', () => { sec.classList.toggle('is-removed'); sync(); save(); });
-    li.appendChild(name);
-    li.appendChild(tog);
-    list.appendChild(li);
-    sync();
-  });
+
+  function moveSection(sec, dir) {
+    const secs = allSections();
+    const i = secs.indexOf(sec);
+    const j = i + dir;
+    if (j < 0 || j >= secs.length) return;
+    if (dir < 0) secs[j].insertAdjacentElement('beforebegin', sec);
+    else secs[j].insertAdjacentElement('afterend', sec);
+    renderPanel();
+    save();
+  }
+
+  function renderPanel() {
+    list.innerHTML = '';
+    const secs = allSections();
+    secs.forEach((sec, i) => {
+      const li = document.createElement('li');
+      li.className = 'ed-srow';
+      const name = document.createElement('span');
+      name.className = 'ed-srow-name';
+      name.textContent = sec.dataset.label || sec.id || 'Section';
+      /* reorder: the story plays in whatever order these rows are in */
+      const moves = document.createElement('span');
+      moves.className = 'ed-move';
+      [['↑', -1, i === 0], ['↓', 1, i === secs.length - 1]].forEach(([glyph, dir, off]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'ed-mv';
+        b.textContent = glyph;
+        b.disabled = off;
+        b.setAttribute('aria-label', (dir < 0 ? 'Move up: ' : 'Move down: ') + name.textContent);
+        b.addEventListener('click', () => moveSection(sec, dir));
+        moves.appendChild(b);
+      });
+      const tog = document.createElement('button');
+      tog.type = 'button';
+      tog.className = 'ed-toggle';
+      tog.setAttribute('role', 'switch');
+      tog.setAttribute('aria-label', 'Show ' + name.textContent);
+      const sync = () => {
+        const shown = !sec.classList.contains('is-removed');
+        tog.setAttribute('aria-checked', shown ? 'true' : 'false');
+        li.classList.toggle('is-off', !shown);
+      };
+      tog.addEventListener('click', () => { sec.classList.toggle('is-removed'); sync(); save(); });
+      li.appendChild(name);
+      li.appendChild(moves);
+      li.appendChild(tog);
+      list.appendChild(li);
+      sync();
+    });
+  }
+  renderPanel();
   panel.appendChild(list);
+
+  /* add another Words page (the lone-lines layout the Quiet uses),
+     then move it wherever it belongs with the arrows */
+  const addSec = document.createElement('button');
+  addSec.type = 'button';
+  addSec.className = 'ed-add ed-panel-addsec';
+  addSec.textContent = '＋ Add a Words page';
+  addSec.addEventListener('click', () => {
+    const sec = makeWordsSection();
+    if (!sec) return;
+    const secs = allSections();
+    secs[secs.length - 1].insertAdjacentElement('afterend', sec);
+    bindTextTree(sec);
+    bindWordsPage(sec);
+    renderPanel();
+    save();
+    sec.scrollIntoView({ block: 'start' });
+  });
+  panel.appendChild(addSec);
+
   const note = document.createElement('p');
   note.className = 'ed-panel-note';
-  note.textContent = 'Turn a section off to leave it out of your finished site — turn it back on any time.';
+  note.textContent = 'Turn a section off to leave it out of your finished site, use the arrows to reorder the story, and add as many Words pages as you like.';
   panel.appendChild(note);
   document.body.appendChild(panel);
 
@@ -415,7 +514,10 @@
   }
   sectionsBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePanel(); });
   document.addEventListener('click', (e) => {
-    if (panel.hidden || panel.contains(e.target) || sectionsBtn.contains(e.target)) return;
+    /* a click on a reorder arrow rebuilds the rows, detaching the clicked
+       button before this bubbles here — a detached target was inside the
+       panel, so it must not close it */
+    if (panel.hidden || !e.target.isConnected || panel.contains(e.target) || sectionsBtn.contains(e.target)) return;
     togglePanel(false);
   });
 

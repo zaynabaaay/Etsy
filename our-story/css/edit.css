@@ -282,8 +282,33 @@ section.is-removed { display: none; }
   border-radius: 8px;
 }
 .ed-srow + .ed-srow { border-top: 1px solid rgba(242, 231, 208, 0.08); }
-.ed-srow-name { font-weight: 300; font-size: 0.84rem; letter-spacing: 0.03em; }
+.ed-srow-name { flex: 1; font-weight: 300; font-size: 0.84rem; letter-spacing: 0.03em; }
 .ed-srow.is-off .ed-srow-name { opacity: 0.45; }
+
+/* reorder arrows — the story plays in whatever order the rows are in */
+.ed-move { display: inline-flex; gap: 0.3rem; }
+.ed-mv {
+  width: 26px;
+  height: 24px;
+  border: 1px solid rgba(201, 161, 95, 0.4);
+  border-radius: 6px;
+  background: transparent;
+  color: #f2e7d0;
+  font-size: 0.78rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.ed-mv:hover:not(:disabled) { background: rgba(201, 161, 95, 0.16); }
+.ed-mv:disabled { opacity: 0.22; cursor: default; }
+
+/* "Add a Words page" — light-on-dark variant of the add control */
+.ed-panel-addsec {
+  display: block;
+  margin: 0.7rem auto 0.2rem;
+  color: #f2e7d0;
+  border-color: rgba(201, 161, 95, 0.55);
+}
+.ed-panel-addsec:hover { background: rgba(201, 161, 95, 0.16); }
 
 /* the on/off switch */
 .ed-toggle {

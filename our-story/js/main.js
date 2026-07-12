@@ -143,18 +143,27 @@ function initOpening() {
       { opacity: 1, y: 0, letterSpacing: '0.005em', filter: 'blur(0px)', duration: 1.4, stagger: 0.2, ease: 'power2.out' }, '<+0.2')
     .to('.intro-title', { duration: 0.4 }); // brief hold on the title before the handoff
 
-  /* ── The handoff: Chapter One's cream paper rises, the opening dims ── */
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: '.scene-beginning',
-      start: 'top bottom',
-      end: 'top 25%',
-      scrub: 0.6,
-    },
-  })
-    .to('.opening-stage', { opacity: 0.18, y: '-9vh', ease: 'none' }, 0)
-    .to('.opening-glow',  { opacity: 0.1, ease: 'none' }, 0)
-    .to('.scroll-cue',    { opacity: 0, ease: 'none', duration: 0.35 }, 0);
+  /* ── The handoff: the next section's paper rises, the opening dims.
+     Sections can be reordered in edit mode, so this targets whatever
+     visible section follows the opening — not a hard-coded scene. ── */
+  const openSec = document.querySelector('.scene-opening');
+  let nextSec = openSec && openSec.nextElementSibling;
+  while (nextSec && (nextSec.tagName !== 'SECTION' || nextSec.classList.contains('is-removed'))) {
+    nextSec = nextSec.nextElementSibling;
+  }
+  if (nextSec) {
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: nextSec,
+        start: 'top bottom',
+        end: 'top 25%',
+        scrub: 0.6,
+      },
+    })
+      .to('.opening-stage', { opacity: 0.18, y: '-9vh', ease: 'none' }, 0)
+      .to('.opening-glow',  { opacity: 0.1, ease: 'none' }, 0)
+      .to('.scroll-cue',    { opacity: 0, ease: 'none', duration: 0.35 }, 0);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -339,63 +348,72 @@ function initMontage() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Scene 05 — The Quiet
+   Words pages (Scene 05 — The Quiet, and any the owner adds)
    The panel holds still via CSS sticky (not JS pinning) while the
    section scrolls past; this timeline is scrubbed over that scroll.
-   Lines appear one beat at a time while evening falls on the page:
-   the background dims from cream through dusk to espresso, so the
-   scene ends already inside the dark world of the letter.
+   Lines appear one beat at a time on the empty paper.
    ══════════════════════════════════════════════════════════════════ */
 function initQuiet() {
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.scene-quiet',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.7,
-    },
+  /* A Words page is a reusable layout: the owner can add any number of
+     them (edit mode → Sections → "Add a Words page") and reorder them.
+     Each builds its own show from whatever it contains: every line but
+     the last speaks and lifts away, an optional stack of little things
+     accumulates, and the last line lands and stays. */
+  gsap.utils.toArray('.scene-quiet').forEach((sec) => {
+    if (sec.classList.contains('is-removed')) return;
+
+    const lines = gsap.utils.toArray(sec.querySelectorAll('.quiet-line'));
+    const smalls = gsap.utils.toArray(sec.querySelectorAll('.quiet-small'));
+    const stack = sec.querySelector('.quiet-stack');
+    if (!lines.length) return;
+    const last = lines[lines.length - 1];
+    const spoken = lines.slice(0, -1);
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sec,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.7,
+      },
+    });
+
+    /* every beat begins while the one before it is still lifting away —
+       the only pauses left are short reading beats, never dead scroll */
+    let t = 0.1;
+    spoken.forEach((ln) => {
+      tl.set(ln, { visibility: 'visible' }, t)
+        .fromTo(ln.querySelector('.mask-inner'),
+          { yPercent: 115, filter: 'blur(6px)' },
+          { yPercent: 0, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, t)
+        .to(ln, { opacity: 0, y: -50, duration: 0.5, ease: 'power1.in' }, t + 0.9);
+      t += 1.3;
+    });
+
+    /* the little things — quicker, gentler, accumulating */
+    if (smalls.length && stack) {
+      const base = t + 0.1;
+      smalls.forEach((el, i) => {
+        tl.fromTo(el, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power1.out' }, base + i * 0.25);
+      });
+      t = base + smalls.length * 0.25 + 0.35;
+      tl.to(stack, { opacity: 0, duration: 0.45, ease: 'power1.in' }, t);
+      t += 0.2;
+    } else {
+      t += 0.3;
+    }
+
+    /* the final line lands alone, and stays */
+    tl.set(last, { visibility: 'visible' }, t)
+      .fromTo(last.querySelector('.mask-inner'),
+        { yPercent: 115, filter: 'blur(6px)' },
+        { yPercent: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, t)
+      .to(last, { yPercent: 0, duration: 0.25 }, t + 0.8); /* brief held beat before release */
+
+    /* scroll room in proportion to the beats this page actually has */
+    sec.style.height = Math.max(200, Math.round(100 + (t + 1.05) * 36)) + 'vh';
   });
-
-  /* every beat begins while the one before it is still lifting away —
-     the only pauses left are short reading beats, never dead scroll */
-
-  /* beat one */
-  tl.set('.ql-1', { visibility: 'visible' }, 0.1)
-    .fromTo('.ql-1 .mask-inner',
-      { yPercent: 115, filter: 'blur(6px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, 0.1)
-    .to('.ql-1', { opacity: 0, y: -50, duration: 0.5, ease: 'power1.in' }, 1.0);
-
-  /* beat two */
-  tl.set('.ql-2', { visibility: 'visible' }, 1.4)
-    .fromTo('.ql-2 .mask-inner',
-      { yPercent: 115, filter: 'blur(6px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 0.7, ease: 'power2.out' }, 1.4)
-    .to('.ql-2', { opacity: 0, y: -50, duration: 0.5, ease: 'power1.in' }, 2.3);
-
-  /* the remembered little things — quicker, gentler, accumulating.
-     Built from however many the owner kept or added (not a fixed three). */
-  const smalls = gsap.utils.toArray('.quiet-small');
-  const base = 2.7, step = 0.25;
-  smalls.forEach((el, i) => {
-    tl.fromTo(el, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power1.out' }, base + i * step);
-  });
-  const stackEnd = base + smalls.length * step + 0.35;
-  tl.to('.quiet-stack', { opacity: 0, duration: 0.45, ease: 'power1.in' }, stackEnd);
-
-  /* the section is made taller when there are more little things, so the
-     extra beats don't speed the whole scene up */
-  const quiet = document.querySelector('.scene-quiet');
-  if (quiet) quiet.style.height = Math.max(220, Math.round(280 + (smalls.length - 3) * 35)) + 'vh';
-
-  /* the final line lands alone (emerging as the stack fades), and stays */
-  const finalAt = stackEnd + 0.2;
-  tl.set('.ql-final', { visibility: 'visible' }, finalAt)
-    .fromTo('.ql-final .mask-inner',
-      { yPercent: 115, filter: 'blur(6px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, finalAt)
-    .to('.ql-final', { yPercent: 0, duration: 0.25 }, finalAt + 0.8); /* brief held beat before release */
 }
 
 /* ══════════════════════════════════════════════════════════════════
