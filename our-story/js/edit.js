@@ -34,22 +34,24 @@
      Runs synchronously, before main.js, so the animations bind to the
      owner's final page — their added lines, their removed sections. */
   let savedSnap = localStorage.getItem(SNAP);
-  /* migration: a snapshot saved before the memories redesign still carries
-     the old camera-montage structure, which current CSS/JS can no longer
-     style or animate (photos render raw and oversized). Swap just that
-     section for the fresh markup — the owner's photos come back on their
-     own, since they're keyed by filename in IndexedDB. */
-  if (savedSnap && (savedSnap.indexOf('montage-stage') !== -1 || savedSnap.indexOf('mphoto') !== -1)) {
+  /* migration: a snapshot saved before the current memories structure
+     (the old camera-montage, or memories without the sticky stage) can't
+     be styled or animated by today's CSS/JS. Swap just that section for
+     the fresh markup — the owner's photos come back on their own, since
+     they're keyed by filename in IndexedDB. */
+  if (savedSnap) {
     const box = document.createElement('div');
     box.innerHTML = savedSnap;
     const oldSec = box.querySelector('.scene-montage');
-    const freshSec = document.querySelector('.scene-montage');
-    if (oldSec && freshSec) {
-      const clone = freshSec.cloneNode(true);
-      if (oldSec.classList.contains('is-removed')) clone.classList.add('is-removed');
-      oldSec.replaceWith(clone);
-      savedSnap = box.innerHTML;
-      try { localStorage.setItem(SNAP, savedSnap); } catch (e) {}
+    if (oldSec && !oldSec.querySelector('.montage-sticky .memory')) {
+      const freshSec = document.querySelector('.scene-montage');
+      if (freshSec) {
+        const clone = freshSec.cloneNode(true);
+        if (oldSec.classList.contains('is-removed')) clone.classList.add('is-removed');
+        oldSec.replaceWith(clone);
+        savedSnap = box.innerHTML;
+        try { localStorage.setItem(SNAP, savedSnap); } catch (e) {}
+      }
     }
   }
   if (savedSnap) {

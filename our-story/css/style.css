@@ -648,6 +648,54 @@ body.cinematic .intro-title .tline { opacity: 0; }
   filter: sepia(0.12) saturate(0.94);
 }
 
+/* ── cinematic: one screen per beat. The chapter line speaks first and
+      lifts away; then each memory holds the screen alone, and a scroll
+      hands it to the next. (Still/edit modes keep the stacked flow.) ── */
+body.cinematic .scene-montage { height: 410vh; padding: 0 0 clamp(5rem, 14vw, 8rem); } /* js/main.js recomputes from the memory count */
+body.cinematic .montage-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+}
+body.cinematic .scene-montage .chapter-head {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+body.cinematic .memories-list {
+  position: absolute;
+  inset: 0;
+  max-width: none;
+  padding: 0;
+  gap: 0;
+}
+body.cinematic .memory {
+  position: absolute;
+  inset: 0;
+  visibility: hidden; /* each is revealed on its own beat (js/main.js) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 clamp(1.25rem, 5vw, 3rem);
+}
+body.cinematic .memory-photos { width: min(100%, 58rem); }
+/* the bridge line waits at the very bottom of the scene — in flow it would
+   ride up over the pinned stage mid-show */
+body.cinematic .montage-exit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(1.5rem, 5vw, 3rem);
+  margin: 0 auto;
+}
+
 .montage-exit {
   margin: clamp(5rem, 14vw, 8rem) auto 0;
   max-width: 26ch;

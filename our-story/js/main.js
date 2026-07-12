@@ -286,25 +286,52 @@ function initNumbers() {
 
 /* ══════════════════════════════════════════════════════════════════
    Scene 04 — The Moments That Made Us
-   Free-scrolling: each memory — a title above its 1–3 photos — reveals
-   as it enters the viewport. Built from however many memories the
-   owner kept or added, so any count works.
+   A one-at-a-time show on a sticky stage: the chapter line holds the
+   first screen and lifts away, then each memory — its title over its
+   1–3 photos — has the screen to itself before handing off to the
+   next. Built from however many memories the owner kept or added.
    ══════════════════════════════════════════════════════════════════ */
 function initMontage() {
 
-  gsap.utils.toArray('.memory').forEach((mem) => {
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: mem,
-        start: 'top 88%',
-        end: 'top 45%',
-        scrub: 0.6,
-      },
-    })
-      .from(mem.querySelector('.memory-title'), { opacity: 0, y: 22, duration: 0.5 }, 0)
-      .from(mem.querySelectorAll('.memory-photo'),
-        { opacity: 0, y: 36, duration: 0.75, stagger: 0.16, ease: 'power2.out' }, 0.2);
+  const mems = gsap.utils.toArray('.memory');
+  const scene = document.querySelector('.scene-montage');
+  if (!mems.length || !scene) return;
+
+  /* about one screen of scroll for the chapter line, then one per memory */
+  scene.style.height = Math.round((1.7 + mems.length * 0.8) * 100) + 'vh';
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: scene,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.6,
+    },
   });
+
+  /* the chapter line says its piece, then gives the screen away
+     (its arrival is handled by initChapterHeads, like every chapter) */
+  tl.to('.scene-montage .chapter-head', { opacity: 0, y: -60, duration: 0.5, ease: 'power1.in' }, 0.3);
+
+  /* each memory: title lands, photos settle, a beat to look — then it
+     lifts away and the next takes the screen */
+  const STEP = 1.8;
+  mems.forEach((mem, i) => {
+    const t = 0.75 + i * STEP;
+    tl.set(mem, { visibility: 'visible' }, t)
+      .fromTo(mem.querySelector('.memory-title'),
+        { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, t)
+      .fromTo(mem.querySelectorAll('.memory-photo'),
+        { opacity: 0, y: 44 },
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: 'power2.out' }, t + 0.12);
+    if (i < mems.length - 1) {
+      tl.to(mem, { opacity: 0, y: -70, duration: 0.45, ease: 'power1.in' }, t + STEP - 0.5);
+    }
+  });
+
+  /* the last memory stays while the stage releases into the bridge line */
+  tl.to(mems[mems.length - 1], { y: 0, duration: 0.6 }, 0.75 + (mems.length - 1) * STEP + 1.0);
 
   /* the bridge line — slows the tempo back down */
   gsap.from('.montage-exit', {
