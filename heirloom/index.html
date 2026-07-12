@@ -35,12 +35,95 @@
       <feDropShadow dx="1.1" dy="1.3" stdDeviation="1.1" flood-color="#8C7457" flood-opacity="0.38"/>
     </filter>
 
-    <!-- Wax seal body -->
+    <!-- Wax seal body (kept for small seal motifs in the page) -->
     <radialGradient id="sealGrad" cx="0.38" cy="0.34" r="0.75">
       <stop offset="0%"  stop-color="#8E4740"/>
       <stop offset="55%" stop-color="#6B2E2A"/>
       <stop offset="100%" stop-color="#471E1B"/>
     </radialGradient>
+
+    <!-- == The envelope & chocolate wax seal ================================ -->
+    <linearGradient id="paperG" x1="0" y1="0" x2="0.25" y2="1">
+      <stop offset="0%"  stop-color="#EAE1CE"/>
+      <stop offset="55%" stop-color="#E2D8C2"/>
+      <stop offset="100%" stop-color="#D8CCB2"/>
+    </linearGradient>
+    <linearGradient id="flapG" x1="0" y1="0" x2="0.18" y2="1">
+      <stop offset="0%"  stop-color="#EFE7D7"/>
+      <stop offset="60%" stop-color="#E7DEC9"/>
+      <stop offset="100%" stop-color="#DCD1B9"/>
+    </linearGradient>
+    <linearGradient id="bottomShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6E5836" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#6E5836" stop-opacity="0.06"/>
+    </linearGradient>
+    <filter id="paperGrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="8" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 0.40  0 0 0 0 0.34  0 0 0 0 0.24  0 0 0 0.06 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <filter id="paperFiber">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.28" numOctaves="2" seed="14" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 0.98  0 0 0 0 0.92  0 0 0 0.07 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <linearGradient id="mouthShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3B2E1C" stop-opacity="0.55"/>
+      <stop offset="30%" stop-color="#3B2E1C" stop-opacity="0.18""/>
+      <stop offset="100%" stop-color="#3B2E1C" stop-opacity="0"/>
+    </linearGradient>
+
+    <radialGradient id="waxG" cx="0.40" cy="0.34" r="0.82">
+      <stop offset="0%"  stop-color="#7A3B33"/>
+      <stop offset="42%" stop-color="#632B26"/>
+      <stop offset="80%" stop-color="#4C1F1B"/>
+      <stop offset="100%" stop-color="#3A1613"/>
+    </radialGradient>
+    <radialGradient id="plateauG" cx="0.42" cy="0.36" r="0.85">
+      <stop offset="0%"  stop-color="#6B302B"/>
+      <stop offset="55%" stop-color="#5C2622"/>
+      <stop offset="100%" stop-color="#451C18"/>
+    </radialGradient>
+    <linearGradient id="rimTL" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#A56455" stop-opacity="0.6"/>
+      <stop offset="45%" stop-color="#A56455" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#A56455" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="rimBR" x1="1" y1="1" x2="0" y2="0">
+      <stop offset="0%"  stop-color="#1F0906" stop-opacity="0.55"/>
+      <stop offset="45%" stop-color="#1F0906" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#1F0906" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="goldG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#EAD196"/>
+      <stop offset="50%" stop-color="#CBA35E"/>
+      <stop offset="100%" stop-color="#A87F42"/>
+    </linearGradient>
+    <filter id="sealGrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="2" seed="4" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <filter id="waxMottle">
+      <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="3" seed="17" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 0.10  0 0 0 0 0.03  0 0 0 0 0.02  0 0 0 0.13 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <filter id="soft1"><feGaussianBlur stdDeviation="1.1"/></filter>
+    <filter id="soft2"><feGaussianBlur stdDeviation="2.2"/></filter>
+
+    <!-- Poured oxblood wax disc: rolled rim, ring ridge, mottled plateau -->
+    <g id="waxDisc">
+      <path fill="url(#waxG)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
+      <!-- rolled-rim lighting following the lobes -->
+      <path fill="none" stroke="url(#rimTL)" stroke-width="5" filter="url(#soft1)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
+      <path fill="none" stroke="url(#rimBR)" stroke-width="5.5" filter="url(#soft1)" d="M58.6 2.7 C63.7 2.8 70.5 9.8 75.9 11.6 C81.4 13.4 87.3 10.1 91.2 13.3 C95.2 16.6 96.4 26.5 99.8 31.2 C103.1 35.9 110.0 37.1 111.5 41.7 C113.1 46.3 109.0 52.9 109.1 58.8 C109.1 64.8 113.5 72.5 111.9 77.6 C110.3 82.6 102.7 84.4 99.5 88.9 C96.2 93.5 96.4 101.8 92.5 105.0 C88.5 108.1 81.5 106.1 76.0 108.1 C70.5 110.0 64.4 116.7 59.3 116.8 C54.2 116.9 50.5 110.6 45.3 108.7 C40.0 106.7 32.2 108.3 27.9 105.1 C23.7 101.8 23.2 93.9 19.8 89.3 C16.5 84.6 9.3 81.8 8.0 77.0 C6.7 72.3 12.0 66.8 12.0 61.0 C12.0 55.2 6.4 47.4 7.8 42.2 C9.2 37.0 17.0 34.5 20.2 29.8 C23.5 25.1 23.1 17.0 27.4 13.9 C31.6 10.7 40.4 12.9 45.6 11.0 C50.9 9.2 53.6 2.6 58.6 2.7 Z"/>
+      <!-- raised ring ridge -->
+      <ellipse cx="59.4" cy="59.3" rx="38.5" ry="40.5" fill="none" stroke="#8A4A40" stroke-width="1.2" opacity="0.6"/>
+      <ellipse cx="60.6" cy="60.8" rx="38.5" ry="40.5" fill="none" stroke="#260C08" stroke-width="1.2" opacity="0.45"/>
+      <!-- plateau -->
+      <ellipse cx="60" cy="60" rx="36" ry="38" fill="url(#plateauG)"/>
+    </g>
 
     <!-- Orchid petal tones -->
     <radialGradient id="orchGrad" cx="0.3" cy="0.3" r="1">
@@ -50,7 +133,7 @@
     </radialGradient>
 
     <!-- Envelope liner: quiet sepia branches on champagne -->
-    <pattern id="linerPat" width="72" height="72" patternUnits="userSpaceOnUse">
+    <pattern id="linerPat" width="72" height="72" patternUnits="userSpaceOnUse" patternTransform="rotate(16)">
       <rect width="72" height="72" fill="#E4D4B6"/>
       <path d="M8 66 C22 50 26 34 40 20 M40 20 C44 15 50 12 56 11 M28 42 C33 40 37 36 39 31 M16 58 C21 57 25 54 27 50"
             fill="none" stroke="#B08D5F" stroke-width="1" opacity="0.5" stroke-linecap="round"/>
@@ -167,24 +250,20 @@
      ====================================================================== -->
 <div id="intro">
   <div class="intro-stage" id="introStage">
-    <div class="table-dressing" aria-hidden="true">
-      <svg class="dress dress-orchid-1" viewBox="-90 -70 180 150"><use href="#orchid"/></svg>
-      <svg class="dress dress-sprig-1" viewBox="-20 -6 48 72" fill="#F1E9D8"><use href="#sprig"/></svg>
-      <svg class="dress dress-stem-1" viewBox="-6 -4 40 130" stroke="#A98F6F"><use href="#driedStem"/></svg>
-    </div>
+
+    <header class="intro-kicker">
+      <p class="kick-line" id="kick1"></p>
+      <div class="kick-rule" aria-hidden="true"><i></i><b></b><i></i></div>
+      <p class="kick-line small" id="kick2"></p>
+    </header>
 
     <div class="envelope" id="envelope">
-      <div class="env-back"></div>
-      <div class="env-liner">
-        <svg viewBox="0 0 500 350" preserveAspectRatio="xMidYMid slice"><rect width="500" height="350" fill="url(#linerPat)"/></svg>
-      </div>
 
-      <!-- The folded card that rises from the envelope -->
+      <!-- The folded card that rises from inside -->
       <div class="folded-card" id="foldedCard">
         <div class="fc-page">
           <div class="fc-inside">
-            <svg class="card-flourish tl" viewBox="0 0 200 170" aria-hidden="true"><g class="flourish-ink" filter="url(#emboss)"><use href="#flourish" transform="scale(0.9)"/></g></svg>
-            <svg class="card-flourish br" viewBox="0 0 200 170" aria-hidden="true"><g class="flourish-ink" filter="url(#emboss)"><use href="#flourish" transform="translate(200 170) rotate(180) scale(0.9)"/></g></svg>
+            <div class="card-frame" aria-hidden="true"></div>
             <p class="fc-invite-line" id="fcInviteLine"></p>
             <h2 class="fc-names"><span id="fcName1"></span><em class="amp">and</em><span id="fcName2"></span></h2>
             <p class="fc-date" id="fcDate"></p>
@@ -193,60 +272,85 @@
         <div class="fc-cover" id="fcCover">
           <div class="fc-cover-front">
             <div class="emboss-date" id="embossDate"></div>
-            <div class="satin-band" aria-hidden="true"></div>
+            <div class="fc-rule" aria-hidden="true"><i></i><b></b><i></i></div>
             <div class="fc-monogram" id="fcMonogram"></div>
           </div>
           <div class="fc-cover-back"></div>
         </div>
       </div>
 
-      <div class="env-front"></div>
-      <p class="env-address" id="envAddress"></p>
+      <!-- Back of the envelope: panels, folds, interior -->
+      <svg class="env-body" viewBox="0 0 1000 872" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="997" height="869" rx="13" fill="url(#paperG)"/>
+        <!-- interior (revealed when the flap lifts): liner + mouth shadow -->
+        <path d="M62 4 L500 545 L938 4 Z" fill="url(#linerPat)"/>
+        <path d="M62 4 L500 545 L938 4 Z" fill="url(#mouthShade)"/>
+        <path d="M62 4 L500 545 L938 4 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
+        <!-- side folds, converging at the flap tip like the reference -->
+        <path d="M274 376 L2 868" fill="none" stroke="#6E5836" stroke-width="1.6" opacity="0.17"/>
+        <path d="M726 376 L998 868" fill="none" stroke="#6E5836" stroke-width="1.6" opacity="0.10"/>
+        <rect x="2" y="560" width="996" height="310" fill="url(#bottomShade)"/>
+        <!-- paper grain & edge treatment -->
+        <rect x="1.5" y="1.5" width="997" height="869" rx="13" fill="#000" filter="url(#paperGrain)"/>
+        <rect x="1.5" y="1.5" width="997" height="869" rx="13" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity="0.22"/>
+        <rect x="2" y="850" width="996" height="20" fill="#6E5836" opacity="0.06"/>
+      </svg>
 
+      <!-- The flap -->
       <div class="env-flap" id="envFlap">
-        <div class="flap-outer"></div>
-        <div class="flap-inner">
-          <svg viewBox="0 0 500 280" preserveAspectRatio="xMidYMid slice"><rect width="500" height="280" fill="url(#linerPat)"/></svg>
-        </div>
+        <svg class="flap-face" viewBox="0 0 1000 655" aria-hidden="true">
+          <path d="M2 2 H998 L977 77 L975 86 L970 101 L963 115 L952 129 L939 144 L926 158 L913 172 L900 187 L887 201 L874 216 L861 230 L848 244 L836 259 L823 273 L810 287 L797 302 L784 316 L771 331 L759 345 L746 359 L733 374 L721 388 L708 402 L696 417 L684 431 L679 437 L504 638 L377 494 L375 491 L364 478 L351 463 L339 449 L325 435 L311 420 L301 406 L289 392 L276 377 L263 363 L251 349 L238 334 L225 320 L212 305 L200 291 L187 277 L174 262 L161 248 L148 234 L135 219 L122 205 L109 190 L96 176 L83 162 L69 147 L51 131 L37 115 L30 101 L25 86 L23 77 Z" fill="url(#flapG)"/>
+          <path d="M2 2 H998 L977 77 L975 86 L970 101 L963 115 L952 129 L939 144 L926 158 L913 172 L900 187 L887 201 L874 216 L861 230 L848 244 L836 259 L823 273 L810 287 L797 302 L784 316 L771 331 L759 345 L746 359 L733 374 L721 388 L708 402 L696 417 L684 431 L679 437 L504 638 L377 494 L375 491 L364 478 L351 463 L339 449 L325 435 L311 420 L301 406 L289 392 L276 377 L263 363 L251 349 L238 334 L225 320 L212 305 L200 291 L187 277 L174 262 L161 248 L148 234 L135 219 L122 205 L109 190 L96 176 L83 162 L69 147 L51 131 L37 115 L30 101 L25 86 L23 77 Z" fill="#000" filter="url(#paperGrain)"/>
+          <rect x="2" width="996" height="7" fill="#FFFFFF" opacity="0.2"/>
+        </svg>
+        <svg class="flap-under" viewBox="0 0 1000 655" aria-hidden="true">
+          <path d="M2 2 H998 L977 77 L975 86 L970 101 L963 115 L952 129 L939 144 L926 158 L913 172 L900 187 L887 201 L874 216 L861 230 L848 244 L836 259 L823 273 L810 287 L797 302 L784 316 L771 331 L759 345 L746 359 L733 374 L721 388 L708 402 L696 417 L684 431 L679 437 L504 638 L377 494 L375 491 L364 478 L351 463 L339 449 L325 435 L311 420 L301 406 L289 392 L276 377 L263 363 L251 349 L238 334 L225 320 L212 305 L200 291 L187 277 L174 262 L161 248 L148 234 L135 219 L122 205 L109 190 L96 176 L83 162 L69 147 L51 131 L37 115 L30 101 L25 86 L23 77 Z" fill="url(#paperG)"/>
+          <path d="M44 16 H956 L944 86 L941 94 L937 108 L931 121 L921 134 L908 148 L896 161 L884 175 L872 188 L860 201 L848 215 L836 228 L824 241 L812 255 L800 268 L788 281 L776 295 L764 308 L752 322 L740 335 L729 348 L717 362 L705 375 L694 388 L683 402 L671 415 L666 420 L504 607 L385 474 L383 471 L374 459 L362 445 L350 432 L338 418 L325 405 L315 392 L303 378 L292 365 L280 352 L268 338 L256 325 L244 312 L232 298 L221 285 L209 271 L197 258 L185 245 L173 231 L161 218 L149 205 L137 191 L124 178 L112 164 L99 151 L83 136 L69 121 L63 108 L59 94 L56 86 Z" fill="url(#linerPat)"/>
+          <path d="M44 16 H956 L944 86 L941 94 L937 108 L931 121 L921 134 L908 148 L896 161 L884 175 L872 188 L860 201 L848 215 L836 228 L824 241 L812 255 L800 268 L788 281 L776 295 L764 308 L752 322 L740 335 L729 348 L717 362 L705 375 L694 388 L683 402 L671 415 L666 420 L504 607 L385 474 L383 471 L374 459 L362 445 L350 432 L338 418 L325 405 L315 392 L303 378 L292 365 L280 352 L268 338 L256 325 L244 312 L232 298 L221 285 L209 271 L197 258 L185 245 L173 231 L161 218 L149 205 L137 191 L124 178 L112 164 L99 151 L83 136 L69 121 L63 108 L59 94 L56 86 Z" fill="none" stroke="#B7A98D" stroke-width="2" opacity="0.5"/>
+        </svg>
       </div>
 
       <!-- The wax seal (a real button) -->
       <button class="seal" id="seal" aria-label="Break the seal and open the invitation">
         <span class="seal-whole">
           <svg viewBox="0 0 120 120">
-            <path class="seal-blob" d="M60 8 C75 6 88 14 96 24 C104 33 112 44 110 58 C108 71 106 84 96 93 C86 102 74 110 60 111 C46 112 32 104 23 94 C14 84 8 72 9 58 C10 44 16 31 26 21 C36 12 45 10 60 8 Z" fill="url(#sealGrad)"/>
-            <circle cx="60" cy="60" r="41" fill="none" stroke="#2E1210" stroke-width="1.6" opacity="0.5"/>
-            <circle cx="60" cy="60" r="38.5" fill="none" stroke="#C98F82" stroke-width="1" opacity="0.35"/>
-            <ellipse cx="44" cy="36" rx="20" ry="10" fill="#FFFFFF" opacity="0.14" transform="rotate(-28 44 36)"/>
-            <text class="seal-init i1" x="41" y="69">O</text>
-            <text class="seal-amp" x="60" y="74">&amp;</text>
-            <text class="seal-init i2" x="80" y="69">A</text>
+            <use href="#waxDisc"/>
+            <g class="engrave">
+              <text class="seal-init i1 sh" x="60.9" y="56.1">O</text>
+              <text class="seal-init i1 hl" x="59.5" y="54.4">O</text>
+              <text class="seal-init i1" x="60" y="55">O</text>
+              <line x1="37" y1="63" x2="83" y2="63" stroke="#D5B172" stroke-width="0.9" opacity="0.95"/>
+              <rect x="58.4" y="61.4" width="3.2" height="3.2" fill="#E6CD8C" transform="rotate(45 60 63)"/>
+              <text class="seal-init i2 sh" x="60.9" y="99.1">A</text>
+              <text class="seal-init i2 hl" x="59.5" y="97.4">A</text>
+              <text class="seal-init i2" x="60" y="98">A</text>
+            </g>
           </svg>
         </span>
         <span class="seal-half left" aria-hidden="true">
           <svg viewBox="0 0 120 120">
-            <g>
-              <path class="seal-blob" d="M60 8 C75 6 88 14 96 24 C104 33 112 44 110 58 C108 71 106 84 96 93 C86 102 74 110 60 111 C46 112 32 104 23 94 C14 84 8 72 9 58 C10 44 16 31 26 21 C36 12 45 10 60 8 Z" fill="url(#sealGrad)"/>
-              <circle cx="60" cy="60" r="41" fill="none" stroke="#2E1210" stroke-width="1.6" opacity="0.5"/>
-              <text class="seal-init i1" x="41" y="69">O</text>
-              <text class="seal-amp" x="60" y="74">&amp;</text>
-            </g>
+            <use href="#waxDisc"/>
+            <text class="seal-init i1 sh" x="60.9" y="56.1">O</text>
+            <text class="seal-init i1" x="60" y="55">O</text>
+            <line x1="37" y1="63" x2="83" y2="63" stroke="#D5B172" stroke-width="0.9" opacity="0.95"/>
           </svg>
         </span>
         <span class="seal-half right" aria-hidden="true">
           <svg viewBox="0 0 120 120">
-            <g>
-              <path class="seal-blob" d="M60 8 C75 6 88 14 96 24 C104 33 112 44 110 58 C108 71 106 84 96 93 C86 102 74 110 60 111 C46 112 32 104 23 94 C14 84 8 72 9 58 C10 44 16 31 26 21 C36 12 45 10 60 8 Z" fill="url(#sealGrad)"/>
-              <circle cx="60" cy="60" r="41" fill="none" stroke="#2E1210" stroke-width="1.6" opacity="0.5"/>
-              <ellipse cx="44" cy="36" rx="20" ry="10" fill="#FFFFFF" opacity="0.14" transform="rotate(-28 44 36)"/>
-              <text class="seal-init i2" x="80" y="69">A</text>
-            </g>
+            <use href="#waxDisc"/>
+            <text class="seal-init i2 sh" x="60.9" y="99.1">A</text>
+            <text class="seal-init i2" x="60" y="98">A</text>
           </svg>
         </span>
       </button>
     </div>
 
-    <p class="tap-hint" id="tapHint"></p>
+    <footer class="intro-below">
+      <p class="intro-date" id="introDate"></p>
+      <div class="below-rule" aria-hidden="true"><b></b><i></i></div>
+      <p class="tap-hint" id="tapHint"></p>
+    </footer>
+
   </div>
   <button class="skip-intro" id="skipIntro">skip</button>
 </div>

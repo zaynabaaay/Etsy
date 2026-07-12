@@ -95,13 +95,15 @@
   document.title = C.couple.firstName + ' & ' + C.couple.secondName;
   document.querySelectorAll('.seal-init.i1').forEach(function (el) { el.textContent = i1; });
   document.querySelectorAll('.seal-init.i2').forEach(function (el) { el.textContent = i2; });
-  $('#envAddress').textContent = C.wording.envelopeLine;
+  $('#kick1').textContent = C.wording.envelopeLine;
+  $('#kick2').textContent = C.wording.envelopeLine2 || 'Prepared for you';
+  $('#introDate').textContent = C.wedding.shortDate.day + ' · ' + C.wedding.shortDate.month + ' · ' + C.wedding.year;
   $('#tapHint').textContent = C.wording.tapHint;
   $('#fcInviteLine').textContent = C.wording.inviteLine;
   $('#fcName1').textContent = C.couple.firstName;
   $('#fcName2').textContent = C.couple.secondName;
   $('#fcDate').textContent = C.wedding.displayDate;
-  $('#fcMonogram').textContent = i1 + ' & ' + i2;
+  $('#fcMonogram').textContent = i1 + ' · ' + i2;
   $('#embossDate').innerHTML =
     '<span>' + esc(C.wedding.shortDate.day) + '</span>' +
     '<span>' + esc(C.wedding.shortDate.month) + '</span>' +
@@ -150,11 +152,8 @@
     /* — hero: the opened invitation card — */
     html +=
       '<section class="section hero">' +
-        decor('orchid', 'width:clamp(120px,20vw,200px); top:4%; right:2%; opacity:.95', '0.05') +
-        decor('sprig', 'width:clamp(46px,8vw,72px); bottom:8%; left:4%; transform:rotate(-30deg)', '0.09') +
         '<div class="invite-card">' +
-          '<svg class="card-flourish tl" viewBox="0 0 200 170" aria-hidden="true"><g class="flourish-ink" filter="url(#emboss)"><use href="#flourish" transform="scale(0.9)"/></g></svg>' +
-          '<svg class="card-flourish br" viewBox="0 0 200 170" aria-hidden="true"><g class="flourish-ink" filter="url(#emboss)"><use href="#flourish" transform="translate(200 170) rotate(180) scale(0.9)"/></g></svg>' +
+          '<div class="card-frame" aria-hidden="true"></div>' +
           '<p class="invite-line">' + esc(w.inviteLine) + '</p>' +
           '<h1 class="hero-names"><span class="name">' + esc(C.couple.firstName) + '</span><span class="amp">and</span><span class="name">' + esc(C.couple.secondName) + '</span></h1>' +
           '<p class="invite-line">' + esc(w.inviteLine2) + '</p>' +
@@ -394,7 +393,7 @@
     petalsOn = true;
     var box = $('#petals');
     (function spawn() {
-      if (document.visibilityState === 'visible' && box.childElementCount < 9) {
+      if (document.visibilityState === 'visible' && box.childElementCount < 6) {
         var p = document.createElement('span');
         p.className = 'petal' + (Math.random() < 0.3 ? ' blur' : '') + (Math.random() < 0.35 ? ' dim' : '');
         var size = 9 + Math.random() * 9;
