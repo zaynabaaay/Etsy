@@ -143,8 +143,9 @@ body {
 }
 
 /* tall enough to scroll through: the confession plays out line by line,
-   then the title emerges as the payoff before Chapter One */
-body.cinematic .scene-opening { height: 700vh; }
+   then the title emerges as the payoff before Chapter One
+   (js/main.js recomputes this from how many lines the owner kept) */
+body.cinematic .scene-opening { height: 400vh; }
 
 /* a soft wash of sunlight behind the names — warms as they arrive */
 .opening-glow {
@@ -593,7 +594,7 @@ body.cinematic .intro-title .tline { opacity: 0; }
 
 /* the tall track that gives the camera its scroll distance */
 .montage { position: relative; }
-body.cinematic .montage { height: 840vh; }
+body.cinematic .montage { height: 560vh; }
 
 /* the pinned viewport the camera looks through. It carries its own paper
    so the backdrop stays still behind the photos — otherwise the section's
@@ -729,7 +730,7 @@ body.reduced-motion .mcap-script { font-size: clamp(1.2rem, 4vw, 1.55rem); }
 
 /* the section is made tall (so there's scroll distance to animate over)
    only in the animated experience; still/edit mode stays one screen */
-body.cinematic .scene-quiet { height: 520vh; }
+body.cinematic .scene-quiet { height: 340vh; }
 
 .quiet-stage {
   position: absolute;

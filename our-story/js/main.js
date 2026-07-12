@@ -90,9 +90,10 @@ function initOpening() {
   const lines = gsap.utils.toArray('.opening-line');
 
   /* give the section scroll room in proportion to how many lines there are,
-     so the pacing stays the same whether there's one line or ten */
+     so the pacing stays the same whether there's one line or ten —
+     kept tight, so each flick of the wheel brings the next line on */
   const stage = document.querySelector('.scene-opening');
-  if (stage) stage.style.height = Math.round((1.5 + Math.max(lines.length, 1) * 1.3) * 100) + 'vh';
+  if (stage) stage.style.height = Math.round((0.9 + Math.max(lines.length, 1) * 0.75) * 100) + 'vh';
 
   /* ── Load-in: the greeting settles onto the page ──
      (time-based) It unmasks upward, the blur clearing as it lands,
@@ -121,14 +122,16 @@ function initOpening() {
   /* the greeting lifts away */
   if (lines[0]) tl.to(lines[0], { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, 0);
 
-  /* every following line emerges the same way, holds, then lifts away */
+  /* every following line emerges the same way, holds briefly, then lifts
+     away — short holds, so the next line is never more than a nudge of
+     scrolling away */
   for (let i = 1; i < lines.length; i++) {
     const ln = lines[i];
-    tl.set(ln, { visibility: 'visible' }, '+=0.15')
+    tl.set(ln, { visibility: 'visible' }, '+=0.08')
       .fromTo(ln.querySelector('.mask-inner'),
         { yPercent: 115, filter: 'blur(7px)' },
         { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
-      .to(ln, { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, '+=0.85');
+      .to(ln, { opacity: 0, y: -60, duration: 0.6, ease: 'power1.in' }, '+=0.25');
   }
 
   /* ── The reveal: the title emerges, warm and slow — the payoff ──
@@ -138,7 +141,7 @@ function initOpening() {
     .fromTo('.intro-title .tline',
       { opacity: 0, y: 40, letterSpacing: '0.2em', filter: 'blur(9px)' },
       { opacity: 1, y: 0, letterSpacing: '0.005em', filter: 'blur(0px)', duration: 1.4, stagger: 0.2, ease: 'power2.out' }, '<+0.2')
-    .to('.intro-title', { duration: 1.0 }); // hold on the title before the handoff
+    .to('.intro-title', { duration: 0.4 }); // brief hold on the title before the handoff
 
   /* ── The handoff: Chapter One's cream paper rises, the opening dims ── */
   gsap.timeline({
@@ -340,25 +343,25 @@ function initMontage() {
 
   /* start on the first target, then let it drift slowly closer (the breath) */
   tl.fromTo(table, at(path[0], 1), { ...at(path[0], 1), duration: 0.001, immediateRender: true }, 0)
-    .to(table, { ...at(path[0], 1.06), duration: 1.4 });
+    .to(table, { ...at(path[0], 1.06), duration: 0.8 });
 
   /* glide to each target, then drift gently while it holds — the camera
      never comes to a hard stop, so the motion stays smooth throughout */
   for (let k = 1; k < path.length; k++) {
-    tl.to(table, { ...at(path[k], 1), duration: 2.1, ease: 'power2.inOut' })
-      .to(table, { ...at(path[k], 1.06), duration: 1.4 });
+    tl.to(table, { ...at(path[k], 1), duration: 1.8, ease: 'power2.inOut' })
+      .to(table, { ...at(path[k], 1.06), duration: 0.8 });
   }
 
   /* pull all the way back: the whole table of moments, together —
-     then hold it there (the payoff) before the section releases */
+     then a short hold (the payoff) before the section releases */
   tl.to(table, {
     x: () => framePull().x,
     y: () => framePull().y,
     scale: () => framePull().scale,
-    duration: 2.6,
+    duration: 2.2,
     ease: 'power2.inOut',
   })
-    .to(table, { duration: 2.3 });
+    .to(table, { duration: 0.9 });
 
   /* the bridge line — slows the tempo back down */
   gsap.from('.montage-exit', {
@@ -398,37 +401,37 @@ function initQuiet() {
     .fromTo('.ql-1 .mask-inner',
       { yPercent: 115, filter: 'blur(6px)' },
       { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 0.2)
-    .to('.ql-1', { opacity: 0, y: -50, duration: 0.6, ease: 'power1.in' }, 1.5);
+    .to('.ql-1', { opacity: 0, y: -50, duration: 0.6, ease: 'power1.in' }, 1.2);
 
-  /* beat two */
-  tl.set('.ql-2', { visibility: 'visible' }, 2.2)
+  /* beat two — starts as beat one lifts, so there's no dead scroll between */
+  tl.set('.ql-2', { visibility: 'visible' }, 1.7)
     .fromTo('.ql-2 .mask-inner',
       { yPercent: 115, filter: 'blur(6px)' },
-      { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 2.2)
-    .to('.ql-2', { opacity: 0, y: -50, duration: 0.6, ease: 'power1.in' }, 3.4);
+      { yPercent: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, 1.7)
+    .to('.ql-2', { opacity: 0, y: -50, duration: 0.6, ease: 'power1.in' }, 2.7);
 
   /* the remembered little things — quicker, gentler, accumulating.
      Built from however many the owner kept or added (not a fixed three). */
   const smalls = gsap.utils.toArray('.quiet-small');
-  const base = 4.2, step = 0.35;
+  const base = 3.2, step = 0.3;
   smalls.forEach((el, i) => {
     tl.fromTo(el, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }, base + i * step);
   });
-  const stackEnd = base + smalls.length * step + 0.65;
+  const stackEnd = base + smalls.length * step + 0.5;
   tl.to('.quiet-stack', { opacity: 0, duration: 0.5, ease: 'power1.in' }, stackEnd);
 
   /* the section is made taller when there are more little things, so the
      extra beats don't speed the whole scene up */
   const quiet = document.querySelector('.scene-quiet');
-  if (quiet) quiet.style.height = Math.max(360, Math.round(520 + (smalls.length - 3) * 60)) + 'vh';
+  if (quiet) quiet.style.height = Math.max(260, Math.round(340 + (smalls.length - 3) * 40)) + 'vh';
 
   /* the final line lands alone, and stays */
-  const finalAt = stackEnd + 0.7;
+  const finalAt = stackEnd + 0.45;
   tl.set('.ql-final', { visibility: 'visible' }, finalAt)
     .fromTo('.ql-final .mask-inner',
       { yPercent: 115, filter: 'blur(6px)' },
       { yPercent: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, finalAt)
-    .to('.ql-final', { yPercent: 0, duration: 0.9 }, finalAt + 0.9); /* held beat before release */
+    .to('.ql-final', { yPercent: 0, duration: 0.4 }, finalAt + 0.9); /* short held beat before release */
 }
 
 /* ══════════════════════════════════════════════════════════════════
