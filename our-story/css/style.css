@@ -716,6 +716,10 @@ body.cinematic .memory {
   justify-content: center;
   padding: 0 clamp(1.25rem, 5vw, 3rem);
 }
+/* each photo gets its own GPU layer, so the entrance is pure compositing —
+   without this, a three-photo row re-renders its sepia filter, shadows and
+   tilt on every frame of the fade, which stutters on tablets */
+body.cinematic .memory-photo { will-change: transform, opacity; }
 body.cinematic .memory-photos { width: min(100%, 58rem); }
 /* the bridge line is the show's final screen — alone, centered */
 body.cinematic .montage-exit {
