@@ -232,6 +232,14 @@ body.editing .quiet-small { color: var(--ink); }
 }
 .ed-del-corner:hover { color: #fff; text-decoration: none; background: rgba(40, 30, 20, 0.96); }
 
+/* ── The Moments That Made Us: memory + photo controls ── */
+/* the memory's remove chip anchors to the memory block's corner */
+body.editing .memory { position: relative; }
+/* each photo's remove chip anchors to that photo's corner */
+body.editing .memory-photo { position: relative; }
+/* "＋ Add a photo" centers under its memory's photos */
+.ed-add-photo { display: inline-block; margin: 1rem auto 0; }
+
 /* a hidden section is simply gone — from the page and the finished site.
    It's brought back from the Sections panel (below). */
 section.is-removed { display: none; }

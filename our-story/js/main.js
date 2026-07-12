@@ -286,82 +286,25 @@ function initNumbers() {
 
 /* ══════════════════════════════════════════════════════════════════
    Scene 04 — The Moments That Made Us
-   A slideshow: the stage pins, and one print at a time fades in and
-   holds while it slowly zooms (Ken Burns), then cross-fades into the
-   next — a breath between each, so every memory can be looked at.
+   Free-scrolling: each memory — a title above its 1–3 photos — reveals
+   as it enters the viewport. Built from however many memories the
+   owner kept or added, so any count works.
    ══════════════════════════════════════════════════════════════════ */
 function initMontage() {
 
-  /* The camera travels across the table. A single scrubbed timeline moves
-     the table under a fixed viewport: it frames the first print, then
-     flies to each in turn (holding on each — the breath), then pulls all
-     the way back to reveal the whole table of moments together. */
-  const table = document.querySelector('.table');
-  const photos = gsap.utils.toArray('.mphoto');
-  if (!table || !photos.length) return;
-
-  const TABLE_W = 1600, TABLE_H = 2200;
-
-  /* the transform that frames a group of prints (one, or a pair), centred
-     and filling the screen. `zoom` lets a beat drift a touch closer while
-     it "holds", so the camera is never fully frozen (smoother, filmic). */
-  const frameGroup = (els, zoom = 1) => {
-    let l = Infinity, t = Infinity, r = -Infinity, btm = -Infinity;
-    els.forEach((el) => {
-      l = Math.min(l, el.offsetLeft);
-      t = Math.min(t, el.offsetTop);
-      r = Math.max(r, el.offsetLeft + el.offsetWidth);
-      btm = Math.max(btm, el.offsetTop + el.offsetHeight);
-    });
-    const cx = (l + r) / 2, cy = (t + btm) / 2;
-    const vw = window.innerWidth, vh = window.innerHeight;
-    const pad = els.length > 1 ? 0.82 : 0.74;
-    const s = Math.min(vw * pad / (r - l), vh * pad / (btm - t)) * zoom;
-    return { scale: s, x: vw / 2 - cx * s, y: vh / 2 - cy * s };
-  };
-  /* the pulled-back transform that fits the whole table on screen */
-  const framePull = () => {
-    const vw = window.innerWidth, vh = window.innerHeight;
-    const s = Math.min(vw * 0.9 / TABLE_W, vh * 0.9 / TABLE_H);
-    return { scale: s, x: vw / 2 - (TABLE_W / 2) * s, y: vh / 2 - (TABLE_H / 2) * s };
-  };
-
-  /* the camera path: a mix of single prints and two-shots */
-  const path = [[0], [1, 2], [3], [4, 5]].map((g) => g.map((i) => photos[i]));
-  const at = (g, z) => ({ x: () => frameGroup(g, z).x, y: () => frameGroup(g, z).y, scale: () => frameGroup(g, z).scale });
-
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.montage',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 1.5,               /* floatier follow — smooths scroll jitter */
-      invalidateOnRefresh: true,
-    },
-    defaults: { ease: 'sine.inOut' },
+  gsap.utils.toArray('.memory').forEach((mem) => {
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: mem,
+        start: 'top 88%',
+        end: 'top 45%',
+        scrub: 0.6,
+      },
+    })
+      .from(mem.querySelector('.memory-title'), { opacity: 0, y: 22, duration: 0.5 }, 0)
+      .from(mem.querySelectorAll('.memory-photo'),
+        { opacity: 0, y: 36, duration: 0.75, stagger: 0.16, ease: 'power2.out' }, 0.2);
   });
-
-  /* start on the first target, then let it drift slowly closer (the breath) */
-  tl.fromTo(table, at(path[0], 1), { ...at(path[0], 1), duration: 0.001, immediateRender: true }, 0)
-    .to(table, { ...at(path[0], 1.06), duration: 0.8 });
-
-  /* glide to each target, then drift gently while it holds — the camera
-     never comes to a hard stop, so the motion stays smooth throughout */
-  for (let k = 1; k < path.length; k++) {
-    tl.to(table, { ...at(path[k], 1), duration: 1.8, ease: 'power2.inOut' })
-      .to(table, { ...at(path[k], 1.06), duration: 0.8 });
-  }
-
-  /* pull all the way back: the whole table of moments, together —
-     then a short hold (the payoff) before the section releases */
-  tl.to(table, {
-    x: () => framePull().x,
-    y: () => framePull().y,
-    scale: () => framePull().scale,
-    duration: 2.2,
-    ease: 'power2.inOut',
-  })
-    .to(table, { duration: 0.9 });
 
   /* the bridge line — slows the tempo back down */
   gsap.from('.montage-exit', {

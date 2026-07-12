@@ -99,7 +99,7 @@
     '.chapter-label', '.chapter-title .mask-inner', '.chapter-sub',
     '.moment-date', '.polaroid-caption', '.moment-text',
     '.counter-script', '.counter-label', '.counter-note',
-    '.mcap',
+    '.memory-title',
     '.quiet-line .mask-inner', '.quiet-small',
     '.letter-label', '.lp', '.sign-pre', '.sign-name',
     '.close-line .mask-inner', '.close-script', '.close-title', '.close-date',
@@ -266,6 +266,73 @@
     img.src = PHOTO_PLACEHOLDER;
     return art;
   };
+
+  /* ── The Moments That Made Us: a stack of memories, each a title over
+        1–3 photos. Whole memories can be added (stacking underneath) or
+        removed; within one, photos can be added up to three or removed
+        down to one. ── */
+  const makeMemoryPhoto = () => {
+    const fig = document.createElement('figure');
+    fig.className = 'memory-photo';
+    fig.innerHTML = '<div class="mframe"><img alt="" loading="lazy"></div>';
+    const img = fig.querySelector('img');
+    img.dataset.photoKey = 'added-' + Date.now() + '-' + (addedSeq++);
+    img.dataset.origSrc = PHOTO_PLACEHOLDER;
+    img.src = PHOTO_PLACEHOLDER;
+    return fig;
+  };
+  const makeMemory = () => {
+    const art = document.createElement('article');
+    art.className = 'memory';
+    art.innerHTML = '<h3 class="memory-title">Name this memory</h3><div class="memory-photos"></div>';
+    art.querySelector('.memory-photos').appendChild(makeMemoryPhoto());
+    return art;
+  };
+  /* the 1–3 photo controls inside one memory */
+  function bindMemoryPhotos(mem) {
+    const row = mem.querySelector('.memory-photos');
+    if (!row) return;
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'ed-add ed-add-photo';
+    addBtn.textContent = '＋ Add a photo';
+    const sync = () => {
+      const figs = row.querySelectorAll('.memory-photo');
+      row.querySelectorAll('.ed-photo-del').forEach((b) => { b.style.display = figs.length > 1 ? '' : 'none'; });
+      addBtn.style.display = figs.length >= 3 ? 'none' : '';
+    };
+    const addDelChip = (fig) => {
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'ed-del ed-del-corner ed-photo-del';
+      del.textContent = '× photo';
+      del.addEventListener('click', (e) => { e.stopPropagation(); fig.remove(); sync(); save(); });
+      fig.appendChild(del);
+    };
+    row.querySelectorAll('.memory-photo').forEach(addDelChip);
+    row.insertAdjacentElement('afterend', addBtn);
+    addBtn.addEventListener('click', () => {
+      const fig = makeMemoryPhoto();
+      row.appendChild(fig);
+      fig.querySelectorAll('img').forEach(bindPhoto);
+      addDelChip(fig);
+      sync();
+      save();
+    });
+    sync();
+  }
+  document.querySelectorAll('.memories-list .memory').forEach(bindMemoryPhotos);
+  /* the whole-memory remove chip sits on the memory's top corner */
+  const placeMemoryDelete = (del, mem) => { del.classList.add('ed-del-corner'); mem.appendChild(del); };
+  enableAddRemove(
+    document.querySelectorAll('.memories-list .memory'), makeMemory,
+    '＋ Add a memory', '× Remove memory',
+    (el) => {
+      el.querySelectorAll('img').forEach((img) => bindPhoto(img));
+      bindMemoryPhotos(el);
+    },
+    placeMemoryDelete
+  );
 
   const letterBody = document.querySelector('.letter-body');
   if (letterBody) enableAddRemove(letterBody.querySelectorAll('.lp'), makeLp, '＋ Add a line', '× remove line');

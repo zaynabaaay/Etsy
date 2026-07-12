@@ -14,8 +14,8 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=51">
-  <link rel="stylesheet" href="css/edit.css?v=51">
+  <link rel="stylesheet" href="css/style.css?v=52">
+  <link rel="stylesheet" href="css/edit.css?v=52">
 </head>
 <body>
 
@@ -199,9 +199,10 @@
 
   <!-- ════════════════════════════════════════════════════════════════
        SCENE 04 · THE MOMENTS THAT MADE US
-       The montage: six photos in a loose overlapping cascade, each
-       drifting at its own depth as you scroll. Denser rhythm than
-       Chapter One — this is the fast-cut stretch of the film.
+       A stack of memories. Each memory is a title — the moment's name —
+       above one, two, or three photos side by side. In edit mode whole
+       memories can be added or removed (new ones stack underneath), and
+       each memory can hold 1–3 photos.
        ════════════════════════════════════════════════════════════════ -->
   <section class="scene-montage" id="montage" data-label="The Memories">
     <div class="chapter-head">
@@ -218,44 +219,31 @@
       <p class="chapter-sub">Not every memory needs many words.</p>
     </div>
 
-    <div class="montage">
-      <!-- The memory table: the prints are scattered across a large
-           surface; the camera travels and zooms across it as you scroll,
-           framing one at a time, then pulls back to reveal them all.
-           EDIT ME · replace the photos + captions below. -->
-      <div class="montage-stage">
-        <div class="table">
-          <figure class="mphoto mp-1">
-            <div class="mframe"><img src="assets/photos/montage-1.jpg" alt="" loading="lazy"></div>
-            <figcaption class="mcap">Santorini &middot; 2022</figcaption>
-          </figure>
-
-          <figure class="mphoto mp-2">
-            <div class="mframe"><img src="assets/photos/montage-2.jpg" alt="" loading="lazy"></div>
-            <figcaption class="mcap mcap-script">your favorite day</figcaption>
-          </figure>
-
-          <figure class="mphoto mp-3">
-            <div class="mframe"><img src="assets/photos/montage-3.jpg" alt="" loading="lazy"></div>
-            <figcaption class="mcap">The kitchen dance &middot; 2021</figcaption>
-          </figure>
-
-          <figure class="mphoto mp-4">
-            <div class="mframe"><img src="assets/photos/montage-4.jpg" alt="" loading="lazy"></div>
-            <figcaption class="mcap">Sunday, no plans &middot; 2023</figcaption>
-          </figure>
-
-          <figure class="mphoto mp-5">
-            <div class="mframe"><img src="assets/photos/montage-5.jpg" alt="" loading="lazy"></div>
-            <figcaption class="mcap mcap-script">the trip we almost missed</figcaption>
-          </figure>
-
-          <figure class="mphoto mp-6">
-            <div class="mframe"><img src="assets/photos/montage-6.jpg" alt="" loading="lazy"></div>
-            <figcaption class="mcap">Home &middot; every year</figcaption>
-          </figure>
+    <!-- EDIT ME · each memory: a title, then 1–3 photos beside each other -->
+    <div class="memories-list">
+      <article class="memory">
+        <h3 class="memory-title">The night of Christmas Eve &middot; 2025</h3>
+        <div class="memory-photos">
+          <figure class="memory-photo"><div class="mframe"><img src="assets/photos/montage-1.jpg" alt="" loading="lazy"></div></figure>
+          <figure class="memory-photo"><div class="mframe"><img src="assets/photos/montage-2.jpg" alt="" loading="lazy"></div></figure>
         </div>
-      </div>
+      </article>
+
+      <article class="memory">
+        <h3 class="memory-title">That time we got stuck in the elevator</h3>
+        <div class="memory-photos">
+          <figure class="memory-photo"><div class="mframe"><img src="assets/photos/montage-3.jpg" alt="" loading="lazy"></div></figure>
+        </div>
+      </article>
+
+      <article class="memory">
+        <h3 class="memory-title">The trip we almost missed &middot; 2023</h3>
+        <div class="memory-photos">
+          <figure class="memory-photo"><div class="mframe"><img src="assets/photos/montage-4.jpg" alt="" loading="lazy"></div></figure>
+          <figure class="memory-photo"><div class="mframe"><img src="assets/photos/montage-5.jpg" alt="" loading="lazy"></div></figure>
+          <figure class="memory-photo"><div class="mframe"><img src="assets/photos/montage-6.jpg" alt="" loading="lazy"></div></figure>
+        </div>
+      </article>
     </div>
 
     <!-- EDIT ME · The closing line that bridges into the next scene -->
@@ -394,7 +382,7 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
-  <script src="js/edit.js?v=51"></script>
-  <script src="js/main.js?v=51"></script>
+  <script src="js/edit.js?v=52"></script>
+  <script src="js/main.js?v=52"></script>
 </body>
 </html>

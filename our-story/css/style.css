@@ -592,110 +592,61 @@ body.cinematic .intro-title .tline { opacity: 0; }
   padding: clamp(5rem, 14vw, 9rem) 0 clamp(5rem, 14vw, 8rem);
 }
 
-/* the tall track that gives the camera its scroll distance */
-.montage { position: relative; }
-body.cinematic .montage { height: 560vh; }
-
-/* the pinned viewport the camera looks through. It carries its own paper
-   so the backdrop stays still behind the photos — otherwise the section's
-   texture scrolls past the pinned stage and the paper appears to move. */
-.montage-stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100lvh;
-  overflow: hidden;
-  background-color: var(--cream);
-  background-image: var(--paper);
-  background-size: 600px;
-  background-blend-mode: multiply;
+/* the memories, stacked one under the next */
+.memories-list {
+  max-width: 66rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 5vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4.5rem, 11vw, 7.5rem);
 }
 
-/* the memory table: a large surface the prints are scattered across.
-   The "camera" (JS transforms) travels and zooms across it as you
-   scroll, framing one print at a time, then pulls back to show all. */
-.table {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1600px;
-  height: 2200px;
-  transform-origin: 0 0;
-  will-change: transform;
+.memory { text-align: center; }
+
+/* the moment's name, spoken over its pictures */
+.memory-title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.35rem, 4.4vw, 2.1rem);
+  line-height: 1.25;
+  color: var(--sepia-deep);
+  margin: 0 auto clamp(1.3rem, 3.5vw, 2rem);
+  max-width: 30ch;
 }
 
-/* each print, scattered across the table at its own spot + angle */
-.mphoto {
-  position: absolute;
+/* 1, 2, or 3 photos, beside each other */
+.memory-photos {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: clamp(0.8rem, 2.4vw, 1.5rem);
+}
+
+.memory-photo {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
   background: #fdfaf1;
-  padding: 16px;
-  padding-bottom: 60px;
-  box-shadow: 0 30px 60px rgba(60, 44, 22, 0.30), 0 10px 22px rgba(60, 44, 22, 0.16);
+  padding: clamp(7px, 1.3vw, 13px);
+  box-shadow: 0 18px 40px rgba(60, 44, 22, 0.22), 0 6px 14px rgba(60, 44, 22, 0.12);
 }
-/* left / top / width in table px, plus a resting tilt.
-   Some sit in overlapping clusters so the camera can frame two at once. */
-.mp-1 { left: 140px;  top: 190px;  width: 540px; transform: rotate(-3deg); }
-.mp-2 { left: 780px;  top: 170px;  width: 470px; transform: rotate(2.6deg); }   /* pair with 3 */
-.mp-3 { left: 1070px; top: 500px;  width: 420px; transform: rotate(-2.2deg); }  /* pair with 2 */
-.mp-4 { left: 250px;  top: 830px;  width: 620px; transform: rotate(2deg); }
-.mp-5 { left: 210px;  top: 1470px; width: 540px; transform: rotate(-2.6deg); }  /* pair with 6 */
-.mp-6 { left: 730px;  top: 1660px; width: 560px; transform: rotate(2.2deg); }   /* pair with 5 */
+/* a lone photo doesn't stretch the full row — it sits like a print */
+.memory-photo:only-child { flex: 0 1 auto; width: min(100%, 32rem); }
+/* the gentle handmade tilt, alternating side to side */
+.memory-photo:nth-child(odd)  { transform: rotate(-1.1deg); }
+.memory-photo:nth-child(even) { transform: rotate(1.2deg); }
 
 .mframe { overflow: hidden; position: relative; }
 
-.mphoto img {
+.memory-photo img {
   display: block;
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
   filter: sepia(0.12) saturate(0.94);
 }
-
-/* captions live on the prints, so their size is in table px */
-.mcap {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 20px;
-  text-align: center;
-  font-family: var(--font-label);
-  font-weight: 300;
-  font-size: 20px;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--gold-deep);
-}
-.mcap-script {
-  font-family: var(--font-script);
-  font-size: 34px;
-  letter-spacing: 0;
-  text-transform: none;
-  bottom: 12px;
-}
-
-/* still / reduced-motion: a simple centered stack of the prints */
-body.reduced-motion .montage { height: auto; }
-body.reduced-motion .montage-stage { position: static; height: auto; overflow: visible; }
-body.reduced-motion .table {
-  position: static;
-  width: auto;
-  height: auto;
-  transform: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(3rem, 8vw, 5rem);
-  padding: clamp(2rem, 7vw, 4rem) clamp(1.5rem, 6vw, 4rem);
-}
-body.reduced-motion .mphoto {
-  position: relative;
-  left: auto;
-  top: auto;
-  width: min(86vw, 520px);
-  transform: rotate(0deg);
-}
-body.reduced-motion .mcap { font-size: clamp(0.6rem, 2vw, 0.7rem); }
-body.reduced-motion .mcap-script { font-size: clamp(1.2rem, 4vw, 1.55rem); }
 
 .montage-exit {
   margin: clamp(5rem, 14vw, 8rem) auto 0;
