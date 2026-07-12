@@ -28,6 +28,22 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 const editing = localStorage.getItem('ourstory:editing') === '1';
 const still = prefersReducedMotion || editing;
 
+/* a keepsake always plays from the title card: don't let the browser
+   restore a mid-story scroll position on refresh (while editing, staying
+   where you were is more useful, so edit mode keeps the default).
+   Browsers restore scroll at different points in the load sequence, so
+   zero it again at load and on pageshow (back/forward cache). */
+if (!editing) {
+  /* ScrollTrigger manages scrollRestoration itself (it flips it back to
+     'auto' and re-applies the stored position for its pins) — this is
+     the API that clears its memory AND sets restoration to manual */
+  ScrollTrigger.clearScrollMemory('manual');
+  const toTop = () => window.scrollTo(0, 0);
+  toTop();
+  window.addEventListener('load', toTop);
+  window.addEventListener('pageshow', toTop);
+}
+
 /* live-computed stat: days since the date in data-count-from-date.
    Runs first (and in all modes) so the number is right everywhere. */
 document.querySelectorAll('[data-count-from-date]').forEach((stat) => {
