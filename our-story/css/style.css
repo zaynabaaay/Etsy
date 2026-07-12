@@ -81,6 +81,30 @@
   --font-serif:  'Cormorant Garamond', 'Times New Roman', serif;
   --font-script: 'Great Vibes', cursive;
   --font-label:  'Jost', 'Helvetica Neue', sans-serif;
+
+  /* ── TYPE SCALE — one size per role, used identically in every scene ──
+     · label     the small tracked-out Jost eyebrows, dates & buttons
+     · title     chapter titles and full-width display lines
+     · voice     the narrator's lone italic lines (opening, quiet)
+     · voice-sm  the narrator speaking over something (memory titles,
+                 the montage exit, the letter's salutation)
+     · script    Great Vibes accents beside other content
+     · script-lg Great Vibes accents that carry a screen or a lockup
+     · body      reading paragraphs (moment stories, the letter)
+     The only sizes outside the scale are one-off display lockups:
+     the cover title, the days counter, the signature, the names. */
+  --size-label:     clamp(0.68rem, 2.3vw, 0.8rem);
+  --track-label:    0.38em;
+  --size-title:     clamp(2.2rem, 8vw, 3.8rem);
+  --size-voice:     clamp(1.4rem, 4.8vw, 2.5rem);
+  --size-voice-sm:  clamp(1.4rem, 4.4vw, 2.1rem);
+  --size-script:    clamp(1.4rem, 4.6vw, 1.9rem);
+  --size-script-lg: clamp(1.55rem, 5.4vw, 2.4rem);
+  --size-body:      clamp(1.1rem, 3.6vw, 1.3rem);
+
+  /* muted inks — the only two dilutions of --ink used anywhere */
+  --ink-body: rgba(43, 33, 24, 0.85);   /* reading paragraphs        */
+  --ink-soft: rgba(43, 33, 24, 0.6);    /* whispered subtitles       */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -216,7 +240,7 @@ body.cinematic .scene-opening { height: 400vh; }
   display: block;
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.4rem, 5vw, 2.5rem);
+  font-size: var(--size-voice);
   line-height: 1.4;
   letter-spacing: 0.01em;
   color: var(--sepia-soft);
@@ -247,8 +271,8 @@ body.cinematic .intro-title .tline { opacity: 0; }
 .scroll-cue-label {
   font-family: var(--font-label);
   font-weight: 300;
-  font-size: 0.62rem;
-  letter-spacing: 0.4em;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--gold-deep);
   padding-left: 0.4em;
@@ -324,8 +348,8 @@ body.cinematic .intro-title .tline { opacity: 0; }
 .chapter-label {
   font-family: var(--font-label);
   font-weight: 300;
-  font-size: 0.72rem;
-  letter-spacing: 0.42em;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--gold-deep);
   padding-left: 0.42em;
@@ -334,7 +358,7 @@ body.cinematic .intro-title .tline { opacity: 0; }
 
 .chapter-title {
   font-weight: 500;
-  font-size: clamp(2.2rem, 8vw, 3.8rem);
+  font-size: var(--size-title);
   line-height: 1.15;
   color: var(--ink);
 }
@@ -351,7 +375,7 @@ body.cinematic .intro-title .tline { opacity: 0; }
   margin-top: 0.9rem;
   font-style: italic;
   font-size: clamp(1.05rem, 3.4vw, 1.3rem);
-  color: rgba(43, 33, 24, 0.55);
+  color: var(--ink-soft);
 }
 
 /* ── the moments ── */
@@ -392,8 +416,8 @@ body.cinematic .intro-title .tline { opacity: 0; }
 .moment-date {
   font-family: var(--font-label);
   font-weight: 300;
-  font-size: clamp(0.66rem, 2.3vw, 0.78rem);
-  letter-spacing: 0.38em;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--gold-deep);
   padding-left: 0.38em;
@@ -450,7 +474,7 @@ body.cinematic .intro-title .tline { opacity: 0; }
   right: 0;
   bottom: clamp(6px, 2vw, 10px);
   font-family: var(--font-script);
-  font-size: clamp(1.25rem, 4.4vw, 1.6rem);
+  font-size: var(--size-script);
   color: var(--gold-deep);
   transform: rotate(-2deg);
 }
@@ -471,9 +495,9 @@ body.cinematic .intro-title .tline { opacity: 0; }
 .moment-text {
   margin-top: 2rem;
   max-width: 30ch;
-  font-size: clamp(1.15rem, 3.9vw, 1.4rem);
+  font-size: var(--size-body);
   line-height: 1.65;
-  color: rgba(43, 33, 24, 0.85);
+  color: var(--ink-body);
 }
 
 .moment-text em {
@@ -543,7 +567,7 @@ body.cinematic .intro-title .tline { opacity: 0; }
 
 .counter-script {
   font-family: var(--font-script);
-  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-size: var(--size-script);
   color: var(--gold-deep);
   transform: rotate(-2deg);
   margin-bottom: clamp(0.8rem, 2.5vw, 1.4rem);
@@ -562,8 +586,8 @@ body.cinematic .intro-title .tline { opacity: 0; }
   margin-top: clamp(1rem, 3vw, 1.6rem);
   font-family: var(--font-label);
   font-weight: 300;
-  font-size: clamp(0.72rem, 2.6vw, 0.9rem);
-  letter-spacing: 0.42em;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--gold-deep);
   padding-left: 0.42em;
@@ -572,7 +596,7 @@ body.cinematic .intro-title .tline { opacity: 0; }
 .counter-note {
   margin-top: clamp(1.2rem, 3.5vw, 1.9rem);
   font-family: var(--font-script);
-  font-size: clamp(1.2rem, 4vw, 1.7rem);
+  font-size: var(--size-script);
   color: var(--gold-deep);
   transform: rotate(-3deg);
   opacity: 0.9;
@@ -609,7 +633,7 @@ body.cinematic .intro-title .tline { opacity: 0; }
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.35rem, 4.4vw, 2.1rem);
+  font-size: var(--size-voice-sm);
   line-height: 1.25;
   color: var(--sepia-deep);
   margin: 0 auto clamp(1.3rem, 3.5vw, 2rem);
@@ -707,9 +731,9 @@ body.cinematic .montage-exit {
   padding: 0 clamp(1.5rem, 6vw, 4rem);
   text-align: center;
   font-style: italic;
-  font-size: clamp(1.2rem, 4.2vw, 1.6rem);
+  font-size: var(--size-voice-sm);
   line-height: 1.5;
-  color: rgba(43, 33, 24, 0.6);
+  color: var(--sepia-soft); /* the narrator's voice, like the quiet lines */
 }
 
 /* ══════════════════════════════════════════════
@@ -757,10 +781,11 @@ body.cinematic .scene-quiet { height: 280vh; }
   visibility: hidden;
   font-style: italic;
   font-weight: 400;
-  /* sized so each beat sits on ONE line on a phone — every line then
-     lands at exactly the same center, beat after beat */
-  font-size: clamp(1.25rem, 4.4vw, 2.6rem);
+  /* the narrator's voice — same size and warm sepia as the opening's
+     spoken lines, so the whole story is told by one voice */
+  font-size: var(--size-voice);
   line-height: 1.4;
+  color: var(--sepia-soft);
 }
 
 .quiet-line .mask {
@@ -783,7 +808,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 /* the little things, in a warm hand */
 .quiet-small {
   font-family: var(--font-script);
-  font-size: clamp(1.5rem, 5.6vw, 2.4rem);
+  font-size: var(--size-script-lg);
   line-height: 1.35;
   color: var(--gold-deep);
   opacity: 0; /* revealed by the scroll */
@@ -855,8 +880,8 @@ body.cinematic .scene-quiet { height: 280vh; }
 .letter-label {
   font-family: var(--font-label);
   font-weight: 300;
-  font-size: clamp(0.62rem, 2.2vw, 0.74rem);
-  letter-spacing: 0.4em;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--sepia);
   padding-left: 0.4em;
@@ -870,7 +895,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 
 /* the ink sits pressed into the paper — a faint letterpress deboss */
 .lp {
-  font-size: clamp(1.05rem, 3.6vw, 1.28rem);
+  font-size: var(--size-body);
   line-height: 1.78;
   color: var(--sepia-deep);
   margin-bottom: 1.4rem;
@@ -879,7 +904,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 
 .lp-salutation {
   font-style: italic;
-  font-size: clamp(1.45rem, 5vw, 1.95rem);
+  font-size: var(--size-voice-sm);
   color: var(--sepia-deep);
   margin-bottom: 1.7rem;
 }
@@ -891,7 +916,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 
 .sign-pre {
   font-style: italic;
-  font-size: clamp(1.05rem, 3.6vw, 1.28rem);
+  font-size: var(--size-body);
   color: var(--sepia-soft);
   margin-bottom: 0.15rem;
 }
@@ -961,7 +986,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 
 .close-line {
   font-weight: 500;
-  font-size: clamp(2rem, 7.5vw, 3.4rem);
+  font-size: var(--size-title);
   line-height: 1.2;
   color: var(--ink);
   margin-bottom: clamp(3rem, 9vw, 4.5rem);
@@ -973,7 +998,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 
 .close-script {
   font-family: var(--font-script);
-  font-size: clamp(1.5rem, 5.4vw, 2.3rem);
+  font-size: var(--size-script-lg);
   color: var(--gold-deep);
   transform: rotate(-2deg);
   margin-bottom: clamp(0.5rem, 1.8vw, 1rem);
@@ -1002,8 +1027,8 @@ body.cinematic .scene-quiet { height: 280vh; }
 .close-date {
   font-family: var(--font-label);
   font-weight: 300;
-  font-size: clamp(0.66rem, 2.3vw, 0.8rem);
-  letter-spacing: 0.38em;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--gold-deep);
   padding-left: 0.38em;
@@ -1021,8 +1046,8 @@ body.cinematic .scene-quiet { height: 280vh; }
   color: var(--gold-deep);
   font-family: var(--font-label);
   font-weight: 300;
-  font-size: 0.72rem;
-  letter-spacing: 0.28em;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   padding-left: calc(1.6rem + 0.28em);
   cursor: pointer;
