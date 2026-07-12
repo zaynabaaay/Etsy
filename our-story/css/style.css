@@ -658,6 +658,13 @@ body.cinematic .montage-sticky {
   height: 100vh;
   height: 100lvh;
   overflow: hidden;
+  /* the stage carries its own paper so the grain holds still while the
+     tall section scrolls past behind it — otherwise the texture appears
+     to slide under the pinned photos */
+  background-color: var(--cream);
+  background-image: var(--paper);
+  background-size: 600px;
+  background-blend-mode: multiply;
 }
 body.cinematic .scene-montage .chapter-head {
   position: absolute;
