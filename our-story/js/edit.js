@@ -43,7 +43,7 @@
     const box = document.createElement('div');
     box.innerHTML = savedSnap;
     const oldSec = box.querySelector('.scene-montage');
-    if (oldSec && !oldSec.querySelector('.montage-sticky .memory')) {
+    if (oldSec && !(oldSec.querySelector('.montage-sticky .memory') && oldSec.querySelector('.montage-sticky .montage-exit'))) {
       const freshSec = document.querySelector('.scene-montage');
       if (freshSec) {
         const clone = freshSec.cloneNode(true);

@@ -297,8 +297,9 @@ function initMontage() {
   const scene = document.querySelector('.scene-montage');
   if (!mems.length || !scene) return;
 
-  /* about one screen of scroll for the chapter line, then one per memory */
-  scene.style.height = Math.round((1.7 + mems.length * 0.8) * 100) + 'vh';
+  /* about one screen of scroll for the chapter line, one per memory,
+     and one for the closing bridge line */
+  scene.style.height = Math.round((1.7 + (mems.length + 1) * 0.8) * 100) + 'vh';
 
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -325,26 +326,16 @@ function initMontage() {
       .fromTo(mem.querySelectorAll('.memory-photo'),
         { opacity: 0, y: 44 },
         { opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: 'power2.out' }, t + 0.12);
-    if (i < mems.length - 1) {
-      tl.to(mem, { opacity: 0, y: -70, duration: 0.45, ease: 'power1.in' }, t + STEP - 0.5);
-    }
+    tl.to(mem, { opacity: 0, y: -70, duration: 0.45, ease: 'power1.in' }, t + STEP - 0.5);
   });
 
-  /* the last memory stays while the stage releases into the bridge line */
-  tl.to(mems[mems.length - 1], { y: 0, duration: 0.6 }, 0.75 + (mems.length - 1) * STEP + 1.0);
-
-  /* the bridge line — slows the tempo back down */
-  gsap.from('.montage-exit', {
-    opacity: 0,
-    y: 24,
-    ease: 'power1.out',
-    scrollTrigger: {
-      trigger: '.montage-exit',
-      start: 'top 90%',
-      end: 'top 60%',
-      scrub: 0.6,
-    },
-  });
+  /* the final screen: the bridge line, alone — it stays as the stage
+     releases into the next scene */
+  const tExit = 0.75 + mems.length * STEP;
+  tl.fromTo('.montage-exit',
+    { opacity: 0, y: 26 },
+    { opacity: 1, y: 0, duration: 0.6, ease: 'power1.out' }, tExit)
+    .to('.montage-exit', { y: 0, duration: 0.8 }, tExit + 0.6); /* held beat before release */
 }
 
 /* ══════════════════════════════════════════════════════════════════
