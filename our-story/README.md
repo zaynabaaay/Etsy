@@ -106,7 +106,6 @@ the text directly in `index.html` rather than only in the browser.
 | `js/vendor/` | GSAP + ScrollTrigger (the animation engine). |
 | `assets/fonts/` | The bundled typefaces. |
 | `assets/photos/` | The placeholder photos you replace with your own. |
-| `assets/art/` | Generated artwork (the dried-flower sprig). |
 | `README.md` | This guide. |
 
 Made with love. Happy anniversary. 🤍

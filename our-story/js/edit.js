@@ -25,8 +25,8 @@
 
   const grain = () => document.querySelector('.grain');
   const allSections = () => Array.from(document.querySelectorAll('body > section'));
-  /* only real, replaceable photos — never the decorative art (the dried
-     flowers, thread, etc., which are also <img>/inline svg) */
+  /* only real, replaceable photos — never the decorative art (the thread
+     etc., which are also <img>/inline svg) */
   const PHOTO_SEL = '.polaroid img, .mframe img, .close-photo img';
   const allPhotos = () => Array.from(document.querySelectorAll(PHOTO_SEL));
 

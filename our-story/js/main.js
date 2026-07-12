@@ -95,12 +95,9 @@ function initOpening() {
   if (stage) stage.style.height = Math.round((1.5 + Math.max(lines.length, 1) * 1.3) * 100) + 'vh';
 
   /* ── Load-in: the greeting settles onto the page ──
-     (time-based) It unmasks upward, the blur clearing as it lands, while
-     the flowers settle into the corner and the scroll cue invites you on. */
-  const loadIn = gsap.timeline({ defaults: { ease: 'power2.out' } })
-    .fromTo('.opening-flowers',
-      { opacity: 0, y: 64, scale: 1.05 },
-      { opacity: 1, y: 0, scale: 1, duration: 1.7 }, 0.3);
+     (time-based) It unmasks upward, the blur clearing as it lands,
+     and the scroll cue invites you on. */
+  const loadIn = gsap.timeline({ defaults: { ease: 'power2.out' } });
   if (lines[0]) {
     loadIn.set(lines[0], { visibility: 'visible' }, 0.6)
       .fromTo(lines[0].querySelector('.mask-inner'),

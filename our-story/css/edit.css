@@ -143,8 +143,7 @@ body.editing .scene-opening { position: relative; z-index: 3; }
 body.editing .opening-stage { padding-bottom: 3rem; }
 body.editing .opening-stage { position: static; inset: auto; } /* let the flattened layers flow */
 body.editing .opening-glow,
-body.editing .scroll-cue,
-body.editing .opening-flowers { display: none; } /* decorative — hidden while editing so it can't overlap the words */
+body.editing .scroll-cue { display: none; } /* decorative — hidden while editing so it can't overlap the words */
 body.editing .intro-screen,
 body.editing .opening-line,
 body.editing .names-group {

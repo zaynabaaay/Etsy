@@ -223,20 +223,9 @@ body.cinematic .scene-opening { height: 700vh; }
      the two would fight and the line would never reach center */
 }
 
-/* the dried-flower sprig in the lower corner (the near/foreground layer) */
-.opening-flowers {
-  position: absolute;
-  right: -4%;
-  bottom: -2%;
-  width: clamp(230px, 52vw, 480px);
-  pointer-events: none;
-  z-index: 1;
-}
-
 /* pre-animation state — only while the cinematic experience is running, so
    the opening stays visible in reduced-motion, edit, and no-JS modes */
-body.cinematic .intro-title .tline,
-body.cinematic .opening-flowers { opacity: 0; }
+body.cinematic .intro-title .tline { opacity: 0; }
 
 /* ── Scroll cue ── */
 .scroll-cue {
