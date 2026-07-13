@@ -105,6 +105,15 @@
       swapFresh(oldOpen);
     }
 
+    /* the photo caption was retired from the cover — strip it from any
+       snapshot that still carries it (e.g. one re-saved by an earlier
+       migration, while the caption was briefly part of the template). */
+    const staleCaps = box.querySelectorAll('.cover-caption');
+    if (staleCaps.length) {
+      staleCaps.forEach((c) => c.remove());
+      migrated = true;
+    }
+
     if (migrated) {
       savedSnap = box.innerHTML;
       try { localStorage.setItem(SNAP, savedSnap); } catch (e) {}
