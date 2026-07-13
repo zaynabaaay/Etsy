@@ -598,12 +598,14 @@
   });
 
   /* One reusable file input, kept in the DOM. This fixes "sometimes I have to
-     tap add a few times", which had two causes with the old per-tap detached
-     input:
-       1. iOS Safari only fires 'change' reliably for an input that lives in
-          the document — a detached one can be discarded before it fires.
-       2. If you re-picked the SAME photo, the browser saw no value change and
-          fired nothing; resetting .value each time makes the repeat count. */
+     tap add a few times". The old code built a fresh <input> on every tap and
+     never attached it to the page; with no strong reference to it, the browser
+     could garbage-collect it while the OS file dialog was still open, so the
+     'change' event fired into nothing and the pick was silently lost. That's
+     timing-dependent — hence intermittent, in any browser. Keeping a single
+     input in the document removes the hazard. Resetting .value after each pick
+     lets the SAME photo be chosen again (browsers fire no 'change' when the
+     input's value is unchanged). */
   let pickTarget = null;
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
