@@ -62,12 +62,28 @@
       swapFresh(oldMon);
     }
 
-    /* opening: a snapshot with the old confession opening (no cover card)
-       — the old title/confession text can't map onto the new cover fields,
-       so the opening resets to the template cover for re-editing. */
+    /* opening: a snapshot from an older opening — either the confession card
+       (no .cover) or an earlier cover that predates today's lockup (no
+       eyebrow / no split Sacramento sign-off). Swap it for the current
+       template, but carry over any edited names + date so they aren't lost.
+       The owner's photo returns on its own (keyed by filename in IndexedDB). */
     const oldOpen = box.querySelector('.scene-opening');
-    if (oldOpen && !oldOpen.querySelector('.cover')) {
+    if (oldOpen && (!oldOpen.querySelector('.cover') ||
+                    !oldOpen.querySelector('.occ-anniv') ||
+                    !oldOpen.querySelector('.cover-eyebrow'))) {
+      const carry = {};
+      ['.cover-names', '.cover-date'].forEach((sel) => {
+        const el = oldOpen.querySelector(sel);
+        if (el) carry[sel] = el.innerHTML;
+      });
       swapFresh(oldOpen);
+      const freshOpen = box.querySelector('.scene-opening');
+      if (freshOpen) {
+        Object.keys(carry).forEach((sel) => {
+          const el = freshOpen.querySelector(sel);
+          if (el) el.innerHTML = carry[sel];
+        });
+      }
     }
 
     if (migrated) {
