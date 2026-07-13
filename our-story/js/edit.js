@@ -215,12 +215,24 @@
     '<span class="edit-bar-msg"><strong>Editing</strong> · tap anything to change it</span>' +
     '<span class="edit-bar-actions">' +
       '<button class="edit-btn" id="ed-sections" type="button">Sections</button>' +
+      '<button class="edit-btn" id="ed-reset" type="button">Start over</button>' +
       '<button class="edit-btn edit-btn-primary" id="ed-download" type="button">Download my site</button>' +
       '<button class="edit-btn" id="ed-done" type="button">Done</button>' +
     '</span>';
   document.body.appendChild(bar);
   bar.querySelector('#ed-done').addEventListener('click', () => { localStorage.removeItem(FLAG); location.reload(); });
   bar.querySelector('#ed-download').addEventListener('click', exportSite);
+  /* Start over: drop the saved words + layout and return to the template's
+     current text, keeping any photos you've added (those live separately in
+     IndexedDB). Useful when the template itself has been updated. */
+  bar.querySelector('#ed-reset').addEventListener('click', () => {
+    const ok = window.confirm(
+      'Start over?\n\nThis clears the words and layout changes on this device and returns to the template. Your added photos are kept.'
+    );
+    if (!ok) return;
+    localStorage.removeItem(SNAP);
+    location.reload();
+  });
 
   /* ── make each photo clickable-to-replace ── */
   function bindPhoto(img) {
