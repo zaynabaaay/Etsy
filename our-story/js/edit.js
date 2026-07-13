@@ -42,16 +42,37 @@
   if (savedSnap) {
     const box = document.createElement('div');
     box.innerHTML = savedSnap;
-    const oldSec = box.querySelector('.scene-montage');
-    if (oldSec && !(oldSec.querySelector('.montage-sticky .memory') && oldSec.querySelector('.montage-sticky .montage-exit'))) {
-      const freshSec = document.querySelector('.scene-montage');
-      if (freshSec) {
-        const clone = freshSec.cloneNode(true);
-        if (oldSec.classList.contains('is-removed')) clone.classList.add('is-removed');
-        oldSec.replaceWith(clone);
-        savedSnap = box.innerHTML;
-        try { localStorage.setItem(SNAP, savedSnap); } catch (e) {}
-      }
+    let migrated = false;
+
+    /* a section in the snapshot that today's CSS/JS can no longer style or
+       animate gets swapped for the current template markup. The owner's
+       photos return on their own (keyed by filename in IndexedDB). */
+    const swapFresh = (oldSec) => {
+      const fresh = oldSec && document.querySelector('.' + oldSec.classList[0]);
+      if (!fresh) return;
+      const clone = fresh.cloneNode(true);
+      if (oldSec.classList.contains('is-removed')) clone.classList.add('is-removed');
+      oldSec.replaceWith(clone);
+      migrated = true;
+    };
+
+    /* memories: an old camera-montage / pre-sticky-stage section */
+    const oldMon = box.querySelector('.scene-montage');
+    if (oldMon && !(oldMon.querySelector('.montage-sticky .memory') && oldMon.querySelector('.montage-sticky .montage-exit'))) {
+      swapFresh(oldMon);
+    }
+
+    /* opening: a snapshot with the old confession opening (no cover card)
+       — the old title/confession text can't map onto the new cover fields,
+       so the opening resets to the template cover for re-editing. */
+    const oldOpen = box.querySelector('.scene-opening');
+    if (oldOpen && !oldOpen.querySelector('.cover')) {
+      swapFresh(oldOpen);
+    }
+
+    if (migrated) {
+      savedSnap = box.innerHTML;
+      try { localStorage.setItem(SNAP, savedSnap); } catch (e) {}
     }
   }
   if (savedSnap) {
