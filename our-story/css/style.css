@@ -996,7 +996,7 @@ body.cinematic .scene-quiet { height: 280vh; }
    words sit above it, crisp. */
 .letter {
   position: relative;
-  max-width: 36rem;
+  max-width: 42rem;
   margin: 0 auto;
   padding: clamp(2.75rem, 8vw, 4.25rem) clamp(2rem, 6vw, 3.25rem) clamp(3rem, 9vw, 4.5rem);
 }
