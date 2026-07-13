@@ -34,6 +34,24 @@
      Runs synchronously, before main.js, so the animations bind to the
      owner's final page — their added lines, their removed sections. */
   let savedSnap = localStorage.getItem(SNAP);
+
+  /* ── the editable pieces of text (the element that holds the words;
+        for masked/animated lines that's the inner span) ── */
+  const TEXT_SELECTORS = [
+    '.cover-eyebrow', '.cover-names', '.cover-subline', '.cover-occasion', '.cover-date',
+    '.chapter-label', '.chapter-title .mask-inner', '.chapter-sub',
+    '.moment-date', '.polaroid-caption', '.moment-text',
+    '.counter-script', '.counter-label', '.counter-note',
+    '.memory-title',
+    '.quiet-line .mask-inner', '.quiet-small',
+    '.letter-label', '.lp', '.sign-pre', '.sign-name',
+    '.close-line .mask-inner', '.close-script', '.close-title', '.close-date',
+  ];
+  /* fields whose internal markup was restructured between versions, so old
+     text can't be dropped straight in — these keep the fresh template
+     default on migration (e.g. the occasion split into HAPPY + script). */
+  const CARRY_SKIP = new Set(['.cover-occasion']);
+
   /* migration: a snapshot saved before the current memories structure
      (the old camera-montage, or memories without the sticky stage) can't
      be styled or animated by today's CSS/JS. Swap just that section for
@@ -52,6 +70,19 @@
       if (!fresh) return;
       const clone = fresh.cloneNode(true);
       if (oldSec.classList.contains('is-removed')) clone.classList.add('is-removed');
+      /* carry over every edited text field that still maps 1:1 by selector,
+         so the owner's words survive the redesign. Fields that were split or
+         restructured (CARRY_SKIP), that are brand-new, or whose count changed
+         (added/removed lines) can't be mapped safely — those keep the fresh
+         template default. */
+      TEXT_SELECTORS.forEach((sel) => {
+        if (CARRY_SKIP.has(sel)) return;
+        const olds = oldSec.querySelectorAll(sel);
+        const news = clone.querySelectorAll(sel);
+        if (olds.length && olds.length === news.length) {
+          news.forEach((n, i) => { n.innerHTML = olds[i].innerHTML; });
+        }
+      });
       oldSec.replaceWith(clone);
       migrated = true;
     };
@@ -71,19 +102,7 @@
     if (oldOpen && (!oldOpen.querySelector('.cover') ||
                     !oldOpen.querySelector('.occ-anniv') ||
                     !oldOpen.querySelector('.cover-eyebrow'))) {
-      const carry = {};
-      ['.cover-names', '.cover-date'].forEach((sel) => {
-        const el = oldOpen.querySelector(sel);
-        if (el) carry[sel] = el.innerHTML;
-      });
       swapFresh(oldOpen);
-      const freshOpen = box.querySelector('.scene-opening');
-      if (freshOpen) {
-        Object.keys(carry).forEach((sel) => {
-          const el = freshOpen.querySelector(sel);
-          if (el) el.innerHTML = carry[sel];
-        });
-      }
     }
 
     if (migrated) {
@@ -147,19 +166,6 @@
     });
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   }).catch(() => {});
-
-  /* ── the editable pieces of text (the element that holds the words;
-        for masked/animated lines that's the inner span) ── */
-  const TEXT_SELECTORS = [
-    '.cover-eyebrow', '.cover-names', '.cover-subline', '.cover-caption', '.cover-occasion', '.cover-date',
-    '.chapter-label', '.chapter-title .mask-inner', '.chapter-sub',
-    '.moment-date', '.polaroid-caption', '.moment-text',
-    '.counter-script', '.counter-label', '.counter-note',
-    '.memory-title',
-    '.quiet-line .mask-inner', '.quiet-small',
-    '.letter-label', '.lp', '.sign-pre', '.sign-name',
-    '.close-line .mask-inner', '.close-script', '.close-title', '.close-date',
-  ];
 
   /* ── build ONE clean HTML snapshot of every section (no edit chrome) ── */
   function snapshotHTML() {

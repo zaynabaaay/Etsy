@@ -280,16 +280,6 @@ body {
   aspect-ratio: 4 / 5;
   object-fit: cover;
 }
-/* handwritten caption in the polaroid's bottom margin */
-.cover-caption {
-  margin-top: clamp(6px, 1.8vw, 9px);
-  font-family: 'Sacramento', var(--font-script);
-  font-size: clamp(0.9rem, 3vw, 1.1rem);
-  line-height: 1.1;
-  text-align: center;
-  color: #8a7355;
-}
-
 /* the occasion plate, beneath the photo */
 .cover-plate {
   display: flex;
@@ -358,15 +348,12 @@ body {
 /* pre-animation state — hidden until the cover settles in (cinematic only) */
 body.cinematic .cover > * { opacity: 0; }
 
-/* ── Scroll cue ── */
+/* ── Scroll cue ──
+   In normal flow beneath the sign-off (not pinned), so it can never collide
+   with the date on shorter/landscape screens — it simply follows the lockup,
+   as in the reference. */
 .scroll-cue {
-  position: absolute;
-  left: 50%;
-  /* the panel is 100lvh tall; this lifts the cue up to the *small*
-     viewport's bottom edge so it stays visible while an address bar
-     is showing, and rests at 1.6rem once it hides */
-  bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px) + (100lvh - 100svh));
-  transform: translateX(-50%);
+  margin-top: clamp(1.6rem, 5.5vw, 2.8rem);
   display: flex;
   flex-direction: column;
   align-items: center;
