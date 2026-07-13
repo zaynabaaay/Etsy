@@ -597,24 +597,34 @@
     togglePanel(false);
   });
 
-  function pickFor(img) {
-    const inp = document.createElement('input');
-    inp.type = 'file';
-    inp.accept = 'image/*';
-    inp.addEventListener('change', () => {
-      const file = inp.files && inp.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async () => {
-        img.src = reader.result;
-        try { await dbSet(img.dataset.photoKey, reader.result); } catch (e) {}
-        save();
-        if (window.ScrollTrigger) ScrollTrigger.refresh();
-      };
-      reader.readAsDataURL(file);
-    });
-    inp.click();
-  }
+  /* One reusable file input, kept in the DOM. This fixes "sometimes I have to
+     tap add a few times", which had two causes with the old per-tap detached
+     input:
+       1. iOS Safari only fires 'change' reliably for an input that lives in
+          the document — a detached one can be discarded before it fires.
+       2. If you re-picked the SAME photo, the browser saw no value change and
+          fired nothing; resetting .value each time makes the repeat count. */
+  let pickTarget = null;
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;';
+  document.body.appendChild(fileInput);
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    const img = pickTarget;
+    fileInput.value = '';               // let the same file be chosen again next time
+    if (!file || !img) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      img.src = reader.result;
+      try { await dbSet(img.dataset.photoKey, reader.result); } catch (e) {}
+      save();
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    };
+    reader.readAsDataURL(file);
+  });
+  function pickFor(img) { pickTarget = img; fileInput.click(); }
 
   /* ── build a finished, shareable copy ──
      A SINGLE self-contained .html file: the stylesheet, the animation code,
