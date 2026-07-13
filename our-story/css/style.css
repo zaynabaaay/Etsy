@@ -41,6 +41,13 @@
   src: url('../assets/fonts/GreatVibes-400.woff2') format('woff2');
 }
 @font-face {
+  font-family: 'Alex Brush';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/AlexBrush-400.woff2') format('woff2');
+}
+@font-face {
   font-family: 'Jost';
   font-style: normal;
   font-weight: 300;
@@ -81,7 +88,7 @@
   --paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014' numOctaves='3' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23ffffff'/%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.09'/%3E%3C/svg%3E");
 
   --font-serif:  'Cormorant Garamond', 'Times New Roman', serif;
-  --font-script: 'Great Vibes', cursive;
+  --font-script: 'Alex Brush', 'Great Vibes', cursive;
   --font-label:  'Jost', 'Helvetica Neue', sans-serif;
 
   /* ── TYPE SCALE — one size per role, used identically in every scene ──
@@ -248,15 +255,12 @@ body {
   align-items: center;
 }
 
-/* occasion — THE "what it's for" line. An elegant italic serif reads more
-   editorial/premium than the casual wedding script. */
+/* occasion — THE "what it's for" line, in the flowing signature script
+   (Alex Brush) from the reference, gold and sized up as a focal line */
 .cover-occasion {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 500;
-  font-size: clamp(1.8rem, 6.6vw, 2.7rem);
-  line-height: 1.1;
-  letter-spacing: 0.01em;
+  font-family: var(--font-script);
+  font-size: clamp(2.6rem, 9.5vw, 4rem);
+  line-height: 1.05;
   color: var(--gold-deep);
 }
 
