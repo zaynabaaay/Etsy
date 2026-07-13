@@ -106,68 +106,19 @@ function initChapterHeads() {
 
 function initOpening() {
 
-  /* every spoken line, in order — however many the owner kept or added.
-     The first is the greeting (it loads in); the rest are the confession,
-     each emerging then lifting away in turn before the title. */
-  const lines = gsap.utils.toArray('.opening-line');
+  /* ── The cover settles in, all at once with a gentle stagger ──
+     Nothing here is scroll-driven: the whole cover (names, photo,
+     occasion) is visible immediately, so a listing viewer understands
+     what this is at a glance. The scroll cue then invites them onward. */
+  gsap.timeline({ defaults: { ease: 'power2.out' } })
+    .fromTo('.cover-head', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1.0 }, 0.2)
+    .fromTo('.cover-photo', { opacity: 0, y: 32, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 1.0 }, 0.5)
+    .fromTo('.cover-plate', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.9 }, 0.95)
+    .to('.scroll-cue', { opacity: 1, duration: 1.0 }, 1.15);
 
-  /* give the section scroll room in proportion to how many lines there are,
-     so the pacing stays the same whether there's one line or ten —
-     kept tight, so each flick of the wheel brings the next line on */
-  const stage = document.querySelector('.scene-opening');
-  if (stage) stage.style.height = Math.round((0.9 + Math.max(lines.length, 1) * 0.75) * 100) + 'vh';
-
-  /* ── Load-in: the greeting settles onto the page ──
-     (time-based) It unmasks upward, the blur clearing as it lands,
-     and the scroll cue invites you on. */
-  const loadIn = gsap.timeline({ defaults: { ease: 'power2.out' } });
-  if (lines[0]) {
-    loadIn.set(lines[0], { visibility: 'visible' }, 0.6)
-      .fromTo(lines[0].querySelector('.mask-inner'),
-        { yPercent: 115, filter: 'blur(7px)' },
-        { yPercent: 0, filter: 'blur(0px)', duration: 1.3 }, 0.6);
-  }
-  loadIn.to('.scroll-cue', { opacity: 1, duration: 1.1 }, '-=0.6');
-
-  /* ── The master scrub: scrolling is the playhead ──
-     The panel holds still via CSS sticky. Scrolling lifts the greeting
-     away, plays the confession line by line, then the title emerges. */
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.scene-opening',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.6,
-    },
-  });
-
-  /* the greeting lifts away */
-  if (lines[0]) tl.to(lines[0], { opacity: 0, y: -60, duration: 0.8, ease: 'power1.in' }, 0);
-
-  /* every following line emerges the same way, holds briefly, then lifts
-     away — short holds, so the next line is never more than a nudge of
-     scrolling away */
-  for (let i = 1; i < lines.length; i++) {
-    const ln = lines[i];
-    tl.set(ln, { visibility: 'visible' }, '+=0.08')
-      .fromTo(ln.querySelector('.mask-inner'),
-        { yPercent: 115, filter: 'blur(7px)' },
-        { yPercent: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out' })
-      .to(ln, { opacity: 0, y: -60, duration: 0.6, ease: 'power1.in' }, '+=0.25');
-  }
-
-  /* ── The reveal: the title emerges, warm and slow — the payoff ──
-     the candlelight warms, then the title rises and clears while its
-     letters breathe into place. */
-  tl.to('.opening-glow', { opacity: 1, duration: 1.5, ease: 'sine.inOut' }, '+=0.15')
-    .fromTo('.intro-title .tline',
-      { opacity: 0, y: 40, letterSpacing: '0.2em', filter: 'blur(9px)' },
-      { opacity: 1, y: 0, letterSpacing: '0.005em', filter: 'blur(0px)', duration: 1.4, stagger: 0.2, ease: 'power2.out' }, '<+0.2')
-    .to('.intro-title', { duration: 0.4 }); // brief hold on the title before the handoff
-
-  /* ── The handoff: the next section's paper rises, the opening dims.
-     Sections can be reordered in edit mode, so this targets whatever
-     visible section follows the opening — not a hard-coded scene. ── */
+  /* ── The handoff: as the next section rises, the cover gently lifts and
+     the scroll cue fades. Sections can be reordered in edit mode, so this
+     targets whatever visible section follows the opening. ── */
   const openSec = document.querySelector('.scene-opening');
   let nextSec = openSec && openSec.nextElementSibling;
   while (nextSec && (nextSec.tagName !== 'SECTION' || nextSec.classList.contains('is-removed'))) {
@@ -182,9 +133,9 @@ function initOpening() {
         scrub: 0.6,
       },
     })
-      .to('.opening-stage', { opacity: 0.18, y: '-9vh', ease: 'none' }, 0)
-      .to('.opening-glow',  { opacity: 0.1, ease: 'none' }, 0)
-      .to('.scroll-cue',    { opacity: 0, ease: 'none', duration: 0.35 }, 0);
+      .to('.cover', { opacity: 0.2, y: '-6vh', ease: 'none' }, 0)
+      .to('.opening-glow', { opacity: 0.1, ease: 'none' }, 0)
+      .to('.scroll-cue', { opacity: 0, ease: 'none', duration: 0.35 }, 0);
   }
 }
 

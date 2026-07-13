@@ -27,7 +27,7 @@
   const allSections = () => Array.from(document.querySelectorAll('body > section'));
   /* only real, replaceable photos — never the decorative art (the thread
      etc., which are also <img>/inline svg) */
-  const PHOTO_SEL = '.polaroid img, .mframe img, .close-photo img';
+  const PHOTO_SEL = '.cover-photo img, .polaroid img, .mframe img, .close-photo img';
   const allPhotos = () => Array.from(document.querySelectorAll(PHOTO_SEL));
 
   /* ── 1 · restore the saved structure + words (in EVERY mode) ──
@@ -114,8 +114,7 @@
   /* ── the editable pieces of text (the element that holds the words;
         for masked/animated lines that's the inner span) ── */
   const TEXT_SELECTORS = [
-    '.intro-title .tline',
-    '.opening-line .mask-inner',
+    '.cover-names', '.cover-occasion', '.cover-date',
     '.chapter-label', '.chapter-title .mask-inner', '.chapter-sub',
     '.moment-date', '.polaroid-caption', '.moment-text',
     '.counter-script', '.counter-label', '.counter-note',
@@ -173,7 +172,7 @@
 
   /* ── make each photo clickable-to-replace ── */
   function bindPhoto(img) {
-    const frame = img.closest('.polaroid, .mframe, .close-photo') || img.parentElement;
+    const frame = img.closest('.cover-photo, .polaroid, .mframe, .close-photo') || img.parentElement;
     frame.classList.add('ephoto');
     if (getComputedStyle(frame).position === 'static') frame.style.position = 'relative';
     if (!frame.querySelector('.ephoto-hint')) {
@@ -262,7 +261,6 @@
   };
 
   const makeLp = () => { const p = document.createElement('p'); p.className = 'lp'; p.textContent = 'Write your next line here.'; return p; };
-  const makeOpeningLine = () => { const d = document.createElement('div'); d.className = 'opening-line'; d.innerHTML = '<span class="mask"><span class="mask-inner">Write your next line here.</span></span>'; return d; };
   const makeQuietSmall = () => { const p = document.createElement('p'); p.className = 'quiet-small'; p.textContent = 'another little thing,'; return p; };
 
   /* a soft placeholder photo for a freshly-added memory (the owner taps it
@@ -361,7 +359,6 @@
 
   const letterBody = document.querySelector('.letter-body');
   if (letterBody) enableAddRemove(letterBody.querySelectorAll('.lp'), makeLp, '＋ Add a line', '× remove line');
-  enableAddRemove(document.querySelectorAll('.opening-line'), makeOpeningLine, '＋ Add a line', '× remove line');
 
   /* ── Words pages (the layout The Quiet uses) — a reusable section.
         Each page's lines and little things are owner-growable, and the

@@ -149,111 +149,130 @@ body {
 /* ══════════════════════════════════════════════
    SCENE 01 · THE OPENING
    ══════════════════════════════════════════════ */
+/* The opening is a COVER, shown all at once — a browser landing here
+   understands instantly what this is: a couple's anniversary keepsake. */
 .scene-opening {
   position: relative;
-}
-
-/* the opening panel holds still via CSS sticky (not JS pinning) while the
-   section scrolls past — the same iOS-safe technique used for The Quiet */
-.opening-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100lvh;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(4rem, 12vw, 7rem) clamp(1.5rem, 6vw, 4rem) clamp(5rem, 12vw, 7rem);
   overflow: hidden;
-  /* The opening is its own sheet: a slightly warmer stock than the page
-     beneath it, so the deckled overlap reads without a hard dividing line. */
+  /* the opening's own warm sheet (a touch warmer than the page beneath,
+     so the deckled overlap into the next section still reads) */
   background-color: var(--paper-opening);
   background-image: var(--paper);
   background-size: 600px;
   background-blend-mode: multiply;
 }
 
-/* tall enough to scroll through: the confession plays out line by line,
-   then the title emerges as the payoff before Chapter One
-   (js/main.js recomputes this from how many lines the owner kept) */
-body.cinematic .scene-opening { height: 400vh; }
-
-/* a soft wash of sunlight behind the names — warms as they arrive */
+/* a soft wash of sunlight behind the cover */
 .opening-glow {
   position: absolute;
   left: 50%;
-  top: 46%;
-  width: min(120vw, 900px);
-  aspect-ratio: 1.4;
+  top: 50%;
+  width: min(120vw, 820px);
+  aspect-ratio: 1.3;
   transform: translate(-50%, -50%);
-  background: radial-gradient(ellipse at center, rgba(214, 170, 100, 0.17), rgba(214, 170, 100, 0.055) 45%, transparent 70%);
-  opacity: 0.2;
+  background: radial-gradient(ellipse at center, rgba(214, 170, 100, 0.2), rgba(214, 170, 100, 0.06) 45%, transparent 70%);
   filter: blur(6px);
   pointer-events: none;
 }
 
-.opening-stage {
-  position: absolute;
-  inset: 0;
-}
-
-/* ── The title · centered, revealed last ── */
-.intro-screen {
-  position: absolute;
-  inset: 0;
+/* ── the cover ──
+   The couple photo is the hero. The names sit ABOVE it as the masthead
+   (this piece's identity), and the occasion signs off BELOW — so the
+   weight is balanced top-and-bottom around the photo, no empty top. */
+.cover {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 0 clamp(1.5rem, 6vw, 4rem);
+  max-width: 34rem;
 }
 
-.intro-title {
-  font-weight: 500;
-  font-size: clamp(3rem, 13vw, 5.8rem);
-  line-height: 1.02;
-  letter-spacing: 0.005em;
+/* masthead — ornament + names, above the photo */
+.cover-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cover-ornament {
+  color: var(--gold-deep);
+  margin-bottom: clamp(0.7rem, 2.2vw, 1.1rem);
+}
+
+/* names — the masthead / identity, the structural anchor of the cover */
+.cover-names {
+  font-size: clamp(1.9rem, 7vw, 2.9rem);
+  line-height: 1.1;
   color: var(--sepia-deep);
-  text-shadow: 0 0 60px rgba(201, 161, 95, 0.25);
+  letter-spacing: 0.01em;
 }
-.intro-title .tline { display: block; }
+.cover-names .amp {
+  font-family: var(--font-script);
+  color: var(--gold-deep);
+  font-size: 1.15em;
+  padding: 0 0.08em;
+}
 
-/* ── The confession · the spoken voice, emerging on scroll ──
-   Every beat is a single centered line landing at the exact same spot,
-   so the reader's eye never has to move between them. */
-.opening-line {
-  position: absolute;
-  inset: 0;
+/* the taped couple photo — the hero, framed by masthead above + plate below */
+.cover-photo {
+  position: relative;
+  width: min(72vw, 300px);
+  margin: clamp(2rem, 5.5vw, 2.8rem) 0;
+  background: #fdfaf1;
+  padding: clamp(10px, 2.8vw, 14px);
+  padding-bottom: clamp(34px, 9vw, 46px);
+  transform: rotate(-2deg);
+  box-shadow:
+    0 2px 6px rgba(60, 44, 22, 0.12),
+    0 22px 46px rgba(60, 44, 22, 0.22);
+}
+.cover-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+/* the occasion plate, beneath the photo */
+.cover-plate {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 0 clamp(1.5rem, 6vw, 4rem);
-  visibility: hidden;
 }
 
-.opening-line .mask {
-  display: block;
-  overflow: hidden;
-  padding: 0.18em 0.1em;
-}
-
-/* an italic serif, like a letter in the writer's own hand. No max-width:
-   each beat stays on one line so they all land at the same centred spot
-   (only the narrowest phones wrap, and then they stay centred). */
-.opening-line .mask-inner {
-  display: block;
+/* occasion — THE "what it's for" line. An elegant italic serif reads more
+   editorial/premium than the casual wedding script. */
+.cover-occasion {
+  font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
-  font-size: var(--size-voice);
-  line-height: 1.4;
+  font-size: clamp(1.8rem, 6.6vw, 2.7rem);
+  line-height: 1.1;
   letter-spacing: 0.01em;
-  color: var(--sepia-soft);
-  /* initial offset is set by GSAP (js/main.js) — no CSS transform here,
-     the two would fight and the line would never reach center */
+  color: var(--gold-deep);
 }
 
-/* pre-animation state — only while the cinematic experience is running, so
-   the opening stays visible in reduced-motion, edit, and no-JS modes */
-body.cinematic .intro-title .tline { opacity: 0; }
+/* date — the quietest line, a refined caption under the occasion */
+.cover-date {
+  margin-top: clamp(0.5rem, 1.6vw, 0.8rem);
+  font-family: var(--font-label);
+  font-weight: 300;
+  font-size: clamp(0.64rem, 2.2vw, 0.74rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--sepia-soft);
+}
+
+/* pre-animation state — hidden until the cover settles in (cinematic only) */
+body.cinematic .cover > * { opacity: 0; }
 
 /* ── Scroll cue ── */
 .scroll-cue {
@@ -1123,10 +1142,6 @@ body.cinematic .scene-quiet { height: 280vh; }
   .grain { animation: none; }
   .scroll-cue-line-inner { animation: none; transform: translateY(0); }
 }
-
-/* still modes show the title card as the opening; the confession lines
-   only exist mid-scroll, so they're hidden to avoid stacking */
-body.reduced-motion .opening-line { display: none; }
 
 body.reduced-motion .scroll-cue {
   opacity: 1;
