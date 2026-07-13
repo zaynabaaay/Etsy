@@ -135,7 +135,7 @@
   /* ── the editable pieces of text (the element that holds the words;
         for masked/animated lines that's the inner span) ── */
   const TEXT_SELECTORS = [
-    '.cover-names', '.cover-occasion', '.cover-date',
+    '.cover-eyebrow', '.cover-names', '.cover-occasion', '.cover-subline', '.cover-date',
     '.chapter-label', '.chapter-title .mask-inner', '.chapter-sub',
     '.moment-date', '.polaroid-caption', '.moment-text',
     '.counter-script', '.counter-label', '.counter-note',
