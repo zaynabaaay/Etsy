@@ -21,6 +21,14 @@
 
   const FLAG = 'ourstory:editing';
   const SNAP = 'ourstory:snapshot';
+  const SNAPVER = 'ourstory:snapshot-version';
+  /* Bump this whenever the TEMPLATE's own words/markup change in a way that
+     should reach everyone — e.g. a rewritten letter. A saved snapshot stamped
+     with an older value is treated as stale and dropped, so the fresh template
+     shows through instead of a frozen old copy. Photos are never touched (they
+     live in IndexedDB). A buyer editing a fixed downloaded copy never bumps
+     this, so their own edits are always kept. */
+  const CONTENT_VERSION = '2';
   const editing = localStorage.getItem(FLAG) === '1';
 
   const grain = () => document.querySelector('.grain');
@@ -34,6 +42,13 @@
      Runs synchronously, before main.js, so the animations bind to the
      owner's final page — their added lines, their removed sections. */
   let savedSnap = localStorage.getItem(SNAP);
+
+  /* drop a snapshot saved against an older template (or one from before
+     versioning existed, which has no stamp) so the current template shows */
+  if (savedSnap && localStorage.getItem(SNAPVER) !== CONTENT_VERSION) {
+    localStorage.removeItem(SNAP);
+    savedSnap = null;
+  }
 
   /* ── the editable pieces of text (the element that holds the words;
         for masked/animated lines that's the inner span) ── */
@@ -116,7 +131,7 @@
 
     if (migrated) {
       savedSnap = box.innerHTML;
-      try { localStorage.setItem(SNAP, savedSnap); } catch (e) {}
+      try { localStorage.setItem(SNAP, savedSnap); localStorage.setItem(SNAPVER, CONTENT_VERSION); } catch (e) {}
     }
   }
   if (savedSnap) {
@@ -193,7 +208,7 @@
     box.querySelectorAll('img[data-orig-src]').forEach((img) => { img.setAttribute('src', img.dataset.origSrc); });
     return box.innerHTML;
   }
-  function save() { try { localStorage.setItem(SNAP, snapshotHTML()); } catch (e) {} }
+  function save() { try { localStorage.setItem(SNAP, snapshotHTML()); localStorage.setItem(SNAPVER, CONTENT_VERSION); } catch (e) {} }
 
   /* ── the always-present "Make it yours" button ── */
   const fab = document.createElement('button');
