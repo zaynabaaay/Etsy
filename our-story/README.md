@@ -21,12 +21,17 @@ no code required. You edit the words and photos right in the browser.
 2. **Make it yours.** Tap the **♥ Make it yours** button in the bottom-right.
    - Tap any words to rewrite them.
    - Tap a photo to choose a picture from your device.
-   - Use the edit bar to reset everything back to the original.
+   - **Sections** lets you hide scenes you don't want (with undo).
+   - **Start over** returns the words and layout to the template (your added
+     photos are kept).
 3. **View it.** Leave edit mode to watch the finished, animated keepsake.
-4. **Share it** (see below).
+4. **Download my site.** In the edit bar, tap **Download my site** — you get a
+   single `our-story.html` file with your words, photos, fonts, and animation
+   all baked in. That one file *is* your finished keepsake (see
+   [Sharing & hosting](#sharing--hosting)).
 
-> Your edits are saved automatically **in the browser you edit them on.** To
-> deliver a finished keepsake to someone else, host it online — see below.
+> Your edits are saved automatically **in the browser you edit them on.**
+> **Download my site** is how you take them with you.
 
 ---
 
@@ -36,10 +41,10 @@ Tap **Make it yours**, then tap directly on any of these:
 
 | Scene | What it is |
 | --- | --- |
-| The Opening | The "Happy Anniversary" line, the title, and the sentence beneath it |
+| The Opening | Your names, the "Happy Anniversary" sign-off, the date, and the two short lines above and below |
 | The Beginning | Three dated moments — each a photo, a handwritten caption, and a few sentences |
 | In Numbers | Your stats and their labels (one counts the days since your date, on its own) |
-| The Moments That Made Us | Six montage photos and their captions |
+| The Moments That Made Us | A stack of memories — each a title and one to a few photos (three sit two-up with one centered below) |
 | The Quiet | The short, quiet lines |
 | The Letter | The whole letter and the signature |
 | The Close | The final line, your names, and the closing note |
@@ -68,17 +73,25 @@ tags in `index.html` so browsers load the fresh files instead of a stale mix.
 
 ## Sharing & hosting
 
-Because it's a folder of static files, hosting is free and easy:
+The easiest path — **one file, works anywhere:**
 
-- **Free hosting.** Drag the whole `our-story/` folder onto
-  [Netlify Drop](https://app.netlify.com/drop), or push it to a
-  [GitHub Pages](https://pages.github.com/) repo, to get a private link you can
-  text to someone.
-- **A QR code.** Turn the hosted link into a QR code and tuck it inside a real
-  card or a framed print.
+1. Edit in the browser, then tap **Download my site**.
+2. You get a single `our-story.html` with everything baked in — your words,
+   your photos, the fonts, and the animation. No other files, no internet
+   needed.
+3. Share that one file however you like:
+   - **Send it directly** — email or message the `.html` file; they open it and
+     it just plays.
+   - **Host it for a link.** Drag `our-story.html` onto
+     [Netlify Drop](https://app.netlify.com/drop) for a private link you can
+     text to someone.
+   - **A QR code.** Turn that link into a QR code and tuck it inside a real card
+     or a framed print.
 
-To bake your words in permanently (so they show for everyone, everywhere), edit
-the text directly in `index.html` rather than only in the browser.
+> Prefer to edit the files by hand? You can also host the whole `our-story/`
+> folder (Netlify Drop or [GitHub Pages](https://pages.github.com/)) — but then
+> your words need to be typed into `index.html` directly, since browser edits
+> live only on your device. For most people, **Download my site** is simpler.
 
 ---
 

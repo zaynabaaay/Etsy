@@ -616,46 +616,116 @@
     inp.click();
   }
 
-  /* ── build a finished, shareable copy with the photos baked in ── */
+  /* ── build a finished, shareable copy ──
+     A SINGLE self-contained .html file: the stylesheet, the animation code,
+     the fonts, and every photo are all inlined, so the file works on its own
+     — double-clicked, emailed, or dropped onto a host — with no other files
+     and no internet. */
+  function abToB64(buf) {
+    let bin = '';
+    const bytes = new Uint8Array(buf), chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(bin);
+  }
+  const MIME = { woff2: 'font/woff2', woff: 'font/woff', ttf: 'font/ttf',
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp',
+    gif: 'image/gif', svg: 'image/svg+xml' };
+  const mimeFor = (url) => MIME[(url.split('?')[0].split('.').pop() || '').toLowerCase()] || 'application/octet-stream';
+  async function asDataURI(url) {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(r.status + ' ' + url);
+    const buf = await r.arrayBuffer();
+    return 'data:' + mimeFor(url) + ';base64,' + abToB64(buf);
+  }
+
   async function exportSite() {
-    await restored;
-    const doc = document.documentElement.cloneNode(true);
+    const btn = document.getElementById('ed-download');
+    const label = btn && btn.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
+    try {
+      await restored;
+      const doc = document.documentElement.cloneNode(true);
 
-    /* sections the owner removed are gone for good in the finished site */
-    doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
+      /* sections the owner removed are gone for good in the finished site */
+      doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
 
-    /* strip every trace of edit mode */
-    doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ephoto-hint, .ed-add, .ed-del').forEach((n) => n.remove());
-    doc.querySelectorAll('.ephoto').forEach((n) => {
-      n.classList.remove('ephoto');
-      if (n.style.position === 'relative') n.style.position = '';
-      if (!n.getAttribute('style')) n.removeAttribute('style');
-    });
-    doc.querySelectorAll('script[src*="edit.js"], link[href*="edit.css"]').forEach((n) => n.remove());
-    doc.querySelectorAll('[contenteditable]').forEach((n) => {
-      n.removeAttribute('contenteditable'); n.removeAttribute('spellcheck'); n.classList.remove('etext');
-    });
-    const body = doc.querySelector('body');
-    body.classList.remove('editing', 'reduced-motion');
+      /* strip every trace of edit mode */
+      doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ephoto-hint, .ed-add, .ed-del').forEach((n) => n.remove());
+      doc.querySelectorAll('.ephoto').forEach((n) => {
+        n.classList.remove('ephoto');
+        if (n.style.position === 'relative') n.style.position = '';
+        if (!n.getAttribute('style')) n.removeAttribute('style');
+      });
+      doc.querySelectorAll('script[src*="edit.js"], link[href*="edit.css"]').forEach((n) => n.remove());
+      doc.querySelectorAll('[contenteditable]').forEach((n) => {
+        n.removeAttribute('contenteditable'); n.removeAttribute('spellcheck'); n.classList.remove('etext');
+      });
+      doc.querySelector('body').classList.remove('editing', 'reduced-motion');
 
-    /* bake the current (possibly replaced) photo into each img */
-    const liveByKey = {};
-    allPhotos().forEach((img) => { liveByKey[img.dataset.photoKey] = img.src; });
-    doc.querySelectorAll('section img[data-photo-key]').forEach((img) => {
-      const src = liveByKey[img.dataset.photoKey];
-      if (src) img.setAttribute('src', src);
-      img.removeAttribute('data-orig-src');
-      img.removeAttribute('data-photo-key');
-    });
+      /* bake the current (possibly replaced) photo into each img */
+      const liveByKey = {};
+      allPhotos().forEach((img) => { liveByKey[img.dataset.photoKey] = img.src; });
+      doc.querySelectorAll('section img[data-photo-key]').forEach((img) => {
+        const src = liveByKey[img.dataset.photoKey];
+        if (src) img.setAttribute('src', src);
+        img.removeAttribute('data-orig-src');
+        img.removeAttribute('data-photo-key');
+      });
 
-    const html = '<!DOCTYPE html>\n' + doc.outerHTML;
-    const blob = new Blob([html], { type: 'text/html' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'our-story.html';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      /* inline the stylesheet, resolving its font url()s to data URIs */
+      for (const link of [...doc.querySelectorAll('link[rel="stylesheet"][href]')]) {
+        try {
+          const href = new URL(link.getAttribute('href'), location.href).href;
+          let css = await (await fetch(href)).text();
+          const urls = [...new Set([...css.matchAll(/url\(\s*['"]?([^'")]+)['"]?\s*\)/g)]
+            .map((m) => m[1]).filter((u) => !/^data:/i.test(u)))];
+          for (const u of urls) {
+            try {
+              const abs = new URL(u, href).href;
+              const data = await asDataURI(abs);
+              css = css.split(u).join(data);
+            } catch (e) { /* leave this url as-is */ }
+          }
+          const style = document.createElement('style');
+          style.textContent = css.replace(/<\/style/gi, '<\\/style');
+          link.replaceWith(style);
+        } catch (e) { /* leave the <link> if it can't be fetched */ }
+      }
+
+      /* inline the scripts (GSAP, ScrollTrigger, main.js), in order */
+      for (const s of [...doc.querySelectorAll('script[src]')]) {
+        try {
+          const src = new URL(s.getAttribute('src'), location.href).href;
+          const js = await (await fetch(src)).text();
+          const inline = document.createElement('script');
+          inline.textContent = js.replace(/<\/script/gi, '<\\/script');
+          s.replaceWith(inline);
+        } catch (e) { /* leave the <script src> if it can't be fetched */ }
+      }
+
+      /* inline any remaining photos still referenced by path */
+      for (const img of [...doc.querySelectorAll('img')]) {
+        const src = img.getAttribute('src');
+        if (!src || /^data:/i.test(src)) continue;
+        try { img.setAttribute('src', await asDataURI(new URL(src, location.href).href)); }
+        catch (e) { /* leave the src as-is */ }
+      }
+
+      const html = '<!DOCTYPE html>\n' + doc.outerHTML;
+      const blob = new Blob([html], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'our-story.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    } catch (e) {
+      window.alert('Sorry — building your file ran into a problem. Please try again.');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = label; }
+    }
   }
 })();
