@@ -14,8 +14,8 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=70">
-  <link rel="stylesheet" href="css/edit.css?v=70">
+  <link rel="stylesheet" href="css/style.css?v=71">
+  <link rel="stylesheet" href="css/edit.css?v=71">
 </head>
 <body>
 
@@ -32,33 +32,40 @@
     <!-- The cover: shown all at once, so anyone landing here understands
          at a glance what this is — a couple's anniversary keepsake. -->
     <div class="cover">
-      <!-- masthead: eyebrow + divider + the couple's names (the piece's identity) -->
+      <!-- masthead: eyebrow · names · divider · sentiment (the piece's identity) -->
       <div class="cover-head">
         <!-- EDIT ME · The occasion eyebrow -->
         <p class="cover-eyebrow">Celebrating our story</p>
+        <!-- EDIT ME · Your names -->
+        <p class="cover-names">Amara <span class="amp">&amp;</span> James</p>
         <div class="cover-rule" aria-hidden="true">
           <span class="rule-line"></span>
-          <svg viewBox="0 0 40 34" width="20" height="17" fill="none">
+          <svg viewBox="0 0 40 34" width="18" height="15" fill="none">
             <path d="M20 30C20 30 3 19.5 3 9.8 3 4.9 7 2 11 2c4.3 0 7.4 3 9 6.2C21.6 5 24.7 2 29 2c4 0 8 2.9 8 7.8C37 19.5 20 30 20 30Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span class="rule-line"></span>
         </div>
-        <!-- EDIT ME · Your names -->
-        <p class="cover-names">Amara <span class="amp">&amp;</span> James</p>
+        <!-- EDIT ME · A short sentiment -->
+        <p class="cover-subline">Thankful for every moment with you</p>
       </div>
 
       <!-- EDIT ME · Replace this photo: assets/photos/cover.jpg -->
       <div class="cover-photo">
         <span class="tape" aria-hidden="true"></span>
         <img src="assets/photos/cover.jpg" alt="Amara &amp; James" loading="eager">
+        <!-- EDIT ME · A little handwritten caption -->
+        <p class="cover-caption">our favorite place is wherever we're together</p>
       </div>
 
       <!-- the occasion sign-off beneath the photo -->
       <div class="cover-plate">
         <!-- EDIT ME · The occasion -->
         <p class="cover-occasion"><span class="occ-happy">Happy</span><span class="occ-anniv">Anniversary</span></p>
-        <!-- EDIT ME · A short sentiment -->
-        <p class="cover-subline">Thankful for every moment with you</p>
+        <div class="cover-plate-heart" aria-hidden="true">
+          <svg viewBox="0 0 40 34" width="18" height="15" fill="none">
+            <path d="M20 30C20 30 3 19.5 3 9.8 3 4.9 7 2 11 2c4.3 0 7.4 3 9 6.2C21.6 5 24.7 2 29 2c4 0 8 2.9 8 7.8C37 19.5 20 30 20 30Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <!-- EDIT ME · The date -->
         <p class="cover-date">June 2024</p>
       </div>
@@ -371,7 +378,7 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
-  <script src="js/edit.js?v=70"></script>
-  <script src="js/main.js?v=70"></script>
+  <script src="js/edit.js?v=71"></script>
+  <script src="js/main.js?v=71"></script>
 </body>
 </html>
