@@ -55,6 +55,13 @@
   src: url('../assets/fonts/Sacramento-400.woff2') format('woff2');
 }
 @font-face {
+  font-family: 'Mr De Haviland';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/MrDeHaviland-400.woff2') format('woff2');
+}
+@font-face {
   font-family: 'Jost';
   font-style: normal;
   font-weight: 300;
@@ -1071,10 +1078,11 @@ body.cinematic .scene-quiet { height: 280vh; }
   margin-bottom: 0.15rem;
 }
 
-/* signed by hand, in the same warm ink — no gilt */
+/* signed by hand, in the same warm ink — no gilt. Mr De Haviland is a fine
+   formal hand, so it's sized up a touch to carry as a signature. */
 .sign-name {
-  font-family: var(--font-script);
-  font-size: clamp(2.4rem, 10vw, 3.6rem);
+  font-family: 'Mr De Haviland', var(--font-script);
+  font-size: clamp(2.9rem, 12vw, 4.4rem);
   line-height: 1.1;
   color: var(--sepia-deep);
 }
