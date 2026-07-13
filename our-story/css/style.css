@@ -209,17 +209,40 @@ body {
   max-width: 34rem;
 }
 
-/* masthead — ornament + names, above the photo */
+/* masthead — eyebrow + divider + names, above the photo */
 .cover-head {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.cover-ornament {
-  color: var(--gold-deep);
-  margin-bottom: clamp(0.7rem, 2.2vw, 1.1rem);
+/* eyebrow — the small spaced line that names the occasion, above everything */
+.cover-eyebrow {
+  font-family: var(--font-label);
+  font-weight: 400;
+  font-size: clamp(0.64rem, 2.3vw, 0.8rem);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  padding-left: 0.34em;
+  color: var(--sepia);
+  margin-bottom: clamp(0.7rem, 2.2vw, 1.05rem);
 }
+
+/* divider — a gold rule · heart · rule beneath the eyebrow */
+.cover-rule {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.8vw, 0.75rem);
+  color: var(--gold-deep);
+  margin-bottom: clamp(0.7rem, 2.2vw, 1.05rem);
+}
+.cover-rule .rule-line {
+  display: block;
+  width: clamp(2rem, 9vw, 3.2rem);
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold-soft));
+}
+.cover-rule .rule-line:last-child { transform: scaleX(-1); }
 
 /* names — the masthead / identity, the structural anchor of the cover */
 .cover-names {
