@@ -89,6 +89,11 @@ document.querySelector('.replay')?.addEventListener('click', () => {
    masked title, subtitle */
 function initChapterHeads() {
   gsap.utils.toArray('.chapter-head').forEach((head) => {
+    /* the montage's chapter head lives on a sticky stage and is revealed AND
+       faded by the montage's own pinned timeline (initMontage). Handling it
+       here too would put two scroll-triggers on one sticky element, which
+       makes the title stutter — so skip it. */
+    if (head.closest('.scene-montage')) return;
     gsap.timeline({
       scrollTrigger: {
         trigger: head,
@@ -279,10 +284,10 @@ function initMontage() {
   const scene = document.querySelector('.scene-montage');
   if (!mems.length || !scene) return;
 
-  /* scroll budget: a short intro for the chapter line, roughly a screen per
+  /* scroll budget: an intro for the chapter line, roughly a screen per
      memory — kept tight so no beat drags */
   const STEP = 1.5;
-  scene.style.height = Math.round((0.8 + mems.length * 0.8) * 100) + 'vh';
+  scene.style.height = Math.round((1.1 + mems.length * 0.8) * 100) + 'vh';
 
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -293,18 +298,26 @@ function initMontage() {
     },
   });
 
-  /* the chapter line says its piece, then gives the screen away
-     (its arrival is handled by initChapterHeads, like every chapter) */
-  tl.to('.scene-montage .chapter-head', { opacity: 0, y: -60, duration: 0.5, ease: 'power1.in' }, 0.3);
+  /* the chapter line reveals, holds a beat, then lifts away — ALL on this one
+     pinned timeline, so nothing else animates the title at the same time */
+  const head = scene.querySelector('.chapter-head');
+  if (head) {
+    tl.from(head.querySelector('.chapter-ornament'), { opacity: 0, y: 18, duration: 0.4 }, 0)
+      .from(head.querySelector('.chapter-label'), { opacity: 0, y: 14, duration: 0.4 }, 0.08)
+      .from(head.querySelector('.chapter-title .mask-inner'), { yPercent: 115, ease: 'power2.out', duration: 0.5 }, 0.14)
+      .from(head.querySelector('.chapter-sub'), { opacity: 0, y: 16, duration: 0.4 }, 0.4)
+      .to(head, { opacity: 0, y: -50, duration: 0.5, ease: 'power1.in' }, 0.72);
+  }
 
   /* each memory glides steadily upward the whole time it's on screen — never
      a frozen frame — fading in as it enters and out as it leaves, so
      scrolling always moves something and no beat feels paused. The last one
      settles at center and stays, ending the montage on a held image rather
      than an empty screen. */
+  const START = 1.05;
   mems.forEach((mem, i) => {
     const last = i === mems.length - 1;
-    const t = 0.7 + i * STEP;
+    const t = START + i * STEP;
     tl.set(mem, { visibility: 'visible' }, t)
       .fromTo(mem, { y: 30 }, { y: last ? 0 : -66, ease: 'none', duration: STEP + 0.2 }, t)
       .fromTo(mem.querySelector('.memory-title'),

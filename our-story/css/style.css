@@ -917,7 +917,8 @@ body.cinematic .memory {
    (not just the inner photo, which the transform's parent would still repaint). */
 body.cinematic .memory,
 body.cinematic .memory-photo,
-body.cinematic .polaroid { will-change: transform, opacity; }
+body.cinematic .polaroid,
+body.cinematic .scene-montage .chapter-head { will-change: transform, opacity; }
 /* the polaroid's two shadow layers cross-fade on --lift as it presses flat;
    giving each its own layer makes that an opacity composite instead of a
    per-frame box-shadow repaint (the heaviest paint in The Beginning) */
