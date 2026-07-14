@@ -459,6 +459,7 @@ body.cinematic .cover > * { opacity: 0; }
 }
 
 .torn-edge {
+  display: none;
   position: absolute;
   /* This is the overhanging bottom of the opening sheet. It begins exactly
      where Chapter One starts, then extends down over the second sheet. */
@@ -1310,3 +1311,85 @@ body.reduced-motion .scroll-cue {
 /* The Quiet, static: paper, final line only */
 body.reduced-motion .ql-final { visibility: visible; }
 body.reduced-motion .quiet-stack { display: none; }
+
+
+/* ── Opening baby's breath ───────────────────────────────────────
+   Two restrained sprigs, placed exactly like the reference: the shorter
+   cluster grows from behind the lower-left of the print; the taller one
+   rises behind its upper-right edge. The stage owns their geometry, so
+   the relationship survives every responsive size. */
+.cover-photo-stage {
+  position: relative;
+  z-index: 1;
+  width: min(74vw, 366px);
+  margin: clamp(1.4rem, 3.6vw, 2.1rem) 0;
+  overflow: visible;
+}
+
+.cover-photo-stage .cover-photo {
+  z-index: 2;
+  width: 100%;
+  margin: 0;
+}
+
+.cover-flower {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: saturate(0.72) sepia(0.08);
+}
+
+.cover-flower-left {
+  --flower-x: 4px;
+  --flower-y: -38px;
+  --flower-angle: -48deg;
+  width: 41%;
+  left: -30%;
+  bottom: 12%;
+  transform: translate(var(--flower-x, 0px), var(--flower-y, 0px)) rotate(var(--flower-angle, -24deg)) scaleX(-1);
+  transform-origin: 82% 94%;
+}
+
+.cover-flower-right {
+  --flower-x: -26px;
+  --flower-y: 9px;
+  --flower-angle: 8deg;
+  width: 46%;
+  right: -36%;
+  top: 2%;
+  transform: translate(var(--flower-x, 0px), var(--flower-y, 0px)) rotate(var(--flower-angle, 4deg));
+  transform-origin: 16% 92%;
+}
+
+.cover-head,
+.cover-plate {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 430px) {
+  .cover-flower-left {
+    width: 40%;
+    left: -28%;
+  }
+
+  .cover-flower-right {
+    width: 44%;
+    right: -32%;
+  }
+}
+
+/* The original entrance sequence animates .cover-photo itself. Keep its new
+   positioning stage visible so that animation can still reveal the print. */
+body.cinematic .cover > .cover-photo-stage {
+  opacity: 1;
+}
+
+body.cinematic .cover-photo-stage .cover-photo {
+  opacity: 0;
+}
