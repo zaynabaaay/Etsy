@@ -62,6 +62,27 @@
   src: url('../assets/fonts/MrDeHaviland-400.woff2') format('woff2');
 }
 @font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/PlayfairDisplay-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/PlayfairDisplay-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Ephesis';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/Ephesis-400.woff2') format('woff2');
+}
+@font-face {
   font-family: 'Jost';
   font-style: normal;
   font-weight: 300;
@@ -1157,16 +1178,20 @@ body.cinematic .scene-quiet { height: 280vh; }
 }
 
 .close-line {
-  font-weight: 500;
+  font-family: 'Playfair Display', var(--font-serif);
+  font-weight: 600;
   font-size: var(--size-title);
-  line-height: 1.2;
+  line-height: 1.22;
   color: var(--ink);
   margin-bottom: clamp(1.6rem, 5vw, 2.6rem);
-  max-width: 18ch;
+  max-width: 16ch;
 }
-/* the emphasised word in the closing line, in gilt italic */
+/* the emphasised word in the closing line, in the gilt calligraphy script */
 .close-yet {
-  font-style: italic;
+  font-family: 'Ephesis', var(--font-script);
+  font-weight: 400;
+  font-size: 1.32em;
+  line-height: 1;
   color: var(--gold-deep);
 }
 /* a gold rule · sparkle · rule divider beneath the closing line */
@@ -1190,25 +1215,25 @@ body.cinematic .scene-quiet { height: 280vh; }
 .close-line .mask-inner { display: block; }
 
 .close-script {
-  font-family: var(--font-script);
-  font-size: var(--size-script-lg);
+  font-family: 'Ephesis', var(--font-script);
+  font-size: calc(var(--size-script-lg) * 1.12);
+  line-height: 1.05;
   color: var(--gold-deep);
-  transform: rotate(-2deg);
   margin-bottom: clamp(0.5rem, 1.8vw, 1rem);
 }
 
 .close-title {
+  font-family: 'Playfair Display', var(--font-serif);
   font-weight: 500;
-  font-variant-caps: small-caps;
-  text-transform: lowercase;
-  font-size: clamp(2rem, 8vw, 3.4rem);
+  text-transform: uppercase;
+  font-size: clamp(1.7rem, 6.6vw, 2.9rem);
   line-height: 1.1;
   letter-spacing: 0.14em;
   color: var(--ink);
   padding-left: 0.14em;
 }
 
-.close-title .amp { font-style: italic; font-weight: 400; color: var(--gold-deep); }
+.close-title .amp { font-family: 'Playfair Display', var(--font-serif); font-style: italic; font-weight: 500; color: var(--gold-deep); }
 
 .close-rule {
   width: clamp(80px, 20vw, 150px);
