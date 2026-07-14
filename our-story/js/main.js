@@ -287,7 +287,7 @@ function initMontage() {
   /* scroll budget: an intro for the chapter line, roughly a screen per
      memory — kept tight so no beat drags */
   const STEP = 1.5;
-  scene.style.height = Math.round((1.1 + mems.length * 0.8) * 100) + 'vh';
+  scene.style.height = Math.round((1.5 + mems.length * 0.8) * 100) + 'vh';
 
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -317,7 +317,7 @@ function initMontage() {
      scrolling always moves something and no beat feels paused. The last one
      settles at center and stays, ending the montage on a held image rather
      than an empty screen. */
-  const START = 1.25;
+  const START = 1.6; /* after the title has fully faded out (its exit ends ~1.45) */
   mems.forEach((mem, i) => {
     const last = i === mems.length - 1;
     const t = START + i * STEP;
