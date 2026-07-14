@@ -306,10 +306,10 @@ function initMontage() {
       .from(head.querySelector('.chapter-label'), { opacity: 0, y: 14, duration: 0.4 }, 0.08)
       .from(head.querySelector('.chapter-title .mask-inner'), { yPercent: 115, ease: 'power2.out', duration: 0.5 }, 0.14)
       .from(head.querySelector('.chapter-sub'), { opacity: 0, y: 16, duration: 0.4 }, 0.4)
-      /* a gentle rise while it's still fully here, then it lifts further up as
-         it fades — so the title travels up a bit before it disappears */
-      .to(head, { y: -30, ease: 'none', duration: 0.35 }, 0.6)
-      .to(head, { opacity: 0, y: -100, duration: 0.5, ease: 'power1.in' }, 0.82);
+      /* a clear rise while it's still fully here, then it lifts well up and
+         off as it fades — so the title travels up before it disappears */
+      .to(head, { y: -70, ease: 'none', duration: 0.45 }, 0.55)
+      .to(head, { opacity: 0, y: -190, duration: 0.55, ease: 'power1.in' }, 0.9);
   }
 
   /* each memory glides steadily upward the whole time it's on screen — never
