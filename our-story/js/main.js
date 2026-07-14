@@ -279,16 +279,17 @@ function initMontage() {
   const scene = document.querySelector('.scene-montage');
   if (!mems.length || !scene) return;
 
-  /* about one screen of scroll for the chapter line, one per memory,
-     and one for the closing bridge line */
-  scene.style.height = Math.round((1.7 + (mems.length + 1) * 0.8) * 100) + 'vh';
+  /* scroll budget: a short intro for the chapter line, roughly a screen per
+     memory, a little for the closing line — kept tight so no beat drags */
+  const STEP = 1.5;
+  scene.style.height = Math.round((0.9 + mems.length * 0.8 + 0.5) * 100) + 'vh';
 
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: scene,
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 1, /* a floatier follow smooths wheel-step jitter */
+      scrub: 0.4, /* follow the scroll closely — no floaty second-long catch-up */
     },
   });
 
@@ -296,29 +297,22 @@ function initMontage() {
      (its arrival is handled by initChapterHeads, like every chapter) */
   tl.to('.scene-montage .chapter-head', { opacity: 0, y: -60, duration: 0.5, ease: 'power1.in' }, 0.3);
 
-  /* each memory: title lands and its photos rise together, as one piece —
-     a beat to look, then it lifts away and the next takes the screen */
-  const STEP = 1.8;
+  /* each memory glides steadily upward the whole time it's on screen — never
+     a frozen frame — fading in as it enters and out as it leaves, so
+     scrolling always moves something and no beat feels paused */
   mems.forEach((mem, i) => {
-    const t = 0.75 + i * STEP;
+    const t = 0.7 + i * STEP;
     tl.set(mem, { visibility: 'visible' }, t)
+      .fromTo(mem, { y: 30 }, { y: -66, ease: 'none', duration: STEP + 0.2 }, t)
       .fromTo(mem.querySelector('.memory-title'),
-        { opacity: 0, y: 26 },
-        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }, t)
+        { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' }, t)
       .fromTo(mem.querySelectorAll('.memory-photo'),
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, t + 0.1)
-      /* a gentle continuous drift instead of a static hold — the memory
-         keeps easing upward the whole time it's on screen, so scrolling
-         always moves something and there's no frozen "forced pause" */
-      .to(mem, { y: -16, ease: 'none', duration: 0.55 }, t + 0.75);
-    tl.to(mem, { opacity: 0, y: -70, duration: 0.45, ease: 'power1.in' }, t + STEP - 0.5);
+        { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, t + 0.06)
+      .to(mem, { opacity: 0, duration: 0.4, ease: 'power1.in' }, t + STEP - 0.28);
   });
 
-  /* the final screen: the bridge line rises in and stays as the stage
-     releases into the next scene (no held beat — it lands right as the
-     section ends, so there's no dead scroll waiting for the handoff) */
-  const tExit = 0.75 + mems.length * STEP;
+  /* the closing bridge line rises in and stays as the stage releases */
+  const tExit = 0.7 + mems.length * STEP;
   tl.fromTo('.montage-exit',
     { opacity: 0, y: 26 },
     { opacity: 1, y: 0, duration: 0.6, ease: 'power1.out' }, tExit);
