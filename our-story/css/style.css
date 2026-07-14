@@ -111,9 +111,10 @@
 :root {
   --espresso:        #171009;   /* deep warm near-black            */
   --espresso-glow:   #3d2812;   /* candlelit center of the dark    */
-  --cream:           #f3ecdc;   /* aged paper                      */
-  --paper-opening:   #eee4d4;   /* first sheet · warm oatmeal ivory */
-  --paper-beginning: #f7f2e8;   /* second sheet · quiet cotton ivory */
+  /* one paper colour across the whole piece — the beginning sheet's tone */
+  --cream:           #f7f2e8;   /* page + most scenes (unified)     */
+  --paper-opening:   #f7f2e8;   /* opening cover (unified)          */
+  --paper-beginning: #f7f2e8;   /* the beginning sheet · the source */
   --cream-text:      #f2e7d0;   /* light type on dark              */
   --ink:             #2b2118;   /* dark type on cream              */
   --gold:            #c9a15f;   /* antique gold accents            */
