@@ -470,10 +470,11 @@ function initClose() {
   gsap.timeline({
     scrollTrigger: { trigger: '.close-names', start: 'top 85%', end: 'top 50%', scrub: 0.7 },
   })
-    .from('.close-script', { opacity: 0, y: 14 }, 0)
-    .from('.close-title', { opacity: 0, y: 18 }, 0.15)
-    .from('.close-rule', { scaleX: 0, ease: 'power2.inOut' }, 0.3)
-    .from('.close-date', { opacity: 0, y: 12 }, 0.4);
+    .from('.close-sparkle', { opacity: 0, scale: 0.6, ease: 'back.out(2)', duration: 0.5 }, 0)
+    .from('.close-script', { opacity: 0, y: 14 }, 0.1)
+    .from('.close-title', { opacity: 0, y: 18 }, 0.25)
+    .from('.close-rule', { scaleX: 0, ease: 'power2.inOut' }, 0.4)
+    .from('.close-date', { opacity: 0, y: 12 }, 0.5);
 
   /* the replay invitation */
   gsap.from('.replay', {
