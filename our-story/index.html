@@ -14,8 +14,8 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=85">
-  <link rel="stylesheet" href="css/edit.css?v=85">
+  <link rel="stylesheet" href="css/style.css?v=86">
+  <link rel="stylesheet" href="css/edit.css?v=86">
 </head>
 <body>
 
@@ -247,12 +247,14 @@
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════
-       SCENE 05 · THE QUIET
-       The emptiest scene, on purpose. The screen pins, short lines
-       appear one beat at a time, and evening falls on the page —
-       cream fades through dusk into the dark world of the letter.
+       SCENE 05 · THE QUIET  (optional — OFF by default)
+       A quiet "Words page": the screen pins and short lines appear one
+       beat at a time on empty paper. It ships hidden (is-removed) so the
+       default story stays tight; turn it on in edit mode (Sections), or
+       delete the "is-removed" class below to show it. This is also the
+       template behind "Add a Words page".
        ════════════════════════════════════════════════════════════════ -->
-  <section class="scene-quiet" id="quiet" data-label="The Quiet">
+  <section class="scene-quiet is-removed" id="quiet" data-label="The Quiet">
     <!-- a tall section; this inner panel sticks to the screen while you
          scroll through it (CSS sticky — reliable on iOS, unlike JS pinning) -->
     <div class="quiet-sticky">
@@ -286,8 +288,7 @@
 
   <!-- ════════════════════════════════════════════════════════════════
        SCENE 06 · THE LETTER
-       The climax. Opens in the same darkness The Quiet ended in — no
-       seam. The letter reveals itself paragraph by paragraph as you
+       The climax. The letter reveals itself paragraph by paragraph as you
        scroll, so it can only be read slowly, and is signed in script.
        ════════════════════════════════════════════════════════════════ -->
   <section class="scene-letter" id="letter" data-label="The Letter">
@@ -377,7 +378,7 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
-  <script src="js/edit.js?v=85"></script>
-  <script src="js/main.js?v=85"></script>
+  <script src="js/edit.js?v=86"></script>
+  <script src="js/main.js?v=86"></script>
 </body>
 </html>
