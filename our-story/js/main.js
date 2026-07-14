@@ -306,7 +306,10 @@ function initMontage() {
       .from(head.querySelector('.chapter-label'), { opacity: 0, y: 14, duration: 0.4 }, 0.08)
       .from(head.querySelector('.chapter-title .mask-inner'), { yPercent: 115, ease: 'power2.out', duration: 0.5 }, 0.14)
       .from(head.querySelector('.chapter-sub'), { opacity: 0, y: 16, duration: 0.4 }, 0.4)
-      .to(head, { opacity: 0, y: -50, duration: 0.5, ease: 'power1.in' }, 0.72);
+      /* a gentle rise while it's still fully here, then it lifts further up as
+         it fades — so the title travels up a bit before it disappears */
+      .to(head, { y: -30, ease: 'none', duration: 0.35 }, 0.6)
+      .to(head, { opacity: 0, y: -100, duration: 0.5, ease: 'power1.in' }, 0.82);
   }
 
   /* each memory glides steadily upward the whole time it's on screen — never
@@ -314,7 +317,7 @@ function initMontage() {
      scrolling always moves something and no beat feels paused. The last one
      settles at center and stays, ending the montage on a held image rather
      than an empty screen. */
-  const START = 1.05;
+  const START = 1.25;
   mems.forEach((mem, i) => {
     const last = i === mems.length - 1;
     const t = START + i * STEP;
