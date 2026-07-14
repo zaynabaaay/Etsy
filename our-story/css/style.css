@@ -127,8 +127,8 @@
 
   /* The generated paper reference is used directly, so the webpage carries
      the same cotton fibres, pulp variation, and warm ivory tone. */
-  --paper: url('../assets/paper-texture-generated.png');
-  --paper-size: 941px 1672px;
+  --paper: url('../assets/paper-texture-ivory.png');
+  --paper-size: 864px 1821px;
   --paper-blend: normal;
 
   --font-serif:  'Cormorant Garamond', 'Times New Roman', serif;
