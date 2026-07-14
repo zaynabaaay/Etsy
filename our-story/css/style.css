@@ -276,7 +276,9 @@ body {
   margin: clamp(1.4rem, 3.6vw, 2.1rem) 0;
   background: #fdfaf1;
   padding: clamp(10px, 2.8vw, 14px);
-  padding-bottom: clamp(30px, 7vw, 40px);
+  /* the white caption band below the image; the Est. stamp centers in it */
+  --band: clamp(44px, 10.5vw, 60px);
+  padding-bottom: var(--band);
   transform: rotate(-2deg);
   box-shadow:
     0 2px 6px rgba(60, 44, 22, 0.12),
@@ -343,16 +345,23 @@ body {
 }
 
 /* the date, stamped into the photo's bottom border like a real print's
-   label — small gilt caps, tilting with the polaroid */
+   label — gilt caps, centered in the white band, tilting with the polaroid */
 .cover-est {
-  margin-top: clamp(7px, 1.8vw, 10px);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--band);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-label);
   font-weight: 400;
-  font-size: clamp(0.6rem, 1.9vw, 0.72rem);
-  letter-spacing: 0.32em;
+  font-size: clamp(0.78rem, 2.6vw, 1rem);
+  letter-spacing: 0.34em;
   text-transform: uppercase;
-  padding-left: 0.32em;
-  text-align: center;
+  padding-left: 0.34em;
   color: var(--gold-deep);
 }
 
