@@ -1138,17 +1138,10 @@ body.cinematic .scene-quiet { height: 280vh; }
   background-size: 600px;
   background-blend-mode: multiply;
   color: var(--ink);
-  padding: 0 clamp(1.5rem, 6vw, 4rem) clamp(5rem, 14vw, 8rem);
+  /* a compact closing — modest top room, no long lead-in */
+  padding: clamp(3rem, 9vw, 5rem) clamp(1.5rem, 6vw, 4rem) clamp(4rem, 11vw, 6.5rem);
   text-align: center;
   overflow: hidden;
-}
-
-/* breathing room between the letter and the close — the scene's own
-   cream paper shows through, since every surface now shares one colour */
-.dawn {
-  height: 70vh;
-  height: 70svh;
-  margin: 0 calc(-1 * clamp(1.5rem, 6vw, 4rem));
 }
 
 .close-inner {
@@ -1158,7 +1151,6 @@ body.cinematic .scene-quiet { height: 280vh; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: clamp(-4rem, -12vw, -7rem); /* pull content up into the dawn's foot */
 }
 
 /* an arched, gold-keyline frame — a matted print to close on */
