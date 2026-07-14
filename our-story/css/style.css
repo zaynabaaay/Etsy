@@ -125,10 +125,11 @@
   --sepia:           #6f5638;   /* eyebrow, thread                  */
   --sepia-soft:      #5d4936;   /* the cover subtitle               */
 
-  /* handmade-paper grain — a mostly-white tile of soft mottling; laid over
-     any warm surface with background-blend-mode:multiply so the paper reads
-     as real stock. Tints the background only, never the text. */
-  --paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014' numOctaves='3' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23ffffff'/%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.09'/%3E%3C/svg%3E");
+  /* The generated paper reference is used directly, so the webpage carries
+     the same cotton fibres, pulp variation, and warm ivory tone. */
+  --paper: url('../assets/paper-texture-generated.png');
+  --paper-size: 941px 1672px;
+  --paper-blend: normal;
 
   --font-serif:  'Cormorant Garamond', 'Times New Roman', serif;
   --font-script: 'Alex Brush', 'Great Vibes', cursive;
@@ -166,8 +167,8 @@ html { scroll-behavior: auto; }
 body {
   background-color: var(--cream);
   background-image: var(--paper);
-  background-size: 600px;
-  background-blend-mode: multiply;
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
   color: var(--ink);
   font-family: var(--font-serif);
   overflow-x: hidden;
@@ -216,8 +217,8 @@ body {
      so the deckled overlap into the next section still reads) */
   background-color: var(--paper-opening);
   background-image: var(--paper);
-  background-size: 600px;
-  background-blend-mode: multiply;
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
 }
 
 /* a soft wash of sunlight behind the cover */
@@ -451,8 +452,8 @@ body.cinematic .cover > * { opacity: 0; }
   z-index: 2;
   background-color: var(--paper-beginning);
   background-image: var(--paper);
-  background-size: 600px;
-  background-blend-mode: multiply;
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
   color: var(--ink);
   padding: clamp(5rem, 14vw, 9rem) 0 clamp(6rem, 16vw, 11rem);
 }
@@ -498,11 +499,11 @@ body.cinematic .cover > * { opacity: 0; }
      as a separate white ribbon. */
   background-color: var(--paper-opening);
   background-image: var(--paper);
-  background-size: 600px;
+  background-size: var(--paper-size);
   /* Continue the opening sheet's grain instead of restarting the tile at
      the overlap, which would reveal a faint horizontal texture seam. */
   background-position: 0 calc(-100lvh + 8px);
-  background-blend-mode: multiply;
+  background-blend-mode: var(--paper-blend);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 8px);
   mask-image: linear-gradient(to bottom, transparent 0, #000 8px);
 }
@@ -733,8 +734,8 @@ body.cinematic .cover > * { opacity: 0; }
   z-index: 2;
   background-color: var(--cream);
   background-image: var(--paper);
-  background-size: 600px;
-  background-blend-mode: multiply;
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
   color: var(--ink);
   padding: clamp(8rem, 22vw, 13rem) clamp(1.5rem, 6vw, 4rem);
   text-align: center;
@@ -799,8 +800,8 @@ body.cinematic .cover > * { opacity: 0; }
   z-index: 2;
   background-color: var(--cream);
   background-image: var(--paper);
-  background-size: 600px;
-  background-blend-mode: multiply;
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
   color: var(--ink);
   padding: clamp(5rem, 14vw, 9rem) 0 clamp(5rem, 14vw, 8rem);
 }
@@ -881,8 +882,8 @@ body.cinematic .montage-sticky {
      to slide under the pinned photos */
   background-color: var(--cream);
   background-image: var(--paper);
-  background-size: 600px;
-  background-blend-mode: multiply;
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
 }
 body.cinematic .scene-montage .chapter-head {
   position: absolute;
@@ -1034,8 +1035,8 @@ body.cinematic .scene-quiet { height: 280vh; }
   z-index: 2;
   background-color: var(--cream);
   background-image: var(--paper);
-  background-size: 600px;
-  background-blend-mode: multiply;
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
   color: var(--ink);
   padding: clamp(4.5rem, 14vw, 9rem) clamp(0.9rem, 4vw, 3rem) clamp(6rem, 18vw, 11rem);
   overflow: hidden;
@@ -1060,8 +1061,8 @@ body.cinematic .scene-quiet { height: 280vh; }
   z-index: 0;
   background-color: #f8f3e7;
   background-image: var(--paper);
-  background-size: 340px;
-  background-blend-mode: multiply;
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
   /* a FIXED torn/deckled edge — a static clip path, so the geometry
      never recomputes on scroll (a live SVG turbulence filter shimmered).
      drop-shadow follows the clipped shape to cast onto the linen. */
@@ -1147,8 +1148,8 @@ body.cinematic .scene-quiet { height: 280vh; }
   z-index: 2;
   background-color: var(--cream);
   background-image: var(--paper);
-  background-size: 600px;
-  background-blend-mode: multiply;
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
   color: var(--ink);
   /* a compact closing — modest top room, no long lead-in */
   padding: clamp(3rem, 9vw, 5rem) clamp(1.5rem, 6vw, 4rem) clamp(4rem, 11vw, 6.5rem);
