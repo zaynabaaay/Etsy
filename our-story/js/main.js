@@ -307,17 +307,21 @@ function initMontage() {
         { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }, t)
       .fromTo(mem.querySelectorAll('.memory-photo'),
         { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, t + 0.1);
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, t + 0.1)
+      /* a gentle continuous drift instead of a static hold — the memory
+         keeps easing upward the whole time it's on screen, so scrolling
+         always moves something and there's no frozen "forced pause" */
+      .to(mem, { y: -16, ease: 'none', duration: 0.55 }, t + 0.75);
     tl.to(mem, { opacity: 0, y: -70, duration: 0.45, ease: 'power1.in' }, t + STEP - 0.5);
   });
 
-  /* the final screen: the bridge line, alone — it stays as the stage
-     releases into the next scene */
+  /* the final screen: the bridge line rises in and stays as the stage
+     releases into the next scene (no held beat — it lands right as the
+     section ends, so there's no dead scroll waiting for the handoff) */
   const tExit = 0.75 + mems.length * STEP;
   tl.fromTo('.montage-exit',
     { opacity: 0, y: 26 },
-    { opacity: 1, y: 0, duration: 0.6, ease: 'power1.out' }, tExit)
-    .to('.montage-exit', { y: 0, duration: 0.8 }, tExit + 0.6); /* held beat before release */
+    { opacity: 1, y: 0, duration: 0.6, ease: 'power1.out' }, tExit);
 }
 
 /* ══════════════════════════════════════════════════════════════════
