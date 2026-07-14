@@ -28,7 +28,7 @@
      shows through instead of a frozen old copy. Photos are never touched (they
      live in IndexedDB). A buyer editing a fixed downloaded copy never bumps
      this, so their own edits are always kept. */
-  const CONTENT_VERSION = '5';
+  const CONTENT_VERSION = '6';
   const editing = localStorage.getItem(FLAG) === '1';
 
   const grain = () => document.querySelector('.grain');
@@ -104,7 +104,7 @@
 
     /* memories: an old camera-montage / pre-sticky-stage section */
     const oldMon = box.querySelector('.scene-montage');
-    if (oldMon && !(oldMon.querySelector('.montage-sticky .memory') && oldMon.querySelector('.montage-sticky .montage-exit'))) {
+    if (oldMon && !oldMon.querySelector('.montage-sticky .memory')) {
       swapFresh(oldMon);
     }
 

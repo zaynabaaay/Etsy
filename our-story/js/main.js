@@ -280,9 +280,9 @@ function initMontage() {
   if (!mems.length || !scene) return;
 
   /* scroll budget: a short intro for the chapter line, roughly a screen per
-     memory, a little for the closing line — kept tight so no beat drags */
+     memory — kept tight so no beat drags */
   const STEP = 1.5;
-  scene.style.height = Math.round((0.9 + mems.length * 0.8 + 0.5) * 100) + 'vh';
+  scene.style.height = Math.round((0.8 + mems.length * 0.8) * 100) + 'vh';
 
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -299,23 +299,20 @@ function initMontage() {
 
   /* each memory glides steadily upward the whole time it's on screen — never
      a frozen frame — fading in as it enters and out as it leaves, so
-     scrolling always moves something and no beat feels paused */
+     scrolling always moves something and no beat feels paused. The last one
+     settles at center and stays, ending the montage on a held image rather
+     than an empty screen. */
   mems.forEach((mem, i) => {
+    const last = i === mems.length - 1;
     const t = 0.7 + i * STEP;
     tl.set(mem, { visibility: 'visible' }, t)
-      .fromTo(mem, { y: 30 }, { y: -66, ease: 'none', duration: STEP + 0.2 }, t)
+      .fromTo(mem, { y: 30 }, { y: last ? 0 : -66, ease: 'none', duration: STEP + 0.2 }, t)
       .fromTo(mem.querySelector('.memory-title'),
         { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' }, t)
       .fromTo(mem.querySelectorAll('.memory-photo'),
-        { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, t + 0.06)
-      .to(mem, { opacity: 0, duration: 0.4, ease: 'power1.in' }, t + STEP - 0.28);
+        { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, t + 0.06);
+    if (!last) tl.to(mem, { opacity: 0, duration: 0.4, ease: 'power1.in' }, t + STEP - 0.28);
   });
-
-  /* the closing bridge line rises in and stays as the stage releases */
-  const tExit = 0.7 + mems.length * STEP;
-  tl.fromTo('.montage-exit',
-    { opacity: 0, y: 26 },
-    { opacity: 1, y: 0, duration: 0.6, ease: 'power1.out' }, tExit);
 }
 
 /* ══════════════════════════════════════════════════════════════════
