@@ -28,7 +28,7 @@
      shows through instead of a frozen old copy. Photos are never touched (they
      live in IndexedDB). A buyer editing a fixed downloaded copy never bumps
      this, so their own edits are always kept. */
-  const CONTENT_VERSION = '3';
+  const CONTENT_VERSION = '4';
   const editing = localStorage.getItem(FLAG) === '1';
 
   const grain = () => document.querySelector('.grain');
@@ -53,7 +53,7 @@
   /* ── the editable pieces of text (the element that holds the words;
         for masked/animated lines that's the inner span) ── */
   const TEXT_SELECTORS = [
-    '.cover-eyebrow', '.cover-names', '.cover-subline', '.cover-occasion', '.cover-date',
+    '.cover-eyebrow', '.cover-names', '.cover-subline', '.cover-occasion', '.cover-est',
     '.chapter-label', '.chapter-title .mask-inner', '.chapter-sub',
     '.moment-date', '.polaroid-caption', '.moment-text',
     '.counter-script', '.counter-label', '.counter-note',
@@ -260,7 +260,13 @@
       hint.textContent = '＋  Tap to add your photo';
       frame.appendChild(hint);
     }
-    frame.addEventListener('click', (e) => { e.preventDefault(); pickFor(img); });
+    frame.addEventListener('click', (e) => {
+      /* an editable label can live inside a photo frame (e.g. the "Est." date
+         stamped on the cover photo) — tapping it should edit the words, not
+         open the photo picker */
+      if (e.target.closest('.etext')) return;
+      e.preventDefault(); pickFor(img);
+    });
   }
   allPhotos().forEach(bindPhoto);
 
