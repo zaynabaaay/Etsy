@@ -1193,10 +1193,14 @@ body.cinematic .scene-quiet { height: 280vh; }
   position: absolute;
   inset: 0;
   z-index: 0;
+  /* Use the exact generated Milestones sheet. The source image contains a
+     landscape paper card; these dimensions crop into that card's paper area
+     and stretch its handmade texture into this portrait letter sheet. */
   background-color: #f8f3e7;
-  background-image: var(--paper);
-  background-size: var(--paper-size);
-  background-blend-mode: var(--paper-blend);
+  background-image: url('../assets/decor/milestone-paper-card.png?v=1');
+  background-size: 133.33% 145%;
+  background-position: center 49%;
+  background-repeat: no-repeat;
   /* a FIXED torn/deckled edge — a static clip path, so the geometry
      never recomputes on scroll (a live SVG turbulence filter shimmered).
      drop-shadow follows the clipped shape to cast onto the linen. */
