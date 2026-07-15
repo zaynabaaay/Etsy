@@ -14,8 +14,8 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=138">
-  <link rel="stylesheet" href="css/edit.css?v=104">
+  <link rel="stylesheet" href="css/style.css?v=140">
+  <link rel="stylesheet" href="css/edit.css?v=107">
 </head>
 <body>
 
@@ -85,6 +85,11 @@
       <span class="scroll-cue-line"><span class="scroll-cue-line-inner"></span></span>
       <span class="scroll-cue-label">Scroll</span>
     </div>
+
+    <img class="free-decor decor-leaf-branch" data-decor-id="leaf-branch" data-decor-name="Olive branch"
+         src="assets/decor/generated-botanical-1.png" alt="" aria-hidden="true" draggable="false">
+    <img class="free-decor decor-dried-daisy" data-decor-id="dried-daisy" data-decor-name="Dried daisies"
+         src="assets/decor/dried-flower-daisy.png" alt="" aria-hidden="true" draggable="false">
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════
@@ -182,6 +187,11 @@
         <p class="moment-text">Do you remember staying up till 3 talking about nothing, and you fell asleep mid-sentence? Nothing big happened &mdash; but that&rsquo;s the night I knew. I still think about it.</p>
       </article>
     </div>
+
+    <img class="free-decor decor-flowering-branch" data-decor-id="flowering-branch" data-decor-name="Flowering branch"
+         src="assets/decor/generated-botanical-2.png" alt="" aria-hidden="true" draggable="false">
+    <img class="free-decor decor-dried-bundle" data-decor-id="dried-bundle" data-decor-name="Dried flower bundle"
+         src="assets/decor/dried-flower-wildflower-bundle.png" alt="" aria-hidden="true" draggable="false">
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════
@@ -259,6 +269,9 @@
         </div>
       </div>
     </div>
+
+    <img class="free-decor decor-corner-branch" data-decor-id="corner-branch" data-decor-name="Corner flower branch"
+         src="assets/decor/generated-botanical-3.png" alt="" aria-hidden="true" draggable="false">
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════
@@ -319,6 +332,9 @@
       </article>
     </div>
     </div>
+
+    <img class="free-decor decor-cream-sprig" data-decor-id="cream-sprig" data-decor-name="Dried cream sprig"
+         src="assets/decor/dried-flower-cream-sprig.png" alt="" aria-hidden="true" draggable="false">
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════
@@ -453,7 +469,8 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
-  <script src="js/edit.js?v=116"></script>
+  <script src="js/edit.js?v=117"></script>
+  <script src="js/decor-editor.js?v=3"></script>
   <script src="js/main.js?v=110"></script>
 </body>
 </html>

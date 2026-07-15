@@ -651,7 +651,11 @@ body.cinematic .cover > * { opacity: 0; }
   width: 56%;
   left: -33%;
   bottom: 4%;
-  transform: rotate(-12deg);
+  transform:
+    translate3d(var(--decor-x, 0px), var(--decor-y, 0px), 0)
+    rotate(calc(-12deg + var(--decor-angle, 0deg)))
+    scaleX(var(--decor-flip, 1))
+    scale(var(--decor-scale, 1));
   transform-origin: 52% 96%;
 }
 
@@ -659,7 +663,12 @@ body.cinematic .cover > * { opacity: 0; }
   width: 53%;
   right: -25%;
   bottom: 2%;
-  transform: rotate(14deg) scaleX(-1);
+  transform:
+    translate3d(var(--decor-x, 0px), var(--decor-y, 0px), 0)
+    rotate(calc(14deg + var(--decor-angle, 0deg)))
+    scaleX(-1)
+    scaleX(var(--decor-flip, 1))
+    scale(var(--decor-scale, 1));
   transform-origin: 48% 96%;
 }
 
@@ -667,7 +676,11 @@ body.cinematic .cover > * { opacity: 0; }
   width: 74%;
   left: -53%;
   bottom: -2%;
-  transform: rotate(-7deg);
+  transform:
+    translate3d(var(--decor-x, 0px), var(--decor-y, 0px), 0)
+    rotate(calc(-7deg + var(--decor-angle, 0deg)))
+    scaleX(var(--decor-flip, 1))
+    scale(var(--decor-scale, 1));
   transform-origin: 54% 92%;
 }
 
@@ -1582,7 +1595,13 @@ body.reduced-motion .quiet-stack { display: none; }
   width: 41%;
   left: -30%;
   bottom: 12%;
-  transform: translate(var(--flower-x, 0px), var(--flower-y, 0px)) rotate(var(--flower-angle, -24deg)) scaleX(-1);
+  transform:
+    translate(var(--flower-x, 0px), var(--flower-y, 0px))
+    translate3d(var(--decor-x, 0px), var(--decor-y, 0px), 0)
+    rotate(calc(var(--flower-angle, -24deg) + var(--decor-angle, 0deg)))
+    scaleX(-1)
+    scaleX(var(--decor-flip, 1))
+    scale(var(--decor-scale, 1));
   transform-origin: 82% 94%;
 }
 
@@ -1593,7 +1612,12 @@ body.reduced-motion .quiet-stack { display: none; }
   width: 46%;
   right: -36%;
   top: 2%;
-  transform: translate(var(--flower-x, 0px), var(--flower-y, 0px)) rotate(var(--flower-angle, 4deg));
+  transform:
+    translate(var(--flower-x, 0px), var(--flower-y, 0px))
+    translate3d(var(--decor-x, 0px), var(--decor-y, 0px), 0)
+    rotate(calc(var(--flower-angle, 4deg) + var(--decor-angle, 0deg)))
+    scaleX(var(--decor-flip, 1))
+    scale(var(--decor-scale, 1));
   transform-origin: 16% 92%;
 }
 
@@ -1681,6 +1705,97 @@ body > section.scene-montage:not(.scene-quiet) {
 
 body > section.scene-letter:not(.scene-quiet) {
   --paper-cut-mask: url('../assets/decor/paper-edge-02.png?v=2');
+}
+
+/* ── movable botanical decorations ────────────────────────────────
+   These live at the quiet outer edges by default. The optional flower
+   editor changes only the custom properties below, so every placement
+   remains responsive and can be restored without rewriting the layout. */
+.free-decor {
+  position: absolute;
+  z-index: 8;
+  left: var(--decor-left, 50%);
+  top: var(--decor-top, 50%);
+  width: var(--decor-width, min(18vw, 240px));
+  max-width: none;
+  height: auto;
+  opacity: 0.86;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  transform:
+    translate(-50%, -50%)
+    translate3d(var(--decor-x, 0px), var(--decor-y, 0px), 0)
+    rotate(var(--decor-angle, 0deg))
+    scaleX(var(--decor-flip, 1))
+    scale(var(--decor-scale, 1));
+  transform-origin: 50% 50%;
+  filter: saturate(0.74) sepia(0.08) drop-shadow(0 7px 8px rgba(67, 49, 27, 0.1));
+}
+
+.decor-leaf-branch {
+  --decor-left: 7%;
+  --decor-top: 28%;
+  --decor-width: min(12vw, 175px);
+  --decor-angle: -17deg;
+}
+
+.decor-dried-daisy {
+  --decor-left: 92%;
+  --decor-top: 72%;
+  --decor-width: min(13vw, 185px);
+  --decor-angle: 14deg;
+}
+
+.decor-flowering-branch {
+  --decor-left: 7%;
+  --decor-top: 38%;
+  --decor-width: min(20vw, 290px);
+  --decor-angle: -10deg;
+}
+
+.decor-dried-bundle {
+  --decor-left: 93%;
+  --decor-top: 73%;
+  --decor-width: min(14vw, 205px);
+  --decor-angle: 11deg;
+}
+
+.decor-corner-branch {
+  --decor-left: 8%;
+  --decor-top: 57%;
+  --decor-width: min(22vw, 320px);
+  --decor-angle: -8deg;
+}
+
+.decor-cream-sprig {
+  --decor-left: 92%;
+  --decor-top: 60%;
+  --decor-width: min(20vw, 285px);
+  --decor-angle: 10deg;
+  --decor-flip: -1;
+}
+
+@media (max-width: 767px) {
+  .decor-leaf-branch,
+  .decor-dried-daisy {
+    --decor-width: min(25vw, 130px);
+  }
+
+  .decor-flowering-branch,
+  .decor-dried-bundle,
+  .decor-corner-branch,
+  .decor-cream-sprig {
+    --decor-width: min(31vw, 165px);
+  }
+
+  .decor-leaf-branch,
+  .decor-flowering-branch,
+  .decor-corner-branch { --decor-left: 10%; }
+
+  .decor-dried-daisy,
+  .decor-dried-bundle,
+  .decor-cream-sprig { --decor-left: 90%; }
 }
 
 /* Earlier sheets sit just above the following sheet, so their masked edge

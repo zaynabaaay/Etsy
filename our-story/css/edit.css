@@ -31,6 +31,136 @@
 .edit-fab-heart { color: #c9a15f; font-size: 0.9rem; }
 body.editing .edit-fab { display: none; }
 
+/* ── standalone decoration placer (?edit-flowers=1) ─────────────── */
+body.decor-editing .edit-fab { display: none; }
+
+body.decor-editing .movable-decor {
+  z-index: 48;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  border-radius: 6px;
+  outline: 1px dashed rgba(150, 112, 47, 0.62);
+  outline-offset: 5px;
+}
+
+body.decor-editing .movable-decor:hover,
+body.decor-editing .movable-decor.is-selected {
+  outline: 2px solid #b68a42;
+  background: rgba(201, 161, 95, 0.08);
+}
+
+body.decor-editing .movable-decor.is-dragging {
+  cursor: grabbing;
+  outline-color: #7f5a21;
+}
+
+.decor-panel {
+  position: fixed;
+  z-index: 80;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  width: min(23rem, calc(100vw - 2rem));
+  padding: 1rem;
+  border: 1px solid rgba(201, 161, 95, 0.55);
+  border-radius: 14px;
+  background: rgba(38, 28, 19, 0.96);
+  color: #f4ead7;
+  box-shadow: 0 16px 42px rgba(27, 18, 10, 0.34);
+  backdrop-filter: blur(10px);
+  font-family: 'Jost', sans-serif;
+}
+
+.decor-panel-head {
+  color: #d5ad6a;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.decor-panel-name {
+  margin: 0.35rem 0 0.8rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.08rem;
+}
+
+.decor-panel label {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.65rem;
+  color: rgba(244, 234, 215, 0.82);
+  font-size: 0.68rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.decor-panel output { color: #d5ad6a; }
+
+.decor-panel input[type='range'] {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: #c9a15f;
+}
+
+.decor-picker-label {
+  display: block !important;
+  margin-bottom: 0.3rem;
+}
+
+.decor-panel select {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.58rem 0.7rem;
+  border: 1px solid rgba(201, 161, 95, 0.52);
+  border-radius: 8px;
+  background: #302318;
+  color: #f4ead7;
+  font: 0.74rem 'Jost', sans-serif;
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+
+.decor-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+}
+
+.decor-panel button {
+  flex: 1 1 auto;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgba(201, 161, 95, 0.52);
+  border-radius: 999px;
+  background: transparent;
+  color: #f4ead7;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.decor-panel button:hover { background: rgba(201, 161, 95, 0.14); }
+.decor-panel button:disabled { opacity: 0.35; cursor: default; }
+.decor-panel .decor-done { background: #c9a15f; color: #2b2118; }
+
+@media (max-width: 600px) {
+  .decor-panel {
+    left: 0.65rem;
+    right: 0.65rem;
+    bottom: max(0.65rem, env(safe-area-inset-bottom, 0px));
+    width: auto;
+    padding: 0.8rem;
+  }
+
+  .decor-panel-name { margin-bottom: 0.45rem; }
+  .decor-panel label { margin-top: 0.4rem; }
+  .decor-panel-actions { margin-top: 0.55rem; }
+}
+
 /* the top bar while editing */
 .edit-bar {
   position: fixed;
