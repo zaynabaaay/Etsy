@@ -1193,14 +1193,13 @@ body.cinematic .scene-quiet { height: 280vh; }
   position: absolute;
   inset: 0;
   z-index: 0;
-  /* Use the exact generated Milestones sheet. The source image contains a
-     landscape paper card; these dimensions crop into that card's paper area
-     and stretch its handmade texture into this portrait letter sheet. */
+  /* The Milestones image is landscape and cannot be stretched across this
+     tall letter without distorting its fibres and torn edge. Use the same
+     site paper texture and matching darker tone on a portrait deckled sheet. */
   background-color: #f8f3e7;
-  background-image: url('../assets/decor/milestone-paper-card.png?v=1');
-  background-size: 133.33% 145%;
-  background-position: center 49%;
-  background-repeat: no-repeat;
+  background-image: var(--paper);
+  background-size: var(--paper-size);
+  background-blend-mode: var(--paper-blend);
   /* a FIXED torn/deckled edge — a static clip path, so the geometry
      never recomputes on scroll (a live SVG turbulence filter shimmered).
      drop-shadow follows the clipped shape to cast onto the linen. */
@@ -1210,6 +1209,15 @@ body.cinematic .scene-quiet { height: 280vh; }
     brightness(0.96)
     saturate(0.94)
     drop-shadow(0 20px 42px rgba(58, 42, 26, 0.26));
+  /* Dedicated portrait render of the same handmade Milestones paper.
+     Its built-in deckled edges and shadow stay naturally proportioned. */
+  background-image: url('../assets/decor/letter-paper-card.png?v=1');
+  background-size: 122% 122%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: normal;
+  clip-path: none;
+  filter: none;
 }
 
 .letter-head,
