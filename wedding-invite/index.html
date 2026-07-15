@@ -12,6 +12,15 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="og.png">
   <title>Layla &amp; Zayn — A Private Invitation</title>
+  <script>
+    try {
+      if (localStorage.getItem('weddingInvitationOpened') === 'true') {
+        document.documentElement.classList.add('invitation-returning');
+      }
+    } catch (error) {
+      // The invitation still works when browser storage is unavailable.
+    }
+  </script>
   <style>
     @font-face {
       font-family: "Invitation Didone";
@@ -110,6 +119,58 @@
       overscroll-behavior-y: contain;
       -webkit-overflow-scrolling: touch;
       pointer-events: auto;
+    }
+
+    .invitation-returning .page { visibility: hidden; }
+
+    .invitation-returning .invitation-page {
+      opacity: 1;
+      visibility: visible;
+      overflow-x: hidden;
+      overflow-y: auto;
+      pointer-events: auto;
+    }
+
+    .replay-opening {
+      position: fixed;
+      z-index: 80;
+      top: max(16px, env(safe-area-inset-top));
+      right: max(16px, env(safe-area-inset-right));
+      min-height: 38px;
+      padding: 10px 15px 9px;
+      border: 1px solid rgba(123,91,50,.34);
+      color: #5b3931;
+      background: rgba(248,241,230,.88);
+      box-shadow: 0 7px 18px rgba(69,44,27,.09);
+      font-family: var(--font-display);
+      font-size: 9px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: .20em;
+      text-transform: uppercase;
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      cursor: pointer;
+      transition: color .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .replay-opening:hover,
+    .replay-opening:focus-visible {
+      border-color: #6a2a2b;
+      color: #f8f0e4;
+      background: #6a2a2b;
+      outline: none;
+    }
+
+    @media (max-width: 520px) {
+      .replay-opening {
+        top: max(10px, env(safe-area-inset-top));
+        right: max(10px, env(safe-area-inset-right));
+        min-height: 34px;
+        padding: 9px 11px 8px;
+        font-size: 8px;
+        letter-spacing: .16em;
+      }
     }
 
     .story-page {
@@ -2072,6 +2133,7 @@
       <p class="sr-only" id="status" role="status" aria-live="polite"></p>
     </section>
     <div class="invitation-page" id="invitationPage" aria-hidden="true">
+      <button class="replay-opening" id="replayOpening" type="button">View envelope</button>
       <article class="story-page" aria-label="Wedding invitation">
         <div class="story-shell">
           <section class="story-section hero-invite reference-invite" aria-labelledby="coupleNames">
@@ -2215,8 +2277,39 @@
       const card = document.querySelector('.invitation-card');
       const rsvpButton = document.getElementById('rsvpButton');
       const rsvpFeedback = document.getElementById('rsvpFeedback');
+      const replayOpening = document.getElementById('replayOpening');
       const revealItems = document.querySelectorAll('.reveal');
+      const openedStorageKey = 'weddingInvitationOpened';
       let opened = false;
+
+      const readOpenedState = () => {
+        try {
+          return localStorage.getItem(openedStorageKey) === 'true';
+        } catch (error) {
+          return false;
+        }
+      };
+
+      const writeOpenedState = value => {
+        try {
+          if (value) localStorage.setItem(openedStorageKey, 'true');
+          else localStorage.removeItem(openedStorageKey);
+        } catch (error) {
+          // Browser storage is optional; the invitation remains usable without it.
+        }
+      };
+
+      const showInvitationImmediately = () => {
+        opened = true;
+        control.checked = true;
+        control.setAttribute('aria-label', 'Invitation opened');
+        invitationPage.setAttribute('aria-hidden', 'false');
+        invitationPage.classList.remove('is-revealing');
+        invitationPage.classList.add('is-ready');
+        invitationPage.scrollTop = 0;
+        status.textContent = 'Invitation ready.';
+        document.documentElement.classList.add('invitation-returning');
+      };
 
       if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver(entries => {
@@ -2261,6 +2354,8 @@
           invitationPage.classList.add('is-ready');
           invitationPage.scrollTop = 0;
           status.textContent = 'Invitation ready.';
+          writeOpenedState(true);
+          document.documentElement.classList.add('invitation-returning');
         }, 3750);
       };
       control.addEventListener('change', () => {
@@ -2273,6 +2368,14 @@
           control.dispatchEvent(new Event('change'));
         }
       });
+
+      replayOpening.addEventListener('click', () => {
+        writeOpenedState(false);
+        document.documentElement.classList.remove('invitation-returning');
+        window.location.reload();
+      });
+
+      if (readOpenedState()) showInvitationImmediately();
     })();
   </script>
 </body>
