@@ -1196,7 +1196,7 @@ body.cinematic .scene-quiet { height: 280vh; }
   /* The Milestones image is landscape and cannot be stretched across this
      tall letter without distorting its fibres and torn edge. Use the same
      site paper texture and matching darker tone on a portrait deckled sheet. */
-  background-color: #f8f3e7;
+  background-color: transparent;
   background-image: var(--paper);
   background-size: var(--paper-size);
   background-blend-mode: var(--paper-blend);
