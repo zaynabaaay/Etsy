@@ -210,6 +210,55 @@
   }
   keyPhotos();
 
+  /* ── photo fit: pan + zoom inside the frame ───────────────────────
+     Fit lives on the <img> as data-fit-scale / data-fit-x / data-fit-y
+     (x,y are 0–100 focal percentages; scale ≥ 1). These ride along in the
+     saved snapshot and the finished download, and are turned into plain CSS
+     (object-position + a scale transform) so a repositioned photo shows in
+     EVERY mode — even the exported file, which never loads this script. A
+     zoomed photo is kept inside the frame by a clip: .mframe already clips;
+     cover/polaroid/close photos get a lightweight .fitclip wrapper. At the
+     default fit the result is pixel-identical to a bare <img>. */
+  const FIT_MIN = 1, FIT_MAX = 4;
+  const clampN = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  function readFit(img) {
+    return {
+      s: clampN(parseFloat(img.dataset.fitScale) || 1, FIT_MIN, FIT_MAX),
+      x: clampN(img.dataset.fitX != null ? parseFloat(img.dataset.fitX) : 50, 0, 100),
+      y: clampN(img.dataset.fitY != null ? parseFloat(img.dataset.fitY) : 50, 0, 100),
+    };
+  }
+  function writeFit(img, f) {
+    const s = clampN(f.s, FIT_MIN, FIT_MAX);
+    const x = clampN(f.x, 0, 100), y = clampN(f.y, 0, 100);
+    if (s === 1 && x === 50 && y === 50) {
+      delete img.dataset.fitScale; delete img.dataset.fitX; delete img.dataset.fitY;
+      img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = '';
+      return;
+    }
+    img.dataset.fitScale = String(+s.toFixed(3));
+    img.dataset.fitX = String(+x.toFixed(2));
+    img.dataset.fitY = String(+y.toFixed(2));
+    img.style.objectPosition = x + '% ' + y + '%';
+    if (s !== 1) { img.style.transform = 'scale(' + s + ')'; img.style.transformOrigin = x + '% ' + y + '%'; }
+    else { img.style.transform = ''; img.style.transformOrigin = ''; }
+  }
+  /* the element that clips a zoomed photo to the frame's edges */
+  function clipOf(img) {
+    const m = img.closest('.mframe');
+    if (m) return m;
+    const p = img.parentElement;
+    if (!p) return img;
+    if (p.classList.contains('fitclip')) return p;
+    const w = document.createElement('span');
+    w.className = 'fitclip';
+    p.insertBefore(w, img);
+    w.appendChild(img);
+    return w;
+  }
+  function ensureFit(img) { clipOf(img); writeFit(img, readFit(img)); }
+  allPhotos().forEach(ensureFit);
+
   /* ── restore saved photos in EVERY mode, so the finished experience
         shows the owner's pictures too ── */
   const restored = dbAll().then((saved) => {
@@ -223,7 +272,7 @@
   function snapshotHTML() {
     const box = document.createElement('div');
     allSections().forEach((s) => box.appendChild(s.cloneNode(true)));
-    box.querySelectorAll('.ephoto-hint, .ed-add, .ed-del').forEach((n) => n.remove());
+    box.querySelectorAll('.ephoto-hint, .ed-add, .ed-del, .fit-tools').forEach((n) => n.remove());
     box.querySelectorAll('[contenteditable]').forEach((n) => {
       n.removeAttribute('contenteditable'); n.removeAttribute('spellcheck'); n.classList.remove('etext');
     });
@@ -285,7 +334,10 @@
     if (!frame.querySelector('.ephoto-hint')) {
       const hint = document.createElement('div');
       hint.className = 'ephoto-hint';
-      hint.textContent = '＋  Tap to add your photo';
+      /* a fresh, still-empty slot says "add"; a filled one advertises the
+         reposition gestures instead */
+      const empty = (img.getAttribute('src') || '').indexOf('Your photo') !== -1;
+      hint.textContent = empty ? '＋  Tap to add your photo' : 'Tap to change · drag to move · pinch to zoom';
       frame.appendChild(hint);
     }
     frame.addEventListener('click', (e) => {
@@ -293,9 +345,101 @@
          stamped on the cover photo) — tapping it should edit the words, not
          open the photo picker */
       if (e.target.closest('.etext')) return;
+      if (e.target.closest('.fit-tools')) return; // zoom buttons handle themselves
       e.preventDefault(); pickFor(img);
     });
+    setupFit(img);
   }
+
+  /* ── drag to move · pinch / buttons to zoom ── */
+  function stepZoom(img, factor) {
+    const f = readFit(img);
+    f.s = clampN(f.s * factor, FIT_MIN, FIT_MAX);
+    writeFit(img, f); save();
+  }
+  function makeFitTools(img) {
+    const host = img.closest('.memory-photo, .cover-photo, .polaroid, .close-photo');
+    if (!host || host.querySelector('.fit-tools')) return;
+    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    const tools = document.createElement('div');
+    tools.className = 'fit-tools';
+    const mk = (cls, glyph, label, fn) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'fit-btn ' + cls; b.textContent = glyph;
+      b.setAttribute('aria-label', label);
+      b.addEventListener('pointerdown', (e) => e.stopPropagation());
+      b.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); fn(); });
+      return b;
+    };
+    tools.appendChild(mk('fit-out', '－', 'Zoom out', () => stepZoom(img, 1 / 1.15)));
+    tools.appendChild(mk('fit-reset', '⟲', 'Reset photo position', () => { writeFit(img, { s: 1, x: 50, y: 50 }); save(); }));
+    tools.appendChild(mk('fit-in', '＋', 'Zoom in', () => stepZoom(img, 1.15)));
+    host.appendChild(tools);
+  }
+  function bindFitGestures(img) {
+    const clip = clipOf(img);
+    if (clip.dataset.fitBound) return;
+    clip.dataset.fitBound = '1';
+    const pts = new Map();
+    let moved = false, pinch0 = 0, scale0 = 1, lastX = 0, lastY = 0, suppress = false;
+    let saveT = 0;
+    const queueSave = () => { clearTimeout(saveT); saveT = setTimeout(save, 250); };
+    clip.addEventListener('pointerdown', (e) => {
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      try { clip.setPointerCapture(e.pointerId); } catch (_) {}
+      if (pts.size === 1) { lastX = e.clientX; lastY = e.clientY; moved = false; }
+      else if (pts.size === 2) {
+        const [a, b] = [...pts.values()];
+        pinch0 = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+        scale0 = readFit(img).s; moved = true;
+      }
+    });
+    clip.addEventListener('pointermove', (e) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const r = clip.getBoundingClientRect();
+      if (pts.size >= 2) { // pinch to zoom
+        const [a, b] = [...pts.values()];
+        const d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+        const f = readFit(img);
+        f.s = clampN(scale0 * (d / pinch0), FIT_MIN, FIT_MAX);
+        writeFit(img, f);
+        clip.classList.add('is-grabbing'); e.preventDefault(); return;
+      }
+      const dx = e.clientX - lastX, dy = e.clientY - lastY;
+      lastX = e.clientX; lastY = e.clientY;
+      if (!moved && Math.abs(dx) + Math.abs(dy) > 2) moved = true;
+      const f = readFit(img);
+      /* drag the picture with the finger → reveal the opposite side */
+      f.x = clampN(f.x - (dx / r.width) * 100, 0, 100);
+      f.y = clampN(f.y - (dy / r.height) * 100, 0, 100);
+      writeFit(img, f);
+      clip.classList.add('is-grabbing'); e.preventDefault();
+    });
+    const end = (e) => {
+      pts.delete(e.pointerId);
+      try { clip.releasePointerCapture(e.pointerId); } catch (_) {}
+      if (pts.size === 0) {
+        clip.classList.remove('is-grabbing');
+        if (moved) { suppress = true; save(); }
+      }
+    };
+    clip.addEventListener('pointerup', end);
+    clip.addEventListener('pointercancel', end);
+    /* a drag ends in a click — swallow it so it doesn't open the photo picker */
+    clip.addEventListener('click', (e) => {
+      if (suppress) { suppress = false; e.stopPropagation(); e.preventDefault(); }
+    }, true);
+    /* desktop: wheel to zoom */
+    clip.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const f = readFit(img);
+      f.s = clampN(f.s * (e.deltaY < 0 ? 1.08 : 1 / 1.08), FIT_MIN, FIT_MAX);
+      writeFit(img, f); queueSave();
+    }, { passive: false });
+  }
+  function setupFit(img) { ensureFit(img); makeFitTools(img); bindFitGestures(img); }
+
   allPhotos().forEach(bindPhoto);
 
   /* ── make each piece of text tappable-to-edit ── */
@@ -654,6 +798,7 @@
     const reader = new FileReader();
     reader.onload = async () => {
       img.src = reader.result;
+      writeFit(img, { s: 1, x: 50, y: 50 }); // a new photo starts centered
       try { await dbSet(img.dataset.photoKey, reader.result); } catch (e) {}
       save();
       if (window.ScrollTrigger) ScrollTrigger.refresh();
@@ -698,7 +843,7 @@
       doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
 
       /* strip every trace of edit mode */
-      doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ephoto-hint, .ed-add, .ed-del').forEach((n) => n.remove());
+      doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ephoto-hint, .ed-add, .ed-del, .fit-tools').forEach((n) => n.remove());
       doc.querySelectorAll('.ephoto').forEach((n) => {
         n.classList.remove('ephoto');
         if (n.style.position === 'relative') n.style.position = '';

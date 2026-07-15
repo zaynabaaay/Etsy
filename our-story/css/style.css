@@ -1020,6 +1020,15 @@ body.reduced-motion .milestone {
 
 .mframe { overflow: hidden; position: relative; }
 
+/* ── photo fit: lets an owner pan (object-position) and zoom (scale) a
+      picture inside its frame. The clip keeps a zoomed photo inside the
+      frame's edges. .mframe already clips; cover/polaroid/close photos get
+      a lightweight .fitclip wrapper (added by edit.js, kept in the saved
+      snapshot and the finished download). At the default fit these are
+      visually identical to a bare <img>. ── */
+.fitclip { display: block; position: relative; overflow: hidden; line-height: 0; }
+.close-photo .fitclip { border-radius: 50% 50% 3px 3px / 60% 60% 3px 3px; }
+
 .memory-photo img {
   display: block;
   width: 100%;

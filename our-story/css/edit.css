@@ -240,6 +240,59 @@ body.editing .memory-photo { position: relative; }
 /* "＋ Add a photo" centers under its memory's photos */
 .ed-add-photo { display: inline-block; margin: 1rem auto 0; }
 
+/* ── photo fit: drag to move, pinch / buttons to zoom ── */
+/* the frame's clip becomes a drag surface while editing */
+body.editing .fitclip,
+body.editing .mframe { cursor: grab; touch-action: none; }
+body.editing .fitclip.is-grabbing,
+body.editing .mframe.is-grabbing { cursor: grabbing; }
+/* while actively dragging/pinching, get the hint overlay out of the way */
+body.editing .ephoto:has(.is-grabbing) .ephoto-hint { opacity: 0 !important; }
+
+/* a small zoom cluster pinned to the photo's bottom edge */
+.fit-tools {
+  position: absolute;
+  left: 50%;
+  bottom: -0.85rem;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  gap: 1px;
+  padding: 2px;
+  border-radius: 100px;
+  background: rgba(23, 16, 9, 0.92);
+  border: 1px solid rgba(201, 161, 95, 0.55);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+/* keep the cluster clear of the polaroid's caption band */
+.polaroid .fit-tools { bottom: clamp(30px, 8.5vw, 42px); }
+.close-photo .fit-tools { bottom: 0.4rem; }
+body.editing .ephoto:hover .fit-tools,
+body.editing .ephoto:focus-within .fit-tools,
+.fit-tools:hover,
+.fit-tools.is-live { opacity: 1; }
+.fit-btn {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  width: 1.9rem;
+  height: 1.7rem;
+  border-radius: 100px;
+  background: transparent;
+  color: #f2e7d0;
+  font-family: 'Jost', sans-serif;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fit-btn:hover { background: rgba(201, 161, 95, 0.28); color: #fff; }
+.fit-btn.fit-reset { font-size: 0.86rem; }
+
 /* a hidden section is simply gone — from the page and the finished site.
    It's brought back from the Sections panel (below). */
 section.is-removed { display: none; }
