@@ -89,11 +89,6 @@ document.querySelector('.replay')?.addEventListener('click', () => {
    masked title, subtitle */
 function initChapterHeads() {
   gsap.utils.toArray('.chapter-head').forEach((head) => {
-    /* the montage's chapter head lives on a sticky stage and is revealed AND
-       faded by the montage's own pinned timeline (initMontage). Handling it
-       here too would put two scroll-triggers on one sticky element, which
-       makes the title stutter — so skip it. */
-    if (head.closest('.scene-montage')) return;
     gsap.timeline({
       scrollTrigger: {
         trigger: head,
@@ -313,50 +308,22 @@ function initMontage() {
   const scene = document.querySelector('.scene-montage');
   if (!mems.length || !scene) return;
 
-  /* scroll budget: an intro for the chapter line, roughly a screen per
-     memory — kept tight so no beat drags */
-  const STEP = 1.5;
-  scene.style.height = Math.round((1.5 + mems.length * 0.8) * 100) + 'vh';
-
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: scene,
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.4, /* follow the scroll closely — no floaty second-long catch-up */
-    },
-  });
-
-  /* the chapter line reveals, holds a beat, then lifts away — ALL on this one
-     pinned timeline, so nothing else animates the title at the same time */
-  const head = scene.querySelector('.chapter-head');
-  if (head) {
-    tl.from(head.querySelector('.chapter-ornament'), { opacity: 0, y: 18, duration: 0.4 }, 0)
-      .from(head.querySelector('.chapter-label'), { opacity: 0, y: 14, duration: 0.4 }, 0.08)
-      .from(head.querySelector('.chapter-title .mask-inner'), { yPercent: 115, ease: 'power2.out', duration: 0.5 }, 0.14)
-      .from(head.querySelector('.chapter-sub'), { opacity: 0, y: 16, duration: 0.4 }, 0.4)
-      /* a clear rise while it's still fully here, then it lifts well up and
-         off as it fades — so the title travels up before it disappears */
-      .to(head, { y: -70, ease: 'none', duration: 0.45 }, 0.55)
-      .to(head, { opacity: 0, y: -190, duration: 0.55, ease: 'power1.in' }, 0.9);
-  }
-
-  /* each memory glides steadily upward the whole time it's on screen — never
-     a frozen frame — fading in as it enters and out as it leaves, so
-     scrolling always moves something and no beat feels paused. The last one
-     settles at center and stays, ending the montage on a held image rather
-     than an empty screen. */
-  const START = 1.6; /* after the title has fully faded out (its exit ends ~1.45) */
-  mems.forEach((mem, i) => {
-    const last = i === mems.length - 1;
-    const t = START + i * STEP;
-    tl.set(mem, { visibility: 'visible' }, t)
-      .fromTo(mem, { y: 30 }, { y: last ? 0 : -66, ease: 'none', duration: STEP + 0.2 }, t)
-      .fromTo(mem.querySelector('.memory-title'),
-        { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' }, t)
-      .fromTo(mem.querySelectorAll('.memory-photo'),
-        { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, t + 0.06);
-    if (!last) tl.to(mem, { opacity: 0, duration: 0.4, ease: 'power1.in' }, t + STEP - 0.28);
+  /* FREE-SCROLLING, like The Beginning: the memories stack down the page and
+     each one reveals as it enters the viewport — its title, then its photo
+     group — tied to scroll. No pinning, no one-at-a-time stage. */
+  mems.forEach((mem) => {
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: mem,
+        start: 'top 84%',
+        end: 'top 50%',
+        scrub: 0.7,
+      },
+    })
+      .from(mem.querySelector('.memory-title'), { opacity: 0, y: 26 }, 0)
+      /* animate the photo GROUP (not each rotated print) so the handmade tilt
+         from CSS is preserved */
+      .from(mem.querySelector('.memory-photos'), { opacity: 0, y: 42 }, 0.12);
   });
 }
 

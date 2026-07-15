@@ -1020,47 +1020,10 @@ body.reduced-motion .milestone {
 /* ── cinematic: one screen per beat. The chapter line speaks first and
       lifts away; then each memory holds the screen alone, and a scroll
       hands it to the next. (Still/edit modes keep the stacked flow.) ── */
-body.cinematic .scene-montage { height: 490vh; padding: 0; } /* js/main.js recomputes from the memory count */
-body.cinematic .montage-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100lvh;
-  overflow: hidden;
-  /* the stage carries its own paper so the grain holds still while the
-     tall section scrolls past behind it — otherwise the texture appears
-     to slide under the pinned photos */
-  background-color: var(--cream);
-  background-image: var(--paper);
-  background-size: var(--paper-size);
-  background-blend-mode: var(--paper-blend);
-}
-body.cinematic .scene-montage .chapter-head {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-body.cinematic .memories-list {
-  position: absolute;
-  inset: 0;
-  max-width: none;
-  padding: 0;
-  gap: 0;
-}
-body.cinematic .memory {
-  position: absolute;
-  inset: 0;
-  visibility: hidden; /* each is revealed on its own beat (js/main.js) */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0 clamp(1.25rem, 5vw, 3rem);
-}
+/* The Memories now FREE-SCROLL, like The Beginning: the memories stack in
+   normal flow (the base .memories-list / .memory layout) and each one reveals
+   as it enters the viewport (js/main.js). The old pinned stage — a sticky
+   100vh panel with absolutely-stacked, one-at-a-time memories — is retired. */
 /* the scroll-animated containers get their own GPU layer, so their sepia
    filter and (large) box-shadows rasterize ONCE and the scroll transform is
    pure compositing. Without this, every frame of the glide/press re-renders
