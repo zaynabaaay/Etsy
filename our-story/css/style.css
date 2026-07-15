@@ -981,7 +981,7 @@ body.reduced-motion .milestone {
 
 .memory { text-align: center; }
 
-/* the moment's name, spoken over its pictures */
+/* the moment's name, followed by the pictures it introduces */
 .memory-title {
   font-family: var(--font-serif);
   font-style: italic;
@@ -989,18 +989,18 @@ body.reduced-motion .milestone {
   font-size: var(--size-voice-sm);
   line-height: 1.25;
   color: var(--sepia-deep);
-  margin: 0 auto clamp(0.65rem, 1.6svh, 0.95rem);
+  margin: 0 auto var(--moments-space-within);
   max-width: 30ch;
 }
 
-/* the little "why this mattered" line under a memory's name */
+/* the little "why this mattered" line reads as a caption after the pictures */
 .memory-sub {
   font-family: var(--font-serif);
   font-weight: 500;
   font-size: clamp(1rem, 3vw, 1.15rem);
   line-height: 1.55;
   color: var(--sepia-soft);
-  margin: 0 auto var(--moments-space-within);
+  margin: var(--moments-space-within) auto 0;
   max-width: 42ch;
 }
 
