@@ -28,6 +28,9 @@
       --gold: #aa8848;
       --floral-image: none;
       --wax: #5b181a;
+      --font-display: "Invitation Didone", Didot, "Bodoni 72", "Bodoni MT", "Times New Roman", serif;
+      --font-body: Baskerville, "Baskerville Old Face", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      --font-script: "Snell Roundhand", "Apple Chancery", "Brush Script MT", cursive;
     }
 
     * { box-sizing: border-box; }
@@ -38,7 +41,7 @@
       overflow: hidden;
       background: var(--ivory);
       color: var(--brown);
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-body);
       -webkit-font-smoothing: antialiased;
     }
 
@@ -124,7 +127,7 @@
         radial-gradient(circle at 84% 42%, rgba(193,159,104,.09), transparent 28rem),
         repeating-linear-gradient(96deg, rgba(106,77,44,.018) 0 1px, transparent 1px 5px),
         #f2eadc;
-      font-family: "Bodoni 72", Didot, "Times New Roman", serif;
+      font-family: var(--font-body);
     }
 
     .story-page::before {
@@ -157,9 +160,9 @@
     .story-kicker,
     .story-label {
       margin: 0;
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-display);
       font-size: clamp(10px, 2.7vw, 13px);
-      font-weight: 500;
+      font-weight: 400;
       line-height: 1.4;
       letter-spacing: .34em;
       text-transform: uppercase;
@@ -242,7 +245,7 @@
     .hero-place {
       margin: 10px 0 0;
       color: var(--story-muted);
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-display);
       font-size: 11px;
       letter-spacing: .26em;
       text-transform: uppercase;
@@ -254,7 +257,7 @@
       gap: 12px;
       margin-top: clamp(48px, 9vh, 84px);
       color: var(--story-gold);
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-display);
       font-size: 9px;
       letter-spacing: .32em;
       text-transform: uppercase;
@@ -317,7 +320,7 @@
       display: block;
       padding: 13px 5px 3px;
       color: var(--story-muted);
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-display);
       font-size: 9px;
       letter-spacing: .28em;
       text-align: center;
@@ -327,6 +330,7 @@
     .portrait-copy h2,
     .section-title {
       margin: 16px 0 22px;
+      font-family: var(--font-display);
       font-size: clamp(40px, 11.5vw, 72px);
       font-weight: 400;
       line-height: .98;
@@ -380,6 +384,7 @@
       display: block;
       margin-bottom: 18px;
       color: var(--story-gold);
+      font-family: var(--font-display);
       font-size: 35px;
       line-height: 1;
     }
@@ -387,9 +392,9 @@
     .schedule-item h3,
     .guest-card h3 {
       margin: 0 0 10px;
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-display);
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 400;
       letter-spacing: .28em;
       text-transform: uppercase;
     }
@@ -411,8 +416,8 @@
       transform: rotate(.6deg);
     }
 
-    .venue-card strong { display: block; margin-bottom: 8px; font-size: 22px; font-weight: 400; }
-    .venue-card span { color: var(--story-muted); font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+    .venue-card strong { display: block; margin-bottom: 8px; font-family: var(--font-display); font-size: 22px; font-weight: 400; }
+    .venue-card span { color: var(--story-muted); font-family: var(--font-display); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
 
     .note-section {
       padding-top: clamp(120px, 21vh, 210px);
@@ -494,7 +499,7 @@
       border: 1px solid #d6ae64;
       color: #f2e6d3;
       background: transparent;
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-display);
       font-size: 10px;
       letter-spacing: .3em;
       text-decoration: none;
@@ -509,7 +514,7 @@
       min-height: 1.5em;
       margin: 22px 0 0;
       color: rgba(242,230,211,.68);
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-display);
       font-size: 10px;
       line-height: 1.5;
       letter-spacing: .16em;
@@ -527,8 +532,8 @@
     }
 
     .closing-section::before { right: -26%; bottom: -18%; opacity: .42; transform: rotate(-18deg); }
-    .closing-script { margin: 0 0 28px; font-size: clamp(38px, 10vw, 64px); font-style: italic; line-height: 1.1; }
-    .closing-names { margin: 0; font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11px; letter-spacing: .34em; text-transform: uppercase; }
+    .closing-script { margin: 0 0 28px; font-family: var(--font-script); font-size: clamp(38px, 10vw, 64px); font-style: normal; line-height: 1.1; }
+    .closing-names { margin: 0; font-family: var(--font-display); font-size: 11px; letter-spacing: .34em; text-transform: uppercase; }
 
     .closing-seal {
       display: grid;
@@ -595,7 +600,7 @@
 
     h1 {
       margin: 0;
-      font-family: "Bodoni 72 Smallcaps", "Bodoni 72", Didot, "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: 2.82cqw;
       font-weight: 400;
       line-height: 1;
@@ -606,7 +611,7 @@
 
     .subtitle {
       margin: 3.2% 0 0;
-      font-family: "Bodoni 72", Didot, "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: 1.36cqw;
       font-weight: 400;
       line-height: 1;
@@ -891,7 +896,7 @@
 
     .date {
       margin: 0;
-      font-family: "Bodoni 72", Didot, "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: 2.82cqw;
       font-weight: 400;
       line-height: 1;
@@ -917,7 +922,7 @@
 
     .tap-copy {
       margin: 0;
-      font-family: "Bodoni 72", Didot, "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: 1.34cqw;
       font-weight: 400;
       line-height: 1;
@@ -1102,7 +1107,7 @@
       display: block;
       padding: 15px 4px 13px;
       color: #705a50;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", serif;
+      font-family: var(--font-display);
       font-size: clamp(8px, 2vw, 10px);
       letter-spacing: .24em;
       text-align: center;
@@ -1120,7 +1125,7 @@
 
     .portrait-copy .story-label {
       color: var(--story-gold);
-      font-family: "Invitation Didone", Didot, "Bodoni 72", serif;
+      font-family: var(--font-display);
       font-size: clamp(10px, 2.6vw, 12px);
       letter-spacing: .28em;
       text-transform: uppercase;
@@ -1129,7 +1134,7 @@
     .portrait-copy h2 {
       margin: clamp(21px, 4vh, 34px) 0 clamp(25px, 4.5vh, 38px);
       color: #4d2925;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", serif;
+      font-family: var(--font-display);
       font-size: clamp(52px, 13vw, 82px);
       font-style: italic;
       font-weight: 400;
@@ -1154,7 +1159,7 @@
     .portrait-story {
       margin: 0;
       color: #6d5951;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", serif;
+      font-family: var(--font-body);
       font-size: clamp(16px, 4.1vw, 20px);
       line-height: 1.8;
     }
@@ -1163,9 +1168,11 @@
       display: block;
       margin-top: 24px;
       color: #9a793c;
-      font-size: .82em;
-      font-style: italic;
-      letter-spacing: .08em;
+      font-family: var(--font-script);
+      font-size: 1.35em;
+      font-style: normal;
+      line-height: 1.15;
+      letter-spacing: .02em;
     }
 
     .details-section,
@@ -1425,7 +1432,7 @@
       max-width: none;
       margin: 0 0 clamp(20px, 3.5vh, 34px);
       color: #53302a;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: clamp(11px, 2.8vw, 14px);
       font-weight: 400;
       line-height: 1;
@@ -1446,7 +1453,7 @@
 
     .hero-formal-copy p {
       margin: 0;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: clamp(9px, 2.25vw, 12px);
       font-weight: 400;
       line-height: 1.25;
@@ -1460,7 +1467,7 @@
       justify-items: center;
       gap: 0;
       margin: 0;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", "Bodoni MT", "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: clamp(56px, 16.5vw, 90px);
       font-weight: 400;
       line-height: .88;
@@ -1509,7 +1516,7 @@
       gap: 7px;
       margin: 0;
       color: #56362f;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: clamp(9px, 2.3vw, 12px);
       font-weight: 400;
       line-height: 1.3;
@@ -1524,7 +1531,7 @@
       gap: 8px;
       margin: clamp(24px, 4.2vh, 38px) 0 0;
       color: #5a4038;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: clamp(9px, 2.3vw, 12px);
       letter-spacing: .20em;
       text-transform: uppercase;
@@ -1532,7 +1539,7 @@
 
     .hero-place strong {
       color: #4d2c26;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", "Times New Roman", serif;
+      font-family: var(--font-display);
       font-size: clamp(16px, 4.4vw, 23px);
       font-weight: 400;
       letter-spacing: .13em;
@@ -1689,7 +1696,7 @@
     .reference-invite .story-kicker {
       margin: 0 0 clamp(25px, 3vw, 38px);
       color: #50302b;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", serif;
+      font-family: var(--font-display);
       font-size: clamp(10px, 1.05vw, 13px);
       line-height: 1.2;
       letter-spacing: .42em;
@@ -1725,7 +1732,7 @@
     .reference-invite .couple-names .ampersand {
       margin: 0;
       color: #b19054;
-      font-family: "Snell Roundhand", "Apple Chancery", "Brush Script MT", cursive;
+      font-family: var(--font-script);
       font-size: .55em;
       font-style: normal;
       letter-spacing: 0;
@@ -1751,7 +1758,7 @@
       justify-content: center;
       margin: 0;
       color: #4e302c;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", serif;
+      font-family: var(--font-display);
       font-size: clamp(12px, 1.35vw, 18px);
       letter-spacing: .43em;
       text-transform: uppercase;
@@ -1772,7 +1779,7 @@
     .reference-time {
       margin: clamp(17px, 2vw, 25px) 0 0;
       color: #5a4038;
-      font-family: "Invitation Didone", Didot, "Bodoni 72", serif;
+      font-family: var(--font-display);
       font-size: clamp(8px, .88vw, 11px);
       letter-spacing: .30em;
       text-transform: uppercase;
@@ -1796,7 +1803,7 @@
 
     .reference-invite .hero-place strong {
       color: #684a40;
-      font-family: "Snell Roundhand", "Apple Chancery", "Brush Script MT", cursive;
+      font-family: var(--font-script);
       font-size: clamp(27px, 3vw, 42px);
       font-style: normal;
       line-height: 1.05;
