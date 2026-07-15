@@ -14,7 +14,7 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=103">
+  <link rel="stylesheet" href="css/style.css?v=115">
   <link rel="stylesheet" href="css/edit.css?v=103">
 </head>
 <body>
@@ -49,12 +49,23 @@
         <p class="cover-subline">Thankful for every moment with you</p>
       </div>
 
-      <!-- EDIT ME · Replace this photo: assets/photos/cover.jpg -->
-      <div class="cover-photo">
-        <span class="tape" aria-hidden="true"></span>
-        <img src="assets/photos/cover.jpg" alt="Amara &amp; James" loading="eager">
-        <!-- EDIT ME · The year it began — sits in the photo's border like a stamp -->
-        <p class="cover-est">Est. 2024</p>
+      <!-- The flowers are anchored to this stage so they stay tucked behind
+           the photo at every screen size, matching the reference. -->
+      <div class="cover-photo-stage">
+        <img class="cover-flower cover-flower-left"
+             src="assets/decor/opening-babys-breath-left.png"
+             alt="" aria-hidden="true" draggable="false">
+        <img class="cover-flower cover-flower-right"
+             src="assets/decor/opening-babys-breath-right.png"
+             alt="" aria-hidden="true" draggable="false">
+
+        <!-- EDIT ME · Replace this photo: assets/photos/cover.jpg -->
+        <div class="cover-photo">
+          <span class="tape" aria-hidden="true"></span>
+          <img src="assets/photos/cover.jpg" alt="Amara &amp; James" loading="eager">
+          <!-- EDIT ME · The year it began — sits in the photo's border like a stamp -->
+          <p class="cover-est">Est. 2024</p>
+        </div>
       </div>
 
       <!-- the occasion sign-off beneath the photo -->
@@ -83,7 +94,7 @@
        thread that draws itself down the page as you scroll.
        ════════════════════════════════════════════════════════════════ -->
   <section class="scene-beginning" id="beginning" data-label="The Beginning">
-    <div class="torn-edge" aria-hidden="true">
+    <div class="torn-edge" aria-hidden="true" hidden>
       <svg viewBox="0 0 1440 90" preserveAspectRatio="none">
         <defs>
           <filter id="tear-shadow" x="-5%" y="-100%" width="110%" height="300%">
