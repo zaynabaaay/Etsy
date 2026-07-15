@@ -744,43 +744,162 @@ body.cinematic .cover > * { opacity: 0; }
   background-size: var(--paper-size);
   background-blend-mode: var(--paper-blend);
   color: var(--ink);
-  padding: clamp(8rem, 22vw, 13rem) clamp(1.5rem, 6vw, 4rem);
+  padding: clamp(7rem, 18vw, 11rem) 0 0;
   text-align: center;
   overflow: hidden;
 }
 .scene-numbers::before {
+  display: none;
+}
+
+/* Unlike photo-led chapters, Milestones continues directly into a held
+   scrolling stage. */
+.numbers-head {
+  margin-bottom: 0;
+}
+
+.milestones-scroll {
+  position: relative;
+  height: 400svh;
+  margin-top: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.milestones-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 36rem;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.milestones-sticky::before {
   content: '';
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(92vw, 660px);
-  aspect-ratio: 1.5;
+  width: min(110vw, 900px);
+  aspect-ratio: 1.2;
   transform: translate(-50%, -50%);
-  background: radial-gradient(ellipse at center, rgba(214, 170, 100, 0.18), transparent 68%);
+  background: radial-gradient(ellipse at center, rgba(214, 170, 100, 0.15), transparent 68%);
   pointer-events: none;
 }
 
-.counter { position: relative; }
+.counter {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 
-.counter-script {
-  font-family: var(--font-script);
-  font-size: var(--size-script);
+.milestone {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  opacity: 0;
+  visibility: hidden;
+}
+
+.milestone:first-child,
+.milestone.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.milestone-heart {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
   color: var(--gold-deep);
-  transform: rotate(-2deg);
-  margin-bottom: clamp(0.8rem, 2.5vw, 1.4rem);
+  margin-bottom: clamp(1.1rem, 3vh, 1.8rem);
+}
+
+.milestone-heart span {
+  width: 1.15rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.58;
+}
+
+.milestone-heart b {
+  font-size: 0.62rem;
+  font-weight: 400;
+}
+
+.milestone-connector {
+  position: relative;
+  width: 1px;
+  height: clamp(1.6rem, 5vh, 2.75rem);
+  margin: clamp(0.75rem, 2vh, 1.1rem) 0;
+  background: linear-gradient(to bottom, rgba(127, 91, 43, 0.2), rgba(127, 91, 43, 0.75));
+}
+
+.milestone-connector::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 4px;
+  height: 4px;
+  background: var(--gold-deep);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.milestone-paper {
+  position: relative;
+  flex: none;
+  width: min(84vw, 650px);
+  aspect-ratio: 1.82;
+  display: grid;
+  place-items: center;
+}
+
+.milestone-paper img {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 50%;
+  width: 133.33%;
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -50%);
+  /* Feather away the generated photo's outer backdrop while preserving the
+     full torn card and its contact shadow, so it blends into the site's
+     continuous paper texture without a rectangular image boundary. */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 13%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 13%, #000 90%, transparent 100%);
+  mask-composite: intersect;
+  pointer-events: none;
+  user-select: none;
+}
+
+.milestone .stat {
+  position: relative;
+  z-index: 1;
 }
 
 .counter .stat-value {
   font-weight: 500;
   font-size: clamp(4.5rem, 20vw, 9rem);
   line-height: 1;
+  letter-spacing: clamp(0.08em, 1.8vw, 0.16em);
+  padding-left: clamp(0.08em, 1.8vw, 0.16em);
   color: var(--ink);
   font-variant-numeric: lining-nums;
   text-shadow: 0 0 50px rgba(201, 161, 95, 0.28);
 }
 
 .counter-label {
-  margin-top: clamp(1rem, 3vw, 1.6rem);
+  margin: 0;
   font-family: var(--font-label);
   font-weight: 300;
   font-size: var(--size-label);
@@ -791,12 +910,36 @@ body.cinematic .cover > * { opacity: 0; }
 }
 
 .counter-note {
-  margin-top: clamp(1.2rem, 3.5vw, 1.9rem);
-  font-family: var(--font-script);
+  margin: 0;
+  font-family: 'Sacramento', var(--font-script);
   font-size: var(--size-script);
   color: var(--gold-deep);
   transform: rotate(-3deg);
   opacity: 0.9;
+}
+
+/* Editing and reduced-motion mode show every milestone in sequence so none
+   of the content is hidden or dependent on scroll animation. */
+body.reduced-motion .milestones-scroll {
+  height: auto;
+}
+
+body.reduced-motion .milestones-sticky {
+  position: relative;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+body.reduced-motion .counter {
+  height: auto;
+}
+
+body.reduced-motion .milestone {
+  position: relative;
+  min-height: min(46rem, 100svh);
+  opacity: 1;
+  visibility: visible;
 }
 
 /* ══════════════════════════════════════════════

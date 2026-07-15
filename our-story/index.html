@@ -14,7 +14,7 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=118">
+  <link rel="stylesheet" href="css/style.css?v=124">
   <link rel="stylesheet" href="css/edit.css?v=103">
 </head>
 <body>
@@ -181,22 +181,74 @@
        up as they arrive; the last one is always the joke.
        ════════════════════════════════════════════════════════════════ -->
   <section class="scene-numbers" id="numbers" data-label="In Numbers">
-    <!-- A single held beat: the live "days together" counter, which
-         recomputes from your date and grows by one each day. -->
-    <div class="counter">
-      <!-- EDIT ME · Small line above the number -->
-      <p class="counter-script">us, so far</p>
-
-      <!-- Counts itself from your date.
-           EDIT ME · your date in data-count-from-date (YYYY-MM-DD) -->
-      <div class="stat" data-count-from-date="2020-07-07">
-        <p class="stat-value">2,194</p>
+    <div class="chapter-head numbers-head">
+      <div class="chapter-ornament" aria-hidden="true">
+        <svg viewBox="0 0 40 34" width="22" height="19" fill="none">
+          <path d="M20 30C20 30 3 19.5 3 9.8 3 4.9 7 2 11 2c4.3 0 7.4 3 9 6.2C21.6 5 24.7 2 29 2c4 0 8 2.9 8 7.8C37 19.5 20 30 20 30Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
+      <p class="chapter-label">Chapter Two</p>
+      <h2 class="chapter-title"><span class="mask"><span class="mask-inner">Milestones</span></span></h2>
+      <p class="chapter-sub">Every day, another piece of our story.</p>
+    </div>
 
-      <!-- EDIT ME · label under the number -->
-      <p class="counter-label">days together</p>
-      <!-- EDIT ME · the little handwritten aside -->
-      <p class="counter-note">and counting</p>
+    <!-- Four held milestone cards. The stage stays in place while scrolling
+         changes the words and number over the same torn paper. -->
+    <div class="milestones-scroll">
+      <div class="milestones-sticky">
+        <div class="counter">
+          <article class="milestone is-active" aria-hidden="false">
+            <div class="milestone-heart" aria-hidden="true"><span></span><b>&hearts;</b><span></span></div>
+            <p class="counter-label">days together</p>
+            <span class="milestone-connector" aria-hidden="true"></span>
+            <div class="milestone-paper">
+              <img src="assets/decor/milestone-paper-card.png?v=1" alt="" aria-hidden="true">
+              <!-- EDIT ME · your date in data-count-from-date (YYYY-MM-DD) -->
+              <div class="stat" data-count-from-date="2020-07-07">
+                <p class="stat-value">2,194</p>
+              </div>
+            </div>
+            <span class="milestone-connector" aria-hidden="true"></span>
+            <p class="counter-note">and counting</p>
+          </article>
+
+          <article class="milestone" aria-hidden="true">
+            <div class="milestone-heart" aria-hidden="true"><span></span><b>&hearts;</b><span></span></div>
+            <p class="counter-label">photos we kept</p>
+            <span class="milestone-connector" aria-hidden="true"></span>
+            <div class="milestone-paper">
+              <img src="assets/decor/milestone-paper-card.png?v=1" alt="" aria-hidden="true">
+              <div class="stat"><p class="stat-value">327</p></div>
+            </div>
+            <span class="milestone-connector" aria-hidden="true"></span>
+            <p class="counter-note">little moments we saved</p>
+          </article>
+
+          <article class="milestone" aria-hidden="true">
+            <div class="milestone-heart" aria-hidden="true"><span></span><b>&hearts;</b><span></span></div>
+            <p class="counter-label">places explored</p>
+            <span class="milestone-connector" aria-hidden="true"></span>
+            <div class="milestone-paper">
+              <img src="assets/decor/milestone-paper-card.png?v=1" alt="" aria-hidden="true">
+              <div class="stat"><p class="stat-value">14</p></div>
+            </div>
+            <span class="milestone-connector" aria-hidden="true"></span>
+            <p class="counter-note">from near and far</p>
+          </article>
+
+          <article class="milestone" aria-hidden="true">
+            <div class="milestone-heart" aria-hidden="true"><span></span><b>&hearts;</b><span></span></div>
+            <p class="counter-label">life we&rsquo;re building</p>
+            <span class="milestone-connector" aria-hidden="true"></span>
+            <div class="milestone-paper">
+              <img src="assets/decor/milestone-paper-card.png?v=1" alt="" aria-hidden="true">
+              <div class="stat"><p class="stat-value">1</p></div>
+            </div>
+            <span class="milestone-connector" aria-hidden="true"></span>
+            <p class="counter-note">my favourite forever</p>
+          </article>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -218,7 +270,7 @@
         </svg>
       </div>
       <!-- EDIT ME · Chapter label -->
-      <p class="chapter-label">Chapter Two</p>
+      <p class="chapter-label">Chapter Three</p>
       <!-- EDIT ME · Chapter title -->
       <h2 class="chapter-title"><span class="mask"><span class="mask-inner">The Moments That Made Us</span></span></h2>
       <!-- EDIT ME · Chapter subtitle -->
@@ -386,7 +438,7 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
-  <script src="js/edit.js?v=103"></script>
-  <script src="js/main.js?v=107"></script>
+  <script src="js/edit.js?v=106"></script>
+  <script src="js/main.js?v=109"></script>
 </body>
 </html>

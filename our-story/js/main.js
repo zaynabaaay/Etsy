@@ -241,20 +241,49 @@ function initBeginning() {
 function initNumbers() {
 
   const counter = document.querySelector('.counter');
-  if (!counter) return;
+  const scroll = document.querySelector('.milestones-scroll');
+  const milestones = gsap.utils.toArray('.milestone');
+  if (!counter || !scroll || !milestones.length) return;
 
-  /* the beat reveals: script, then the number, its label, and the aside */
-  gsap.timeline({
-    scrollTrigger: { trigger: counter, start: 'top 72%', once: true },
-    defaults: { ease: 'power2.out' },
-  })
-    .from('.counter-script', { opacity: 0, y: 16, duration: 0.9 })
-    .from('.counter .stat-value', { opacity: 0, y: 26, duration: 1.0 }, '-=0.5')
-    .from('.counter-label', { opacity: 0, y: 14, duration: 0.8 }, '-=0.45')
-    .from('.counter-note', { opacity: 0, scale: 0.9, rotate: -7, duration: 0.7 }, '-=0.3');
+  gsap.set(milestones, { autoAlpha: 0 });
+  gsap.set(milestones[0], { autoAlpha: 1 });
+
+  const setActiveMilestone = (index) => {
+    milestones.forEach((milestone, i) => {
+      const active = i === index;
+      milestone.classList.toggle('is-active', active);
+      milestone.setAttribute('aria-hidden', active ? 'false' : 'true');
+    });
+  };
+  setActiveMilestone(0);
+
+  /* The stage is held by CSS sticky positioning. This scrubbed timeline
+     cross-fades each complete milestone over the same torn-paper card, so
+     the number appears to change as the reader continues downward. */
+  const scenes = gsap.timeline({
+    scrollTrigger: {
+      trigger: scroll,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.55,
+      onUpdate: (self) => setActiveMilestone(Math.round(self.progress * (milestones.length - 1))),
+    },
+  });
+
+  for (let i = 1; i < milestones.length; i++) {
+    const at = i - 0.5;
+    scenes
+      .to(milestones[i - 1], { autoAlpha: 0, duration: 0.5, ease: 'power1.inOut' }, at)
+      .fromTo(milestones[i],
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: 0.5, ease: 'power1.inOut' }, at)
+      .fromTo(milestones[i].querySelector('.stat-value'),
+        { y: 18, scale: 0.96 },
+        { y: 0, scale: 1, duration: 0.5, ease: 'power2.out' }, at);
+  }
 
   /* the number counts itself up from zero */
-  const stat = counter.querySelector('.stat');
+  const stat = counter.querySelector('[data-count-from-date]');
   const valueEl = stat && stat.querySelector('.stat-value');
   const target = parseInt(stat && stat.dataset.count, 10);
   if (valueEl && !isNaN(target)) {
@@ -263,7 +292,7 @@ function initNumbers() {
       val: target,
       duration: 1.9,
       ease: 'power2.out',
-      scrollTrigger: { trigger: counter, start: 'top 66%', once: true },
+      scrollTrigger: { trigger: scroll, start: 'top 78%', once: true },
       onUpdate: () => {
         valueEl.textContent = Math.round(c.val).toLocaleString('en-US');
       },

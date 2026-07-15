@@ -120,6 +120,34 @@
       swapFresh(oldOpen);
     }
 
+    /* Milestones grew from one counter into a held sequence of cards. Swap
+       only that section for the new structure; every other saved word,
+       photo, flower position, and section choice remains untouched. */
+    let oldNumbers = box.querySelector('.scene-numbers');
+    if (oldNumbers && !oldNumbers.querySelector('.milestones-scroll')) {
+      swapFresh(oldNumbers);
+      oldNumbers = box.querySelector('.scene-numbers');
+    }
+
+    /* Older saved copies may also predate the Milestones chapter heading. */
+    const freshNumbersHead = document.querySelector('.scene-numbers .numbers-head');
+    if (oldNumbers && freshNumbersHead && !oldNumbers.querySelector('.numbers-head')) {
+      oldNumbers.insertBefore(freshNumbersHead.cloneNode(true), oldNumbers.firstChild);
+      migrated = true;
+    }
+
+    const montageChapter = box.querySelector('.scene-montage .chapter-label');
+    if (oldNumbers && montageChapter && montageChapter.textContent.trim().toLowerCase() === 'chapter two') {
+      montageChapter.textContent = 'Chapter Three';
+      migrated = true;
+    }
+
+    const staleCounterScripts = box.querySelectorAll('.counter-script');
+    if (staleCounterScripts.length) {
+      staleCounterScripts.forEach((line) => line.remove());
+      migrated = true;
+    }
+
     /* the photo caption was retired from the cover — strip it from any
        snapshot that still carries it (e.g. one re-saved by an earlier
        migration, while the caption was briefly part of the template). */
