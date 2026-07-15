@@ -599,6 +599,7 @@ body.cinematic .cover > * { opacity: 0; }
 }
 
 .moment-date { grid-area: date; }
+.moment .moment-photo-stage { grid-area: photo; }
 .moment .polaroid { grid-area: photo; }
 .moment .moment-text { grid-area: text; }
 
@@ -618,6 +619,75 @@ body.cinematic .cover > * { opacity: 0; }
 }
 
 /* ── polaroid ── */
+.moment-photo-stage {
+  position: relative;
+  isolation: isolate;
+  width: min(78vw, 340px);
+  overflow: visible;
+}
+
+.moment-photo-stage .polaroid {
+  z-index: 2;
+  width: 100%;
+}
+
+/* The floral placements mirror the reference: baby's breath rises behind
+   the first print on the left, returns behind the second on the right, and
+   a smaller baby's-breath/olive pairing grows behind the final print. */
+.moment-flower {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  max-width: none;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  opacity: 0.82;
+  filter: saturate(0.46) sepia(0.12) brightness(1.04);
+}
+
+.moment-flower--one {
+  width: 56%;
+  left: -33%;
+  bottom: 4%;
+  transform: rotate(-12deg);
+  transform-origin: 52% 96%;
+}
+
+.moment-flower--two {
+  width: 53%;
+  right: -25%;
+  bottom: 2%;
+  transform: rotate(14deg) scaleX(-1);
+  transform-origin: 48% 96%;
+}
+
+.moment-flower--three {
+  width: 74%;
+  left: -53%;
+  bottom: -2%;
+  transform: rotate(-7deg);
+  transform-origin: 54% 92%;
+}
+
+@media (max-width: 767px) {
+  .moment-flower--one {
+    width: 52%;
+    left: -24%;
+  }
+
+  .moment-flower--two {
+    width: 49%;
+    right: -19%;
+  }
+
+  .moment-flower--three {
+    width: 64%;
+    left: -31%;
+  }
+}
+
 .polaroid {
   position: relative;
   width: min(78vw, 340px);
