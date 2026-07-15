@@ -696,6 +696,12 @@ body.cinematic .cover > * { opacity: 0; }
   color: var(--ink);
 }
 
+/* The memories stack on phones, so the centre thread would run through the
+   content without communicating the desktop's left/right relationship. */
+@media (max-width: 767px) {
+  .thread { display: none; }
+}
+
 /* desktop: moments alternate around the thread */
 @media (min-width: 768px) {
   .moment {
@@ -1404,7 +1410,10 @@ body > section:not(.scene-quiet) {
   --paper-cut-height: clamp(26px, 5.5vw, 72px);
   --paper-cut-mask: url('../assets/decor/paper-edge-01.png?v=2');
   position: relative;
-  overflow: visible;
+  /* Let the torn edge overlap the next sheet vertically, but never let
+     off-canvas flowers widen or horizontally shift the mobile page. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 body > section:not(.scene-quiet)::after {
