@@ -211,7 +211,9 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: clamp(4rem, 12vw, 7rem) clamp(1.5rem, 6vw, 4rem) clamp(5rem, 12vw, 7rem);
+  /* Vertical rhythm follows the viewport height, not its width. Using vw here
+     made the cover unnecessarily tall on wide desktop screens. */
+  padding: clamp(2.75rem, 5.5svh, 4rem) clamp(1.5rem, 6vw, 4rem) clamp(2.25rem, 4.5svh, 3.5rem);
   overflow: hidden;
   /* the opening's own warm sheet (a touch warmer than the page beneath,
      so the deckled overlap into the next section still reads) */
@@ -262,7 +264,7 @@ body {
   text-transform: uppercase;
   padding-left: 0.34em;
   color: var(--sepia);
-  margin-bottom: clamp(0.6rem, 1.9vw, 0.85rem);
+  margin-bottom: clamp(0.45rem, 1svh, 0.7rem);
 }
 
 /* divider — a gold rule · heart · rule beneath the names */
@@ -271,7 +273,7 @@ body {
   align-items: center;
   gap: clamp(0.5rem, 1.8vw, 0.75rem);
   color: var(--gold-deep);
-  margin-bottom: clamp(0.7rem, 2.2vw, 1.05rem);
+  margin-bottom: clamp(0.45rem, 1.1svh, 0.75rem);
 }
 .cover-rule .rule-line {
   display: block;
@@ -288,7 +290,7 @@ body {
   line-height: 1.04;
   color: var(--sepia-deep);
   letter-spacing: 0.005em;
-  margin-bottom: clamp(0.6rem, 1.8vw, 0.9rem);
+  margin-bottom: clamp(0.35rem, 0.9svh, 0.65rem);
 }
 .cover-names .amp {
   font-family: var(--font-serif);
@@ -403,7 +405,7 @@ body.cinematic .cover > * { opacity: 0; }
    with the date on shorter/landscape screens — it simply follows the lockup,
    as in the reference. */
 .scroll-cue {
-  margin-top: clamp(1.6rem, 5.5vw, 2.8rem);
+  margin-top: clamp(1.25rem, 2.8svh, 2rem);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -455,7 +457,7 @@ body.cinematic .cover > * { opacity: 0; }
   background-size: var(--paper-size);
   background-blend-mode: var(--paper-blend);
   color: var(--ink);
-  padding: clamp(5rem, 14vw, 9rem) 0 clamp(6rem, 16vw, 11rem);
+  padding: clamp(4rem, 7svh, 5.5rem) 0 clamp(4.5rem, 8svh, 6.5rem);
 }
 
 .torn-edge {
@@ -528,12 +530,12 @@ body.cinematic .cover > * { opacity: 0; }
 .chapter-head {
   text-align: center;
   padding: 0 clamp(1.5rem, 6vw, 4rem);
-  margin-bottom: clamp(4rem, 12vw, 8rem);
+  margin-bottom: clamp(2.75rem, 5svh, 4rem);
 }
 
 .chapter-ornament {
   color: var(--gold-deep);
-  margin-bottom: 1.1rem;
+  margin-bottom: 0.75rem;
 }
 
 .chapter-label {
@@ -544,7 +546,7 @@ body.cinematic .cover > * { opacity: 0; }
   text-transform: uppercase;
   color: var(--gold-deep);
   padding-left: 0.42em;
-  margin-bottom: 1.2rem;
+  margin-bottom: 0.75rem;
 }
 
 .chapter-title {
@@ -563,7 +565,7 @@ body.cinematic .cover > * { opacity: 0; }
 .chapter-title .mask-inner { display: block; }
 
 .chapter-sub {
-  margin-top: 0.9rem;
+  margin-top: 0.6rem;
   font-style: italic;
   font-size: clamp(1.05rem, 3.4vw, 1.3rem);
   color: var(--ink-soft);
@@ -601,7 +603,7 @@ body.cinematic .cover > * { opacity: 0; }
 .moment .moment-text { grid-area: text; }
 
 .moment + .moment {
-  margin-top: clamp(5rem, 14vw, 9rem);
+  margin-top: clamp(3.5rem, 7svh, 5.5rem);
 }
 
 .moment-date {
@@ -612,7 +614,7 @@ body.cinematic .cover > * { opacity: 0; }
   text-transform: uppercase;
   color: var(--gold-deep);
   padding-left: 0.38em;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1rem;
 }
 
 /* ── polaroid ── */
@@ -712,7 +714,7 @@ body.cinematic .cover > * { opacity: 0; }
     grid-template-rows: auto auto;
     align-items: start;
     align-content: center;
-    column-gap: clamp(3rem, 7vw, 6rem);
+    column-gap: clamp(2.5rem, 4vw, 4.5rem);
     text-align: left;
     justify-items: start;
   }
@@ -728,7 +730,7 @@ body.cinematic .cover > * { opacity: 0; }
   }
 
   .moment-date { align-self: end; }
-  .moment-text { margin-top: 1.4rem; }
+  .moment-text { margin-top: 1.1rem; }
 }
 
 /* ══════════════════════════════════════════════
@@ -744,7 +746,7 @@ body.cinematic .cover > * { opacity: 0; }
   background-size: var(--paper-size);
   background-blend-mode: var(--paper-blend);
   color: var(--ink);
-  padding: clamp(7rem, 18vw, 11rem) 0 0;
+  padding: clamp(4.5rem, 7svh, 6rem) 0 0;
   text-align: center;
   overflow: hidden;
 }
@@ -761,7 +763,7 @@ body.cinematic .cover > * { opacity: 0; }
 .milestones-scroll {
   position: relative;
   height: 400svh;
-  margin-top: clamp(1.25rem, 4vw, 2.5rem);
+  margin-top: clamp(1rem, 2svh, 1.5rem);
 }
 
 .milestones-sticky {
@@ -954,7 +956,7 @@ body.reduced-motion .milestone {
   background-size: var(--paper-size);
   background-blend-mode: var(--paper-blend);
   color: var(--ink);
-  padding: clamp(5rem, 14vw, 9rem) 0 clamp(5rem, 14vw, 8rem);
+  padding: clamp(4rem, 7svh, 5.5rem) 0 clamp(4.5rem, 8svh, 6.5rem);
 }
 
 /* the memories, stacked one under the next */
@@ -964,7 +966,7 @@ body.reduced-motion .milestone {
   padding: 0 clamp(1.25rem, 5vw, 3rem);
   display: flex;
   flex-direction: column;
-  gap: clamp(4.5rem, 11vw, 7.5rem);
+  gap: clamp(3.5rem, 7svh, 5rem);
 }
 
 .memory { text-align: center; }
@@ -988,7 +990,7 @@ body.reduced-motion .milestone {
   font-size: clamp(1rem, 3vw, 1.15rem);
   line-height: 1.55;
   color: var(--sepia-soft);
-  margin: 0 auto clamp(1.3rem, 3.5vw, 2rem);
+  margin: 0 auto clamp(1.25rem, 2.5svh, 1.75rem);
   max-width: 42ch;
 }
 
@@ -1070,7 +1072,7 @@ body.cinematic .montage-exit {
 }
 
 .montage-exit {
-  margin: clamp(5rem, 14vw, 8rem) auto 0;
+  margin: clamp(3rem, 6svh, 4.5rem) auto 0;
   max-width: 26ch;
   padding: 0 clamp(1.5rem, 6vw, 4rem);
   text-align: center;
@@ -1172,7 +1174,7 @@ body.cinematic .scene-quiet { height: 280vh; }
   background-size: var(--paper-size);
   background-blend-mode: var(--paper-blend);
   color: var(--ink);
-  padding: clamp(4.5rem, 14vw, 9rem) clamp(0.9rem, 4vw, 3rem) clamp(6rem, 18vw, 11rem);
+  padding: clamp(4rem, 7svh, 5.5rem) clamp(0.9rem, 4vw, 3rem) clamp(5rem, 9svh, 7rem);
   overflow: hidden;
 }
 
@@ -1185,7 +1187,7 @@ body.cinematic .scene-quiet { height: 280vh; }
   position: relative;
   max-width: 42rem;
   margin: 0 auto;
-  padding: clamp(2.75rem, 8vw, 4.25rem) clamp(2rem, 6vw, 3.25rem) clamp(3rem, 9vw, 4.5rem);
+  padding: clamp(2.5rem, 4.5svh, 3.5rem) clamp(2rem, 6vw, 3.25rem) clamp(2.75rem, 5svh, 3.75rem);
 }
 
 .letter::before {
@@ -1229,7 +1231,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 
 .letter-head {
   text-align: center;
-  margin-bottom: clamp(2.25rem, 7vw, 3.25rem);
+  margin-bottom: clamp(1.75rem, 3.5svh, 2.5rem);
 }
 
 .letter-ornament {
@@ -1258,7 +1260,7 @@ body.cinematic .scene-quiet { height: 280vh; }
   font-size: var(--size-body);
   line-height: 1.78;
   color: var(--sepia-deep);
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.2rem;
   text-shadow: 0 1px 0 rgba(255, 252, 244, 0.6);
 }
 
@@ -1266,11 +1268,11 @@ body.cinematic .scene-quiet { height: 280vh; }
   font-style: italic;
   font-size: var(--size-voice-sm);
   color: var(--sepia-deep);
-  margin-bottom: 1.7rem;
+  margin-bottom: 1.4rem;
 }
 
 .letter-sign {
-  margin-top: clamp(2rem, 7vw, 3rem);
+  margin-top: clamp(1.75rem, 3svh, 2.5rem);
   text-align: right;
 }
 
@@ -1302,7 +1304,7 @@ body.cinematic .scene-quiet { height: 280vh; }
   background-blend-mode: var(--paper-blend);
   color: var(--ink);
   /* a compact closing — modest top room, no long lead-in */
-  padding: clamp(3rem, 9vw, 5rem) clamp(1.5rem, 6vw, 4rem) clamp(4rem, 11vw, 6.5rem);
+  padding: clamp(3rem, 5svh, 4.25rem) clamp(1.5rem, 6vw, 4rem) clamp(4rem, 7svh, 5.5rem);
   text-align: center;
   overflow: hidden;
 }
@@ -1327,7 +1329,7 @@ body.cinematic .scene-quiet { height: 280vh; }
   box-shadow:
     0 2px 6px rgba(60, 44, 22, 0.10),
     0 20px 44px rgba(60, 44, 22, 0.18);
-  margin-bottom: clamp(3rem, 9vw, 5rem);
+  margin-bottom: clamp(2.25rem, 4.5svh, 3.5rem);
 }
 
 .close-photo img {
@@ -1345,7 +1347,7 @@ body.cinematic .scene-quiet { height: 280vh; }
   font-size: var(--size-title);
   line-height: 1.24;
   color: var(--ink);
-  margin-bottom: clamp(1.3rem, 4vw, 2.1rem);
+  margin-bottom: clamp(1.1rem, 2.5svh, 1.7rem);
   /* wrap as "The best is" / "yet to come." like the reference */
   max-width: 5.6em;
 }
@@ -1364,7 +1366,7 @@ body.cinematic .scene-quiet { height: 280vh; }
   justify-content: center;
   gap: clamp(0.55rem, 2vw, 0.85rem);
   color: var(--gold-deep);
-  margin: 0 auto clamp(1.1rem, 3.2vw, 1.7rem);
+  margin: 0 auto clamp(1rem, 2svh, 1.4rem);
 }
 .close-sparkle .sp-line {
   display: block;
@@ -1416,7 +1418,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 }
 
 .replay {
-  margin-top: clamp(3.5rem, 10vw, 5.5rem);
+  margin-top: clamp(2.5rem, 5svh, 3.75rem);
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
@@ -1471,7 +1473,7 @@ body.reduced-motion .quiet-stack { display: none; }
   position: relative;
   z-index: 1;
   width: min(74vw, 366px);
-  margin: clamp(1.4rem, 3.6vw, 2.1rem) 0;
+  margin: clamp(1rem, 2.2svh, 1.5rem) 0;
   overflow: visible;
 }
 
