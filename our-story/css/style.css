@@ -1393,3 +1393,81 @@ body.cinematic .cover > .cover-photo-stage {
 body.cinematic .cover-photo-stage .cover-photo {
   opacity: 0;
 }
+
+
+/* ── Content-height-aware torn paper sections ────────────────────
+   Every edge is anchored to the section's real bottom, so adding or removing
+   content moves it automatically. The upper part of each transparent strip
+   fades into the shared paper texture; only the fibrous silhouette and its
+   restrained contact shadow remain visible over the next sheet. */
+body > section:not(.scene-quiet) {
+  --paper-cut-height: clamp(26px, 5.5vw, 72px);
+  --paper-cut-mask: url('../assets/decor/paper-edge-01.png?v=2');
+  position: relative;
+  overflow: visible;
+}
+
+body > section:not(.scene-quiet)::after {
+  content: '';
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  bottom: -25px;
+  width: 100%;
+  height: var(--paper-cut-height);
+  pointer-events: none;
+  background-image: var(--paper-cut-mask);
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 44%, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 44%, #000 100%);
+  filter:
+    drop-shadow(0 1px 0.5px rgba(255, 255, 255, 0.72))
+    drop-shadow(0 3px 2px rgba(77, 56, 31, 0.24));
+}
+
+body > section:nth-of-type(3n + 2):not(.scene-quiet) {
+  --paper-cut-mask: url('../assets/decor/paper-edge-02.png?v=2');
+}
+
+body > section:nth-of-type(3n):not(.scene-quiet) {
+  --paper-cut-mask: url('../assets/decor/paper-edge-03.png?v=2');
+}
+
+/* The counter needs the gentler tear: the deeper third variant creates an
+   isolated notch at this wide, quiet transition. */
+body > section.scene-numbers:not(.scene-quiet) {
+  --paper-cut-mask: url('../assets/decor/paper-edge-01.png?v=2');
+}
+
+body > section.scene-montage:not(.scene-quiet) {
+  --paper-cut-mask: url('../assets/decor/paper-edge-02.png?v=2');
+}
+
+body > section.scene-letter:not(.scene-quiet) {
+  --paper-cut-mask: url('../assets/decor/paper-edge-02.png?v=2');
+}
+
+/* Earlier sheets sit just above the following sheet, so their masked edge
+   and very small contact shadow remain visible across the overlap. */
+body > section:nth-of-type(1) { z-index: 7; }
+body > section:nth-of-type(2) { z-index: 6; }
+body > section:nth-of-type(3) { z-index: 5; }
+body > section:nth-of-type(4) { z-index: 4; }
+body > section:nth-of-type(5) { z-index: 3; }
+body > section:nth-of-type(6) { z-index: 2; }
+body > section:nth-of-type(7) { z-index: 1; }
+
+@media (max-width: 600px) {
+  body > section:not(.scene-quiet) {
+    --paper-cut-height: 30px;
+  }
+
+  body > section:not(.scene-quiet)::after {
+    bottom: -10px;
+    filter:
+      drop-shadow(0 1px 0.4px rgba(255, 255, 255, 0.68))
+      drop-shadow(0 2.5px 1.6px rgba(77, 56, 31, 0.21));
+  }
+}
