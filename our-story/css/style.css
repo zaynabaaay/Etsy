@@ -1711,6 +1711,38 @@ body > section.scene-letter:not(.scene-quiet) {
    These live at the quiet outer edges by default. The optional flower
    editor changes only the custom properties below, so every placement
    remains responsive and can be restored without rewriting the layout. */
+body.decor-layer-active { position: relative; }
+
+.decor-global-layer {
+  position: absolute;
+  z-index: 42;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.decor-global-layer .layered-anchored-decor {
+  position: absolute;
+  z-index: 8;
+  right: auto;
+  bottom: auto;
+  left: var(--decor-left);
+  top: var(--decor-top);
+  width: var(--decor-width);
+  max-width: none;
+  height: auto;
+  transform:
+    translate(-50%, -50%)
+    translate3d(var(--decor-x, 0px), var(--decor-y, 0px), 0)
+    rotate(calc(var(--decor-base-angle, 0deg) + var(--decor-angle, 0deg)))
+    scaleX(var(--decor-base-flip, 1))
+    scaleX(var(--decor-flip, 1))
+    scale(var(--decor-scale, 1));
+  transform-origin: 50% 50%;
+}
+
 .free-decor {
   position: absolute;
   z-index: 8;
@@ -1776,6 +1808,62 @@ body > section.scene-letter:not(.scene-quiet) {
   --decor-flip: -1;
 }
 
+.decor-eucalyptus-lunaria {
+  --decor-left: 84%;
+  --decor-top: 34%;
+  --decor-width: min(12vw, 178px);
+  --decor-angle: 17deg;
+}
+
+.decor-wildflower-fan {
+  --decor-left: 87%;
+  --decor-top: 50%;
+  --decor-width: min(17vw, 245px);
+  --decor-angle: 8deg;
+}
+
+.decor-cosmos-stem {
+  --decor-left: 14%;
+  --decor-top: 68%;
+  --decor-width: min(10vw, 145px);
+  --decor-angle: -14deg;
+}
+
+.decor-olive-arch {
+  --decor-left: 52%;
+  --decor-top: 9%;
+  --decor-width: min(44vw, 650px);
+  --decor-angle: -3deg;
+}
+
+.decor-straight-olive {
+  --decor-left: 4%;
+  --decor-top: 58%;
+  --decor-width: min(8vw, 112px);
+  --decor-angle: 0deg;
+}
+
+.decor-straight-eucalyptus {
+  --decor-left: 96%;
+  --decor-top: 29%;
+  --decor-width: min(8vw, 118px);
+  --decor-angle: 0deg;
+}
+
+.decor-straight-ruscus {
+  --decor-left: 5%;
+  --decor-top: 48%;
+  --decor-width: min(8vw, 116px);
+  --decor-angle: 0deg;
+}
+
+.decor-straight-myrtle {
+  --decor-left: 94%;
+  --decor-top: 64%;
+  --decor-width: min(8vw, 112px);
+  --decor-angle: 0deg;
+}
+
 @media (max-width: 767px) {
   .decor-leaf-branch,
   .decor-dried-daisy {
@@ -1785,17 +1873,38 @@ body > section.scene-letter:not(.scene-quiet) {
   .decor-flowering-branch,
   .decor-dried-bundle,
   .decor-corner-branch,
-  .decor-cream-sprig {
+  .decor-cream-sprig,
+  .decor-eucalyptus-lunaria,
+  .decor-wildflower-fan,
+  .decor-cosmos-stem,
+  .decor-straight-olive,
+  .decor-straight-eucalyptus,
+  .decor-straight-ruscus,
+  .decor-straight-myrtle {
     --decor-width: min(31vw, 165px);
   }
 
+  .decor-olive-arch { --decor-width: min(76vw, 430px); }
+
+  .decor-straight-olive,
+  .decor-straight-eucalyptus,
+  .decor-straight-ruscus,
+  .decor-straight-myrtle { --decor-width: min(20vw, 96px); }
+
   .decor-leaf-branch,
   .decor-flowering-branch,
-  .decor-corner-branch { --decor-left: 10%; }
+  .decor-corner-branch,
+  .decor-cosmos-stem,
+  .decor-straight-olive,
+  .decor-straight-ruscus { --decor-left: 10%; }
 
   .decor-dried-daisy,
   .decor-dried-bundle,
-  .decor-cream-sprig { --decor-left: 90%; }
+  .decor-cream-sprig,
+  .decor-eucalyptus-lunaria,
+  .decor-wildflower-fan,
+  .decor-straight-eucalyptus,
+  .decor-straight-myrtle { --decor-left: 90%; }
 }
 
 /* Earlier sheets sit just above the following sheet, so their masked edge

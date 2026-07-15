@@ -11,19 +11,60 @@
   const params = new URLSearchParams(location.search);
   const arranging = params.get('edit-flowers') === '1';
   const anchoredPlants = [
-    ['.cover-flower-left', 'cover-babys-breath-left', "Opening baby's breath — left"],
-    ['.cover-flower-right', 'cover-babys-breath-right', "Opening baby's breath — right"],
-    ['.moment-flower--one', 'beginning-babys-breath-one', "Beginning baby's breath — first photo"],
-    ['.moment-flower--two', 'beginning-babys-breath-two', "Beginning baby's breath — second photo"],
-    ['.moment-flower--three', 'beginning-botanical-three', 'Beginning leafy branch — third photo'],
+    ['.cover-flower-left', 'cover-babys-breath-left', "Opening baby's breath — left", -48, -1],
+    ['.cover-flower-right', 'cover-babys-breath-right', "Opening baby's breath — right", 8, 1],
+    ['.moment-flower--one', 'beginning-babys-breath-one', "Beginning baby's breath — first photo", -12, 1],
+    ['.moment-flower--two', 'beginning-babys-breath-two', "Beginning baby's breath — second photo", 14, -1],
+    ['.moment-flower--three', 'beginning-botanical-three', 'Beginning leafy branch — third photo', -7, 1],
   ];
 
-  anchoredPlants.forEach(([selector, id, name]) => {
+  anchoredPlants.forEach(([selector, id, name, baseAngle, baseFlip]) => {
     const el = document.querySelector(selector);
     if (!el) return;
     el.dataset.decorId = id;
     el.dataset.decorName = name;
+    el.dataset.decorBaseAngle = baseAngle;
+    el.dataset.decorBaseFlip = baseFlip;
   });
+
+  /* Every plant is lifted into one page-level layer. This keeps both the
+     original photo botanicals and the free-standing branches above every
+     paper sheet when they cross a section boundary. */
+  const pagePlants = Array.from(document.querySelectorAll('[data-decor-id]'));
+  if (pagePlants.length) {
+    const layer = document.createElement('div');
+    layer.className = 'decor-global-layer';
+    document.body.classList.add('decor-layer-active');
+    document.body.appendChild(layer);
+
+    pagePlants.forEach((el) => {
+      if (el.classList.contains('free-decor')) {
+        const parent = el.offsetParent;
+        const parentRect = parent ? parent.getBoundingClientRect() : { left: 0, top: 0 };
+        const styles = getComputedStyle(el);
+        const left = parseFloat(styles.left) || 0;
+        const top = parseFloat(styles.top) || 0;
+        el.style.setProperty('--decor-left', parentRect.left + window.scrollX + left + 'px');
+        el.style.setProperty('--decor-top', parentRect.top + window.scrollY + top + 'px');
+      } else {
+        const rect = el.getBoundingClientRect();
+        el.classList.add('layered-anchored-decor');
+        el.style.setProperty('--decor-left', rect.left + window.scrollX + rect.width / 2 + 'px');
+        el.style.setProperty('--decor-top', rect.top + window.scrollY + rect.height / 2 + 'px');
+        el.style.setProperty('--decor-width', el.offsetWidth + 'px');
+        el.style.setProperty('--decor-base-angle', (Number(el.dataset.decorBaseAngle) || 0) + 'deg');
+        el.style.setProperty('--decor-base-flip', Number(el.dataset.decorBaseFlip) || 1);
+      }
+      layer.appendChild(el);
+    });
+
+    const sizeLayer = () => {
+      layer.style.height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) + 'px';
+    };
+    sizeLayer();
+    window.addEventListener('load', sizeLayer, { once: true });
+    window.addEventListener('resize', sizeLayer);
+  }
 
   const decors = Array.from(document.querySelectorAll('[data-decor-id]'));
   if (!decors.length) return;
