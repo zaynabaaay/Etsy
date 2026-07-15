@@ -1211,13 +1211,13 @@ body.cinematic .scene-quiet { height: 280vh; }
     drop-shadow(0 20px 42px rgba(58, 42, 26, 0.26));
   /* Dedicated portrait render of the same handmade Milestones paper.
      Its built-in deckled edges and shadow stay naturally proportioned. */
-  background-image: url('../assets/decor/letter-paper-card.png?v=1');
+  background-image: url('../assets/decor/letter-paper-card-transparent.png?v=1');
   background-size: 122% 122%;
   background-position: center;
   background-repeat: no-repeat;
   background-blend-mode: normal;
   clip-path: none;
-  filter: none;
+  filter: drop-shadow(0 20px 42px rgba(58, 42, 26, 0.26));
 }
 
 .letter-head,
