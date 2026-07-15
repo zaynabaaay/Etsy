@@ -867,6 +867,7 @@ body.cinematic .cover > * { opacity: 0; }
   max-width: none;
   height: auto;
   transform: translate(-50%, -50%);
+  filter: brightness(0.96) saturate(0.94);
   /* Feather away the generated photo's outer backdrop while preserving the
      full torn card and its contact shadow, so it blends into the site's
      continuous paper texture without a rectangular image boundary. */
@@ -1200,7 +1201,11 @@ body.cinematic .scene-quiet { height: 280vh; }
      never recomputes on scroll (a live SVG turbulence filter shimmered).
      drop-shadow follows the clipped shape to cast onto the linen. */
   clip-path: polygon(0.00% 0.26%, 5.56% 0.91%, 11.11% 0.90%, 16.67% 0.25%, 22.22% 0.98%, 27.78% 1.25%, 33.33% 1.46%, 38.89% 1.10%, 44.44% 0.45%, 50.00% 1.59%, 55.56% 0.33%, 61.11% 0.88%, 66.67% 0.65%, 72.22% 0.17%, 77.78% 0.84%, 83.33% 1.58%, 88.89% 0.77%, 94.44% 0.64%, 98.60% 0.00%, 99.41% 5.56%, 99.36% 11.11%, 99.66% 16.67%, 98.61% 22.22%, 99.83% 27.78%, 99.22% 33.33%, 99.06% 38.89%, 99.66% 44.44%, 98.63% 50.00%, 99.52% 55.56%, 98.87% 61.11%, 99.86% 66.67%, 99.87% 72.22%, 99.56% 77.78%, 99.32% 83.33%, 98.55% 88.89%, 99.15% 94.44%, 100.00% 99.57%, 94.44% 98.42%, 88.89% 98.74%, 83.33% 99.74%, 77.78% 99.01%, 72.22% 99.96%, 66.67% 99.02%, 61.11% 99.89%, 55.56% 99.06%, 50.00% 98.76%, 44.44% 98.73%, 38.89% 99.36%, 33.33% 98.51%, 27.78% 98.79%, 22.22% 99.62%, 16.67% 99.54%, 11.11% 99.84%, 5.56% 98.95%, 0.71% 100.00%, 0.16% 94.44%, 1.48% 88.89%, 0.02% 83.33%, 0.64% 77.78%, 1.16% 72.22%, 0.45% 66.67%, 0.63% 61.11%, 0.42% 55.56%, 0.55% 50.00%, 0.34% 44.44%, 1.30% 38.89%, 0.57% 33.33%, 0.03% 27.78%, 0.20% 22.22%, 0.25% 16.67%, 0.56% 11.11%, 0.14% 5.56%);
-  filter: drop-shadow(0 20px 42px rgba(58, 42, 26, 0.26));
+  /* Match the slightly deeper ivory used by the Milestones paper card. */
+  filter:
+    brightness(0.96)
+    saturate(0.94)
+    drop-shadow(0 20px 42px rgba(58, 42, 26, 0.26));
 }
 
 .letter-head,
