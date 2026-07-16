@@ -275,6 +275,17 @@ function initNumbers() {
     });
   };
 
+  const finishCountUps = () => {
+    stats.forEach((s) => {
+      if (!s || !s.el || s.target === null) return;
+      if (s.tween) {
+        s.tween.kill();
+        s.tween = null;
+      }
+      s.el.textContent = s.target.toLocaleString('en-US');
+    });
+  };
+
   let activeIndex = -1;
   const setActiveMilestone = (index, count) => {
     if (index === activeIndex) return;
@@ -319,6 +330,7 @@ function initNumbers() {
     frame = 0;
     const currentScrollY = window.scrollY;
     const scrollingUp = currentScrollY < lastScrollY;
+    const scrollingDown = currentScrollY > lastScrollY;
     lastScrollY = currentScrollY;
     const rect = scroll.getBoundingClientRect();
     /* Both measurements come from the scene itself and therefore do not
@@ -332,6 +344,7 @@ function initNumbers() {
        scroll-position correction (no smooth animation), so there is no
        reverse pause and no extra compositor work on iOS. */
     if (scrollingUp && rect.top < 0 && -rect.top < distance) {
+      finishCountUps();
       pin('before', 0);
       setActiveMilestone(0, false);
       armed = false;
@@ -351,7 +364,7 @@ function initNumbers() {
     /* first time the held stage is actually on screen, kick off the count-up
        for whichever card is showing (so the days number counts up on arrival,
        not silently back at the top of the page) */
-    if (!armed && rect.top <= window.innerHeight * 0.5) {
+    if (scrollingDown && !armed && rect.top <= window.innerHeight * 0.5) {
       armed = true;
       runCountUp(activeIndex);
     }
