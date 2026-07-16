@@ -11,6 +11,7 @@
   const LEGACY_KEY = 'ourstory:decor-positions:v1';
   const params = new URLSearchParams(location.search);
   const arranging = params.get('edit-flowers') === '1';
+  const isPhone = window.matchMedia('(max-width: 767px)').matches;
 
   let saved = {};
   try {
@@ -68,14 +69,79 @@
   const numbersSection = document.querySelector('#numbers');
   const milestonesScroll = document.querySelector('.milestones-scroll');
 
-  const targetLayer = (state) =>
-    state?.sectionId === 'numbers' && milestoneLayer ? milestoneLayer : layer;
+  const targetLayer = (state) => {
+    if (state?.sectionId === 'numbers' && milestoneLayer) return milestoneLayer;
+    return (state?.sectionId && document.getElementById(state.sectionId)) || layer;
+  };
+
+  const sectionPageOrigin = (section) => {
+    const rect = section.getBoundingClientRect();
+    return { left: rect.left + window.scrollX, top: rect.top + window.scrollY, rect };
+  };
+
+  const sectionForPageY = (pageY) => {
+    const sections = Array.from(document.querySelectorAll('body > section[id]'));
+    const exact = sections.find((section) => {
+      const origin = sectionPageOrigin(section);
+      return pageY >= origin.top && pageY <= origin.top + origin.rect.height;
+    });
+    if (exact) return exact;
+    return sections.reduce((closest, section) => {
+      const origin = sectionPageOrigin(section);
+      const distance = Math.min(
+        Math.abs(pageY - origin.top),
+        Math.abs(pageY - (origin.top + origin.rect.height))
+      );
+      return !closest || distance < closest.distance ? { section, distance } : closest;
+    }, null)?.section;
+  };
 
   const setSectionMetadata = (el, state) => {
     if (state?.sectionId) el.dataset.sectionId = state.sectionId;
     el.classList.toggle('milestone-pinned-decor', state?.sectionId === 'numbers');
   };
   let migratedPinnedPlants = false;
+
+  const stableHash = (value) => Array.from(String(value || '')).reduce(
+    (hash, character) => ((hash * 31) + character.charCodeAt(0)) >>> 0,
+    7
+  );
+
+  /* Desktop placements are intentionally art-directed. Phones get a separate
+     safe layout: anchored photo flowers return to their responsive defaults,
+     while loose plants use their CSS default or a deterministic outer-edge
+     slot. This prevents desktop pixel offsets from pushing plants off-screen
+     or extending the page with empty overflow. The saved desktop state is
+     never overwritten by this phone-only presentation. */
+  const viewState = (el, state) => {
+    if (!isPhone) return state;
+    if (el.matches('.cover-flower, .moment-flower')) {
+      return Object.assign({}, state, { x: 0, y: 0, angle: 0, scale: 1, flip: 1 });
+    }
+    const section = state?.sectionId === 'numbers'
+      ? milestoneLayer
+      : state?.sectionId && document.getElementById(state.sectionId);
+    if (!section) return state;
+    const rect = state.sectionId === 'numbers'
+      ? { width: window.innerWidth, height: window.innerHeight }
+      : section.getBoundingClientRect();
+    const fallback = el.__mobileDefault;
+    const hash = stableHash(el.dataset.decorId);
+    const width = Math.min(
+      Number(fallback?.width) || Number(state.width) || 130,
+      Math.max(82, window.innerWidth * 0.3)
+    );
+    const safeLeft = hash % 2 ? rect.width - width * 0.28 : width * 0.28;
+    const safeTop = rect.height * (0.16 + ((hash >>> 1) % 5) * 0.16);
+    return Object.assign({}, state, {
+      left: Number.isFinite(fallback?.left) ? fallback.left : safeLeft,
+      top: Number.isFinite(fallback?.top) ? fallback.top : safeTop,
+      width,
+      x: 0,
+      y: 0,
+      scale: Math.min(Number(state.scale) || 1, 1.05),
+    });
+  };
 
   const viewportCoordinate = (rawValue, viewportSize, fallback) => {
     const raw = String(rawValue || '').trim();
@@ -85,18 +151,19 @@
 
   const apply = (el, state) => {
     if (!state) return;
-    if (Number.isFinite(state.left)) el.style.setProperty('--decor-left', state.left + 'px');
-    if (Number.isFinite(state.top)) el.style.setProperty('--decor-top', state.top + 'px');
-    if (Number.isFinite(state.width)) el.style.setProperty('--decor-width', state.width + 'px');
-    el.style.setProperty('--decor-x', (Number(state.x) || 0) + 'px');
-    el.style.setProperty('--decor-y', (Number(state.y) || 0) + 'px');
-    el.style.setProperty('--decor-angle', (Number(state.angle) || 0) + 'deg');
-    el.style.setProperty('--decor-scale', Number.isFinite(Number(state.scale)) ? Number(state.scale) : 1);
-    el.style.setProperty('--decor-flip', Number(state.flip) === -1 ? -1 : 1);
+    const shown = viewState(el, state);
+    if (Number.isFinite(shown.left)) el.style.setProperty('--decor-left', shown.left + 'px');
+    if (Number.isFinite(shown.top)) el.style.setProperty('--decor-top', shown.top + 'px');
+    if (Number.isFinite(shown.width)) el.style.setProperty('--decor-width', shown.width + 'px');
+    el.style.setProperty('--decor-x', (Number(shown.x) || 0) + 'px');
+    el.style.setProperty('--decor-y', (Number(shown.y) || 0) + 'px');
+    el.style.setProperty('--decor-angle', (Number(shown.angle) || 0) + 'deg');
+    el.style.setProperty('--decor-scale', Number.isFinite(Number(shown.scale)) ? Number(shown.scale) : 1);
+    el.style.setProperty('--decor-flip', Number(shown.flip) === -1 ? -1 : 1);
   };
 
-  /* Lift original plants into the page-level layer, except Milestones plants:
-     those belong to its held viewport so they stay fixed with the paper. */
+  /* Keep each plant inside the section it decorates. Milestones plants use
+     their held viewport layer so they stay fixed with the paper. */
   sourcePlants.forEach((el) => {
     const id = el.dataset.decorId;
     const stored = saved[id];
@@ -107,15 +174,24 @@
     }
 
     if (el.classList.contains('free-decor')) {
-      const parent = el.offsetParent;
-      const parentRect = parent ? parent.getBoundingClientRect() : { left: 0, top: 0 };
       const styles = getComputedStyle(el);
-      const left = parseFloat(styles.left) || 0;
-      const top = parseFloat(styles.top) || 0;
 
       if (originSectionId === 'numbers' && milestoneLayer) {
         const rect = el.getBoundingClientRect();
         const baseAngle = parseFloat(styles.getPropertyValue('--decor-angle')) || 0;
+        el.__mobileDefault = {
+          left: viewportCoordinate(
+            styles.getPropertyValue('--decor-left'),
+            window.innerWidth,
+            rect.left + rect.width / 2
+          ),
+          top: viewportCoordinate(
+            styles.getPropertyValue('--decor-top'),
+            window.innerHeight,
+            rect.top + rect.height / 2
+          ),
+          width: el.offsetWidth,
+        };
         const pinnedState = Object.assign({}, stored || {}, {
           sectionId: 'numbers',
           left: viewportCoordinate(
@@ -134,6 +210,7 @@
           angle: Number.isFinite(Number(stored?.angle)) ? Number(stored.angle) : baseAngle,
           scale: Number.isFinite(Number(stored?.scale)) ? Number(stored.scale) : 1,
           flip: Number(stored?.flip) === -1 ? -1 : 1,
+          coordinateSpace: 'viewport',
         });
         setSectionMetadata(el, pinnedState);
         milestoneLayer.appendChild(el);
@@ -145,8 +222,51 @@
         return;
       }
 
-      el.style.setProperty('--decor-left', parentRect.left + window.scrollX + left + 'px');
-      el.style.setProperty('--decor-top', parentRect.top + window.scrollY + top + 'px');
+      const markupSection = document.getElementById(originSectionId);
+      if (!markupSection) return;
+      const rect = el.getBoundingClientRect();
+      const markupOrigin = sectionPageOrigin(markupSection);
+      const storedInSection = stored?.coordinateSpace === 'section' && stored?.sectionId;
+      const finalPageX = Number(stored?.left) + (Number(stored?.x) || 0);
+      const finalPageY = Number(stored?.top) + (Number(stored?.y) || 0);
+      const ownerSection = storedInSection
+        ? document.getElementById(stored.sectionId) || markupSection
+        : stored && Number.isFinite(finalPageY)
+          ? sectionForPageY(finalPageY) || markupSection
+          : markupSection;
+      const ownerOrigin = sectionPageOrigin(ownerSection);
+      if (ownerSection === markupSection) {
+        el.__mobileDefault = {
+          left: rect.left - markupOrigin.rect.left + rect.width / 2,
+          top: rect.top - markupOrigin.rect.top + rect.height / 2,
+          width: el.offsetWidth,
+        };
+      }
+      const sectionState = Object.assign({}, stored || {}, {
+        sectionId: ownerSection.id,
+        coordinateSpace: 'section',
+        left: storedInSection && Number.isFinite(Number(stored.left))
+          ? Number(stored.left)
+          : Number.isFinite(finalPageX)
+            ? finalPageX - ownerOrigin.left
+            : rect.left - ownerOrigin.rect.left + rect.width / 2,
+        top: storedInSection && Number.isFinite(Number(stored.top))
+          ? Number(stored.top)
+          : Number.isFinite(finalPageY)
+            ? finalPageY - ownerOrigin.top
+            : rect.top - ownerOrigin.rect.top + rect.height / 2,
+        x: storedInSection ? Number(stored.x) || 0 : 0,
+        y: storedInSection ? Number(stored.y) || 0 : 0,
+        width: Number.isFinite(Number(stored?.width)) ? Number(stored.width) : el.offsetWidth,
+      });
+      setSectionMetadata(el, sectionState);
+      ownerSection.appendChild(el);
+      apply(el, sectionState);
+      if (stored && !isPhone) {
+        saved[id] = sectionState;
+        migratedPinnedPlants = true;
+      }
+      return;
     } else {
       /* These five flowers are intentionally anchored inside their photo
          stages so the print stays in front of their stems. Moving them into
@@ -156,14 +276,12 @@
       if (stored) apply(el, stored);
       return;
     }
-
-    layer.appendChild(el);
-    if (stored) apply(el, stored);
   });
 
   /* Restore copies created from the library on earlier visits. */
-  Object.entries(saved).forEach(([id, state]) => {
-    if (!state || !state.added || state.deleted) return;
+  Object.entries(saved).forEach(([id, storedState]) => {
+    if (!storedState || !storedState.added || storedState.deleted) return;
+    const state = Object.assign({}, storedState);
     const plant = catalog.find((item) => item.id === state.catalogId);
     if (!plant) return;
 
@@ -171,19 +289,28 @@
        coordinates. Migrate any copy that lives inside that section once,
        preserving its horizontal position and bringing its vertical position
        into the held viewport. */
-    if (!state.sectionId && numbersSection && milestonesScroll) {
-      const numbersRect = numbersSection.getBoundingClientRect();
-      const numbersTop = numbersRect.top + window.scrollY;
-      const numbersBottom = numbersRect.bottom + window.scrollY;
-      if (state.top >= numbersTop && state.top <= numbersBottom) {
-        const stageTop = milestonesScroll.getBoundingClientRect().top + window.scrollY;
-        state.sectionId = 'numbers';
-        state.top = Math.min(
-          window.innerHeight - 70,
-          Math.max(70, state.top - stageTop)
-        );
-        saved[id] = state;
-        migratedPinnedPlants = true;
+    if (!state.sectionId) {
+      const owner = sectionForPageY(state.top + (Number(state.y) || 0));
+      if (owner) state.sectionId = owner.id;
+    }
+
+    if (state.sectionId === 'numbers' && numbersSection && milestonesScroll && state.coordinateSpace !== 'viewport') {
+      const stageTop = milestonesScroll.getBoundingClientRect().top + window.scrollY;
+      state.top = Math.min(window.innerHeight - 70, Math.max(70, state.top - stageTop));
+      state.coordinateSpace = 'viewport';
+      saved[id] = state;
+      migratedPinnedPlants = true;
+    } else if (state.sectionId && state.sectionId !== 'numbers' && state.coordinateSpace !== 'section') {
+      const owner = document.getElementById(state.sectionId);
+      if (owner) {
+        const origin = sectionPageOrigin(owner);
+        state.left -= origin.left;
+        state.top -= origin.top;
+        state.coordinateSpace = 'section';
+        if (!isPhone) {
+          saved[id] = state;
+          migratedPinnedPlants = true;
+        }
       }
     }
 
@@ -225,7 +352,12 @@
   };
 
   const sizeLayer = () => {
-    layer.style.height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) + 'px';
+    /* The global layer is now only an emergency fallback. Keep it at zero
+       height when empty so it can never extend the document with blank
+       scrollable pages below the closing section. */
+    layer.style.height = layer.childElementCount
+      ? Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) + 'px'
+      : '0px';
   };
   sizeLayer();
   window.addEventListener('load', sizeLayer, { once: true });
@@ -422,9 +554,11 @@
     const visibleTop = Math.max(0, sectionRect?.top || 0);
     const visibleBottom = Math.min(window.innerHeight, sectionRect?.bottom || window.innerHeight);
     const pinToMilestones = section?.id === 'numbers' && milestoneLayer;
-    const left = window.innerWidth * 0.5 + (pinToMilestones ? 0 : window.scrollX);
+    const left = pinToMilestones
+      ? window.innerWidth * 0.5
+      : window.innerWidth * 0.5 - (sectionRect?.left || 0);
     const viewportTop = (visibleTop + visibleBottom) * 0.5;
-    const top = pinToMilestones ? viewportTop : window.scrollY + viewportTop;
+    const top = pinToMilestones ? viewportTop : viewportTop - (sectionRect?.top || 0);
     const id = 'added-' + plant.id + '-' + Date.now().toString(36) + '-' + (++idCounter);
     const width = Math.min(plant.width || 150, Math.max(86, window.innerWidth * 0.3));
     const state = {
@@ -439,6 +573,7 @@
       angle: 0,
       scale: 1,
       flip: 1,
+      coordinateSpace: pinToMilestones ? 'viewport' : 'section',
     };
     const el = document.createElement('img');
     el.className = 'free-decor library-added-decor';

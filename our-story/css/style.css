@@ -1840,7 +1840,7 @@ body.decor-layer-active {
 
 .free-decor {
   position: absolute;
-  z-index: 8;
+  z-index: 1;
   left: var(--decor-left, 50%);
   top: var(--decor-top, 50%);
   width: var(--decor-width, min(18vw, 240px));
@@ -1858,6 +1858,20 @@ body.decor-layer-active {
     scale(var(--decor-scale, 1));
   transform-origin: 50% 50%;
   filter: saturate(0.74) sepia(0.08) drop-shadow(0 7px 8px rgba(67, 49, 27, 0.1));
+}
+
+/* Loose library plants now stay inside the section they decorate. Section
+   content forms a foreground layer, so flowers can frame photographs but
+   never accidentally cover faces or text. Editing temporarily lifts the
+   selected plant through edit.css. */
+.scene-opening .cover,
+.scene-beginning .chapter-head,
+.scene-beginning .moments,
+.scene-montage .montage-sticky,
+.scene-letter .letter,
+.scene-close .close-inner {
+  position: relative;
+  z-index: 2;
 }
 
 .decor-leaf-branch {
@@ -1960,14 +1974,6 @@ body.decor-layer-active {
 }
 
 @media (max-width: 767px) {
-  /* Free-positioned desktop arrangements do not translate cleanly to a
-     narrow phone. Hide those loose pieces on mobile; the flowers anchored
-     directly to the opening and Beginning photos remain responsive. */
-  .decor-global-layer .free-decor,
-  .milestone-decor-layer .free-decor {
-    display: none;
-  }
-
   /* One large photograph per screen. Two- and three-photo memories become
      a vertical sequence instead of shrinking into a crowded collage. */
   .memory-photos {
