@@ -246,8 +246,11 @@ function initNumbers() {
      filled with the live day count higher up in this file.) */
   const stats = milestones.map((m) => {
     const el = m.querySelector('.stat-value');
-    const target = el ? parseInt((el.textContent || '').replace(/[^0-9]/g, ''), 10) : NaN;
-    return { el, target: isNaN(target) ? null : target, tween: null };
+    /* only the days card counts up — the others show their number straight
+       away (a live day-count reads as a memory; a static tally does not). */
+    const isDays = !!m.querySelector('[data-count-from-date]');
+    const target = (isDays && el) ? parseInt((el.textContent || '').replace(/[^0-9]/g, ''), 10) : NaN;
+    return { el, target: (isDays && !isNaN(target)) ? target : null, tween: null };
   });
 
   /* the number ticks up from zero each time its card takes the stage — a

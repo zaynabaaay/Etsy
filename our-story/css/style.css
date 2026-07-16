@@ -869,13 +869,16 @@ body.cinematic .cover > * { opacity: 0; }
   place-items: center;
   overflow: hidden;
   isolation: isolate;
-  /* The pinned viewport owns the paper texture, so the background remains
-     visually stationary while only the milestone content changes. */
+  /* The held stage paints its own paper texture AND the torn card as
+     background layers, so both stay glued to this element and move with it as
+     one — no separate <img> to re-composite and vibrate on iOS touch scroll.
+     Layer order: card (top) over the tiled paper texture over the cream. */
   background-color: var(--cream);
-  background-image: var(--paper);
-  background-size: var(--paper-size);
-  background-position: center center;
-  background-blend-mode: var(--paper-blend);
+  background-image: url('../assets/decor/milestone-paper-card-ivory-v3.png?v=1'), var(--paper);
+  background-repeat: no-repeat, repeat;
+  background-position: center center, center center;
+  background-size: min(112vw, 866px) auto, var(--paper-size);
+  background-blend-mode: normal, var(--paper-blend);
 }
 
 .milestones-sticky::before {
@@ -908,24 +911,6 @@ body.cinematic .cover > * { opacity: 0; }
   z-index: 3;
   width: 100%;
   height: 100%;
-}
-
-.milestone-fixed-paper {
-  position: absolute;
-  z-index: 1;
-  left: 50%;
-  top: 50%;
-  width: min(112vw, 866px);
-  max-width: none;
-  height: auto;
-  /* translate3d + backface-hidden keep this large card on its own GPU layer,
-     so iOS composites it once instead of re-rasterising it every frame during
-     momentum scroll (the source of the light "vibration" on the held stage). */
-  transform: translate3d(-50%, -50%, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  pointer-events: none;
-  user-select: none;
 }
 
 .milestone {
