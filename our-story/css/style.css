@@ -880,6 +880,15 @@ body.cinematic .cover > * { opacity: 0; }
   margin-top: 0;
 }
 
+.milestones-scroll.is-single {
+  height: 100svh;
+}
+
+.milestones-scroll.is-single .milestones-sticky {
+  position: relative;
+  top: auto;
+}
+
 .milestones-sticky {
   position: sticky;
   top: 0;
@@ -1951,6 +1960,46 @@ body.decor-layer-active {
 }
 
 @media (max-width: 767px) {
+  /* Free-positioned desktop arrangements do not translate cleanly to a
+     narrow phone. Hide those loose pieces on mobile; the flowers anchored
+     directly to the opening and Beginning photos remain responsive. */
+  .decor-global-layer .free-decor,
+  .milestone-decor-layer .free-decor {
+    display: none;
+  }
+
+  /* One large photograph per screen. Two- and three-photo memories become
+     a vertical sequence instead of shrinking into a crowded collage. */
+  .memory-photos {
+    width: 100%;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: clamp(2rem, 7svh, 4rem);
+  }
+
+  .memory-photo,
+  .memory-photo:only-child {
+    flex: none;
+    width: min(90vw, 28rem);
+    height: min(82svh, 42rem);
+    display: block;
+    padding: clamp(8px, 2.4vw, 12px);
+  }
+
+  .memory-photo .mframe,
+  .memory-photo .fitclip {
+    width: 100%;
+    height: 100%;
+  }
+
+  .memory-photo img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: cover;
+  }
+
   .decor-leaf-branch,
   .decor-dried-daisy {
     --decor-width: min(25vw, 130px);

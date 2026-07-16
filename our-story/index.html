@@ -14,7 +14,7 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=157">
+  <link rel="stylesheet" href="css/style.css?v=158">
   <link rel="stylesheet" href="css/edit.css?v=109">
 </head>
 <body>
@@ -208,8 +208,7 @@
        up as they arrive; the last one is always the joke.
        ════════════════════════════════════════════════════════════════ -->
   <section class="scene-numbers" id="numbers" data-label="In Numbers">
-    <!-- Four held milestone cards. The stage stays in place while scrolling
-         changes the words and number over the same torn paper. -->
+    <!-- One clear milestone: the live number of days together. -->
     <div class="milestones-scroll">
       <div class="milestones-sticky">
         <!-- This heading changes with the active milestone and remains part
@@ -246,41 +245,6 @@
             <p class="counter-note">and counting</p>
           </article>
 
-          <article class="milestone" data-title="Photos We Kept" aria-hidden="true">
-            <div class="milestone-heart" aria-hidden="true"><span></span><b>&hearts;</b><span></span></div>
-            <p class="counter-label">photos we kept</p>
-            <span class="milestone-connector" aria-hidden="true"></span>
-            <div class="milestone-paper">
-              <img src="assets/decor/milestone-paper-card.png?v=1" alt="" aria-hidden="true">
-              <div class="stat"><p class="stat-value">327</p></div>
-            </div>
-            <span class="milestone-connector" aria-hidden="true"></span>
-            <p class="counter-note">little moments we saved</p>
-          </article>
-
-          <article class="milestone" data-title="Places Explored" aria-hidden="true">
-            <div class="milestone-heart" aria-hidden="true"><span></span><b>&hearts;</b><span></span></div>
-            <p class="counter-label">places explored</p>
-            <span class="milestone-connector" aria-hidden="true"></span>
-            <div class="milestone-paper">
-              <img src="assets/decor/milestone-paper-card.png?v=1" alt="" aria-hidden="true">
-              <div class="stat"><p class="stat-value">8</p></div>
-            </div>
-            <span class="milestone-connector" aria-hidden="true"></span>
-            <p class="counter-note">from near and far</p>
-          </article>
-
-          <article class="milestone" data-title="Life We&rsquo;re Building" aria-hidden="true">
-            <div class="milestone-heart" aria-hidden="true"><span></span><b>&hearts;</b><span></span></div>
-            <p class="counter-label">life we&rsquo;re building</p>
-            <span class="milestone-connector" aria-hidden="true"></span>
-            <div class="milestone-paper">
-              <img src="assets/decor/milestone-paper-card.png?v=1" alt="" aria-hidden="true">
-              <div class="stat"><p class="stat-value">1</p></div>
-            </div>
-            <span class="milestone-connector" aria-hidden="true"></span>
-            <p class="counter-note">my favourite forever</p>
-          </article>
         </div>
       </div>
     </div>
@@ -494,8 +458,8 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
-  <script src="js/edit.js?v=123"></script>
+  <script src="js/edit.js?v=124"></script>
   <script src="js/decor-editor.js?v=9"></script>
-  <script src="js/main.js?v=120"></script>
+  <script src="js/main.js?v=121"></script>
 </body>
 </html>

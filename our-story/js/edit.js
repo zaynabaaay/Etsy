@@ -165,6 +165,14 @@
         headingText.textContent = firstTitle;
         migrated = true;
       }
+
+      /* The final template keeps only the live Days Together counter. Remove
+         the three retired cards from saved snapshots without replacing the
+         section, so every placed plant and edited first-card value survives. */
+      Array.from(savedMilestones).slice(1).forEach((milestone) => {
+        milestone.remove();
+        migrated = true;
+      });
     }
 
     const montageChapter = box.querySelector('.scene-montage .chapter-label');

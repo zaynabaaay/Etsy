@@ -301,6 +301,34 @@ function initNumbers() {
     if (count) runCountUp(index);
   };
   setActiveMilestone(0, false); // shown silently; it counts up on arrival (below)
+
+  /* With one meaningful milestone there is no held sequence to scrub
+     through. The section occupies one normal viewport and the live days
+     count plays once, only as the visitor reaches it while moving down. */
+  if (milestones.length === 1) {
+    scroll.classList.add('is-single');
+    let previousScrollY = window.scrollY;
+    let counted = false;
+    let singleFrame = 0;
+    const updateSingleMilestone = () => {
+      singleFrame = 0;
+      const currentScrollY = window.scrollY;
+      const scrollingDown = currentScrollY > previousScrollY;
+      previousScrollY = currentScrollY;
+      const rect = scroll.getBoundingClientRect();
+      if (!counted && scrollingDown && rect.top <= window.innerHeight * 0.72 && rect.bottom > 0) {
+        counted = true;
+        runCountUp(0);
+      }
+    };
+    const requestSingleUpdate = () => {
+      if (!singleFrame) singleFrame = window.requestAnimationFrame(updateSingleMilestone);
+    };
+    window.addEventListener('scroll', requestSingleUpdate, { passive: true });
+    updateSingleMilestone();
+    return;
+  }
+
   let armed = false;
   let pinState = '';
   let lastScrollY = window.scrollY;
