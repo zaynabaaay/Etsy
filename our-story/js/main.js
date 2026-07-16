@@ -284,10 +284,28 @@ function initNumbers() {
   };
   setActiveMilestone(0, false); // shown silently; it counts up on arrival (below)
   let armed = false;
+  let pinState = '';
 
-  /* Keep this scene entirely native: no ScrollTrigger, scrub, transforms,
-     or animated counter. A passive scroll reader swaps only the three text
-     nodes at fixed quarters while CSS keeps the composition stationary. */
+  /* Hold the stage with position:fixed, NOT CSS position:sticky. Sticky
+     jitters on iOS here because the page clips horizontal overflow (to hide
+     the flowers that bleed off the edges), and a sticky element inside a
+     clipped ancestor gets repositioned a frame behind the scroll — the whole
+     stage vibrates. A fixed element is pulled out of the scroll entirely and
+     rides the compositor, so it holds rock-steady. We drive three states by
+     hand: absolute at the track's top before the stage is reached, fixed to
+     the viewport while it's held, then absolute at the track's bottom so it
+     scrolls away at the end. The look is identical — only the mechanism
+     changes. (Runs only in cinematic mode; edit/reduced-motion never calls
+     this, so its plain stacked layout is untouched.) */
+  const pin = (state, topPx) => {
+    if (state === pinState) return;
+    pinState = state;
+    const s = sticky.style;
+    s.left = '0px'; s.right = '0px'; s.bottom = 'auto';
+    if (state === 'fixed') { s.position = 'fixed'; s.top = '0px'; }
+    else { s.position = 'absolute'; s.top = topPx + 'px'; }
+  };
+
   let frame = 0;
   const updateMilestone = () => {
     frame = 0;
@@ -296,6 +314,11 @@ function initNumbers() {
        change when iPad Chrome/Safari expands or collapses its browser bars. */
     const distance = Math.max(1, scroll.offsetHeight - sticky.offsetHeight);
     const progress = Math.max(0, Math.min(1, -rect.top / distance));
+
+    /* choose the pin state from where the track sits in the viewport */
+    if (rect.top > 0) pin('before', 0);
+    else if (-rect.top < distance) pin('fixed', 0);
+    else pin('after', distance);
 
     /* first time the held stage is actually on screen, kick off the count-up
        for whichever card is showing (so the days number counts up on arrival,
