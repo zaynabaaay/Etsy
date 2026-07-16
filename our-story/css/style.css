@@ -874,7 +874,7 @@ body.cinematic .cover > * { opacity: 0; }
      one — no separate <img> to re-composite and vibrate on iOS touch scroll.
      Layer order: card (top) over the tiled paper texture over the cream. */
   background-color: var(--cream);
-  background-image: url('../assets/decor/milestone-paper-card-ivory-v3.png?v=1'), var(--paper);
+  background-image: url('../assets/decor/milestone-paper-card-cloud-white-v4.png?v=1'), var(--paper);
   background-repeat: no-repeat, repeat;
   background-position: center center, center center;
   background-size: min(112vw, 866px) auto, var(--paper-size);
@@ -1295,9 +1295,9 @@ body.cinematic .scene-quiet { height: 280vh; }
    words sit above it, crisp. */
 .letter {
   position: relative;
-  max-width: 42rem;
+  max-width: 46rem;
   margin: 0 auto;
-  padding: clamp(2.5rem, 4.5svh, 3.5rem) clamp(2rem, 6vw, 3.25rem) clamp(2.75rem, 5svh, 3.75rem);
+  padding: clamp(2.5rem, 4.5svh, 3.5rem) clamp(2.5rem, 7vw, 4rem) clamp(2.75rem, 5svh, 3.75rem);
 }
 
 .letter::before {
@@ -1323,7 +1323,7 @@ body.cinematic .scene-quiet { height: 280vh; }
     drop-shadow(0 20px 42px rgba(58, 42, 26, 0.26));
   /* Dedicated portrait render of the same handmade Milestones paper.
      Its built-in deckled edges and shadow stay naturally proportioned. */
-  background-image: url('../assets/decor/letter-paper-card-ivory-v2.png?v=1');
+  background-image: url('../assets/decor/letter-paper-card-cloud-white-wide-v3.png?v=1');
   background-size: 122% 122%;
   background-position: center;
   background-repeat: no-repeat;
