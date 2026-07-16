@@ -869,16 +869,28 @@ body.cinematic .cover > * { opacity: 0; }
   place-items: center;
   overflow: hidden;
   isolation: isolate;
-  /* The held stage paints its own paper texture AND the torn card as
-     background layers, so both stay glued to this element and move with it as
-     one — no separate <img> to re-composite and vibrate on iOS touch scroll.
-     Layer order: card (top) over the tiled paper texture over the cream. */
+  /* The held stage paints its own paper texture, torn card, and soft cast
+     shadow as background layers, so all three stay glued to this element and
+     move with it as one — no separate <img> to re-composite and vibrate on
+     iOS touch scroll. Layer order: card over shadow over paper texture. */
   background-color: var(--cream);
-  background-image: url('../assets/decor/milestone-paper-card-cloud-white-v4.png?v=1'), var(--paper);
-  background-repeat: no-repeat, repeat;
-  background-position: center center, center center;
-  background-size: min(112vw, 866px) auto, var(--paper-size);
-  background-blend-mode: normal, var(--paper-blend);
+  background-image:
+    url('../assets/decor/milestone-paper-card-cloud-white-v4.png?v=1'),
+    radial-gradient(
+      ellipse at center,
+      rgba(58, 42, 26, 0.26) 0%,
+      rgba(58, 42, 26, 0.18) 42%,
+      rgba(58, 42, 26, 0.07) 61%,
+      transparent 74%
+    ),
+    var(--paper);
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-position: center center, center calc(50% + 20px), center center;
+  background-size:
+    min(112vw, 866px) auto,
+    min(120vw, 950px) min(78vw, 620px),
+    var(--paper-size);
+  background-blend-mode: normal, normal, var(--paper-blend);
 }
 
 .milestones-sticky::before {
