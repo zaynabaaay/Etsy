@@ -69,6 +69,9 @@ body.decor-editing .movable-decor.is-dragging {
   box-shadow: 0 16px 42px rgba(27, 18, 10, 0.34);
   backdrop-filter: blur(10px);
   font-family: 'Jost', sans-serif;
+  max-height: min(84svh, 54rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .decor-panel-head {
@@ -82,6 +85,106 @@ body.decor-editing .movable-decor.is-dragging {
   margin: 0.35rem 0 0.8rem;
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.08rem;
+}
+
+.decor-current-section {
+  margin: 0.25rem 0 0.7rem;
+  color: rgba(244, 234, 215, 0.72);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.decor-current-section strong {
+  color: #d5ad6a;
+  font-weight: 400;
+}
+
+.decor-panel details {
+  margin-top: 0.55rem;
+  border-top: 1px solid rgba(201, 161, 95, 0.22);
+  padding-top: 0.5rem;
+}
+
+.decor-panel summary {
+  cursor: pointer;
+  color: #f4ead7;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.decor-library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+
+.decor-library-item {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.35rem;
+  border: 1px solid rgba(201, 161, 95, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.decor-library-item img {
+  width: 2.25rem;
+  height: 2.75rem;
+  object-fit: contain;
+}
+
+.decor-library-item span {
+  min-width: 0;
+  overflow: hidden;
+  color: rgba(244, 234, 215, 0.82);
+  font-size: 0.62rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+}
+
+.decor-library-item button {
+  flex: none;
+  padding: 0.38rem 0.52rem;
+}
+
+.decor-placed-list {
+  display: grid;
+  gap: 0.3rem;
+  max-height: 12rem;
+  margin-top: 0.55rem;
+  overflow-y: auto;
+}
+
+.decor-placed-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem;
+}
+
+.decor-placed-row .decor-placed-select {
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decor-panel .decor-row-delete,
+.decor-panel .decor-delete {
+  border-color: rgba(203, 111, 92, 0.64);
+  color: #efb7aa;
+}
+
+.decor-transform-controls {
+  margin-top: 0.7rem;
+  border-top: 1px solid rgba(201, 161, 95, 0.22);
+  padding-top: 0.45rem;
 }
 
 .decor-panel label {
@@ -159,6 +262,9 @@ body.decor-editing .movable-decor.is-dragging {
   .decor-panel-name { margin-bottom: 0.45rem; }
   .decor-panel label { margin-top: 0.4rem; }
   .decor-panel-actions { margin-top: 0.55rem; }
+  .decor-library-grid { grid-template-columns: 1fr; }
+  .decor-library-item { grid-template-columns: 2rem minmax(0, 1fr) auto; }
+  .decor-library-item img { width: 2rem; height: 2.35rem; }
 }
 
 /* the top bar while editing */

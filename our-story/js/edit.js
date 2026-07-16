@@ -28,7 +28,7 @@
      shows through instead of a frozen old copy. Photos are never touched (they
      live in IndexedDB). A buyer editing a fixed downloaded copy never bumps
      this, so their own edits are always kept. */
-  const CONTENT_VERSION = '18';
+  const CONTENT_VERSION = '19';
   const editing = localStorage.getItem(FLAG) === '1';
 
   const grain = () => document.querySelector('.grain');

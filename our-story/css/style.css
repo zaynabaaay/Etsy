@@ -162,7 +162,12 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: auto; }
+html {
+  scroll-behavior: auto;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
 
 body {
   background-color: var(--cream);
@@ -172,6 +177,8 @@ body {
   color: var(--ink);
   font-family: var(--font-serif);
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -857,6 +864,13 @@ body.cinematic .cover > * { opacity: 0; }
   display: grid;
   place-items: center;
   overflow: hidden;
+  /* The pinned viewport owns the paper texture, so the background remains
+     visually stationary while only the milestone content changes. */
+  background-color: var(--cream);
+  background-image: var(--paper);
+  background-size: var(--paper-size);
+  background-position: center center;
+  background-blend-mode: var(--paper-blend);
 }
 
 .milestones-sticky::before {
@@ -877,8 +891,31 @@ body.cinematic .cover > * { opacity: 0; }
   height: 100%;
 }
 
+.milestone-fixed-paper {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 50%;
+  width: min(112vw, 866px);
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -50%);
+  filter: brightness(0.96) saturate(0.94);
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 13%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 13%, #000 90%, transparent 100%);
+  mask-composite: intersect;
+  pointer-events: none;
+  user-select: none;
+}
+
 .milestone {
   position: absolute;
+  z-index: 1;
   inset: 0;
   display: flex;
   flex-direction: column;
@@ -944,28 +981,7 @@ body.cinematic .cover > * { opacity: 0; }
 }
 
 .milestone-paper img {
-  position: absolute;
-  z-index: 0;
-  left: 50%;
-  top: 50%;
-  width: 133.33%;
-  max-width: none;
-  height: auto;
-  transform: translate(-50%, -50%);
-  filter: brightness(0.96) saturate(0.94);
-  /* Feather away the generated photo's outer backdrop while preserving the
-     full torn card and its contact shadow, so it blends into the site's
-     continuous paper texture without a rectangular image boundary. */
-  -webkit-mask-image:
-    linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, #000 13%, #000 90%, transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, #000 13%, #000 90%, transparent 100%);
-  mask-composite: intersect;
-  pointer-events: none;
-  user-select: none;
+  display: none;
 }
 
 .milestone .stat {
@@ -1711,7 +1727,12 @@ body > section.scene-letter:not(.scene-quiet) {
    These live at the quiet outer edges by default. The optional flower
    editor changes only the custom properties below, so every placement
    remains responsive and can be restored without rewriting the layout. */
-body.decor-layer-active { position: relative; }
+body.decor-layer-active {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
 
 .decor-global-layer {
   position: absolute;
@@ -1719,8 +1740,11 @@ body.decor-layer-active { position: relative; }
   top: 0;
   left: 0;
   width: 100%;
-  overflow: visible;
+  max-width: 100vw;
+  overflow-x: clip;
+  overflow-y: visible;
   pointer-events: none;
+  contain: layout style;
 }
 
 .decor-global-layer .layered-anchored-decor {
