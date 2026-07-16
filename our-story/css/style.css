@@ -918,7 +918,12 @@ body.cinematic .cover > * { opacity: 0; }
   width: min(112vw, 866px);
   max-width: none;
   height: auto;
-  transform: translate(-50%, -50%);
+  /* translate3d + backface-hidden keep this large card on its own GPU layer,
+     so iOS composites it once instead of re-rasterising it every frame during
+     momentum scroll (the source of the light "vibration" on the held stage). */
+  transform: translate3d(-50%, -50%, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   pointer-events: none;
   user-select: none;
 }

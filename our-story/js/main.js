@@ -241,8 +241,35 @@ function initNumbers() {
   const milestones = gsap.utils.toArray('.milestone');
   if (!counter || !scroll || !sticky || !milestones.length) return;
 
+  /* Capture each card's final number ONCE — before the count-up ever rewrites
+     it — so we always tick up to the true value. (The days card was already
+     filled with the live day count higher up in this file.) */
+  const stats = milestones.map((m) => {
+    const el = m.querySelector('.stat-value');
+    const target = el ? parseInt((el.textContent || '').replace(/[^0-9]/g, ''), 10) : NaN;
+    return { el, target: isNaN(target) ? null : target, tween: null };
+  });
+
+  /* the number ticks up from zero each time its card takes the stage — a
+     memory being counted, not a machine. Runs on a timer, not on scroll,
+     so it never adds work to the scroll itself. */
+  const runCountUp = (index) => {
+    const s = stats[index];
+    if (!s || !s.el || s.target === null) return;
+    if (s.tween) s.tween.kill();
+    const proxy = { v: 0 };
+    s.el.textContent = '0';
+    s.tween = gsap.to(proxy, {
+      v: s.target,
+      duration: Math.max(0.6, Math.min(1.5, s.target / 260)),
+      ease: 'power2.out',
+      onUpdate: () => { s.el.textContent = Math.round(proxy.v).toLocaleString('en-US'); },
+      onComplete: () => { s.el.textContent = s.target.toLocaleString('en-US'); },
+    });
+  };
+
   let activeIndex = -1;
-  const setActiveMilestone = (index) => {
+  const setActiveMilestone = (index, count) => {
     if (index === activeIndex) return;
     activeIndex = index;
     milestones.forEach((milestone, i) => {
@@ -250,8 +277,10 @@ function initNumbers() {
       milestone.classList.toggle('is-active', active);
       milestone.setAttribute('aria-hidden', active ? 'false' : 'true');
     });
+    if (count) runCountUp(index);
   };
-  setActiveMilestone(0);
+  setActiveMilestone(0, false); // shown silently; it counts up on arrival (below)
+  let armed = false;
 
   /* Keep this scene entirely native: no ScrollTrigger, scrub, transforms,
      or animated counter. A passive scroll reader swaps only the three text
@@ -264,6 +293,15 @@ function initNumbers() {
        change when iPad Chrome/Safari expands or collapses its browser bars. */
     const distance = Math.max(1, scroll.offsetHeight - sticky.offsetHeight);
     const progress = Math.max(0, Math.min(1, -rect.top / distance));
+
+    /* first time the held stage is actually on screen, kick off the count-up
+       for whichever card is showing (so the days number counts up on arrival,
+       not silently back at the top of the page) */
+    if (!armed && rect.top <= window.innerHeight * 0.5) {
+      armed = true;
+      runCountUp(activeIndex);
+    }
+
     const proposedIndex = Math.min(
       milestones.length - 1,
       Math.floor(progress * milestones.length)
@@ -274,10 +312,10 @@ function initNumbers() {
     const deadZone = 0.015;
     if (proposedIndex > activeIndex) {
       const nextBoundary = (activeIndex + 1) / milestones.length;
-      if (progress >= nextBoundary + deadZone) setActiveMilestone(proposedIndex);
+      if (progress >= nextBoundary + deadZone) setActiveMilestone(proposedIndex, true);
     } else if (proposedIndex < activeIndex) {
       const previousBoundary = activeIndex / milestones.length;
-      if (progress <= previousBoundary - deadZone) setActiveMilestone(proposedIndex);
+      if (progress <= previousBoundary - deadZone) setActiveMilestone(proposedIndex, true);
     }
   };
   const requestMilestoneUpdate = () => {
