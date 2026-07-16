@@ -129,11 +129,42 @@
       oldNumbers = box.querySelector('.scene-numbers');
     }
 
-    /* Older saved copies may also predate the Milestones chapter heading. */
+    /* Keep the changing Milestones heading inside the held stage. Earlier
+       snapshots stored it above the stage, which recreates the empty gap and
+       lets the shared chapter reveal apply a scroll transform to it. Move the
+       existing node so edited wording and every saved decoration survive. */
     const freshNumbersHead = document.querySelector('.scene-numbers .numbers-head');
-    if (oldNumbers && freshNumbersHead && !oldNumbers.querySelector('.numbers-head')) {
-      oldNumbers.insertBefore(freshNumbersHead.cloneNode(true), oldNumbers.firstChild);
+    const oldMilestonesSticky = oldNumbers && oldNumbers.querySelector('.milestones-sticky');
+    let oldNumbersHead = oldNumbers && oldNumbers.querySelector('.numbers-head');
+    if (oldMilestonesSticky && freshNumbersHead && !oldNumbersHead) {
+      oldMilestonesSticky.insertBefore(freshNumbersHead.cloneNode(true), oldMilestonesSticky.firstChild);
+      oldNumbersHead = oldMilestonesSticky.querySelector('.numbers-head');
       migrated = true;
+    }
+    if (oldMilestonesSticky && oldNumbersHead && oldNumbersHead.parentElement !== oldMilestonesSticky) {
+      oldMilestonesSticky.insertBefore(oldNumbersHead, oldMilestonesSticky.firstChild);
+      migrated = true;
+    }
+
+    /* Add the per-card titles to saved Milestones markup without replacing
+       the section. Deriving them from the editable labels preserves any
+       wording the owner already changed. */
+    if (oldNumbers) {
+      const titleCase = (value) => value.replace(/(^|\s)([a-z])/g, (match) => match.toUpperCase());
+      const savedMilestones = oldNumbers.querySelectorAll('.milestone');
+      savedMilestones.forEach((milestone) => {
+        if (milestone.dataset.title) return;
+        const label = milestone.querySelector('.counter-label');
+        if (!label) return;
+        milestone.dataset.title = titleCase(label.textContent.trim());
+        migrated = true;
+      });
+      const firstTitle = savedMilestones[0] && savedMilestones[0].dataset.title;
+      const headingText = oldNumbers.querySelector('.numbers-head .mask-inner');
+      if (firstTitle && headingText && headingText.textContent.trim() !== firstTitle) {
+        headingText.textContent = firstTitle;
+        migrated = true;
+      }
     }
 
     const montageChapter = box.querySelector('.scene-montage .chapter-label');

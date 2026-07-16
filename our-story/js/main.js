@@ -88,7 +88,10 @@ document.querySelector('.replay')?.addEventListener('click', () => {
 /* shared: every chapter head reveals the same way — ornament, label,
    masked title, subtitle */
 function initChapterHeads() {
-  gsap.utils.toArray('.chapter-head').forEach((head) => {
+  /* The Milestones heading lives inside a compositor-held fixed stage. It
+     must never receive a scrubbed transform: doing so makes iOS repaint the
+     entire stage a frame behind touch scrolling and visibly shake. */
+  gsap.utils.toArray('.chapter-head:not(.numbers-head)').forEach((head) => {
     gsap.timeline({
       scrollTrigger: {
         trigger: head,
