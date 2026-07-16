@@ -838,7 +838,11 @@ body.cinematic .cover > * { opacity: 0; }
   color: var(--ink);
   padding: clamp(4.5rem, 7svh, 6rem) 0 0;
   text-align: center;
-  overflow: hidden;
+  /* `overflow: hidden` turns this into a competing scroll container on
+     WebKit/iPad and makes its sticky child visibly jitter. Clip only the
+     horizontal artwork without interfering with vertical page scrolling. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 .scene-numbers::before {
   display: none;

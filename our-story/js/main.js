@@ -252,38 +252,28 @@ function initNumbers() {
   };
   setActiveMilestone(0);
 
-  /* CSS holds the entire composition still. Scroll only selects the next
-     set of words and its number—there is no scrubbed transform or crossfade
-     that can make the paper, plants, or background shimmer on touch scroll. */
-  ScrollTrigger.create({
-    trigger: scroll,
-    start: 'top top',
-    end: 'bottom bottom',
-    onUpdate: (self) => {
-      const index = Math.min(
-        milestones.length - 1,
-        Math.floor(self.progress * milestones.length)
-      );
-      setActiveMilestone(index);
-    },
-  });
+  /* Keep this scene entirely native: no ScrollTrigger, scrub, transforms,
+     or animated counter. A passive scroll reader swaps only the three text
+     nodes at fixed quarters while CSS keeps the composition stationary. */
+  let frame = 0;
+  const updateMilestone = () => {
+    frame = 0;
+    const rect = scroll.getBoundingClientRect();
+    const distance = Math.max(1, scroll.offsetHeight - window.innerHeight);
+    const progress = Math.max(0, Math.min(1, -rect.top / distance));
+    const index = Math.min(
+      milestones.length - 1,
+      Math.floor(progress * milestones.length)
+    );
+    setActiveMilestone(index);
+  };
+  const requestMilestoneUpdate = () => {
+    if (!frame) frame = window.requestAnimationFrame(updateMilestone);
+  };
 
-  /* the number counts itself up from zero */
-  const stat = counter.querySelector('[data-count-from-date]');
-  const valueEl = stat && stat.querySelector('.stat-value');
-  const target = parseInt(stat && stat.dataset.count, 10);
-  if (valueEl && !isNaN(target)) {
-    const c = { val: 0 };
-    gsap.to(c, {
-      val: target,
-      duration: 1.9,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: scroll, start: 'top 78%', once: true },
-      onUpdate: () => {
-        valueEl.textContent = Math.round(c.val).toLocaleString('en-US');
-      },
-    });
-  }
+  window.addEventListener('scroll', requestMilestoneUpdate, { passive: true });
+  window.addEventListener('resize', requestMilestoneUpdate, { passive: true });
+  updateMilestone();
 }
 
 /* ══════════════════════════════════════════════════════════════════
