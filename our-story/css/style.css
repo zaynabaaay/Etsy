@@ -926,9 +926,24 @@ body.cinematic .cover > * { opacity: 0; }
   z-index: 0;
 }
 
-.milestone-decor-layer {
+/* A static foreground copy of the cutout keeps placed botanicals tucked
+   naturally behind the Milestones paper. It has no filter or animated
+   transform, so it remains part of the stable held composition on iOS. */
+.milestones-sticky::after {
+  content: '';
   position: absolute;
   z-index: 2;
+  inset: 0;
+  background-image: url('../assets/decor/milestone-paper-card-cloud-white-v4.png?v=1');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: min(112vw, 866px) auto;
+  pointer-events: none;
+}
+
+.milestone-decor-layer {
+  position: absolute;
+  z-index: 1;
   inset: 0;
   overflow: hidden;
   pointer-events: none;

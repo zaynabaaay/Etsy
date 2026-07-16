@@ -148,13 +148,13 @@
       el.style.setProperty('--decor-left', parentRect.left + window.scrollX + left + 'px');
       el.style.setProperty('--decor-top', parentRect.top + window.scrollY + top + 'px');
     } else {
-      const rect = el.getBoundingClientRect();
-      el.classList.add('layered-anchored-decor');
-      el.style.setProperty('--decor-left', rect.left + window.scrollX + rect.width / 2 + 'px');
-      el.style.setProperty('--decor-top', rect.top + window.scrollY + rect.height / 2 + 'px');
-      el.style.setProperty('--decor-width', el.offsetWidth + 'px');
-      el.style.setProperty('--decor-base-angle', (Number(el.dataset.decorBaseAngle) || 0) + 'deg');
-      el.style.setProperty('--decor-base-flip', Number(el.dataset.decorBaseFlip) || 1);
+      /* These five flowers are intentionally anchored inside their photo
+         stages so the print stays in front of their stems. Moving them into
+         the page-level library layer made every flower sit on top of the
+         photograph. Keep the original DOM relationship; dragging still uses
+         the same x/y, angle, size, and flip custom properties. */
+      if (stored) apply(el, stored);
+      return;
     }
 
     layer.appendChild(el);
@@ -202,9 +202,7 @@
   });
   if (migratedPinnedPlants) persist();
 
-  let decors = Array.from(document.querySelectorAll(
-    '.decor-global-layer [data-decor-id], .milestone-decor-layer [data-decor-id]'
-  ));
+  let decors = Array.from(document.querySelectorAll('img[data-decor-id]'));
   decors.forEach((el) => el.classList.add('movable-decor'));
 
   const cssNumber = (el, name, fallback) => {

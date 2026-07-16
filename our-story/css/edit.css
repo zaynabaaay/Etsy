@@ -55,6 +55,14 @@ body.decor-editing .movable-decor.is-dragging {
   outline-color: #7f5a21;
 }
 
+/* The finished Milestones composition tucks plants behind its paper. Lift
+   only the editor layer above the paper and counter while arranging so no
+   flower can become unclickable or trapped behind the card. */
+body.decor-editing .milestone-decor-layer {
+  z-index: 7;
+  pointer-events: none;
+}
+
 .decor-panel {
   position: fixed;
   z-index: 80;
