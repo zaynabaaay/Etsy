@@ -56,8 +56,8 @@
     '.cover-eyebrow', '.cover-names', '.cover-subline', '.cover-occasion', '.cover-est',
     '.chapter-label', '.chapter-title .mask-inner', '.chapter-sub',
     '.moment-date', '.polaroid-caption', '.moment-text',
-    '.counter-script', '.counter-label', '.counter-note',
-    '.memory-title',
+    '.counter-script', '.counter-label', '.counter-note', '.stat-value',
+    '.memory-title', '.memory-sub',
     '.quiet-line .mask-inner', '.quiet-small',
     '.letter-label', '.lp', '.sign-pre', '.sign-name',
     '.close-line .mask-inner', '.close-script', '.close-title', '.close-date',
@@ -459,6 +459,10 @@
   /* ── make each piece of text tappable-to-edit ── */
   function bindText(el) {
     if (el.classList.contains('etext')) return;
+    /* the "days together" number is computed live from the anniversary date
+       (main.js overwrites it every load), so hand-editing it wouldn't stick —
+       leave that one alone; the other milestone numbers are free text. */
+    if (el.matches('.stat-value') && el.closest('[data-count-from-date]')) return;
     el.classList.add('etext');
     el.setAttribute('contenteditable', 'true');
     el.setAttribute('spellcheck', 'false');
@@ -578,7 +582,9 @@
   const makeMemory = () => {
     const art = document.createElement('article');
     art.className = 'memory';
-    art.innerHTML = '<h3 class="memory-title">Name this memory</h3><div class="memory-photos"></div>';
+    art.innerHTML = '<h3 class="memory-title">Name this memory</h3>' +
+      '<div class="memory-photos"></div>' +
+      '<p class="memory-sub">A line about why this moment mattered.</p>';
     art.querySelector('.memory-photos').appendChild(makeMemoryPhoto());
     return art;
   };
