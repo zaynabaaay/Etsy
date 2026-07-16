@@ -239,6 +239,7 @@ function initNumbers() {
   const scroll = document.querySelector('.milestones-scroll');
   const sticky = document.querySelector('.milestones-sticky');
   const milestones = gsap.utils.toArray('.milestone');
+  const sectionTitle = document.querySelector('.numbers-head .mask-inner');
   if (!counter || !scroll || !sticky || !milestones.length) return;
 
   /* Capture each card's final number ONCE — before the count-up ever rewrites
@@ -280,6 +281,9 @@ function initNumbers() {
       milestone.classList.toggle('is-active', active);
       milestone.setAttribute('aria-hidden', active ? 'false' : 'true');
     });
+    if (sectionTitle) {
+      sectionTitle.textContent = milestones[index].dataset.title || '';
+    }
     if (count) runCountUp(index);
   };
   setActiveMilestone(0, false); // shown silently; it counts up on arrival (below)

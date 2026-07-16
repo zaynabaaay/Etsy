@@ -836,7 +836,7 @@ body.cinematic .cover > * { opacity: 0; }
   background-size: var(--paper-size);
   background-blend-mode: var(--paper-blend);
   color: var(--ink);
-  padding: clamp(4.5rem, 7svh, 6rem) 0 0;
+  padding: 0;
   text-align: center;
   /* `overflow: hidden` turns this into a competing scroll container on
      WebKit/iPad and makes its sticky child visibly jitter. Clip only the
@@ -848,16 +848,35 @@ body.cinematic .cover > * { opacity: 0; }
   display: none;
 }
 
-/* Unlike photo-led chapters, Milestones continues directly into a held
-   scrolling stage. */
+/* The changing chapter title belongs to the held stage. Keeping it inside
+   the same viewport removes the disconnected empty beat that used to sit
+   between the static "Milestones" heading and the number card. */
 .numbers-head {
+  position: absolute;
+  z-index: 5;
+  top: clamp(1.75rem, 4.5svh, 3.25rem);
+  left: 50%;
+  width: 100%;
+  transform: translateX(-50%);
   margin-bottom: 0;
+}
+
+.numbers-head .chapter-ornament {
+  margin-bottom: 0.45rem;
+}
+
+.numbers-head .chapter-label {
+  margin-bottom: 0.35rem;
+}
+
+.numbers-head .chapter-title {
+  font-size: clamp(2.25rem, 7vw, 4.25rem);
 }
 
 .milestones-scroll {
   position: relative;
   height: 400svh;
-  margin-top: clamp(1rem, 2svh, 1.5rem);
+  margin-top: 0;
 }
 
 .milestones-sticky {
@@ -1014,6 +1033,7 @@ body.cinematic .cover > * { opacity: 0; }
 }
 
 .counter-label {
+  display: none;
   margin: 0;
   font-family: var(--font-label);
   font-weight: 300;
@@ -1044,6 +1064,18 @@ body.reduced-motion .milestones-sticky {
   height: auto;
   min-height: 0;
   overflow: visible;
+}
+
+body.reduced-motion .numbers-head {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  padding-top: clamp(3rem, 7svh, 5rem);
+}
+
+body.reduced-motion .counter-label {
+  display: block;
 }
 
 body.reduced-motion .counter {
