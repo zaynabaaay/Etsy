@@ -196,6 +196,14 @@
       t.onerror = () => rej(t.error);
     });
   }
+  async function dbClear() {
+    const db = await openDB();
+    return new Promise((res, rej) => {
+      const t = db.transaction(STORE, 'readwrite');
+      t.objectStore(STORE).clear();
+      t.oncomplete = res; t.onerror = () => rej(t.error);
+    });
+  }
 
   /* ── every photo gets a stable key from its filename, and remembers its
         original src so the snapshot can stay small ── */
@@ -203,7 +211,10 @@
     allPhotos().forEach((img) => {
       if (!img.dataset.origSrc) img.dataset.origSrc = img.getAttribute('src') || '';
       if (!img.dataset.photoKey) {
-        const m = img.dataset.origSrc.match(/([^/]+)\.(jpg|jpeg|png|webp|gif)$/i);
+        /* key off the filename only — tolerate a ?v= cache-busting suffix so
+           bumping it never changes a photo's key (which would orphan a
+           replaced photo saved in IndexedDB) */
+        const m = img.dataset.origSrc.match(/([^/]+)\.(jpg|jpeg|png|webp|gif)(?=$|\?)/i);
         img.dataset.photoKey = m ? m[1] : 'photo-' + Math.random().toString(36).slice(2, 8);
       }
     });
@@ -314,15 +325,18 @@
   document.body.appendChild(bar);
   bar.querySelector('#ed-done').addEventListener('click', () => { localStorage.removeItem(FLAG); location.reload(); });
   bar.querySelector('#ed-download').addEventListener('click', exportSite);
-  /* Start over: drop the saved words + layout and return to the template's
-     current text, keeping any photos you've added (those live separately in
-     IndexedDB). Useful when the template itself has been updated. */
-  bar.querySelector('#ed-reset').addEventListener('click', () => {
+  /* Start over: a true full reset — drop the saved words, layout, AND every
+     photo you've added, returning to the template exactly as it ships
+     (including its own pictures). Useful when a device is showing a stale
+     saved copy instead of the current template. */
+  bar.querySelector('#ed-reset').addEventListener('click', async () => {
     const ok = window.confirm(
-      'Start over?\n\nThis clears the words and layout changes on this device and returns to the template. Your added photos are kept.'
+      'Start over?\n\nThis clears everything on this device — your words, layout, and any photos you added — and returns to the template exactly as it comes. This cannot be undone.'
     );
     if (!ok) return;
     localStorage.removeItem(SNAP);
+    localStorage.removeItem(SNAPVER);
+    try { await dbClear(); } catch (e) {}
     location.reload();
   });
 
