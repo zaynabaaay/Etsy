@@ -237,8 +237,9 @@ function initNumbers() {
 
   const counter = document.querySelector('.counter');
   const scroll = document.querySelector('.milestones-scroll');
+  const sticky = document.querySelector('.milestones-sticky');
   const milestones = gsap.utils.toArray('.milestone');
-  if (!counter || !scroll || !milestones.length) return;
+  if (!counter || !scroll || !sticky || !milestones.length) return;
 
   let activeIndex = -1;
   const setActiveMilestone = (index) => {
@@ -259,20 +260,32 @@ function initNumbers() {
   const updateMilestone = () => {
     frame = 0;
     const rect = scroll.getBoundingClientRect();
-    const distance = Math.max(1, scroll.offsetHeight - window.innerHeight);
+    /* Both measurements come from the scene itself and therefore do not
+       change when iPad Chrome/Safari expands or collapses its browser bars. */
+    const distance = Math.max(1, scroll.offsetHeight - sticky.offsetHeight);
     const progress = Math.max(0, Math.min(1, -rect.top / distance));
-    const index = Math.min(
+    const proposedIndex = Math.min(
       milestones.length - 1,
       Math.floor(progress * milestones.length)
     );
-    setActiveMilestone(index);
+
+    /* A small dead zone prevents touch-scroll momentum from toggling two
+       milestones back and forth when it settles exactly on a boundary. */
+    const deadZone = 0.015;
+    if (proposedIndex > activeIndex) {
+      const nextBoundary = (activeIndex + 1) / milestones.length;
+      if (progress >= nextBoundary + deadZone) setActiveMilestone(proposedIndex);
+    } else if (proposedIndex < activeIndex) {
+      const previousBoundary = activeIndex / milestones.length;
+      if (progress <= previousBoundary - deadZone) setActiveMilestone(proposedIndex);
+    }
   };
   const requestMilestoneUpdate = () => {
     if (!frame) frame = window.requestAnimationFrame(updateMilestone);
   };
 
   window.addEventListener('scroll', requestMilestoneUpdate, { passive: true });
-  window.addEventListener('resize', requestMilestoneUpdate, { passive: true });
+  window.addEventListener('orientationchange', requestMilestoneUpdate, { passive: true });
   updateMilestone();
 }
 
