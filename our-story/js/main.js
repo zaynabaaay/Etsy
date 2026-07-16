@@ -292,6 +292,7 @@ function initNumbers() {
   setActiveMilestone(0, false); // shown silently; it counts up on arrival (below)
   let armed = false;
   let pinState = '';
+  let lastScrollY = window.scrollY;
 
   /* Hold the stage with position:fixed, NOT CSS position:sticky. Sticky
      jitters on iOS here because the page clips horizontal overflow (to hide
@@ -316,11 +317,31 @@ function initNumbers() {
   let frame = 0;
   const updateMilestone = () => {
     frame = 0;
+    const currentScrollY = window.scrollY;
+    const scrollingUp = currentScrollY < lastScrollY;
+    lastScrollY = currentScrollY;
     const rect = scroll.getBoundingClientRect();
     /* Both measurements come from the scene itself and therefore do not
        change when iPad Chrome/Safari expands or collapses its browser bars. */
     const distance = Math.max(1, scroll.offsetHeight - sticky.offsetHeight);
     const progress = Math.max(0, Math.min(1, -rect.top / distance));
+
+    /* The four held beats are a forward-reading experience. On the way back
+       up, skip directly to the start of the track instead of pinning the
+       visitor through all four numbers in reverse. The jump is an immediate
+       scroll-position correction (no smooth animation), so there is no
+       reverse pause and no extra compositor work on iOS. */
+    if (scrollingUp && rect.top < 0 && -rect.top < distance) {
+      pin('before', 0);
+      setActiveMilestone(0, false);
+      armed = false;
+      window.scrollTo({
+        top: Math.max(0, currentScrollY + rect.top - 1),
+        left: 0,
+        behavior: 'auto',
+      });
+      return;
+    }
 
     /* choose the pin state from where the track sits in the viewport */
     if (rect.top > 0) pin('before', 0);
