@@ -240,10 +240,10 @@ function initNumbers() {
   const milestones = gsap.utils.toArray('.milestone');
   if (!counter || !scroll || !milestones.length) return;
 
-  gsap.set(milestones, { autoAlpha: 0 });
-  gsap.set(milestones[0], { autoAlpha: 1 });
-
+  let activeIndex = -1;
   const setActiveMilestone = (index) => {
+    if (index === activeIndex) return;
+    activeIndex = index;
     milestones.forEach((milestone, i) => {
       const active = i === index;
       milestone.classList.toggle('is-active', active);
@@ -252,30 +252,21 @@ function initNumbers() {
   };
   setActiveMilestone(0);
 
-  /* The stage is held by CSS sticky positioning. This scrubbed timeline
-     cross-fades each complete milestone over the same torn-paper card, so
-     the number appears to change as the reader continues downward. */
-  const scenes = gsap.timeline({
-    scrollTrigger: {
-      trigger: scroll,
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.55,
-      onUpdate: (self) => setActiveMilestone(Math.round(self.progress * (milestones.length - 1))),
+  /* CSS holds the entire composition still. Scroll only selects the next
+     set of words and its number—there is no scrubbed transform or crossfade
+     that can make the paper, plants, or background shimmer on touch scroll. */
+  ScrollTrigger.create({
+    trigger: scroll,
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: (self) => {
+      const index = Math.min(
+        milestones.length - 1,
+        Math.floor(self.progress * milestones.length)
+      );
+      setActiveMilestone(index);
     },
   });
-
-  for (let i = 1; i < milestones.length; i++) {
-    const at = i - 0.5;
-    scenes
-      .to(milestones[i - 1], { autoAlpha: 0, duration: 0.5, ease: 'power1.inOut' }, at)
-      .fromTo(milestones[i],
-        { autoAlpha: 0 },
-        { autoAlpha: 1, duration: 0.5, ease: 'power1.inOut' }, at)
-      .fromTo(milestones[i].querySelector('.stat-value'),
-        { y: 18, scale: 0.96 },
-        { y: 0, scale: 1, duration: 0.5, ease: 'power2.out' }, at);
-  }
 
   /* the number counts itself up from zero */
   const stat = counter.querySelector('[data-count-from-date]');

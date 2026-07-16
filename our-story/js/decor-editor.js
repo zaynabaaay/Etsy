@@ -64,6 +64,24 @@
   layer.className = 'decor-global-layer';
   document.body.classList.add('decor-layer-active');
   document.body.appendChild(layer);
+  const milestoneLayer = document.querySelector('.milestone-decor-layer');
+  const numbersSection = document.querySelector('#numbers');
+  const milestonesScroll = document.querySelector('.milestones-scroll');
+
+  const targetLayer = (state) =>
+    state?.sectionId === 'numbers' && milestoneLayer ? milestoneLayer : layer;
+
+  const setSectionMetadata = (el, state) => {
+    if (state?.sectionId) el.dataset.sectionId = state.sectionId;
+    el.classList.toggle('milestone-pinned-decor', state?.sectionId === 'numbers');
+  };
+  let migratedPinnedPlants = false;
+
+  const viewportCoordinate = (rawValue, viewportSize, fallback) => {
+    const raw = String(rawValue || '').trim();
+    if (raw.endsWith('%')) return viewportSize * (parseFloat(raw) || 0) / 100;
+    return fallback;
+  };
 
   const apply = (el, state) => {
     if (!state) return;
@@ -77,11 +95,12 @@
     el.style.setProperty('--decor-flip', Number(state.flip) === -1 ? -1 : 1);
   };
 
-  /* Lift every original plant into the page-level layer. Paper sections can
-     never cover this layer, even when a plant crosses a section boundary. */
+  /* Lift original plants into the page-level layer, except Milestones plants:
+     those belong to its held viewport so they stay fixed with the paper. */
   sourcePlants.forEach((el) => {
     const id = el.dataset.decorId;
     const stored = saved[id];
+    const originSectionId = el.closest('section')?.id || '';
     if (stored && stored.deleted) {
       el.remove();
       return;
@@ -93,6 +112,39 @@
       const styles = getComputedStyle(el);
       const left = parseFloat(styles.left) || 0;
       const top = parseFloat(styles.top) || 0;
+
+      if (originSectionId === 'numbers' && milestoneLayer) {
+        const rect = el.getBoundingClientRect();
+        const baseAngle = parseFloat(styles.getPropertyValue('--decor-angle')) || 0;
+        const pinnedState = Object.assign({}, stored || {}, {
+          sectionId: 'numbers',
+          left: viewportCoordinate(
+            styles.getPropertyValue('--decor-left'),
+            window.innerWidth,
+            rect.left + rect.width / 2
+          ),
+          top: viewportCoordinate(
+            styles.getPropertyValue('--decor-top'),
+            window.innerHeight,
+            rect.top + rect.height / 2
+          ),
+          width: Number.isFinite(Number(stored?.width)) ? Number(stored.width) : el.offsetWidth,
+          x: Number(stored?.x) || 0,
+          y: Number(stored?.y) || 0,
+          angle: Number.isFinite(Number(stored?.angle)) ? Number(stored.angle) : baseAngle,
+          scale: Number.isFinite(Number(stored?.scale)) ? Number(stored.scale) : 1,
+          flip: Number(stored?.flip) === -1 ? -1 : 1,
+        });
+        setSectionMetadata(el, pinnedState);
+        milestoneLayer.appendChild(el);
+        apply(el, pinnedState);
+        if (stored) {
+          saved[id] = pinnedState;
+          migratedPinnedPlants = true;
+        }
+        return;
+      }
+
       el.style.setProperty('--decor-left', parentRect.left + window.scrollX + left + 'px');
       el.style.setProperty('--decor-top', parentRect.top + window.scrollY + top + 'px');
     } else {
@@ -114,6 +166,27 @@
     if (!state || !state.added || state.deleted) return;
     const plant = catalog.find((item) => item.id === state.catalogId);
     if (!plant) return;
+
+    /* Placements saved before the pinned Milestones layer existed used page
+       coordinates. Migrate any copy that lives inside that section once,
+       preserving its horizontal position and bringing its vertical position
+       into the held viewport. */
+    if (!state.sectionId && numbersSection && milestonesScroll) {
+      const numbersRect = numbersSection.getBoundingClientRect();
+      const numbersTop = numbersRect.top + window.scrollY;
+      const numbersBottom = numbersRect.bottom + window.scrollY;
+      if (state.top >= numbersTop && state.top <= numbersBottom) {
+        const stageTop = milestonesScroll.getBoundingClientRect().top + window.scrollY;
+        state.sectionId = 'numbers';
+        state.top = Math.min(
+          window.innerHeight - 70,
+          Math.max(70, state.top - stageTop)
+        );
+        saved[id] = state;
+        migratedPinnedPlants = true;
+      }
+    }
+
     const el = document.createElement('img');
     el.className = 'free-decor library-added-decor';
     el.src = plant.src;
@@ -123,11 +196,15 @@
     el.dataset.decorName = plant.name;
     el.dataset.catalogId = plant.id;
     el.dataset.added = 'true';
-    layer.appendChild(el);
+    setSectionMetadata(el, state);
+    targetLayer(state).appendChild(el);
     apply(el, state);
   });
+  if (migratedPinnedPlants) persist();
 
-  let decors = Array.from(layer.querySelectorAll('[data-decor-id]'));
+  let decors = Array.from(document.querySelectorAll(
+    '.decor-global-layer [data-decor-id], .milestone-decor-layer [data-decor-id]'
+  ));
   decors.forEach((el) => el.classList.add('movable-decor'));
 
   const cssNumber = (el, name, fallback) => {
@@ -158,6 +235,7 @@
 
   if (!arranging) return;
   document.body.classList.add('decor-editing');
+  if (milestoneLayer) milestoneLayer.removeAttribute('aria-hidden');
 
   const panel = document.createElement('div');
   panel.className = 'decor-panel';
@@ -343,15 +421,18 @@
   const addPlant = (plant) => {
     const section = visibleSection();
     const sectionRect = section?.getBoundingClientRect();
-    const left = window.scrollX + window.innerWidth * 0.5;
     const visibleTop = Math.max(0, sectionRect?.top || 0);
     const visibleBottom = Math.min(window.innerHeight, sectionRect?.bottom || window.innerHeight);
-    const top = window.scrollY + (visibleTop + visibleBottom) * 0.5;
+    const pinToMilestones = section?.id === 'numbers' && milestoneLayer;
+    const left = window.innerWidth * 0.5 + (pinToMilestones ? 0 : window.scrollX);
+    const viewportTop = (visibleTop + visibleBottom) * 0.5;
+    const top = pinToMilestones ? viewportTop : window.scrollY + viewportTop;
     const id = 'added-' + plant.id + '-' + Date.now().toString(36) + '-' + (++idCounter);
     const width = Math.min(plant.width || 150, Math.max(86, window.innerWidth * 0.3));
     const state = {
       added: true,
       catalogId: plant.id,
+      sectionId: section?.id || '',
       left,
       top,
       width,
@@ -370,7 +451,8 @@
     el.dataset.decorName = plant.name;
     el.dataset.catalogId = plant.id;
     el.dataset.added = 'true';
-    layer.appendChild(el);
+    setSectionMetadata(el, state);
+    targetLayer(state).appendChild(el);
     apply(el, state);
     saved[id] = state;
     decors.push(el);
