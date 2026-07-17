@@ -269,7 +269,7 @@
      zoomed photo is kept inside the frame by a clip: .mframe already clips;
      cover/polaroid/close photos get a lightweight .fitclip wrapper. At the
      default fit the result is pixel-identical to a bare <img>. */
-  const FIT_MIN = 1, FIT_MAX = 4;
+  const FIT_MIN = 0.4, FIT_MAX = 4;
   const clampN = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
   function readFit(img) {
     return {
@@ -283,13 +283,19 @@
     const x = clampN(f.x, 0, 100), y = clampN(f.y, 0, 100);
     if (s === 1 && x === 50 && y === 50) {
       delete img.dataset.fitScale; delete img.dataset.fitX; delete img.dataset.fitY;
-      img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = '';
+      img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = ''; img.style.objectFit = '';
       return;
     }
     img.dataset.fitScale = String(+s.toFixed(3));
     img.dataset.fitX = String(+x.toFixed(2));
     img.dataset.fitY = String(+y.toFixed(2));
     img.style.objectPosition = x + '% ' + y + '%';
+    /* Zooming OUT past the fill point (scale < 1) should reveal the WHOLE photo
+       instead of a shrunken crop, so below 1 we switch the photo from cover to
+       contain — the entire image sits matted inside the frame. At/above fill it
+       stays full-bleed exactly as the template ships. object-fit rides in the
+       inline style so it survives the saved snapshot and the exported file. */
+    img.style.objectFit = s < 1 ? 'contain' : '';
     if (s !== 1) { img.style.transform = 'scale(' + s + ')'; img.style.transformOrigin = x + '% ' + y + '%'; }
     else { img.style.transform = ''; img.style.transformOrigin = ''; }
   }
