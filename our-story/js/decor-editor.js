@@ -13,9 +13,10 @@
   const arranging = params.get('edit-flowers') === '1';
   const isPhone = window.matchMedia('(max-width: 767px)').matches;
 
-  /* Complete arrangement exported from the iPad on July 16. This is now the
-     shared starting layout on every device; new adjustments save to v5 so
-     older browser-only positions cannot move the plants again. */
+  /* Complete arrangement exported from the iPad. This is the shared starting
+     layout that every device — and every buyer's fresh browser — sees, so the
+     flowers are genuinely part of the template. New in-browser adjustments save
+     to v5 on top of this, but this baked layout is the source of truth. */
   const defaultLayout = {
     'beginning-babys-breath-one': { left: 632.6356201171875, top: 1602.1925659179688, width: 190, x: 0.12109375, y: 0.05859375, angle: 0, scale: 1, flip: 1, deleted: true },
     'beginning-babys-breath-two': { left: 1582.1451416015625, top: 2148.7647705078125, width: 180, x: -0.1015625, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
@@ -24,21 +25,24 @@
     'leaf-branch': { left: 156.79687881469727, top: 293.015625, width: 175, x: -0.0703125, y: -0.07421875, angle: 0, scale: 1, flip: 1, deleted: true },
     'straight-eucalyptus': { left: 2150.3984375, top: 549.359375, width: 118, x: -0.0078125, y: -0.1015625, angle: 0, scale: 1, flip: 1, deleted: true },
     'wildflower-fan': { left: 1948.796875, top: 947.171875, width: 245, x: 0, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
-    'dried-bundle': { left: 1601.46875, top: 82.83984375, width: 205, x: -25.4884033203125, y: 1023.8092346191406, angle: 31, scale: 0.73, flip: 1, sectionId: 'beginning', coordinateSpace: 'section', deleted: true },
+    'dried-bundle': { left: 1601.46875, top: 82.83984375, width: 205, x: -25.4884033203125, y: 1023.8092346191406, angle: 31, scale: 0.73, flip: 1, sectionId: 'beginning', coordinateSpace: 'section' },
     'flowering-branch': { left: 156.79688453674316, top: 719.8515625, width: 290, x: -0.37109375, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
-    'added-plant-dried-cosmos-stem-mroayfjy-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 1120, top: 494.25, width: 145, x: -450.3359375, y: 90.5078125, angle: -41, scale: 1, flip: 1, coordinateSpace: 'section' },
+    'added-plant-dried-cosmos-stem-mroayfjy-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 1120, top: 494.25, width: 145, x: -450.3359375, y: 90.5078125, angle: -41, scale: 1, flip: 1, coordinateSpace: 'section', deleted: true },
     'cream-sprig': { left: 2060.7969360351562, top: 1648.8984375, width: 285, x: -0.57421875, y: -0.60546875, angle: 0, scale: 1, flip: 1, deleted: true },
     'olive-arch': { left: 1164.7968444824219, top: 95.1171875, width: 650, x: -0.19921875, y: -0.28125, angle: 0, scale: 1, flip: 1, deleted: true },
     'straight-myrtle': { left: 2105.59375, top: 751.65625, width: 112, x: -0.10546875, y: -0.16796875, angle: 0, scale: 1, flip: 1, deleted: true },
     'straight-olive': { left: 0, top: 0, width: 109, x: -0.07421875, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
-    'added-plant-generated-botanical-1-mrobmf54-1': { added: true, catalogId: 'plant-generated-botanical-1', sectionId: 'beginning', left: 1120, top: 1380, width: 175, x: -448.734375, y: 264.31640625, angle: -43, scale: 1, flip: 1, coordinateSpace: 'section' },
+    'added-plant-generated-botanical-1-mrobmf54-1': { added: true, catalogId: 'plant-generated-botanical-1', sectionId: 'beginning', left: 1120, top: 1380, width: 175, x: -885.734375, y: 242.81640625, angle: -43, scale: 1, flip: 1, coordinateSpace: 'section' },
     'corner-branch': { left: 0, top: 0, width: 320, x: -0.328125, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
     'added-plant-opening-babys-breath-right-mrobnbvu-2': { added: true, catalogId: 'plant-opening-babys-breath-right', sectionId: 'numbers', left: 1120, top: 577.17578125, width: 168, x: 360.55859375, y: -105.2734375, angle: 45, scale: 0.8, flip: -1, coordinateSpace: 'viewport' },
     'cosmos-stem': { left: 313.6, top: 691.56, width: 145, x: -0.40234375, y: 0.0859375, angle: -14, scale: 1, flip: 1, deleted: true },
     'straight-ruscus': { left: 112, top: 1321.2734375, width: 116, x: -0.2578125, y: -0.640625, angle: 0, scale: 1, flip: 1, deleted: true },
-    'added-plant-opening-babys-breath-right-mrobtsww-1': { added: true, catalogId: 'plant-opening-babys-breath-right', sectionId: 'montage', left: 1120, top: 664.46875, width: 168, x: 292.24609375, y: 286.1953125, angle: 34, scale: 0.88, flip: 1, coordinateSpace: 'section' },
-    'added-plant-dried-cosmos-stem-mrobuje6-2': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 145, x: 463.5390625, y: 196.890625, angle: 48, scale: 0.86, flip: -1, coordinateSpace: 'section', deleted: true },
-    'added-plant-dried-flower-daisy-mrobv8ko-3': { added: true, catalogId: 'plant-dried-flower-daisy', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 185, x: -510.19921875, y: 30.46484375, angle: -56, scale: 0.75, flip: 1, coordinateSpace: 'section' },
+    'added-plant-opening-babys-breath-right-mrobtsww-1': { added: true, catalogId: 'plant-opening-babys-breath-right', sectionId: 'montage', left: 1120, top: 664.46875, width: 168, x: -155.25390625, y: 246.1953125, angle: 50, scale: 0.88, flip: -1, coordinateSpace: 'section' },
+    'added-plant-dried-cosmos-stem-mrobuje6-2': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 145, x: 463.5390625, y: 196.890625, angle: 48, scale: 0.86, flip: -1, coordinateSpace: 'section' },
+    'added-plant-dried-flower-daisy-mrobv8ko-3': { added: true, catalogId: 'plant-dried-flower-daisy', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 185, x: -963.69921875, y: 67.46484375, angle: -28, scale: 0.75, flip: -1, coordinateSpace: 'section' },
+    'added-plant-dried-cosmos-stem-mror1ph1-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 683, top: 830.640625, width: 137, x: -462.5, y: -239, angle: -22, scale: 1, flip: -1, coordinateSpace: 'section' },
+    'added-plant-dried-flower-wildflower-bundle-mror227e-2': { added: true, catalogId: 'plant-dried-flower-wildflower-bundle', sectionId: 'beginning', left: 683, top: 830.640625, width: 191, x: 454.5, y: 281.5, angle: 38, scale: 0.74, flip: -1, coordinateSpace: 'section' },
+    'added-plant-dried-cosmos-stem-mror70sz-5': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'montage', left: 683, top: 2311.484375, width: 137, x: 486.5, y: -62, angle: 65, scale: 0.86, flip: -1, coordinateSpace: 'section' },
   };
 
   let saved = JSON.parse(JSON.stringify(defaultLayout));
