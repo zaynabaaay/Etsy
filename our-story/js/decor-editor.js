@@ -25,24 +25,27 @@
     'leaf-branch': { left: 156.79687881469727, top: 293.015625, width: 175, x: -0.0703125, y: -0.07421875, angle: 0, scale: 1, flip: 1, deleted: true },
     'straight-eucalyptus': { left: 2150.3984375, top: 549.359375, width: 118, x: -0.0078125, y: -0.1015625, angle: 0, scale: 1, flip: 1, deleted: true },
     'wildflower-fan': { left: 1948.796875, top: 947.171875, width: 245, x: 0, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
-    'dried-bundle': { left: 1601.46875, top: 82.83984375, width: 205, x: -25.4884033203125, y: 1023.8092346191406, angle: 31, scale: 0.73, flip: 1, sectionId: 'beginning', coordinateSpace: 'section' },
+    'dried-bundle': { left: 1601.46875, top: 82.83984375, width: 205, x: -25.4884033203125, y: 1023.8092346191406, angle: 31, scale: 0.73, flip: 1, sectionId: 'beginning', coordinateSpace: 'section', phone: { deleted: true } },
     'flowering-branch': { left: 156.79688453674316, top: 719.8515625, width: 290, x: -0.37109375, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
-    'added-plant-dried-cosmos-stem-mroayfjy-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 1120, top: 494.25, width: 145, x: -450.3359375, y: 90.5078125, angle: -41, scale: 1, flip: 1, coordinateSpace: 'section', deleted: true },
+    'added-plant-dried-cosmos-stem-mroayfjy-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 1120, top: 494.25, width: 145, x: -450.3359375, y: 90.5078125, angle: -41, scale: 1, flip: 1, coordinateSpace: 'section', deleted: true, phone: { left: 357.24, top: 736.9, width: 117, x: -32, y: 158, angle: 35, scale: 0.76, flip: 1 } },
     'cream-sprig': { left: 2060.7969360351562, top: 1648.8984375, width: 285, x: -0.57421875, y: -0.60546875, angle: 0, scale: 1, flip: 1, deleted: true },
     'olive-arch': { left: 1164.7968444824219, top: 95.1171875, width: 650, x: -0.19921875, y: -0.28125, angle: 0, scale: 1, flip: 1, deleted: true },
     'straight-myrtle': { left: 2105.59375, top: 751.65625, width: 112, x: -0.10546875, y: -0.16796875, angle: 0, scale: 1, flip: 1, deleted: true },
     'straight-olive': { left: 0, top: 0, width: 109, x: -0.07421875, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
-    'added-plant-generated-botanical-1-mrobmf54-1': { added: true, catalogId: 'plant-generated-botanical-1', sectionId: 'beginning', left: 1120, top: 1380, width: 175, x: -885.734375, y: 242.81640625, angle: -43, scale: 1, flip: 1, coordinateSpace: 'section' },
+    'added-plant-generated-botanical-1-mrobmf54-1': { added: true, catalogId: 'plant-generated-botanical-1', sectionId: 'beginning', left: 1120, top: 1380, width: 175, x: -885.734375, y: 242.81640625, angle: -43, scale: 1, flip: 1, coordinateSpace: 'section', phone: { left: 32.76, top: 1473.8, width: 117, x: 32, y: 123, angle: -70, scale: 0.73, flip: 1 } },
     'corner-branch': { left: 0, top: 0, width: 320, x: -0.328125, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
-    'added-plant-opening-babys-breath-right-mrobnbvu-2': { added: true, catalogId: 'plant-opening-babys-breath-right', sectionId: 'numbers', left: 1120, top: 577.17578125, width: 168, x: 360.55859375, y: -105.2734375, angle: 45, scale: 0.8, flip: -1, coordinateSpace: 'viewport' },
+    'added-plant-opening-babys-breath-right-mrobnbvu-2': { added: true, catalogId: 'plant-opening-babys-breath-right', sectionId: 'numbers', left: 1120, top: 577.17578125, width: 168, x: 360.55859375, y: -105.2734375, angle: 45, scale: 0.8, flip: -1, coordinateSpace: 'viewport', phone: { left: 357.24, top: 214.08, width: 117, x: -59, y: 343, angle: 42, scale: 0.87, flip: -1 } },
     'cosmos-stem': { left: 313.6, top: 691.56, width: 145, x: -0.40234375, y: 0.0859375, angle: -14, scale: 1, flip: 1, deleted: true },
     'straight-ruscus': { left: 112, top: 1321.2734375, width: 116, x: -0.2578125, y: -0.640625, angle: 0, scale: 1, flip: 1, deleted: true },
-    'added-plant-opening-babys-breath-right-mrobtsww-1': { added: true, catalogId: 'plant-opening-babys-breath-right', sectionId: 'montage', left: 1120, top: 664.46875, width: 168, x: -155.25390625, y: 246.1953125, angle: 50, scale: 0.88, flip: -1, coordinateSpace: 'section' },
-    'added-plant-dried-cosmos-stem-mrobuje6-2': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 145, x: 463.5390625, y: 196.890625, angle: 48, scale: 0.86, flip: -1, coordinateSpace: 'section' },
-    'added-plant-dried-flower-daisy-mrobv8ko-3': { added: true, catalogId: 'plant-dried-flower-daisy', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 185, x: -963.69921875, y: 67.46484375, angle: -28, scale: 0.75, flip: -1, coordinateSpace: 'section' },
-    'added-plant-dried-cosmos-stem-mror1ph1-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 683, top: 830.640625, width: 137, x: -462.5, y: -239, angle: -22, scale: 1, flip: -1, coordinateSpace: 'section' },
-    'added-plant-dried-flower-wildflower-bundle-mror227e-2': { added: true, catalogId: 'plant-dried-flower-wildflower-bundle', sectionId: 'beginning', left: 683, top: 830.640625, width: 191, x: 454.5, y: 281.5, angle: 38, scale: 0.74, flip: -1, coordinateSpace: 'section' },
-    'added-plant-dried-cosmos-stem-mror70sz-5': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'montage', left: 683, top: 2311.484375, width: 137, x: 486.5, y: -62, angle: 65, scale: 0.86, flip: -1, coordinateSpace: 'section' },
+    'added-plant-opening-babys-breath-right-mrobtsww-1': { added: true, catalogId: 'plant-opening-babys-breath-right', sectionId: 'montage', left: 1120, top: 664.46875, width: 168, x: -155.25390625, y: 246.1953125, angle: 50, scale: 0.88, flip: -1, coordinateSpace: 'section', phone: { deleted: true } },
+    'added-plant-dried-cosmos-stem-mrobuje6-2': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 145, x: 463.5390625, y: 196.890625, angle: 48, scale: 0.86, flip: -1, coordinateSpace: 'section', phone: { deleted: true } },
+    'added-plant-dried-flower-daisy-mrobv8ko-3': { added: true, catalogId: 'plant-dried-flower-daisy', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 185, x: -963.69921875, y: 67.46484375, angle: -28, scale: 0.75, flip: -1, coordinateSpace: 'section', phone: { deleted: true } },
+    'added-plant-dried-cosmos-stem-mror1ph1-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 683, top: 830.640625, width: 137, x: -462.5, y: -239, angle: -22, scale: 1, flip: -1, coordinateSpace: 'section', phone: { deleted: true } },
+    'added-plant-dried-flower-wildflower-bundle-mror227e-2': { added: true, catalogId: 'plant-dried-flower-wildflower-bundle', sectionId: 'beginning', left: 683, top: 830.640625, width: 191, x: 454.5, y: 281.5, angle: 38, scale: 0.74, flip: -1, coordinateSpace: 'section', phone: { deleted: true } },
+    'added-plant-dried-cosmos-stem-mror70sz-5': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'montage', left: 683, top: 2311.484375, width: 137, x: 486.5, y: -62, angle: 65, scale: 0.86, flip: -1, coordinateSpace: 'section', phone: { left: 32.76, top: 2860.15, width: 117, x: 260.67, y: 190.67, angle: 65, scale: 0.86, flip: -1 } },
+    'added-plant-dried-eucalyptus-lunaria-mrovt7h6-1': { added: true, catalogId: 'plant-dried-eucalyptus-lunaria', sectionId: 'montage', left: 195, top: 332.2421875, width: 117, x: 0, y: 0, angle: 0, scale: 1, flip: 1, coordinateSpace: 'section', deleted: true, phone: { left: 357.24, top: 715.5175, width: 117, x: -303, y: -680.67, angle: -48, scale: 1, flip: 1 } },
+    'added-plant-dried-eucalyptus-lunaria-mrovu17f-2': { added: true, catalogId: 'plant-dried-eucalyptus-lunaria', sectionId: 'numbers', left: 195, top: 190.7578125, width: 117, x: 0, y: 0, angle: 0, scale: 1, flip: 1, coordinateSpace: 'viewport', deleted: true, phone: { left: 32.76, top: 428.16, width: 117, x: 22.33, y: 147, angle: -49, scale: 0.8, flip: 1 } },
+    'added-plant-flowering-olive-arch-mrovw36l-1': { added: true, catalogId: 'plant-flowering-olive-arch', sectionId: 'montage', left: 195, top: 201.2421875, width: 117, x: 0, y: 0, angle: 0, scale: 1, flip: 1, coordinateSpace: 'section', deleted: true, phone: { left: 357.24, top: 715.5175, width: 117, x: -112.67, y: 23.67, angle: 0, scale: 1, flip: 1 } },
   };
 
   let saved = JSON.parse(JSON.stringify(defaultLayout));
@@ -52,6 +55,21 @@
   } catch (error) {
     saved = JSON.parse(JSON.stringify(defaultLayout));
   }
+
+  /* A plant's visibility is per-device, just like its position. On a phone a
+     `.phone` overlay decides: an overlay WITHOUT a `deleted` key means the plant
+     was hand-placed for phones and shows there even when it's hidden on iPad; an
+     overlay WITH `deleted:true` hides it on phones only. With no overlay at all,
+     phones follow the shared (iPad) flag. On iPad/desktop the shared top-level
+     `deleted` always decides. This lets each device keep its own set of flowers
+     without one wiping the other. */
+  const effDeleted = (state) => {
+    if (!state) return false;
+    if (isPhone && state.phone) {
+      return Object.prototype.hasOwnProperty.call(state.phone, 'deleted') ? !!state.phone.deleted : false;
+    }
+    return !!state.deleted;
+  };
 
   const persist = () => {
     try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (error) {}
@@ -152,7 +170,11 @@
        shared record, so the iPad/desktop layout (the top-level values) is never
        touched — each device shows its own dragged arrangement. */
     const record = saved[el.dataset.decorId];
-    if (record && record.phone) return Object.assign({}, state, record.phone);
+    const phone = record && record.phone;
+    const PLACE_KEYS = ['left', 'top', 'width', 'x', 'y', 'angle', 'scale', 'flip'];
+    if (phone && PLACE_KEYS.some((key) => phone[key] !== undefined)) {
+      return Object.assign({}, state, phone);
+    }
     if (el.matches('.cover-flower, .moment-flower')) {
       return Object.assign({}, state, { x: 0, y: 0, angle: 0, scale: 1, flip: 1 });
     }
@@ -209,7 +231,7 @@
     /* A hidden source can seed the library without appearing as a placed
        plant. Every visible plant remains selectable in edit mode. */
     if (el.dataset.decorCatalogOnly === 'true') return;
-    if (stored && stored.deleted) {
+    if (effDeleted(stored)) {
       el.remove();
       return;
     }
@@ -317,7 +339,7 @@
 
   /* Restore copies created from the library on earlier visits. */
   Object.entries(saved).forEach(([id, storedState]) => {
-    if (!storedState || !storedState.added || storedState.deleted) return;
+    if (!storedState || !storedState.added || effDeleted(storedState)) return;
     const state = Object.assign({}, storedState);
     const plant = catalog.find((item) => item.id === state.catalogId);
     if (!plant) return;
@@ -536,8 +558,15 @@
     /* Always leave a "deleted" tombstone — never just drop the key. The shared
        default layout is merged UNDER the saved layout on load, so a bare delete
        lets a default flower reappear next visit ("it keeps coming back after I
-       press Done"). The tombstone overrides the default and keeps it gone. */
-    saved[id] = Object.assign({}, saved[id] || current(el), { deleted: true });
+       press Done"). The tombstone overrides the default and keeps it gone.
+       On a phone the tombstone goes on the `.phone` overlay so it hides the
+       plant on phones ONLY — the iPad layout is never touched. */
+    const base = saved[id] || current(el);
+    if (isPhone) {
+      saved[id] = Object.assign({}, base, { phone: Object.assign({}, base.phone, { deleted: true }) });
+    } else {
+      saved[id] = Object.assign({}, base, { deleted: true });
+    }
     if (selected === el) selected = null;
     el.remove();
     decors = decors.filter((item) => item !== el);
@@ -645,6 +674,13 @@
       flip: 1,
       coordinateSpace: pinToMilestones ? 'viewport' : 'section',
     };
+    /* A plant added while on a phone belongs to the phone layout only: it is
+       hidden on iPad (top-level deleted) and shown on the phone through its
+       own overlay, so the two devices' flower sets stay independent. */
+    if (isPhone) {
+      state.deleted = true;
+      state.phone = { left, top, width, x: 0, y: 0, angle: 0, scale: 1, flip: 1 };
+    }
     const el = document.createElement('img');
     el.className = 'free-decor library-added-decor';
     el.src = plant.src;
@@ -705,9 +741,11 @@
     if (!selected) return;
     const id = selected.dataset.decorId;
     if (isPhone) {
-      /* Reset on a phone only clears this plant's phone placement, returning it
-         to the auto-safe fallback. The iPad/desktop layout is left untouched. */
-      if (saved[id]) delete saved[id].phone;
+      /* Reset on a phone clears this plant's phone placement (back to the
+         auto-safe fallback) but KEEPS it visible on the phone — an empty overlay
+         still counts as "shown here", so a phone-added flower doesn't vanish.
+         The iPad/desktop layout is left untouched. */
+      if (saved[id]) saved[id].phone = {};
       apply(selected, saved[id] || current(selected));
       persist();
       updatePanel();
