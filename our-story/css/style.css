@@ -1225,7 +1225,31 @@ body.reduced-motion .milestone {
   gap: var(--moments-space-between);
 }
 
-.memory { text-align: center; }
+.memory { text-align: center; position: relative; }
+
+/* a botanical tucked at the edge of each memory, sitting behind the photos
+   and peeking out — anchored to the memory so it moves and scales with it and
+   never drifts. New memories cycle through the pool (one → two → three → …). */
+.memory-title,
+.memory-photos,
+.memory-sub { position: relative; z-index: 1; }
+.memory-flower {
+  position: absolute;
+  z-index: 0;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.9;
+}
+.memory-flower--one   { width: 26%; left: -7%;  top: 24%;    transform: rotate(-10deg); }
+.memory-flower--two   { width: 22%; right: -6%; top: 18%;    transform: rotate(12deg); }
+.memory-flower--three { width: 26%; left: -6%;  bottom: 6%;  transform: rotate(-8deg); }
+@media (max-width: 640px) {
+  .memory-flower--one   { width: 30%; left: -9%; }
+  .memory-flower--two   { width: 26%; right: -8%; }
+  .memory-flower--three { width: 30%; left: -9%; }
+}
 
 /* the moment's name, followed by the pictures it introduces */
 .memory-title {

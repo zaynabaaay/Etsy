@@ -28,7 +28,7 @@
      shows through instead of a frozen old copy. Photos are never touched (they
      live in IndexedDB). A buyer editing a fixed downloaded copy never bumps
      this, so their own edits are always kept. */
-  const CONTENT_VERSION = '19';
+  const CONTENT_VERSION = '20';
   const editing = localStorage.getItem(FLAG) === '1';
 
   const grain = () => document.querySelector('.grain');
@@ -582,25 +582,55 @@
   const PHOTO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23e7ddc6'/%3E%3Ctext x='50%25' y='50%25' font-family='Georgia,serif' font-size='34' fill='%23a2906f' text-anchor='middle' dominant-baseline='middle'%3EYour photo%3C/text%3E%3C/svg%3E";
   let addedSeq = 0;
   const makeMoment = () => {
+    const moments = Array.from(document.querySelectorAll('.moments .moment'));
+    const n = moments.length;
     /* a clear tilt that alternates side to side like the originals
        (-3, 2.5, -2.5…) — never landing near straight */
-    const n = document.querySelectorAll('.moments .moment').length;
     const mag = 2.5 + Math.random();
     const tilt = (n % 2 === 0 ? -mag : mag).toFixed(1);
+    /* carry the NEXT flower in the rotation (1, 2, 3, 1, …) by cloning the
+       matching example moment's photo stage — its flower comes along, so a new
+       moment never repeats the flower directly above it */
+    const source = moments[n % 3] || moments[0];
+
     const art = document.createElement('article');
     art.className = 'moment';
-    art.innerHTML =
-      '<p class="moment-date">Month 00 · Year</p>' +
-      '<div class="polaroid" data-tilt="' + tilt + '">' +
-        '<span class="tape" aria-hidden="true"></span>' +
-        '<img alt="" loading="lazy">' +
-        '<p class="polaroid-caption">a caption</p>' +
-      '</div>' +
-      '<p class="moment-text">Tell the story of this moment.</p>';
-    const img = art.querySelector('img');
-    img.dataset.photoKey = 'added-' + Date.now() + '-' + (addedSeq++);
-    img.dataset.origSrc = PHOTO_PLACEHOLDER;
-    img.src = PHOTO_PLACEHOLDER;
+    const date = document.createElement('p');
+    date.className = 'moment-date';
+    date.textContent = 'Month 00 · Year';
+    art.appendChild(date);
+
+    let pimg;
+    const srcStage = source && source.querySelector('.moment-photo-stage');
+    if (srcStage) {
+      const stage = srcStage.cloneNode(true);
+      const pol = stage.querySelector('.polaroid');
+      if (pol) pol.setAttribute('data-tilt', tilt);
+      const capt = stage.querySelector('.polaroid-caption');
+      if (capt) capt.textContent = 'a caption';
+      pimg = stage.querySelector('.polaroid img');
+      art.appendChild(stage);
+    } else {
+      const pol = document.createElement('div');
+      pol.className = 'polaroid';
+      pol.setAttribute('data-tilt', tilt);
+      pol.innerHTML = '<span class="tape" aria-hidden="true"></span><img alt="" loading="lazy"><p class="polaroid-caption">a caption</p>';
+      pimg = pol.querySelector('img');
+      art.appendChild(pol);
+    }
+
+    const text = document.createElement('p');
+    text.className = 'moment-text';
+    text.textContent = 'Tell the story of this moment.';
+    art.appendChild(text);
+
+    if (pimg) {
+      pimg.removeAttribute('srcset');
+      pimg.dataset.photoKey = 'added-' + Date.now() + '-' + (addedSeq++);
+      pimg.dataset.origSrc = PHOTO_PLACEHOLDER;
+      pimg.src = PHOTO_PLACEHOLDER;
+      pimg.alt = '';
+    }
     return art;
   };
 
@@ -619,11 +649,19 @@
     return fig;
   };
   const makeMemory = () => {
+    const memories = Array.from(document.querySelectorAll('.memories-list .memory'));
+    const n = memories.length;
+    /* carry the next flower in the rotation, cloned from the matching example
+       memory (1, 2, 3, 1, …) so no two neighbours share a flower */
+    const source = memories[n % 3] || memories[0];
     const art = document.createElement('article');
     art.className = 'memory';
-    art.innerHTML = '<h3 class="memory-title">Name this memory</h3>' +
+    const srcFlower = source && source.querySelector('.memory-flower');
+    if (srcFlower) art.appendChild(srcFlower.cloneNode(true));
+    art.insertAdjacentHTML('beforeend',
+      '<h3 class="memory-title">Name this memory</h3>' +
       '<div class="memory-photos"></div>' +
-      '<p class="memory-sub">A line about why this moment mattered.</p>';
+      '<p class="memory-sub">A line about why this moment mattered.</p>');
     art.querySelector('.memory-photos').appendChild(makeMemoryPhoto());
     return art;
   };
@@ -667,7 +705,8 @@
     document.querySelectorAll('.memories-list .memory'), makeMemory,
     '＋ Add a memory', '× Remove memory',
     (el) => {
-      el.querySelectorAll('img').forEach((img) => bindPhoto(img));
+      /* only the real photos are replaceable — never the decorative flower */
+      el.querySelectorAll('.mframe img').forEach((img) => bindPhoto(img));
       bindMemoryPhotos(el);
     },
     placeMemoryDelete
@@ -723,7 +762,8 @@
     document.querySelectorAll('.moments .moment'), makeMoment,
     '＋ Add a memory', '× Remove',
     (el) => {
-      el.querySelectorAll('img').forEach((img) => bindPhoto(img));
+      /* only the polaroid photo is replaceable — never the decorative flower */
+      el.querySelectorAll('.polaroid img').forEach((img) => bindPhoto(img));
       /* angle it now too, so it matches the others while editing */
       const pol = el.querySelector('.polaroid');
       if (pol && window.gsap) gsap.set(pol, { rotation: parseFloat(pol.dataset.tilt || 0) });
