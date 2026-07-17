@@ -390,8 +390,10 @@
         '<button type="button" id="decor-reset" disabled>Reset</button>' +
         '<button type="button" id="decor-delete" class="decor-delete" disabled>Delete</button>' +
         '<button type="button" id="decor-reset-all">Reset all</button>' +
+        '<button type="button" id="decor-copy-layout" class="decor-copy-layout">Copy layout</button>' +
         '<button type="button" id="decor-done" class="decor-done">Done</button>' +
       '</div>' +
+      '<p class="decor-copy-status" role="status" aria-live="polite"></p>' +
     '</div>';
   document.body.appendChild(panel);
 
@@ -407,6 +409,8 @@
   const flip = panel.querySelector('#decor-flip');
   const reset = panel.querySelector('#decor-reset');
   const deleteSelected = panel.querySelector('#decor-delete');
+  const copyLayout = panel.querySelector('#decor-copy-layout');
+  const copyStatus = panel.querySelector('.decor-copy-status');
   let selected = null;
   let drag = null;
   let idCounter = 0;
@@ -649,6 +653,48 @@
     updatePanel();
   });
   deleteSelected.addEventListener('click', () => deleteDecor(selected));
+  copyLayout.addEventListener('click', async () => {
+    persist();
+    const exportText = JSON.stringify({
+      version: 2,
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        pixelRatio: window.devicePixelRatio || 1,
+      },
+      layout: saved,
+    });
+    let copied = false;
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(exportText);
+        copied = true;
+      }
+    } catch (error) {}
+
+    if (!copied) {
+      const field = document.createElement('textarea');
+      field.value = exportText;
+      field.setAttribute('readonly', '');
+      field.style.position = 'fixed';
+      field.style.left = '-9999px';
+      document.body.appendChild(field);
+      field.select();
+      field.setSelectionRange(0, field.value.length);
+      try { copied = document.execCommand('copy'); } catch (error) {}
+      field.remove();
+    }
+
+    if (copied) {
+      copyLayout.textContent = 'Copied \u2713';
+      copyStatus.textContent = 'Paste the copied layout into the Codex chat.';
+      window.setTimeout(() => { copyLayout.textContent = 'Copy layout'; }, 2600);
+    } else {
+      copyStatus.textContent = 'Copy the layout text, then paste it into the Codex chat.';
+      window.prompt('Copy this complete plant layout:', exportText);
+    }
+  });
   panel.querySelector('#decor-reset-all').addEventListener('click', () => {
     if (!window.confirm('Remove added plants and restore every original plant?')) return;
     try {

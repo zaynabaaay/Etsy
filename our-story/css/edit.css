@@ -256,7 +256,19 @@ body.decor-editing .milestone-decor-layer {
 
 .decor-panel button:hover { background: rgba(201, 161, 95, 0.14); }
 .decor-panel button:disabled { opacity: 0.35; cursor: default; }
+.decor-panel .decor-copy-layout {
+  border-color: rgba(213, 173, 106, 0.82);
+  color: #f4d79f;
+}
 .decor-panel .decor-done { background: #c9a15f; color: #2b2118; }
+
+.decor-copy-status {
+  min-height: 1.25em;
+  margin: 0.55rem 0 0;
+  color: rgba(244, 234, 215, 0.78);
+  font-size: 0.62rem;
+  line-height: 1.35;
+}
 
 @media (max-width: 600px) {
   .decor-panel {
