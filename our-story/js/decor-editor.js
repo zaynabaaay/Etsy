@@ -129,7 +129,6 @@
     if (state?.sectionId) el.dataset.sectionId = state.sectionId;
     el.classList.toggle('milestone-pinned-decor', state?.sectionId === 'numbers');
   };
-  let migratedPinnedPlants = false;
 
   const stableHash = (value) => Array.from(String(value || '')).reduce(
     (hash, character) => ((hash * 31) + character.charCodeAt(0)) >>> 0,
@@ -247,10 +246,9 @@
         setSectionMetadata(el, pinnedState);
         milestoneLayer.appendChild(el);
         apply(el, pinnedState);
-        if (stored) {
-          saved[id] = pinnedState;
-          migratedPinnedPlants = true;
-        }
+        /* apply for display only — never re-save on load. Rewriting the
+           position on every load (from live measurements) is what made a
+           locked flower walk a little further each refresh. */
         return;
       }
 
@@ -294,10 +292,7 @@
       setSectionMetadata(el, sectionState);
       ownerSection.appendChild(el);
       apply(el, sectionState);
-      if (stored && !isPhone) {
-        saved[id] = sectionState;
-        migratedPinnedPlants = true;
-      }
+      /* display only — the locked value is never rewritten on load */
       return;
     } else {
       /* These five flowers are intentionally anchored inside their photo
@@ -326,12 +321,14 @@
       if (owner) state.sectionId = owner.id;
     }
 
+    /* one-time coordinate-space conversion for legacy saves — computed for
+       display only, never written back (writing it back on every load is what
+       made placements drift). New placements are already saved in the right
+       space, so they skip this entirely and stay put. */
     if (state.sectionId === 'numbers' && numbersSection && milestonesScroll && state.coordinateSpace !== 'viewport') {
       const stageTop = milestonesScroll.getBoundingClientRect().top + window.scrollY;
       state.top = Math.min(window.innerHeight - 70, Math.max(70, state.top - stageTop));
       state.coordinateSpace = 'viewport';
-      saved[id] = state;
-      migratedPinnedPlants = true;
     } else if (state.sectionId && state.sectionId !== 'numbers' && state.coordinateSpace !== 'section') {
       const owner = document.getElementById(state.sectionId);
       if (owner) {
@@ -339,10 +336,6 @@
         state.left -= origin.left;
         state.top -= origin.top;
         state.coordinateSpace = 'section';
-        if (!isPhone) {
-          saved[id] = state;
-          migratedPinnedPlants = true;
-        }
       }
     }
 
@@ -359,7 +352,6 @@
     targetLayer(state).appendChild(el);
     apply(el, state);
   });
-  if (migratedPinnedPlants) persist();
 
   let decors = Array.from(document.querySelectorAll('img[data-decor-id]:not([data-decor-catalog-only="true"])'));
   decors.forEach((el) => el.classList.add('movable-decor'));
