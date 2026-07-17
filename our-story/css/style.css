@@ -805,6 +805,8 @@ body.cinematic .cover > * { opacity: 0; }
 }
 
 .moment-text {
+  position: relative;
+  z-index: 0;
   margin-top: 2rem;
   max-width: 30ch;
   font-size: var(--size-body);
@@ -815,6 +817,22 @@ body.cinematic .cover > * { opacity: 0; }
 .moment-text em {
   font-style: italic;
   color: var(--ink);
+}
+
+/* a botanical that wraps the bottom corner of the moment's text — anchored to
+   the text block, so it sits the same on desktop and mobile and never drifts
+   onto the words (it tucks behind them, curling up from the corner) */
+.moment-corner-flower {
+  position: absolute;
+  z-index: -1;
+  left: -13%;
+  bottom: -7%;
+  width: 46%;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.9;
 }
 
 /* The memories stack on phones, so the centre thread would run through the
