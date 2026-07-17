@@ -7,15 +7,15 @@
 (function () {
   'use strict';
 
-  const KEY = 'ourstory:decor-library:v3';
-  const OLD_KEYS = ['ourstory:decor-library:v2', 'ourstory:decor-positions:v1'];
+  const KEY = 'ourstory:decor-library:v4';
+  const OLD_KEYS = ['ourstory:decor-library:v3', 'ourstory:decor-library:v2', 'ourstory:decor-positions:v1'];
   const params = new URLSearchParams(location.search);
   const arranging = params.get('edit-flowers') === '1';
   const isPhone = window.matchMedia('(max-width: 767px)').matches;
 
   /* Complete arrangement exported from the iPad on July 16. This is now the
-     shared starting layout on every device; new adjustments save to v3 so
-     the broken v2 coordinate migration cannot move the plants again. */
+     shared starting layout on every device; new adjustments save to v4 so
+     older browser-only positions cannot move the plants again. */
   const defaultLayout = {
     'beginning-babys-breath-one': { left: 632.6356201171875, top: 1602.1925659179688, width: 190, x: 0.12109375, y: 0.05859375, angle: 0, scale: 1, flip: 1, deleted: true },
     'beginning-babys-breath-two': { left: 1582.1451416015625, top: 2148.7647705078125, width: 180, x: -0.1015625, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
@@ -24,12 +24,16 @@
     'leaf-branch': { left: 156.79687881469727, top: 293.015625, width: 175, x: -0.0703125, y: -0.07421875, angle: 0, scale: 1, flip: 1, deleted: true },
     'straight-eucalyptus': { left: 2150.3984375, top: 549.359375, width: 118, x: -0.0078125, y: -0.1015625, angle: 0, scale: 1, flip: 1, deleted: true },
     'wildflower-fan': { left: 1948.796875, top: 947.171875, width: 245, x: 0, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
-    'dried-bundle': { left: 2083.1953125, top: 1382.875, width: 205, x: -481.7265625, y: -253.53515625, angle: 34, scale: 0.94, flip: 1 },
+    'dried-bundle': { left: 1601.46875, top: 82.83984375, width: 205, x: -25.4884033203125, y: 1023.8092346191406, angle: 31, scale: 0.73, flip: 1, sectionId: 'beginning', coordinateSpace: 'section' },
     'flowering-branch': { left: 156.79688453674316, top: 719.8515625, width: 290, x: -0.37109375, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
     'added-plant-dried-cosmos-stem-mroayfjy-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 1120, top: 494.25, width: 145, x: -450.3359375, y: 90.5078125, angle: -41, scale: 1, flip: 1, coordinateSpace: 'section' },
     'cream-sprig': { left: 2060.7969360351562, top: 1648.8984375, width: 285, x: -0.57421875, y: -0.60546875, angle: 0, scale: 1, flip: 1, deleted: true },
     'olive-arch': { left: 1164.7968444824219, top: 95.1171875, width: 650, x: -0.19921875, y: -0.28125, angle: 0, scale: 1, flip: 1, deleted: true },
     'straight-myrtle': { left: 2105.59375, top: 751.65625, width: 112, x: -0.10546875, y: -0.16796875, angle: 0, scale: 1, flip: 1, deleted: true },
+    'straight-olive': { left: 0, top: 0, width: 109, x: -0.07421875, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
+    'added-plant-generated-botanical-1-mrobmf54-1': { added: true, catalogId: 'plant-generated-botanical-1', sectionId: 'beginning', left: 1120, top: 1380, width: 175, x: -448.734375, y: 264.31640625, angle: -43, scale: 1, flip: 1, coordinateSpace: 'section' },
+    'corner-branch': { left: 0, top: 0, width: 320, x: -0.328125, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
+    'added-plant-opening-babys-breath-right-mrobnbvu-2': { added: true, catalogId: 'plant-opening-babys-breath-right', sectionId: 'numbers', left: 1120, top: 577.17578125, width: 168, x: 328.94140625, y: -64.03125, angle: 45, scale: 0.8, flip: -1, coordinateSpace: 'viewport' },
   };
 
   let saved = JSON.parse(JSON.stringify(defaultLayout));
@@ -676,7 +680,7 @@
   copyLayout.addEventListener('click', async () => {
     persist();
     const exportText = JSON.stringify({
-      version: 2,
+      version: 4,
       viewport: {
         width: window.innerWidth,
         height: window.innerHeight,
