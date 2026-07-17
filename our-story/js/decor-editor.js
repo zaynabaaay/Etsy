@@ -7,17 +7,37 @@
 (function () {
   'use strict';
 
-  const KEY = 'ourstory:decor-library:v2';
-  const LEGACY_KEY = 'ourstory:decor-positions:v1';
+  const KEY = 'ourstory:decor-library:v3';
+  const OLD_KEYS = ['ourstory:decor-library:v2', 'ourstory:decor-positions:v1'];
   const params = new URLSearchParams(location.search);
   const arranging = params.get('edit-flowers') === '1';
   const isPhone = window.matchMedia('(max-width: 767px)').matches;
 
-  let saved = {};
+  /* Complete arrangement exported from the iPad on July 16. This is now the
+     shared starting layout on every device; new adjustments save to v3 so
+     the broken v2 coordinate migration cannot move the plants again. */
+  const defaultLayout = {
+    'beginning-babys-breath-one': { left: 632.6356201171875, top: 1602.1925659179688, width: 190, x: 0.12109375, y: 0.05859375, angle: 0, scale: 1, flip: 1, deleted: true },
+    'beginning-babys-breath-two': { left: 1582.1451416015625, top: 2148.7647705078125, width: 180, x: -0.1015625, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
+    'dried-daisy': { left: 2039.2414062500002, top: 764.062875, width: 185, x: 0, y: 0, angle: 14, scale: 1, flip: 1, sectionId: 'opening', coordinateSpace: 'section', deleted: true },
+    'eucalyptus-lunaria': { left: 1881.64078125, top: 358.188, width: 178, x: 0.02734375, y: -0.1015625, angle: 17, scale: 1, flip: 1, sectionId: 'opening', coordinateSpace: 'section', deleted: true },
+    'leaf-branch': { left: 156.79687881469727, top: 293.015625, width: 175, x: -0.0703125, y: -0.07421875, angle: 0, scale: 1, flip: 1, deleted: true },
+    'straight-eucalyptus': { left: 2150.3984375, top: 549.359375, width: 118, x: -0.0078125, y: -0.1015625, angle: 0, scale: 1, flip: 1, deleted: true },
+    'wildflower-fan': { left: 1948.796875, top: 947.171875, width: 245, x: 0, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
+    'dried-bundle': { left: 2083.1953125, top: 1382.875, width: 205, x: -481.7265625, y: -253.53515625, angle: 34, scale: 0.94, flip: 1 },
+    'flowering-branch': { left: 156.79688453674316, top: 719.8515625, width: 290, x: -0.37109375, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
+    'added-plant-dried-cosmos-stem-mroayfjy-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 1120, top: 494.25, width: 145, x: -450.3359375, y: 90.5078125, angle: -41, scale: 1, flip: 1, coordinateSpace: 'section' },
+    'cream-sprig': { left: 2060.7969360351562, top: 1648.8984375, width: 285, x: -0.57421875, y: -0.60546875, angle: 0, scale: 1, flip: 1, deleted: true },
+    'olive-arch': { left: 1164.7968444824219, top: 95.1171875, width: 650, x: -0.19921875, y: -0.28125, angle: 0, scale: 1, flip: 1, deleted: true },
+    'straight-myrtle': { left: 2105.59375, top: 751.65625, width: 112, x: -0.10546875, y: -0.16796875, angle: 0, scale: 1, flip: 1, deleted: true },
+  };
+
+  let saved = JSON.parse(JSON.stringify(defaultLayout));
   try {
-    saved = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem(LEGACY_KEY) || '{}') || {};
+    const currentLayout = JSON.parse(localStorage.getItem(KEY) || '{}') || {};
+    saved = Object.assign(saved, currentLayout);
   } catch (error) {
-    saved = {};
+    saved = JSON.parse(JSON.stringify(defaultLayout));
   }
 
   const persist = () => {
@@ -168,9 +188,9 @@
     const id = el.dataset.decorId;
     const stored = saved[id];
     const originSectionId = el.closest('section')?.id || '';
-    /* Locked pieces still seed the reusable plant catalog, but their approved
-       art-directed placement is now owned by CSS instead of localStorage. */
-    if (el.dataset.decorLocked === 'true') return;
+    /* A hidden source can seed the library without appearing as a placed
+       plant. Every visible plant remains selectable in edit mode. */
+    if (el.dataset.decorCatalogOnly === 'true') return;
     if (stored && stored.deleted) {
       el.remove();
       return;
@@ -332,7 +352,7 @@
   });
   if (migratedPinnedPlants) persist();
 
-  let decors = Array.from(document.querySelectorAll('img[data-decor-id]:not([data-decor-locked="true"])'));
+  let decors = Array.from(document.querySelectorAll('img[data-decor-id]:not([data-decor-catalog-only="true"])'));
   decors.forEach((el) => el.classList.add('movable-decor'));
 
   const cssNumber = (el, name, fallback) => {
@@ -699,7 +719,7 @@
     if (!window.confirm('Remove added plants and restore every original plant?')) return;
     try {
       localStorage.removeItem(KEY);
-      localStorage.removeItem(LEGACY_KEY);
+      OLD_KEYS.forEach((key) => localStorage.removeItem(key));
     } catch (error) {}
     location.reload();
   });

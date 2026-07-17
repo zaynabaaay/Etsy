@@ -14,7 +14,7 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=161">
+  <link rel="stylesheet" href="css/style.css?v=162">
   <link rel="stylesheet" href="css/edit.css?v=110">
 </head>
 <body>
@@ -177,10 +177,10 @@
         <p class="moment-date">October 5 · 2025</p>
         <div class="moment-photo-stage moment-photo-stage--three">
           <img class="locked-decor moment-olive-locked" data-decor-id="straight-olive" data-decor-name="Straight olive sprig"
-               data-decor-locked="true" src="assets/decor/straight-olive-sprig.png" alt="" aria-hidden="true" draggable="false">
+               src="assets/decor/straight-olive-sprig.png" alt="" aria-hidden="true" draggable="false">
           <!-- Kept as a catalog source, but hidden from the locked layout so
                the hand-placed olive sprig remains the only plant here. -->
-          <img class="moment-flower moment-flower--three" data-decor-locked="true"
+          <img class="moment-flower moment-flower--three" data-decor-catalog-only="true"
                src="assets/decor/botanical-corner-left.png" alt="" aria-hidden="true" hidden>
           <div class="polaroid" data-tilt="-2.5">
             <span class="tape" aria-hidden="true"></span>
@@ -233,7 +233,7 @@
              makes the whole stage vibrate while scrolling -->
         <div class="milestone-decor-layer" aria-hidden="true">
           <img class="locked-decor milestone-corner-branch" data-decor-id="corner-branch" data-decor-name="Corner flower branch"
-               data-decor-locked="true" src="assets/decor/generated-botanical-3.png" alt="" aria-hidden="true" draggable="false">
+               src="assets/decor/generated-botanical-3.png" alt="" aria-hidden="true" draggable="false">
         </div>
         <div class="counter">
           <article class="milestone is-active" data-title="Days Together" aria-hidden="false">
@@ -463,7 +463,7 @@
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
   <script src="js/edit.js?v=124"></script>
-  <script src="js/decor-editor.js?v=12"></script>
+  <script src="js/decor-editor.js?v=13"></script>
   <script src="js/main.js?v=121"></script>
 </body>
 </html>
