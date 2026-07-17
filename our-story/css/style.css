@@ -1008,6 +1008,20 @@ body.cinematic .cover > * { opacity: 0; }
     drop-shadow(0 7px 8px rgba(67, 49, 27, 0.1));
 }
 
+/* Tablet layouts place the story column closer to the viewport edges than
+   desktop. Pull both locked botanicals inward so they remain visible beside
+   their paper/photo instead of being clipped by the iPad viewport. */
+@media (min-width: 768px) and (max-width: 1180px) {
+  .moment-olive-locked {
+    left: -5%;
+  }
+
+  .milestone-corner-branch {
+    left: calc(50% + min(37vw, 380px));
+    width: min(18vw, 180px);
+  }
+}
+
 @media (max-width: 767px) {
   .milestone-corner-branch {
     left: calc(50% + min(38vw, 190px));
