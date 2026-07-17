@@ -168,6 +168,9 @@
     const id = el.dataset.decorId;
     const stored = saved[id];
     const originSectionId = el.closest('section')?.id || '';
+    /* Locked pieces still seed the reusable plant catalog, but their approved
+       art-directed placement is now owned by CSS instead of localStorage. */
+    if (el.dataset.decorLocked === 'true') return;
     if (stored && stored.deleted) {
       el.remove();
       return;
@@ -329,7 +332,7 @@
   });
   if (migratedPinnedPlants) persist();
 
-  let decors = Array.from(document.querySelectorAll('img[data-decor-id]'));
+  let decors = Array.from(document.querySelectorAll('img[data-decor-id]:not([data-decor-locked="true"])'));
   decors.forEach((el) => el.classList.add('movable-decor'));
 
   const cssNumber = (el, name, fallback) => {

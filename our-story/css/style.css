@@ -691,6 +691,31 @@ body.cinematic .cover > * { opacity: 0; }
   transform-origin: 54% 92%;
 }
 
+.moment-flower--three[hidden] {
+  display: none !important;
+}
+
+/* This sprig was placed by hand beside the final Beginning photo. Keep it
+   anchored to the print so its relationship survives different screens and
+   can no longer drift when section coordinates are recalculated. */
+.moment-olive-locked {
+  position: absolute;
+  z-index: 0;
+  left: -25%;
+  bottom: 8%;
+  width: 32%;
+  max-width: none;
+  height: auto;
+  opacity: 0.82;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  transform: rotate(-24deg);
+  transform-origin: 50% 94%;
+  filter: saturate(0.58) sepia(0.08) brightness(1.04)
+    drop-shadow(0 5px 7px rgba(67, 49, 27, 0.08));
+}
+
 @media (max-width: 767px) {
   .moment-flower--one {
     width: 52%;
@@ -960,6 +985,34 @@ body.cinematic .cover > * { opacity: 0; }
 
 .milestone-decor-layer .free-decor {
   z-index: 1;
+}
+
+/* Locked from the hand-arranged iPad layout: the upright branch peeks out
+   from behind the right edge of the torn paper and remains glued to the held
+   Milestones stage while the page scrolls. */
+.milestone-corner-branch {
+  position: absolute;
+  z-index: 1;
+  left: calc(50% + min(38vw, 470px));
+  top: 50%;
+  width: min(22vw, 320px);
+  max-width: none;
+  height: auto;
+  opacity: 0.86;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  transform-origin: 50% 50%;
+  filter: saturate(0.74) sepia(0.08)
+    drop-shadow(0 7px 8px rgba(67, 49, 27, 0.1));
+}
+
+@media (max-width: 767px) {
+  .milestone-corner-branch {
+    left: calc(50% + min(38vw, 190px));
+    width: min(38vw, 190px);
+  }
 }
 
 .counter {
