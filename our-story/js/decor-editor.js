@@ -143,6 +143,12 @@
      never overwritten by this phone-only presentation. */
   const viewState = (el, state) => {
     if (!isPhone) return state;
+    /* If this plant has a hand-placed PHONE position, show that instead of the
+       auto-safe fallback. Phone placements live in a `.phone` sub-object on the
+       shared record, so the iPad/desktop layout (the top-level values) is never
+       touched — each device shows its own dragged arrangement. */
+    const record = saved[el.dataset.decorId];
+    if (record && record.phone) return Object.assign({}, state, record.phone);
     if (el.matches('.cover-flower, .moment-flower')) {
       return Object.assign({}, state, { x: 0, y: 0, angle: 0, scale: 1, flip: 1 });
     }
@@ -361,9 +367,29 @@
     return Number.isFinite(value) ? value : fallback;
   };
 
+  const GEOM_KEYS = ['left', 'top', 'width', 'x', 'y', 'angle', 'scale', 'flip'];
+  const pickGeom = (state) => {
+    const out = {};
+    GEOM_KEYS.forEach((key) => { if (state[key] !== undefined) out[key] = state[key]; });
+    return out;
+  };
+
+  /* Route every geometry edit to the right layout. On a phone, edits are saved
+     into the record's `.phone` overlay so the iPad/desktop numbers stay put; on
+     iPad/desktop they update the shared top-level record as before. */
+  const writeGeometry = (id, state) => {
+    const base = saved[id] || {};
+    if (isPhone) {
+      saved[id] = Object.assign({}, base, { phone: Object.assign({}, base.phone, pickGeom(state)) });
+    } else {
+      saved[id] = Object.assign({}, base, state);
+    }
+    return saved[id];
+  };
+
   const current = (el) => {
     const stored = saved[el.dataset.decorId] || {};
-    return Object.assign({
+    const applied = {
       left: cssNumber(el, '--decor-left', 0),
       top: cssNumber(el, '--decor-top', 0),
       width: cssNumber(el, '--decor-width', el.offsetWidth || 150),
@@ -372,7 +398,20 @@
       angle: cssNumber(el, '--decor-angle', 0),
       scale: cssNumber(el, '--decor-scale', 1),
       flip: cssNumber(el, '--decor-flip', 1),
-    }, stored);
+    };
+    if (isPhone) {
+      /* On a phone the "current" placement is whatever is displayed right now —
+         either the auto-safe fallback or an existing phone override — plus the
+         shared record's identity fields (added / catalogId / sectionId /
+         coordinateSpace) so a save keeps the plant in its section. Desktop
+         geometry must NOT leak in, or the first phone drag would jump the plant
+         to the iPad coordinates. */
+      const meta = Object.assign({}, stored);
+      delete meta.phone;
+      GEOM_KEYS.forEach((key) => delete meta[key]);
+      return Object.assign(applied, stored.phone || {}, meta);
+    }
+    return Object.assign(applied, stored);
   };
 
   const sizeLayer = () => {
@@ -480,9 +519,9 @@
 
   const saveSelected = (state) => {
     if (!selected) return;
-    const previous = saved[selected.dataset.decorId] || {};
-    saved[selected.dataset.decorId] = Object.assign({}, previous, state);
-    apply(selected, saved[selected.dataset.decorId]);
+    const id = selected.dataset.decorId;
+    writeGeometry(id, state);
+    apply(selected, saved[id]);
     persist();
     updatePanel();
   };
@@ -526,8 +565,7 @@
         x: drag.state.x + event.clientX - drag.startX,
         y: drag.state.y + event.clientY - drag.startY,
       });
-      const previous = saved[el.dataset.decorId] || {};
-      saved[el.dataset.decorId] = Object.assign({}, previous, next);
+      writeGeometry(el.dataset.decorId, next);
       apply(el, saved[el.dataset.decorId]);
       updatePanel();
     });
@@ -662,6 +700,15 @@
   reset.addEventListener('click', () => {
     if (!selected) return;
     const id = selected.dataset.decorId;
+    if (isPhone) {
+      /* Reset on a phone only clears this plant's phone placement, returning it
+         to the auto-safe fallback. The iPad/desktop layout is left untouched. */
+      if (saved[id]) delete saved[id].phone;
+      apply(selected, saved[id] || current(selected));
+      persist();
+      updatePanel();
+      return;
+    }
     if (selected.dataset.added === 'true') {
       const state = current(selected);
       saved[id] = Object.assign({}, saved[id], { x: 0, y: 0, angle: 0, scale: 1, flip: 1 });
