@@ -490,11 +490,11 @@
   const deleteDecor = (el) => {
     if (!el) return;
     const id = el.dataset.decorId;
-    if (el.dataset.added === 'true') {
-      delete saved[id];
-    } else {
-      saved[id] = Object.assign({}, current(el), { deleted: true });
-    }
+    /* Always leave a "deleted" tombstone — never just drop the key. The shared
+       default layout is merged UNDER the saved layout on load, so a bare delete
+       lets a default flower reappear next visit ("it keeps coming back after I
+       press Done"). The tombstone overrides the default and keeps it gone. */
+    saved[id] = Object.assign({}, saved[id] || current(el), { deleted: true });
     if (selected === el) selected = null;
     el.remove();
     decors = decors.filter((item) => item !== el);
