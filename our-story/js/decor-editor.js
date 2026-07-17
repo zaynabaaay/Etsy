@@ -24,7 +24,7 @@
     'leaf-branch': { left: 156.79687881469727, top: 293.015625, width: 175, x: -0.0703125, y: -0.07421875, angle: 0, scale: 1, flip: 1, deleted: true },
     'straight-eucalyptus': { left: 2150.3984375, top: 549.359375, width: 118, x: -0.0078125, y: -0.1015625, angle: 0, scale: 1, flip: 1, deleted: true },
     'wildflower-fan': { left: 1948.796875, top: 947.171875, width: 245, x: 0, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
-    'dried-bundle': { left: 1601.46875, top: 82.83984375, width: 205, x: -25.4884033203125, y: 1023.8092346191406, angle: 31, scale: 0.73, flip: 1, sectionId: 'beginning', coordinateSpace: 'section' },
+    'dried-bundle': { left: 1601.46875, top: 82.83984375, width: 205, x: -25.4884033203125, y: 1023.8092346191406, angle: 31, scale: 0.73, flip: 1, sectionId: 'beginning', coordinateSpace: 'section', deleted: true },
     'flowering-branch': { left: 156.79688453674316, top: 719.8515625, width: 290, x: -0.37109375, y: 0, angle: 0, scale: 1, flip: 1, deleted: true },
     'added-plant-dried-cosmos-stem-mroayfjy-1': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'beginning', left: 1120, top: 494.25, width: 145, x: -450.3359375, y: 90.5078125, angle: -41, scale: 1, flip: 1, coordinateSpace: 'section' },
     'cream-sprig': { left: 2060.7969360351562, top: 1648.8984375, width: 285, x: -0.57421875, y: -0.60546875, angle: 0, scale: 1, flip: 1, deleted: true },
@@ -37,7 +37,7 @@
     'cosmos-stem': { left: 313.6, top: 691.56, width: 145, x: -0.40234375, y: 0.0859375, angle: -14, scale: 1, flip: 1, deleted: true },
     'straight-ruscus': { left: 112, top: 1321.2734375, width: 116, x: -0.2578125, y: -0.640625, angle: 0, scale: 1, flip: 1, deleted: true },
     'added-plant-opening-babys-breath-right-mrobtsww-1': { added: true, catalogId: 'plant-opening-babys-breath-right', sectionId: 'montage', left: 1120, top: 664.46875, width: 168, x: 292.24609375, y: 286.1953125, angle: 34, scale: 0.88, flip: 1, coordinateSpace: 'section' },
-    'added-plant-dried-cosmos-stem-mrobuje6-2': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 145, x: 463.5390625, y: 196.890625, angle: 48, scale: 0.86, flip: -1, coordinateSpace: 'section' },
+    'added-plant-dried-cosmos-stem-mrobuje6-2': { added: true, catalogId: 'plant-dried-cosmos-stem', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 145, x: 463.5390625, y: 196.890625, angle: 48, scale: 0.86, flip: -1, coordinateSpace: 'section', deleted: true },
     'added-plant-dried-flower-daisy-mrobv8ko-3': { added: true, catalogId: 'plant-dried-flower-daisy', sectionId: 'montage', left: 1120, top: 2190.1484375, width: 185, x: -510.19921875, y: 30.46484375, angle: -56, scale: 0.75, flip: 1, coordinateSpace: 'section' },
   };
 
