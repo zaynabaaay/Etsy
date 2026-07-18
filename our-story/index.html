@@ -14,8 +14,8 @@
   <!-- Fonts are bundled with the template (assets/fonts) — no internet needed.
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
-  <link rel="stylesheet" href="css/style.css?v=165">
-  <link rel="stylesheet" href="css/edit.css?v=110">
+  <link rel="stylesheet" href="css/style.css?v=166">
+  <link rel="stylesheet" href="css/edit.css?v=111">
 </head>
 <body>
 
@@ -416,20 +416,21 @@
        ════════════════════════════════════════════════════════════════ -->
   <section class="scene-close" id="close" data-label="The Closing">
     <div class="close-inner">
+      <!-- EDIT ME · The closing line -->
+      <h2 class="close-line"><span class="mask"><span class="mask-inner">The best is <span class="close-yet">yet</span> to come.</span></span></h2>
+
+      <div class="close-sparkle" aria-hidden="true">
+        <span class="sp-line"></span>
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 1 L13.5 10.5 L23 12 L13.5 13.5 L12 23 L10.5 13.5 L1 12 L10.5 10.5 Z"/></svg>
+        <span class="sp-line"></span>
+      </div>
+
       <!-- EDIT ME · Replace this photo: assets/photos/closing.jpg -->
       <div class="close-photo">
         <img src="assets/photos/closing.jpg?v=2" alt="Us, today" loading="lazy">
       </div>
 
-      <!-- EDIT ME · The closing line -->
-      <h2 class="close-line"><span class="mask"><span class="mask-inner">The best is <span class="close-yet">yet</span> to come.</span></span></h2>
-
       <div class="close-names">
-        <div class="close-sparkle" aria-hidden="true">
-          <span class="sp-line"></span>
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 1 L13.5 10.5 L23 12 L13.5 13.5 L12 23 L10.5 13.5 L1 12 L10.5 10.5 Z"/></svg>
-          <span class="sp-line"></span>
-        </div>
         <!-- EDIT ME · Script line -->
         <p class="close-script">here&rsquo;s to us</p>
         <!-- EDIT ME · Your names -->
@@ -462,8 +463,8 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
-  <script src="js/edit.js?v=125"></script>
+  <script src="js/edit.js?v=126"></script>
   <script src="js/decor-editor.js?v=24"></script>
-  <script src="js/main.js?v=121"></script>
+  <script src="js/main.js?v=122"></script>
 </body>
 </html>

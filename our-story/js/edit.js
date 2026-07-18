@@ -737,6 +737,193 @@
     placeMomentDelete
   );
 
+  /* ══════════════════════════════════════════════════════════════════
+     DESIGN SYSTEM · per-line type, colour, and remove
+     Tap any line while editing and a contextual bar appears offering:
+       · a ROLE (Header / Body / Subtext / Script) — a coordinated
+         font + size preset, so the page stays cohesive;
+       · an advanced FONT pick (any of the bundled faces);
+       · a text COLOUR (on-brand swatches + a custom picker);
+       · REMOVE this line — the layout closes up around it.
+     Everything is written as inline styles + data-ds-* on the element,
+     so it rides through the snapshot into the saved and downloaded site.
+     ══════════════════════════════════════════════════════════════════ */
+
+  /* role → a full set of inline type styles (inline wins over scene CSS
+     and survives the snapshot). Values reuse the page's own tokens. */
+  const DS_ROLES = {
+    header:  { fontFamily: "'Playfair Display', 'Cormorant Garamond', serif", fontWeight: '600', fontStyle: 'normal', fontSize: 'clamp(2rem, 7vw, 3.4rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.2' },
+    body:    { fontFamily: "'Cormorant Garamond', serif", fontWeight: '500', fontStyle: 'normal', fontSize: 'clamp(1.1rem, 3.6vw, 1.3rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.5' },
+    subtext: { fontFamily: "'Jost', sans-serif", fontWeight: '300', fontStyle: 'normal', fontSize: 'clamp(0.72rem, 2.4vw, 0.85rem)', letterSpacing: '0.34em', textTransform: 'uppercase', lineHeight: '1.5' },
+    script:  { fontFamily: "'Ephesis', 'Alex Brush', cursive", fontWeight: '400', fontStyle: 'normal', fontSize: 'clamp(1.6rem, 5.4vw, 2.4rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.3' },
+  };
+  const DS_ROLE_PROPS = ['fontFamily', 'fontWeight', 'fontStyle', 'fontSize', 'letterSpacing', 'textTransform', 'lineHeight'];
+
+  /* the bundled faces, for the advanced "any font" list */
+  const DS_FONTS = [
+    ['', 'Default for this style'],
+    ['Cormorant Garamond', "'Cormorant Garamond', serif"],
+    ['Playfair Display', "'Playfair Display', serif"],
+    ['Jost', "'Jost', sans-serif"],
+    ['Alex Brush', "'Alex Brush', cursive"],
+    ['Great Vibes', "'Great Vibes', cursive"],
+    ['Sacramento', "'Sacramento', cursive"],
+    ['Pinyon Script', "'Pinyon Script', cursive"],
+    ['Mr De Haviland', "'Mr De Haviland', cursive"],
+    ['Ephesis', "'Ephesis', cursive"],
+  ];
+
+  /* on-brand text colours (label → value) */
+  const DS_SWATCHES = [
+    ['Ink', '#2b2118'], ['Gold', '#96702f'], ['Sepia', '#4e3a28'],
+    ['Soft', 'rgba(43,33,24,0.6)'], ['Cream', '#f2e7d0'],
+  ];
+
+  /* the line that a "remove" acts on: climb out of a reveal mask so we
+     drop the whole title/line, not just its inner span */
+  function dsLineOf(el) {
+    const mask = el.closest('.mask');
+    return mask ? (mask.parentElement || el) : el;
+  }
+
+  function dsRefresh() {
+    save();
+    if (window.ScrollTrigger) { try { ScrollTrigger.refresh(); } catch (e) {} }
+  }
+
+  function dsApplyRole(el, role) {
+    const set = DS_ROLES[role];
+    if (!set) return;
+    DS_ROLE_PROPS.forEach((p) => { el.style[p] = set[p]; });
+    el.dataset.dsRole = role;
+    delete el.dataset.dsFont; // the role owns the font now
+    dsRefresh();
+  }
+
+  function dsApplyFont(el, value) {
+    if (!value) {
+      // back to the role's own font (or the template default)
+      if (el.dataset.dsRole && DS_ROLES[el.dataset.dsRole]) {
+        el.style.fontFamily = DS_ROLES[el.dataset.dsRole].fontFamily;
+      } else {
+        el.style.fontFamily = '';
+      }
+      delete el.dataset.dsFont;
+    } else {
+      el.style.fontFamily = value;
+      el.dataset.dsFont = value;
+    }
+    dsRefresh();
+  }
+
+  function dsApplyColor(el, value) {
+    el.style.color = value || '';
+    dsRefresh();
+  }
+
+  function dsRemoveLine(el) {
+    const line = dsLineOf(el);
+    // take a trailing repeatable-line delete control with it, if any
+    const sib = line.nextElementSibling;
+    if (sib && sib.classList && sib.classList.contains('ed-del')) sib.remove();
+    line.remove();
+    dsRefresh();
+  }
+
+  /* ── the contextual bar ── */
+  let dsActive = null; // the line currently being styled
+  const styleBar = document.createElement('div');
+  styleBar.className = 'ed-style-bar';
+  styleBar.id = 'ed-style-bar';
+  styleBar.hidden = true;
+  styleBar.innerHTML =
+    '<div class="eds-grip" aria-hidden="true"></div>' +
+    '<div class="eds-row">' +
+      '<span class="eds-label">Style</span>' +
+      '<div class="eds-seg" data-group="role">' +
+        '<button type="button" data-role="header">Header</button>' +
+        '<button type="button" data-role="body">Body</button>' +
+        '<button type="button" data-role="subtext">Subtext</button>' +
+        '<button type="button" data-role="script">Script</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="eds-row">' +
+      '<span class="eds-label">Font</span>' +
+      '<select class="eds-font">' +
+        DS_FONTS.map((f) => '<option value="' + f[1] + '">' + f[0] + '</option>').join('') +
+      '</select>' +
+    '</div>' +
+    '<div class="eds-row">' +
+      '<span class="eds-label">Colour</span>' +
+      '<div class="eds-colors">' +
+        DS_SWATCHES.map((c) => '<button type="button" class="eds-sw" data-color="' + c[1] + '" title="' + c[0] + '" style="background:' + c[1] + '"></button>').join('') +
+        '<label class="eds-sw eds-sw-custom" title="Custom colour"><input type="color" value="#2b2118"></label>' +
+      '</div>' +
+    '</div>' +
+    '<div class="eds-row eds-row-foot">' +
+      '<button type="button" class="eds-remove">🗑 Remove this line</button>' +
+      '<button type="button" class="eds-done">Done</button>' +
+    '</div>';
+  document.body.appendChild(styleBar);
+  const fontSel = styleBar.querySelector('.eds-font');
+  const customColor = styleBar.querySelector('.eds-sw-custom input');
+
+  function dsSyncBar() {
+    if (!dsActive) return;
+    // role highlight
+    const role = dsActive.dataset.dsRole || '';
+    styleBar.querySelectorAll('.eds-seg [data-role]').forEach((b) => {
+      b.classList.toggle('is-on', b.dataset.role === role);
+    });
+    // font select
+    fontSel.value = dsActive.dataset.dsFont || '';
+    // colour swatch highlight
+    const cur = dsActive.style.color || '';
+    styleBar.querySelectorAll('.eds-sw[data-color]').forEach((b) => {
+      b.classList.toggle('is-on', b.dataset.color === cur);
+    });
+  }
+
+  function showStyleBar(el) {
+    dsActive = el;
+    styleBar.hidden = false;
+    document.body.classList.add('ds-bar-open');
+    dsSyncBar();
+  }
+  function hideStyleBar() {
+    styleBar.hidden = true;
+    document.body.classList.remove('ds-bar-open');
+    dsActive = null;
+  }
+
+  // show the bar whenever a text line takes focus (delegated → also
+  // covers lines added later via the "Add" buttons)
+  document.addEventListener('focusin', (e) => {
+    const el = e.target.closest && e.target.closest('.etext');
+    if (el) showStyleBar(el);
+  });
+  // tapping away from both the bar and any editable closes it
+  document.addEventListener('pointerdown', (e) => {
+    if (styleBar.hidden) return;
+    if (e.target.closest('.ed-style-bar') || e.target.closest('.etext')) return;
+    hideStyleBar();
+  });
+
+  styleBar.querySelectorAll('.eds-seg [data-role]').forEach((b) => {
+    b.addEventListener('click', () => { if (dsActive) { dsApplyRole(dsActive, b.dataset.role); dsSyncBar(); } });
+  });
+  fontSel.addEventListener('change', () => { if (dsActive) { dsApplyFont(dsActive, fontSel.value); } });
+  styleBar.querySelectorAll('.eds-sw[data-color]').forEach((b) => {
+    b.addEventListener('click', () => { if (dsActive) { dsApplyColor(dsActive, b.dataset.color); dsSyncBar(); } });
+  });
+  customColor.addEventListener('input', () => { if (dsActive) dsApplyColor(dsActive, customColor.value); });
+  styleBar.querySelector('.eds-remove').addEventListener('click', () => {
+    if (!dsActive) return;
+    dsRemoveLine(dsActive);
+    hideStyleBar();
+  });
+  styleBar.querySelector('.eds-done').addEventListener('click', hideStyleBar);
+
   /* ── the Sections panel: show/hide, reorder, and add sections ──
      (no controls cluttering the page; hidden sections simply don't appear
      and are left out of the finished site) ── */
@@ -908,7 +1095,7 @@
       doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
 
       /* strip every trace of edit mode */
-      doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ephoto-hint, .ed-add, .ed-del, .fit-tools').forEach((n) => n.remove());
+      doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ed-style-bar, .ephoto-hint, .ed-add, .ed-del, .fit-tools').forEach((n) => n.remove());
       doc.querySelectorAll('.ephoto').forEach((n) => {
         n.classList.remove('ephoto');
         if (n.style.position === 'relative') n.style.position = '';

@@ -596,11 +596,19 @@ function initClose() {
     scrollTrigger: { trigger: '.close-line', start: 'top 85%', end: 'top 55%', scrub: 0.7 },
   });
 
+  /* the divider now sits between the closing line and the photo, so it
+     reveals on its own beat rather than with the names below */
+  gsap.from('.close-sparkle', {
+    opacity: 0,
+    scale: 0.6,
+    ease: 'back.out(2)',
+    scrollTrigger: { trigger: '.close-sparkle', start: 'top 90%', end: 'top 62%', scrub: 0.7 },
+  });
+
   /* the names bookend the opening */
   gsap.timeline({
     scrollTrigger: { trigger: '.close-names', start: 'top 85%', end: 'top 50%', scrub: 0.7 },
   })
-    .from('.close-sparkle', { opacity: 0, scale: 0.6, ease: 'back.out(2)', duration: 0.5 }, 0)
     .from('.close-script', { opacity: 0, y: 14 }, 0.1)
     .from('.close-title', { opacity: 0, y: 18 }, 0.25)
     .from('.close-rule', { scaleX: 0, ease: 'power2.inOut' }, 0.4)
