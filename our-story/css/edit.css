@@ -757,3 +757,23 @@ section.is-removed { display: none; }
   cursor: pointer;
 }
 body.ds-bar-open .edit-fab { opacity: 0; pointer-events: none; }
+
+/* ── phone-width edit bar: compact buttons that wrap instead of running
+      off-screen; the Download button drops to its short label ── */
+.edit-btn-short { display: none; }
+@media (max-width: 640px) {
+  .edit-bar { justify-content: center; }
+  .edit-bar-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 0.4rem;
+  }
+  .edit-btn {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+  }
+  .edit-btn-long { display: none; }
+  .edit-btn-short { display: inline; }
+}

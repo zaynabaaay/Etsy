@@ -364,7 +364,9 @@
     '<span class="edit-bar-actions">' +
       '<button class="edit-btn" id="ed-sections" type="button">Sections</button>' +
       '<button class="edit-btn" id="ed-reset" type="button">Start over</button>' +
-      '<button class="edit-btn edit-btn-primary" id="ed-download" type="button">Download my site</button>' +
+      '<button class="edit-btn edit-btn-primary" id="ed-download" type="button">' +
+        '<span class="edit-btn-long">Download my site</span><span class="edit-btn-short">Download</span>' +
+      '</button>' +
       '<button class="edit-btn" id="ed-done" type="button">Done</button>' +
     '</span>';
   document.body.appendChild(bar);
@@ -884,15 +886,65 @@
     });
   }
 
+  /* keep a bottom-docked panel glued to the *visual* viewport, so the
+     iOS keyboard (which shrinks it) never covers the controls */
+  function placeBarBottom() {
+    const H = styleBar.getBoundingClientRect().height;
+    const vv = window.visualViewport;
+    const top = vv ? vv.offsetTop + vv.height - H - 10 : window.innerHeight - H - 10;
+    styleBar.style.top = Math.round(top) + 'px';
+  }
+  let vvBound = false;
+  function bindVV() {
+    if (vvBound || !window.visualViewport) return;
+    vvBound = true;
+    window.visualViewport.addEventListener('resize', placeBarBottom);
+    window.visualViewport.addEventListener('scroll', placeBarBottom);
+  }
+  function unbindVV() {
+    if (!vvBound) return;
+    vvBound = false;
+    window.visualViewport.removeEventListener('resize', placeBarBottom);
+    window.visualViewport.removeEventListener('scroll', placeBarBottom);
+  }
+
   function showStyleBar(el) {
     dsActive = el;
     styleBar.hidden = false;
     document.body.classList.add('ds-bar-open');
     dsSyncBar();
+    /* Dock below the edit bar (however tall it wraps) and scroll the
+       tapped line to rest just under the panel, so the words being
+       styled stay visible above the phone keyboard. Near the top of the
+       page there's no room to push the line down — flip the panel to
+       the bottom of the visual viewport instead. */
+    requestAnimationFrame(() => {
+      unbindVV();
+      const topBar = document.querySelector('.edit-bar');
+      const topH = topBar ? topBar.getBoundingClientRect().height : 0;
+      styleBar.style.top = Math.round(topH + 10) + 'px';
+      const line = dsLineOf(dsActive);
+      if (!line || !line.getBoundingClientRect) return;
+      const barBottom = styleBar.getBoundingClientRect().bottom;
+      const lineTop = line.getBoundingClientRect().top;
+      const maxUp = window.scrollY;
+      const maxDown = Math.max(0,
+        document.documentElement.scrollHeight - window.innerHeight - window.scrollY);
+      const delta = Math.min(maxDown, Math.max(-maxUp, lineTop - (barBottom + 18)));
+      if (lineTop - delta < barBottom) {
+        /* still covered after any possible scroll — dock to the bottom */
+        placeBarBottom();
+        bindVV();
+      } else if (Math.abs(delta) > 6) {
+        window.scrollBy({ top: delta, behavior: 'smooth' });
+      }
+    });
   }
   function hideStyleBar() {
     styleBar.hidden = true;
     document.body.classList.remove('ds-bar-open');
+    styleBar.style.top = '';
+    unbindVV();
     dsActive = null;
   }
 
@@ -1137,7 +1189,7 @@
 
   async function exportSite() {
     const btn = document.getElementById('ed-download');
-    const label = btn && btn.textContent;
+    const label = btn && btn.innerHTML;
     if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
     try {
       await restored;
@@ -1220,7 +1272,7 @@
     } catch (e) {
       window.alert('Sorry — building your file ran into a problem. Please try again.');
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = label; }
+      if (btn) { btn.disabled = false; btn.innerHTML = label; }
     }
   }
 })();
