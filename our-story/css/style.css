@@ -1067,12 +1067,11 @@ body.cinematic .cover > * { opacity: 0; }
   pointer-events: auto;
 }
 
+/* The chapter head above already supplies the heart ornament, so this
+   second "— ♥ —" mark is redundant — and at some scroll positions it rides
+   up behind the absolutely-positioned title. Hidden like .counter-label. */
 .milestone-heart {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  color: var(--gold-deep);
-  margin-bottom: clamp(1.1rem, 3vh, 1.8rem);
+  display: none;
 }
 
 .milestone-heart span {
