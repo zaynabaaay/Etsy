@@ -775,10 +775,12 @@
     ['Ephesis', "'Ephesis', cursive"],
   ];
 
-  /* on-brand text colours (label → value) */
+  /* on-brand text colours (label → value → dark-scene-only?).
+     Cream is light-on-dark: it only reads on the dark opening scene, so
+     it's hidden elsewhere to prevent a one-tap "my text vanished". */
   const DS_SWATCHES = [
-    ['Ink', '#2b2118'], ['Gold', '#96702f'], ['Sepia', '#4e3a28'],
-    ['Soft', 'rgba(43,33,24,0.6)'], ['Cream', '#f2e7d0'],
+    ['Ink', '#2b2118', false], ['Gold', '#96702f', false], ['Sepia', '#4e3a28', false],
+    ['Soft', 'rgba(43,33,24,0.6)', false], ['Cream', '#f2e7d0', true],
   ];
 
   /* the line that a "remove" acts on: climb out of a reveal mask so we
@@ -825,12 +827,47 @@
 
   function dsRemoveLine(el) {
     const line = dsLineOf(el);
+    const parent = line.parentNode;
+    if (!parent) return;
+    /* a stable anchor: the node before the line stays put, so we can
+       drop the line back exactly where it was on undo */
+    const prev = line.previousSibling;
     // take a trailing repeatable-line delete control with it, if any
     const sib = line.nextElementSibling;
-    if (sib && sib.classList && sib.classList.contains('ed-del')) sib.remove();
+    const del = (sib && sib.classList && sib.classList.contains('ed-del')) ? sib : null;
+    if (del) del.remove();
     line.remove();
     dsRefresh();
+    dsShowUndo(() => {
+      if (prev && prev.parentNode === parent) prev.after(line);
+      else parent.insertBefore(line, parent.firstChild);
+      if (del) line.after(del);
+      bindTextTree(line);
+      dsRefresh();
+    });
   }
+
+  /* ── "Line removed · Undo" toast ── */
+  const toast = document.createElement('div');
+  toast.className = 'ed-toast';
+  toast.hidden = true;
+  toast.innerHTML = '<span class="ed-toast-msg">Line removed</span>' +
+    '<button type="button" class="ed-toast-undo">Undo</button>';
+  document.body.appendChild(toast);
+  const toastUndo = toast.querySelector('.ed-toast-undo');
+  let toastTimer = 0, toastAction = null;
+  function hideToast() { toast.hidden = true; toast.classList.remove('is-in'); toastAction = null; }
+  function dsShowUndo(undoFn) {
+    toastAction = undoFn;
+    clearTimeout(toastTimer);
+    toast.hidden = false;
+    requestAnimationFrame(() => toast.classList.add('is-in'));
+    toastTimer = setTimeout(hideToast, 6000);
+  }
+  toastUndo.addEventListener('click', () => {
+    const fn = toastAction; clearTimeout(toastTimer); hideToast();
+    if (fn) fn();
+  });
 
   /* ── the contextual bar ── */
   let dsActive = null; // the line currently being styled
@@ -858,7 +895,7 @@
     '<div class="eds-row">' +
       '<span class="eds-label">Colour</span>' +
       '<div class="eds-colors">' +
-        DS_SWATCHES.map((c) => '<button type="button" class="eds-sw" data-color="' + c[1] + '" title="' + c[0] + '" style="background:' + c[1] + '"></button>').join('') +
+        DS_SWATCHES.map((c) => '<button type="button" class="eds-sw" data-color="' + c[1] + '" title="' + c[0] + '"' + (c[2] ? ' data-dark-only="1"' : '') + ' style="background:' + c[1] + '"></button>').join('') +
         '<label class="eds-sw eds-sw-custom" title="Custom colour"><input type="color" value="#2b2118"></label>' +
       '</div>' +
     '</div>' +
@@ -879,11 +916,27 @@
     });
     // font select
     fontSel.value = dsActive.dataset.dsFont || '';
-    // colour swatch highlight
-    const cur = dsActive.style.color || '';
-    styleBar.querySelectorAll('.eds-sw[data-color]').forEach((b) => {
-      b.classList.toggle('is-on', b.dataset.color === cur);
+    // dark-only swatches (Cream) show only on the dark opening scene
+    const onDark = !!dsActive.closest('.scene-opening');
+    styleBar.querySelectorAll('.eds-sw[data-dark-only]').forEach((b) => {
+      b.style.display = onDark ? '' : 'none';
     });
+    // colour swatch highlight (compare in a normalised rgb form so a saved
+    // hex still lights its swatch after reload)
+    const cur = dsColorKey(dsActive.style.color || '');
+    styleBar.querySelectorAll('.eds-sw[data-color]').forEach((b) => {
+      b.classList.toggle('is-on', dsColorKey(b.dataset.color) === cur);
+    });
+  }
+
+  /* normalise any CSS colour to a comparable "r,g,b(,a)" string so the
+     active swatch highlights whether it was set as hex or restored as rgb */
+  const dsColorProbe = document.createElement('span');
+  function dsColorKey(v) {
+    if (!v) return '';
+    dsColorProbe.style.color = '';
+    dsColorProbe.style.color = v;
+    return dsColorProbe.style.color; // browser canonical form, or '' if invalid
   }
 
   /* keep a bottom-docked panel glued to the *visual* viewport, so the
@@ -1199,7 +1252,7 @@
       doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
 
       /* strip every trace of edit mode */
-      doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ed-style-bar, .ephoto-hint, .ed-add, .ed-del, .fit-tools').forEach((n) => n.remove());
+      doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ed-style-bar, .ed-toast, .ephoto-hint, .ed-add, .ed-del, .fit-tools').forEach((n) => n.remove());
       doc.querySelectorAll('.ephoto').forEach((n) => {
         n.classList.remove('ephoto');
         if (n.style.position === 'relative') n.style.position = '';
