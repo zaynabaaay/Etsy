@@ -1042,20 +1042,72 @@
   fileInput.accept = 'image/*';
   fileInput.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;';
   document.body.appendChild(fileInput);
-  fileInput.addEventListener('change', () => {
+  /* Phone photos arrive at 3–8 MB; stored raw they blow past mobile
+     Safari's storage quota and balloon the exported single file to
+     unsendable sizes. Nothing on the page displays wider than ~1600px,
+     so downscale to that and re-encode as a high-quality JPEG (a white
+     underlay keeps transparent PNGs from going black). If anything about
+     decoding fails — or the "compressed" copy comes out bigger — the
+     original file is kept as-is. */
+  const PHOTO_MAX_PX = 1600;
+  const PHOTO_JPEG_Q = 0.82;
+  const PHOTO_KEEP_BYTES = 600 * 1024; // small files aren't worth re-encoding
+  function fileAsDataURL(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = () => rej(r.error);
+      r.readAsDataURL(file);
+    });
+  }
+  async function decodePhoto(file) {
+    if (window.createImageBitmap) {
+      try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+      catch (e) { /* fall through to <img> decoding */ }
+    }
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file);
+      const im = new Image();
+      im.onload = () => { URL.revokeObjectURL(url); res(im); };
+      im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('decode failed')); };
+      im.src = url;
+    });
+  }
+  async function compressPhoto(file) {
+    const original = await fileAsDataURL(file);
+    try {
+      const bmp = await decodePhoto(file);
+      const w = bmp.naturalWidth || bmp.width, h = bmp.naturalHeight || bmp.height;
+      if (!w || !h) return original;
+      const scale = Math.min(1, PHOTO_MAX_PX / Math.max(w, h));
+      if (scale === 1 && file.size <= PHOTO_KEEP_BYTES) return original;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(w * scale);
+      canvas.height = Math.round(h * scale);
+      const cx = canvas.getContext('2d');
+      cx.fillStyle = '#fff';
+      cx.fillRect(0, 0, canvas.width, canvas.height);
+      cx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+      if (bmp.close) bmp.close();
+      const jpeg = canvas.toDataURL('image/jpeg', PHOTO_JPEG_Q);
+      return jpeg.length < original.length ? jpeg : original;
+    } catch (e) {
+      return original;
+    }
+  }
+  fileInput.addEventListener('change', async () => {
     const file = fileInput.files && fileInput.files[0];
     const img = pickTarget;
     fileInput.value = '';               // let the same file be chosen again next time
     if (!file || !img) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
-      img.src = reader.result;
-      writeFit(img, { s: 1, x: 50, y: 50 }); // a new photo starts centered
-      try { await dbSet(img.dataset.photoKey, reader.result); } catch (e) {}
-      save();
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
-    };
-    reader.readAsDataURL(file);
+    let data;
+    try { data = await compressPhoto(file); }
+    catch (e) { try { data = await fileAsDataURL(file); } catch (e2) { return; } }
+    img.src = data;
+    writeFit(img, { s: 1, x: 50, y: 50 }); // a new photo starts centered
+    try { await dbSet(img.dataset.photoKey, data); } catch (e) {}
+    save();
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
   });
   function pickFor(img) { pickTarget = img; fileInput.click(); }
 
