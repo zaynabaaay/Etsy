@@ -127,7 +127,7 @@
 
   /* The generated paper reference is used directly, so the webpage carries
      the same cotton fibres, pulp variation, and warm ivory tone. */
-  --paper: url('../assets/paper-texture-ivory.png');
+  --paper: url('../assets/paper-texture-ivory.png?v=2');
   --paper-size: 864px 1821px;
   --paper-blend: normal;
 
@@ -935,7 +935,7 @@ body.cinematic .cover > * { opacity: 0; }
      iOS touch scroll. Layer order: card over shadow over paper texture. */
   background-color: var(--cream);
   background-image:
-    url('../assets/decor/milestone-paper-card-cloud-white-v4.png?v=1'),
+    url('../assets/decor/milestone-paper-card-cloud-white-v4.png?v=2'),
     radial-gradient(
       ellipse at center,
       rgba(58, 42, 26, 0.14) 0%,
@@ -974,7 +974,7 @@ body.cinematic .cover > * { opacity: 0; }
   position: absolute;
   z-index: 2;
   inset: 0;
-  background-image: url('../assets/decor/milestone-paper-card-cloud-white-v4.png?v=1');
+  background-image: url('../assets/decor/milestone-paper-card-cloud-white-v4.png?v=2');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: min(112vw, 866px) auto;
@@ -1470,7 +1470,7 @@ body.cinematic .scene-quiet { height: 280vh; }
     drop-shadow(0 20px 42px rgba(58, 42, 26, 0.26));
   /* Dedicated portrait render of the same handmade Milestones paper.
      Its built-in deckled edges and shadow stay naturally proportioned. */
-  background-image: url('../assets/decor/letter-paper-card-cloud-white-wide-v3.png?v=1');
+  background-image: url('../assets/decor/letter-paper-card-cloud-white-wide-v3.png?v=2');
   background-size: 122% 122%;
   background-position: center;
   background-repeat: no-repeat;
