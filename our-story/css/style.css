@@ -785,7 +785,9 @@ body.cinematic .cover > * { opacity: 0; }
   left: 0;
   right: 0;
   bottom: clamp(6px, 2vw, 10px);
-  font-family: var(--font-script);
+  padding: 0 clamp(14px, 5vw, 22px);
+  text-align: center;
+  font-family: 'Ephesis', var(--font-script);
   font-size: var(--size-script);
   color: var(--gold-deep);
   transform: rotate(-2deg);
