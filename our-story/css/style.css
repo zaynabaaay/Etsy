@@ -589,10 +589,10 @@ body.cinematic .cover > * { opacity: 0; }
 .thread {
   position: absolute;
   left: 50%;
-  top: -3rem;
+  top: 1.75rem;
   transform: translateX(-50%);
   width: min(56vw, 300px);
-  height: calc(100% + 3rem);
+  height: calc(100% - 1.75rem);
   color: rgba(150, 112, 47, 0.5);
   pointer-events: none;
 }
