@@ -29,7 +29,15 @@
      live in IndexedDB). A buyer editing a fixed downloaded copy never bumps
      this, so their own edits are always kept. */
   const CONTENT_VERSION = '19';
-  const editing = localStorage.getItem(FLAG) === '1';
+  /* Editing is remembered in localStorage, but a *manual* page refresh should
+     drop you into the finished Preview rather than keep editing. Internal
+     reloads that must stay in edit mode (entering edit, undo/redo, reset) set
+     KEEPEDIT first; a load without it — a real refresh — exits to Preview. */
+  const KEEPEDIT = 'ourstory:keepedit';
+  let editing = localStorage.getItem(FLAG) === '1';
+  const keepEditing = sessionStorage.getItem(KEEPEDIT) === '1';
+  sessionStorage.removeItem(KEEPEDIT);
+  if (editing && !keepEditing) { localStorage.removeItem(FLAG); editing = false; }
 
   const grain = () => document.querySelector('.grain');
   const allSections = () => Array.from(document.querySelectorAll('body > section'));
@@ -353,7 +361,7 @@
   fab.className = 'edit-fab';
   fab.type = 'button';
   fab.innerHTML = '<span class="edit-fab-heart">♥</span> Make it yours';
-  fab.addEventListener('click', () => { localStorage.setItem(FLAG, '1'); location.reload(); });
+  fab.addEventListener('click', () => { localStorage.setItem(FLAG, '1'); sessionStorage.setItem(KEEPEDIT, '1'); location.reload(); });
   document.body.appendChild(fab);
 
   if (!editing) return; // view mode: just the button + restored edits
@@ -396,6 +404,9 @@
     localStorage.removeItem(SNAP);
     localStorage.removeItem(SNAPVER);
     try { await dbClear(); } catch (e) {}
+    /* stay in edit after a reset, and clear the undo history (reset can't be undone) */
+    sessionStorage.setItem(KEEPEDIT, '1');
+    try { sessionStorage.removeItem('ourstory:hist'); sessionStorage.removeItem('ourstory:histpos'); } catch (e) {}
     location.reload();
   });
 
@@ -1209,6 +1220,7 @@
     try {
       localStorage.setItem(SNAP, hist[histPos]);
       localStorage.setItem(SNAPVER, CONTENT_VERSION);
+      sessionStorage.setItem(KEEPEDIT, '1'); // undo/redo reloads but stays in edit
       sessionStorage.setItem(HNAV, '1');
       sessionStorage.setItem(HSCROLL, String(window.scrollY));
     } catch (e) {}
