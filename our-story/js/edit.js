@@ -368,31 +368,29 @@
     '<span class="edit-bar-history">' +
       '<button class="edit-icon-btn" id="ed-undo" type="button" aria-label="Undo" title="Undo">&#8630;</button>' +
       '<button class="edit-icon-btn" id="ed-redo" type="button" aria-label="Redo" title="Redo">&#8631;</button>' +
+      '<button class="edit-btn edit-btn-reset" id="ed-reset" type="button">Reset</button>' +
     '</span>' +
-    '<span class="edit-bar-msg"><strong>Editing</strong> · tap anything to change it</span>' +
     '<span class="edit-bar-actions">' +
       '<button class="edit-btn edit-btn-sections" id="ed-sections" type="button">Sections</button>' +
-      '<button class="edit-btn" id="ed-reset" type="button">Start over</button>' +
+      '<button class="edit-btn" id="ed-done" type="button">Done</button>' +
       '<button class="edit-btn edit-btn-primary" id="ed-publish" type="button">' +
         '<span class="edit-btn-long">Publish my keepsake</span><span class="edit-btn-short">Publish</span>' +
       '</button>' +
-      '<button class="edit-btn" id="ed-download" type="button">' +
-        '<span class="edit-btn-long">Download my site</span><span class="edit-btn-short">Download</span>' +
-      '</button>' +
-      '<button class="edit-btn" id="ed-done" type="button">Done</button>' +
     '</span>';
   document.body.appendChild(bar);
   bar.querySelector('#ed-done').addEventListener('click', () => { localStorage.removeItem(FLAG); location.reload(); });
-  bar.querySelector('#ed-download').addEventListener('click', exportSite);
+  /* one "Publish my keepsake" button that offers a shareable link OR a
+     downloaded file (or both) — Download folds into this instead of its own
+     top-bar button */
   const publishBtn = bar.querySelector('#ed-publish');
-  if (publishBtn) publishBtn.addEventListener('click', publishSite);
+  if (publishBtn) publishBtn.addEventListener('click', openFinishChooser);
   /* Start over: a true full reset — drop the saved words, layout, AND every
      photo you've added, returning to the template exactly as it ships
      (including its own pictures). Useful when a device is showing a stale
      saved copy instead of the current template. */
   bar.querySelector('#ed-reset').addEventListener('click', async () => {
     const ok = window.confirm(
-      'Start over?\n\nThis clears everything on this device — your words, layout, and any photos you added — and returns to the template exactly as it comes. This cannot be undone.'
+      'Reset everything?\n\nThis clears everything on this device — your words, layout, and any photos you added — and returns to the template exactly as it comes. This cannot be undone.'
     );
     if (!ok) return;
     localStorage.removeItem(SNAP);
@@ -1535,6 +1533,29 @@
     }
   }
 
+  /* "Publish my keepsake" opens this — pick a shareable link, a downloaded
+     file, or both. Publishing then offers a download too (in the link card). */
+  function openFinishChooser() {
+    ensureShareStyles();
+    const wrap = document.createElement('div');
+    wrap.className = 'keepsake-share';
+    wrap.innerHTML =
+      '<div class="keepsake-share-card">' +
+        '<div class="keepsake-share-title">Your keepsake &#10084;&#65039;</div>' +
+        '<p class="keepsake-share-sub">Publish a link you can share, or download a file to keep — you can do both.</p>' +
+        '<div class="keepsake-share-actions">' +
+          '<button type="button" class="keepsake-btn keepsake-do-publish">Publish a link</button>' +
+          '<button type="button" class="keepsake-btn keepsake-alt keepsake-do-download">Download a file</button>' +
+        '</div>' +
+        '<div class="keepsake-share-foot"><button type="button" class="keepsake-btn keepsake-alt keepsake-close">Cancel</button></div>' +
+      '</div>';
+    document.body.appendChild(wrap);
+    wrap.querySelector('.keepsake-do-publish').addEventListener('click', () => { wrap.remove(); publishSite(); });
+    wrap.querySelector('.keepsake-do-download').addEventListener('click', () => { wrap.remove(); exportSite(); });
+    wrap.querySelector('.keepsake-close').addEventListener('click', () => wrap.remove());
+    wrap.addEventListener('click', (e) => { if (e.target === wrap) wrap.remove(); });
+  }
+
   /* Upload the finished keepsake to the hosted /publish endpoint and show the
      owner a unique, shareable link that opens on any phone — no file needed.
      Falls back to a friendly message if the site isn't hosted with publishing
@@ -1573,7 +1594,8 @@
       '.keepsake-share-url{width:100%;box-sizing:border-box;border:1px solid #cdbfae;border-radius:10px;padding:12px;font-size:14px;color:#2E1F19;background:#fff;text-align:center;margin-bottom:14px}' +
       '.keepsake-share-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}' +
       '.keepsake-btn{appearance:none;cursor:pointer;border:1px solid #2E1F19;background:#2E1F19;color:#F5F1E9;border-radius:999px;padding:11px 20px;font-size:14px;text-decoration:none;font-family:inherit}' +
-      '.keepsake-btn.keepsake-close,.keepsake-btn.keepsake-copy{background:transparent;color:#2E1F19}';
+      '.keepsake-btn.keepsake-close,.keepsake-btn.keepsake-copy,.keepsake-btn.keepsake-alt{background:transparent;color:#2E1F19}' +
+      '.keepsake-share-foot{margin-top:14px}';
     document.head.appendChild(s);
   }
 
@@ -1591,6 +1613,7 @@
           '<a class="keepsake-btn keepsake-open" target="_blank" rel="noopener">Open</a>' +
           '<button type="button" class="keepsake-btn keepsake-close">Done</button>' +
         '</div>' +
+        '<div class="keepsake-share-foot"><button type="button" class="keepsake-btn keepsake-alt keepsake-dl-too">Download a copy too</button></div>' +
       '</div>';
     const field = wrap.querySelector('.keepsake-share-url');
     field.value = url;
@@ -1603,6 +1626,7 @@
       e.target.textContent = 'Copied ✓';
     });
     wrap.querySelector('.keepsake-close').addEventListener('click', () => wrap.remove());
+    wrap.querySelector('.keepsake-dl-too').addEventListener('click', () => exportSite());
     wrap.addEventListener('click', (e) => { if (e.target === wrap) wrap.remove(); });
   }
 })();

@@ -320,7 +320,8 @@ body.editing .edit-bar { display: flex; }
 .edit-bar-actions { display: flex; gap: 0.6rem; }
 
 /* undo / redo live in the top bar so they're always in reach */
-.edit-bar-history { display: flex; gap: 0.4rem; }
+.edit-bar-history { display: flex; align-items: center; gap: 0.4rem; }
+.edit-btn-reset { padding: 0.5rem 0.95rem; }
 .edit-icon-btn {
   width: 38px; height: 34px;
   border-radius: 9px;
