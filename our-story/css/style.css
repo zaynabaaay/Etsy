@@ -1523,9 +1523,10 @@ body.cinematic .scene-quiet { height: 280vh; }
   text-shadow: 0 1px 0 rgba(255, 252, 244, 0.6);
 }
 
+/* the greeting is just the letter's Body text, set in italic — not a title */
 .lp-salutation {
   font-style: italic;
-  font-size: var(--size-voice-sm);
+  font-size: var(--size-body);
   color: var(--sepia-deep);
   margin-bottom: 1.4rem;
 }
