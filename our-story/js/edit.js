@@ -372,13 +372,13 @@
     '</span>' +
     '<span class="edit-bar-actions">' +
       '<button class="edit-btn edit-btn-sections" id="ed-sections" type="button">Sections</button>' +
-      '<button class="edit-btn" id="ed-done" type="button">Done</button>' +
+      '<button class="edit-btn" id="ed-preview" type="button">Preview</button>' +
       '<button class="edit-btn edit-btn-primary" id="ed-publish" type="button">' +
         '<span class="edit-btn-long">Publish my keepsake</span><span class="edit-btn-short">Publish</span>' +
       '</button>' +
     '</span>';
   document.body.appendChild(bar);
-  bar.querySelector('#ed-done').addEventListener('click', () => { localStorage.removeItem(FLAG); location.reload(); });
+  bar.querySelector('#ed-preview').addEventListener('click', () => { localStorage.removeItem(FLAG); location.reload(); });
   /* one "Publish my keepsake" button that offers a shareable link OR a
      downloaded file (or both) — Download folds into this instead of its own
      top-bar button */
