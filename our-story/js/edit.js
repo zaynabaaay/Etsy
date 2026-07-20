@@ -364,7 +364,10 @@
     '<span class="edit-bar-actions">' +
       '<button class="edit-btn" id="ed-sections" type="button">Sections</button>' +
       '<button class="edit-btn" id="ed-reset" type="button">Start over</button>' +
-      '<button class="edit-btn edit-btn-primary" id="ed-download" type="button">' +
+      '<button class="edit-btn edit-btn-primary" id="ed-publish" type="button">' +
+        '<span class="edit-btn-long">Publish my keepsake</span><span class="edit-btn-short">Publish</span>' +
+      '</button>' +
+      '<button class="edit-btn" id="ed-download" type="button">' +
         '<span class="edit-btn-long">Download my site</span><span class="edit-btn-short">Download</span>' +
       '</button>' +
       '<button class="edit-btn" id="ed-done" type="button">Done</button>' +
@@ -372,6 +375,8 @@
   document.body.appendChild(bar);
   bar.querySelector('#ed-done').addEventListener('click', () => { localStorage.removeItem(FLAG); location.reload(); });
   bar.querySelector('#ed-download').addEventListener('click', exportSite);
+  const publishBtn = bar.querySelector('#ed-publish');
+  if (publishBtn) publishBtn.addEventListener('click', publishSite);
   /* Start over: a true full reset — drop the saved words, layout, AND every
      photo you've added, returning to the template exactly as it ships
      (including its own pictures). Useful when a device is showing a stale
@@ -1240,80 +1245,88 @@
     return 'data:' + mimeFor(url) + ';base64,' + abToB64(buf);
   }
 
+  /* Build the finished keepsake as ONE fully self-contained HTML string —
+     styles, fonts, scripts and photos all inlined, so it works on its own,
+     offline, forever. Shared by "Download" (save a file) and "Publish"
+     (upload and get a shareable link). */
+  async function buildKeepsakeHTML() {
+    await restored;
+    const doc = document.documentElement.cloneNode(true);
+
+    /* sections the owner removed are gone for good in the finished keepsake */
+    doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
+
+    /* strip every trace of edit mode */
+    doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ed-style-bar, .ed-toast, .ephoto-hint, .ed-add, .ed-del, .fit-tools, .keepsake-share').forEach((n) => n.remove());
+    doc.querySelectorAll('.ephoto').forEach((n) => {
+      n.classList.remove('ephoto');
+      if (n.style.position === 'relative') n.style.position = '';
+      if (!n.getAttribute('style')) n.removeAttribute('style');
+    });
+    doc.querySelectorAll('script[src*="edit.js"], link[href*="edit.css"]').forEach((n) => n.remove());
+    doc.querySelectorAll('[contenteditable]').forEach((n) => {
+      n.removeAttribute('contenteditable'); n.removeAttribute('spellcheck'); n.classList.remove('etext');
+    });
+    doc.querySelector('body').classList.remove('editing', 'reduced-motion');
+
+    /* bake the current (possibly replaced) photo into each img */
+    const liveByKey = {};
+    allPhotos().forEach((img) => { liveByKey[img.dataset.photoKey] = img.src; });
+    doc.querySelectorAll('section img[data-photo-key]').forEach((img) => {
+      const src = liveByKey[img.dataset.photoKey];
+      if (src) img.setAttribute('src', src);
+      img.removeAttribute('data-orig-src');
+      img.removeAttribute('data-photo-key');
+    });
+
+    /* inline the stylesheet, resolving its font url()s to data URIs */
+    for (const link of [...doc.querySelectorAll('link[rel="stylesheet"][href]')]) {
+      try {
+        const href = new URL(link.getAttribute('href'), location.href).href;
+        let css = await (await fetch(href)).text();
+        const urls = [...new Set([...css.matchAll(/url\(\s*['"]?([^'")]+)['"]?\s*\)/g)]
+          .map((m) => m[1]).filter((u) => !/^data:/i.test(u)))];
+        for (const u of urls) {
+          try {
+            const abs = new URL(u, href).href;
+            const data = await asDataURI(abs);
+            css = css.split(u).join(data);
+          } catch (e) { /* leave this url as-is */ }
+        }
+        const style = document.createElement('style');
+        style.textContent = css.replace(/<\/style/gi, '<\\/style');
+        link.replaceWith(style);
+      } catch (e) { /* leave the <link> if it can't be fetched */ }
+    }
+
+    /* inline the scripts (GSAP, ScrollTrigger, main.js), in order */
+    for (const s of [...doc.querySelectorAll('script[src]')]) {
+      try {
+        const src = new URL(s.getAttribute('src'), location.href).href;
+        const js = await (await fetch(src)).text();
+        const inline = document.createElement('script');
+        inline.textContent = js.replace(/<\/script/gi, '<\\/script');
+        s.replaceWith(inline);
+      } catch (e) { /* leave the <script src> if it can't be fetched */ }
+    }
+
+    /* inline any remaining photos still referenced by path */
+    for (const img of [...doc.querySelectorAll('img')]) {
+      const src = img.getAttribute('src');
+      if (!src || /^data:/i.test(src)) continue;
+      try { img.setAttribute('src', await asDataURI(new URL(src, location.href).href)); }
+      catch (e) { /* leave the src as-is */ }
+    }
+
+    return '<!DOCTYPE html>\n' + doc.outerHTML;
+  }
+
   async function exportSite() {
     const btn = document.getElementById('ed-download');
     const label = btn && btn.innerHTML;
     if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
     try {
-      await restored;
-      const doc = document.documentElement.cloneNode(true);
-
-      /* sections the owner removed are gone for good in the finished site */
-      doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
-
-      /* strip every trace of edit mode */
-      doc.querySelectorAll('.edit-fab, .edit-bar, .ed-panel, .ed-style-bar, .ed-toast, .ephoto-hint, .ed-add, .ed-del, .fit-tools').forEach((n) => n.remove());
-      doc.querySelectorAll('.ephoto').forEach((n) => {
-        n.classList.remove('ephoto');
-        if (n.style.position === 'relative') n.style.position = '';
-        if (!n.getAttribute('style')) n.removeAttribute('style');
-      });
-      doc.querySelectorAll('script[src*="edit.js"], link[href*="edit.css"]').forEach((n) => n.remove());
-      doc.querySelectorAll('[contenteditable]').forEach((n) => {
-        n.removeAttribute('contenteditable'); n.removeAttribute('spellcheck'); n.classList.remove('etext');
-      });
-      doc.querySelector('body').classList.remove('editing', 'reduced-motion');
-
-      /* bake the current (possibly replaced) photo into each img */
-      const liveByKey = {};
-      allPhotos().forEach((img) => { liveByKey[img.dataset.photoKey] = img.src; });
-      doc.querySelectorAll('section img[data-photo-key]').forEach((img) => {
-        const src = liveByKey[img.dataset.photoKey];
-        if (src) img.setAttribute('src', src);
-        img.removeAttribute('data-orig-src');
-        img.removeAttribute('data-photo-key');
-      });
-
-      /* inline the stylesheet, resolving its font url()s to data URIs */
-      for (const link of [...doc.querySelectorAll('link[rel="stylesheet"][href]')]) {
-        try {
-          const href = new URL(link.getAttribute('href'), location.href).href;
-          let css = await (await fetch(href)).text();
-          const urls = [...new Set([...css.matchAll(/url\(\s*['"]?([^'")]+)['"]?\s*\)/g)]
-            .map((m) => m[1]).filter((u) => !/^data:/i.test(u)))];
-          for (const u of urls) {
-            try {
-              const abs = new URL(u, href).href;
-              const data = await asDataURI(abs);
-              css = css.split(u).join(data);
-            } catch (e) { /* leave this url as-is */ }
-          }
-          const style = document.createElement('style');
-          style.textContent = css.replace(/<\/style/gi, '<\\/style');
-          link.replaceWith(style);
-        } catch (e) { /* leave the <link> if it can't be fetched */ }
-      }
-
-      /* inline the scripts (GSAP, ScrollTrigger, main.js), in order */
-      for (const s of [...doc.querySelectorAll('script[src]')]) {
-        try {
-          const src = new URL(s.getAttribute('src'), location.href).href;
-          const js = await (await fetch(src)).text();
-          const inline = document.createElement('script');
-          inline.textContent = js.replace(/<\/script/gi, '<\\/script');
-          s.replaceWith(inline);
-        } catch (e) { /* leave the <script src> if it can't be fetched */ }
-      }
-
-      /* inline any remaining photos still referenced by path */
-      for (const img of [...doc.querySelectorAll('img')]) {
-        const src = img.getAttribute('src');
-        if (!src || /^data:/i.test(src)) continue;
-        try { img.setAttribute('src', await asDataURI(new URL(src, location.href).href)); }
-        catch (e) { /* leave the src as-is */ }
-      }
-
-      const html = '<!DOCTYPE html>\n' + doc.outerHTML;
+      const html = await buildKeepsakeHTML();
       const blob = new Blob([html], { type: 'text/html' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -1327,5 +1340,76 @@
     } finally {
       if (btn) { btn.disabled = false; btn.innerHTML = label; }
     }
+  }
+
+  /* Upload the finished keepsake to the hosted /publish endpoint and show the
+     owner a unique, shareable link that opens on any phone — no file needed.
+     Falls back to a friendly message if the site isn't hosted with publishing
+     enabled (e.g. opened as a local file). */
+  async function publishSite() {
+    const btn = document.getElementById('ed-publish');
+    const label = btn && btn.innerHTML;
+    if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
+    try {
+      const html = await buildKeepsakeHTML();
+      const res = await fetch('publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/html' },
+        body: html,
+      });
+      if (!res.ok) throw new Error('publish failed ' + res.status);
+      const data = await res.json();
+      const url = new URL(data.url, location.href).href;
+      showKeepsakeLink(url);
+    } catch (e) {
+      window.alert('Publishing needs the online version of the template. Open it from your Storiel link (not a downloaded file) and try again — or use Download to save a file instead.');
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = label; }
+    }
+  }
+
+  function ensureShareStyles() {
+    if (document.getElementById('keepsake-share-styles')) return;
+    const s = document.createElement('style');
+    s.id = 'keepsake-share-styles';
+    s.textContent =
+      '.keepsake-share{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(46,31,25,.55);padding:20px}' +
+      '.keepsake-share-card{background:#F5F1E9;color:#2E1F19;max-width:440px;width:100%;border-radius:18px;padding:28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:center;font-family:Georgia,serif}' +
+      '.keepsake-share-title{font-size:24px;margin-bottom:8px}' +
+      '.keepsake-share-sub{font-size:15px;line-height:1.5;color:#6b5d50;margin:0 0 18px}' +
+      '.keepsake-share-url{width:100%;box-sizing:border-box;border:1px solid #cdbfae;border-radius:10px;padding:12px;font-size:14px;color:#2E1F19;background:#fff;text-align:center;margin-bottom:14px}' +
+      '.keepsake-share-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}' +
+      '.keepsake-btn{appearance:none;cursor:pointer;border:1px solid #2E1F19;background:#2E1F19;color:#F5F1E9;border-radius:999px;padding:11px 20px;font-size:14px;text-decoration:none;font-family:inherit}' +
+      '.keepsake-btn.keepsake-close,.keepsake-btn.keepsake-copy{background:transparent;color:#2E1F19}';
+    document.head.appendChild(s);
+  }
+
+  function showKeepsakeLink(url) {
+    ensureShareStyles();
+    const wrap = document.createElement('div');
+    wrap.className = 'keepsake-share';
+    wrap.innerHTML =
+      '<div class="keepsake-share-card">' +
+        '<div class="keepsake-share-title">Your keepsake is live ❤️</div>' +
+        '<p class="keepsake-share-sub">Open it on any phone or computer, and share the link with your someone. It stays at this link.</p>' +
+        '<input class="keepsake-share-url" readonly>' +
+        '<div class="keepsake-share-actions">' +
+          '<button type="button" class="keepsake-btn keepsake-copy">Copy link</button>' +
+          '<a class="keepsake-btn keepsake-open" target="_blank" rel="noopener">Open</a>' +
+          '<button type="button" class="keepsake-btn keepsake-close">Done</button>' +
+        '</div>' +
+      '</div>';
+    const field = wrap.querySelector('.keepsake-share-url');
+    field.value = url;
+    wrap.querySelector('.keepsake-open').href = url;
+    document.body.appendChild(wrap);
+    field.addEventListener('focus', () => field.select());
+    wrap.querySelector('.keepsake-copy').addEventListener('click', async (e) => {
+      try { await navigator.clipboard.writeText(url); }
+      catch (err) { field.focus(); field.select(); try { document.execCommand('copy'); } catch (_) {} }
+      e.target.textContent = 'Copied ✓';
+    });
+    wrap.querySelector('.keepsake-close').addEventListener('click', () => wrap.remove());
+    wrap.addEventListener('click', (e) => { if (e.target === wrap) wrap.remove(); });
   }
 })();
