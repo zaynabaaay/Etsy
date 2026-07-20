@@ -1,0 +1,12 @@
+{
+  "name": "storiel",
+  "main": "worker.js",
+  "compatibility_date": "2025-06-01",
+  "assets": {
+    "directory": "./our-story",
+    "binding": "ASSETS"
+  },
+  "r2_buckets": [
+    { "binding": "KEEPSAKES", "bucket_name": "storiel-keepsakes" }
+  ]
+}
