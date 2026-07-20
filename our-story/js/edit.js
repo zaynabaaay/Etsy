@@ -1035,6 +1035,41 @@
     window.visualViewport.removeEventListener('scroll', placeBarBottom);
   }
 
+  /* iPad / desktop: glue the right-hand dock to the *visible* viewport, so it
+     stays pinned in the top-right no matter how far down the page you scroll
+     or that the on-screen keyboard is up (iOS lets plain position:fixed drift
+     away in that case, which made the menu "scroll off"). */
+  const DOCK_TOP = 58; // just below the top edit bar
+  function placeDockWide() {
+    const vv = window.visualViewport;
+    const offTop = vv ? vv.offsetTop : 0;
+    const vh = vv ? vv.height : window.innerHeight;
+    styleBar.style.top = Math.round(offTop + DOCK_TOP) + 'px';
+    styleBar.style.bottom = 'auto';
+    styleBar.style.height = Math.round(vh - DOCK_TOP - 8) + 'px';
+    styleBar.style.maxHeight = 'none';
+  }
+  let wideVVBound = false;
+  function bindWideVV() {
+    if (wideVVBound) return;
+    wideVVBound = true;
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', placeDockWide);
+      window.visualViewport.addEventListener('scroll', placeDockWide);
+    }
+    window.addEventListener('scroll', placeDockWide, { passive: true });
+  }
+  function unbindWideVV() {
+    if (!wideVVBound) return;
+    wideVVBound = false;
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', placeDockWide);
+      window.visualViewport.removeEventListener('scroll', placeDockWide);
+    }
+    window.removeEventListener('scroll', placeDockWide);
+    styleBar.style.top = ''; styleBar.style.bottom = ''; styleBar.style.height = ''; styleBar.style.maxHeight = '';
+  }
+
   const isWide = () => window.innerWidth >= 768;
   /* which tab is showing (Sections list vs the Edit controls) */
   function setTab(name) {
@@ -1044,7 +1079,11 @@
   }
   /* the Edit tab shows the controls when a line is selected, else a hint */
   function syncEditBody() { styleBar.classList.toggle('has-sel', !!dsActive); }
-  function openDock() { styleBar.hidden = false; document.body.classList.add('ds-bar-open'); }
+  function openDock() {
+    styleBar.hidden = false;
+    document.body.classList.add('ds-bar-open');
+    if (isWide()) { bindWideVV(); placeDockWide(); }
+  }
 
   function showStyleBar(el) {
     dsActive = el;
@@ -1052,9 +1091,9 @@
     setTab('edit');
     syncEditBody();
     dsSyncBar();
-    /* iPad / desktop: the panel is docked to the right by CSS — no need to
-       reposition it or scroll the line out from under a keyboard. */
-    if (isWide()) { unbindVV(); styleBar.style.top = ''; return; }
+    /* iPad / desktop: the dock is glued to the visible viewport's top-right,
+       so it stays put as you scroll or when the keyboard opens. */
+    if (isWide()) { unbindVV(); bindWideVV(); placeDockWide(); return; }
     /* Phone: dock below the edit bar (however tall it wraps) and scroll the
        tapped line to rest just under the panel, so the words being
        styled stay visible above the keyboard. Near the top of the
@@ -1087,9 +1126,9 @@
   function hideStyleBar() {
     dsActive = null;
     syncEditBody();
-    styleBar.style.top = '';
     unbindVV();
-    if (isWide()) return;
+    if (isWide()) { placeDockWide(); return; }
+    styleBar.style.top = '';
     styleBar.hidden = true;
     document.body.classList.remove('ds-bar-open');
   }
