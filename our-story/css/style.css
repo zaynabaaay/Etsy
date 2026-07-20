@@ -904,9 +904,8 @@ body.cinematic .cover > * { opacity: 0; }
   margin-bottom: 0.35rem;
 }
 
-.numbers-head .chapter-title {
-  font-size: clamp(2.25rem, 7vw, 4.25rem);
-}
+/* Days Together is a Section title like the others — it shares the one
+   --size-title (set on .chapter-title), no bespoke bigger size. */
 
 .milestones-scroll {
   position: relative;
