@@ -922,6 +922,14 @@
   styleBar.hidden = true;
   styleBar.innerHTML =
     '<div class="eds-grip" aria-hidden="true"></div>' +
+    '<div class="eds-tabs" role="tablist">' +
+      '<button type="button" class="eds-tab-btn" data-tab="sections">Sections</button>' +
+      '<button type="button" class="eds-tab-btn" data-tab="edit">Edit</button>' +
+    '</div>' +
+    '<div class="eds-tab-body" data-tab="sections"></div>' +
+    '<div class="eds-tab-body eds-editbody" data-tab="edit">' +
+    '<p class="eds-hint">Tap any words on the page to style them.</p>' +
+    '<div class="eds-controls">' +
     '<div class="eds-row eds-row-style">' +
       '<span class="eds-label">Style</span>' +
       '<div class="eds-seg" data-group="role">' +
@@ -960,7 +968,9 @@
     '<div class="eds-row eds-row-foot">' +
       '<button type="button" class="eds-remove">🗑 Remove this line</button>' +
       '<button type="button" class="eds-done">Done</button>' +
-    '</div>';
+    '</div>' +
+    '</div>' + // .eds-controls
+    '</div>';  // .eds-tab-body[edit]
   document.body.appendChild(styleBar);
   const fontSel = styleBar.querySelector('.eds-font');
   const customColor = styleBar.querySelector('.eds-sw-custom input');
@@ -1025,14 +1035,26 @@
     window.visualViewport.removeEventListener('scroll', placeBarBottom);
   }
 
+  const isWide = () => window.innerWidth >= 768;
+  /* which tab is showing (Sections list vs the Edit controls) */
+  function setTab(name) {
+    styleBar.dataset.tab = name;
+    styleBar.querySelectorAll('.eds-tab-btn').forEach((b) => b.classList.toggle('is-on', b.dataset.tab === name));
+    styleBar.querySelectorAll('.eds-tab-body').forEach((b) => { b.hidden = b.dataset.tab !== name; });
+  }
+  /* the Edit tab shows the controls when a line is selected, else a hint */
+  function syncEditBody() { styleBar.classList.toggle('has-sel', !!dsActive); }
+  function openDock() { styleBar.hidden = false; document.body.classList.add('ds-bar-open'); }
+
   function showStyleBar(el) {
     dsActive = el;
-    styleBar.hidden = false;
-    document.body.classList.add('ds-bar-open');
+    openDock();
+    setTab('edit');
+    syncEditBody();
     dsSyncBar();
     /* iPad / desktop: the panel is docked to the right by CSS — no need to
        reposition it or scroll the line out from under a keyboard. */
-    if (window.innerWidth >= 768) { unbindVV(); styleBar.style.top = ''; return; }
+    if (isWide()) { unbindVV(); styleBar.style.top = ''; return; }
     /* Phone: dock below the edit bar (however tall it wraps) and scroll the
        tapped line to rest just under the panel, so the words being
        styled stay visible above the keyboard. Near the top of the
@@ -1060,12 +1082,16 @@
       }
     });
   }
+  /* leaving a line: on iPad/desktop the dock stays (just drops the selection,
+     showing the hint); on phone the whole card closes */
   function hideStyleBar() {
-    styleBar.hidden = true;
-    document.body.classList.remove('ds-bar-open');
+    dsActive = null;
+    syncEditBody();
     styleBar.style.top = '';
     unbindVV();
-    dsActive = null;
+    if (isWide()) return;
+    styleBar.hidden = true;
+    document.body.classList.remove('ds-bar-open');
   }
 
   // show the bar whenever a text line takes focus (delegated → also
@@ -1101,14 +1127,12 @@
     hideStyleBar();
   });
   styleBar.querySelector('.eds-done').addEventListener('click', hideStyleBar);
+  styleBar.querySelectorAll('.eds-tab-btn').forEach((b) => {
+    b.addEventListener('click', () => { openDock(); setTab(b.dataset.tab); });
+  });
 
-  /* ── the Sections panel: show/hide, reorder, and add sections ──
-     (no controls cluttering the page; hidden sections simply don't appear
-     and are left out of the finished site) ── */
-  const panel = document.createElement('div');
-  panel.className = 'ed-panel';
-  panel.hidden = true;
-  panel.innerHTML = '<div class="ed-panel-head">Sections</div>';
+  /* ── the Sections tab: show/hide + reorder the story's sections ──
+     lives inside the docked panel's "Sections" tab (no separate panel). */
   const list = document.createElement('ul');
   list.className = 'ed-panel-list';
 
@@ -1164,27 +1188,27 @@
     });
   }
   renderPanel();
-  panel.appendChild(list);
+  const sectionsTab = styleBar.querySelector('.eds-tab-body[data-tab="sections"]');
+  sectionsTab.appendChild(list);
 
   const note = document.createElement('p');
   note.className = 'ed-panel-note';
   note.textContent = 'Turn a section off to leave it out of your finished site, and use the arrows to reorder the story.';
-  panel.appendChild(note);
-  document.body.appendChild(panel);
+  sectionsTab.appendChild(note);
 
+  /* the top-bar "Sections" button opens the dock on its Sections tab */
   const sectionsBtn = bar.querySelector('#ed-sections');
-  function togglePanel(open) {
-    panel.hidden = open === undefined ? !panel.hidden : !open;
-    sectionsBtn.classList.toggle('is-active', !panel.hidden);
-  }
-  sectionsBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePanel(); });
-  document.addEventListener('click', (e) => {
-    /* a click on a reorder arrow rebuilds the rows, detaching the clicked
-       button before this bubbles here — a detached target was inside the
-       panel, so it must not close it */
-    if (panel.hidden || !e.target.isConnected || panel.contains(e.target) || sectionsBtn.contains(e.target)) return;
-    togglePanel(false);
+  sectionsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openDock();
+    setTab('sections');
   });
+
+  /* start the dock: on iPad/desktop it lives open on the Sections tab;
+     on phone it stays closed until a line or the Sections button opens it */
+  setTab('sections');
+  syncEditBody();
+  if (isWide()) openDock(); else styleBar.hidden = true;
 
   /* One reusable file input, kept in the DOM. This fixes "sometimes I have to
      tap add a few times". The old code built a fresh <input> on every tap and

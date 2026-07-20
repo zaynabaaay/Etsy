@@ -758,6 +758,40 @@ section.is-removed { display: none; }
 }
 body.ds-bar-open .edit-fab { opacity: 0; pointer-events: none; }
 
+/* ── one dock, two tabs: Sections · Edit ── */
+.eds-tabs { display: flex; gap: 0.3rem; margin: 0.1rem 0 0.3rem; }
+.eds-tab-btn {
+  flex: 1;
+  padding: 0.5rem 0.4rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgba(242, 231, 208, 0.55);
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.eds-tab-btn:hover { color: rgba(242, 231, 208, 0.85); }
+.eds-tab-btn.is-on { color: #f2e7d0; border-bottom-color: #c9a15f; }
+.eds-tab-body[hidden] { display: none; }
+.eds-hint {
+  margin: 0;
+  padding: 1.6rem 0.8rem;
+  text-align: center;
+  font-weight: 300;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: rgba(242, 231, 208, 0.5);
+}
+/* the Edit tab shows the hint until a line is selected, then the controls */
+.ed-style-bar:not(.has-sel) .eds-controls { display: none; }
+.ed-style-bar.has-sel .eds-hint { display: none; }
+.eds-controls { display: flex; flex-direction: column; gap: 0.5rem; }
+
 /* ── iPad / desktop: the style controls become a panel docked to the right
       edge (below the top edit bar), instead of a floating card. The phone
       keeps the bottom-docked card that dodges the keyboard. ── */
@@ -774,6 +808,7 @@ body.ds-bar-open .edit-fab { opacity: 0; pointer-events: none; }
     gap: 0.7rem;
     padding: 0.9rem 1.1rem 1.1rem;
   }
+  .ed-style-bar .eds-grip { display: none; }
   /* roles wrap to a tidy 2-column grid in the narrow panel */
   .ed-style-bar .eds-row-style { align-items: flex-start; }
   .ed-style-bar .eds-seg[data-group="role"] {
