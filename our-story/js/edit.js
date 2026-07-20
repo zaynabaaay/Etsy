@@ -207,6 +207,39 @@
     if (host) host.insertAdjacentHTML('afterend', savedSnap);
   }
 
+  /* ── flowers that belong to a memory's photos ──
+     The rule (matching the template's current look): 1 photo → none,
+     2 → one tucked on each, 3 → one on the third (centre) photo. Runs in
+     EVERY mode so the finished + downloaded pages show them, and again on
+     add/remove (below) so it adapts live. The flower is attached to the
+     print, so it scales with it and never drifts like the old plants. */
+  const MEM_FLOWERS = {
+    2: [
+      { photo: 1, cls: 'pair-left',  src: 'assets/decor/dried-flower-daisy.png' },
+      { photo: 2, cls: 'pair-right', src: 'assets/decor/dried-cosmos-stem.png' },
+    ],
+    3: [
+      { photo: 3, cls: 'trio-third', src: 'assets/decor/opening-babys-breath-right.png' },
+    ],
+  };
+  function applyMemoryFlowers(mem) {
+    if (!mem) return;
+    mem.querySelectorAll('.memory-photo-flower').forEach((f) => f.remove());
+    const photos = mem.querySelectorAll('.memory-photo');
+    (MEM_FLOWERS[photos.length] || []).forEach((slot) => {
+      const ph = photos[slot.photo - 1];
+      if (!ph) return;
+      const img = document.createElement('img');
+      img.className = 'memory-photo-flower memory-photo-flower--' + slot.cls;
+      img.src = slot.src;
+      img.alt = '';
+      img.setAttribute('aria-hidden', 'true');
+      img.setAttribute('draggable', 'false');
+      ph.appendChild(img);
+    });
+  }
+  document.querySelectorAll('.memories-list .memory').forEach(applyMemoryFlowers);
+
   /* ── tiny IndexedDB store (photos can be large, so not localStorage) ── */
   const DB = 'ourstory', STORE = 'photos';
   function openDB() {
@@ -652,6 +685,7 @@
       const figs = row.querySelectorAll('.memory-photo');
       row.querySelectorAll('.ed-photo-del').forEach((b) => { b.style.display = figs.length > 1 ? '' : 'none'; });
       addBtn.style.display = figs.length >= 3 ? 'none' : '';
+      applyMemoryFlowers(mem); // re-tuck the flowers for the new photo count
     };
     const addDelChip = (fig) => {
       const del = document.createElement('button');

@@ -1278,6 +1278,38 @@ body.reduced-motion .milestone {
 .memory-photo:nth-child(odd)  { transform: rotate(-1.1deg); }
 .memory-photo:nth-child(even) { transform: rotate(1.2deg); }
 
+/* ── flowers attached to a memory's photos ──────────────────────────
+   The photo-count rule lives in edit.js (1 photo → none · 2 → one tucked
+   on each · 3 → one on the third photo), reproducing the template's
+   existing look. Anchored to the print so they scale with it and can no
+   longer drift off-screen the way the old section-pinned plants did.
+   Placement values below were measured from the current layout. */
+.memory-photo { position: relative; }
+/* the ancestor prefix keeps these above `.memory-photo img` (which would
+   otherwise force the flower to 100% width, 4/3, object-fit:cover) */
+.memory-photo > .memory-photo-flower {
+  position: absolute;
+  z-index: -1;               /* tuck behind the print */
+  display: block;
+  height: auto;
+  aspect-ratio: auto;        /* cancel the 4/3 meant for real photos */
+  object-fit: fill;          /* cancel the cover crop */
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  opacity: 0.82;
+  filter: saturate(0.46) sepia(0.12) brightness(1.04);
+}
+.memory-photo > .memory-photo-flower--trio-third { width: 33%; left: 133.7%; top: 46.8%; transform: translate(-50%, -50%) rotate(50deg) scaleX(-1); }
+.memory-photo > .memory-photo-flower--pair-left  { width: 30%; left: 9.3%;   top: 60.1%; transform: translate(-50%, -50%) rotate(-28deg) scaleX(-1); }
+.memory-photo > .memory-photo-flower--pair-right { width: 26%; left: 126.3%; top: 57.8%; transform: translate(-50%, -50%) rotate(65deg) scaleX(-1); }
+
+/* Phones stack the photos full-width, where an overhanging flower would run
+   off the screen — so the memory flowers are a tablet/desktop touch. */
+@media (max-width: 767px) {
+  .memory-photo > .memory-photo-flower { display: none; }
+}
+
 .mframe { overflow: hidden; position: relative; }
 
 /* ── photo fit: lets an owner pan (object-position) and zoom (scale) a
