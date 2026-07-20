@@ -1243,10 +1243,12 @@ body.reduced-motion .milestone {
 }
 
 /* the little "why this mattered" line reads as a caption after the pictures */
+/* the memory's reflection is Body text (matching the letter / story),
+   just centred under the photos */
 .memory-sub {
   font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: clamp(1rem, 3vw, 1.15rem);
+  font-weight: 400;
+  font-size: var(--size-body);
   line-height: 1.55;
   color: var(--sepia-soft);
   margin: var(--moments-space-within) auto 0;
