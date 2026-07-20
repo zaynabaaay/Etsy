@@ -701,20 +701,20 @@ body.cinematic .cover > * { opacity: 0; }
    at the outer edge; the count/side rotation is chosen in edit.js. */
 .moment-photo-flower {
   position: absolute;
-  z-index: 3;                /* sits at the corner, above the print */
-  bottom: -7%;
-  width: 34%;
+  z-index: 0;                /* behind the polaroid (z-index: 2) */
+  width: 52%;
   height: auto;
   pointer-events: none;
   user-select: none;
   -webkit-user-drag: none;
-  opacity: 0.92;
-  filter: saturate(0.62) sepia(0.08) brightness(0.98);
+  opacity: 0.9;
+  filter: saturate(0.6) sepia(0.08) brightness(0.98);
 }
-/* tucked at the bottom-outer corner, mostly on the paper beside the print */
-.moment-photo-flower--one   { left: -15%;  transform: rotate(-22deg); }
-.moment-photo-flower--two   { right: -15%; transform: rotate(22deg) scaleX(-1); }
-.moment-photo-flower--three { left: -19%; width: 38%; transform: rotate(-14deg); }
+/* the bloom emerges from behind the outer edge; the stem stays hidden
+   behind the print (so no bare stem shows) */
+.moment-photo-flower--one   { left: 18%; top: 56%; transform: translate(-50%, -50%) rotate(-62deg) scaleX(-1); }
+.moment-photo-flower--two   { left: 82%; top: 56%; transform: translate(-50%, -50%) rotate(62deg); }
+.moment-photo-flower--three { left: 15%; top: 58%; width: 56%; transform: translate(-50%, -50%) rotate(-56deg) scaleX(-1); }
 
 /* This sprig was placed by hand beside the final Beginning photo. Keep it
    anchored to the print so its relationship survives different screens and
@@ -1321,9 +1321,9 @@ body.reduced-motion .milestone {
   opacity: 0.82;
   filter: saturate(0.46) sepia(0.12) brightness(1.04);
 }
-.memory-photo > .memory-photo-flower--trio-third { width: 34%; left: 100%;  top: 82%; transform: translate(-50%, -50%) rotate(28deg) scaleX(-1); }
-.memory-photo > .memory-photo-flower--pair-left  { width: 30%; left: 2%;    top: 84%; transform: translate(-50%, -50%) rotate(-24deg) scaleX(-1); }
-.memory-photo > .memory-photo-flower--pair-right { width: 28%; left: 98%;   top: 84%; transform: translate(-50%, -50%) rotate(30deg) scaleX(-1); }
+.memory-photo > .memory-photo-flower--trio-third { width: 54%; left: 80%;   top: 54%; transform: translate(-50%, -50%) rotate(66deg); }
+.memory-photo > .memory-photo-flower--pair-left  { width: 46%; left: 20%; top: 56%; transform: translate(-50%, -50%) rotate(-62deg) scaleX(-1); }
+.memory-photo > .memory-photo-flower--pair-right { width: 42%; left: 80%; top: 58%; transform: translate(-50%, -50%) rotate(62deg); }
 
 /* Phones stack the photos full-width, where an overhanging flower would run
    off the screen — so the memory flowers are a tablet/desktop touch. */
