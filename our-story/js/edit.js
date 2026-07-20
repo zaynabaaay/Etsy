@@ -757,12 +757,17 @@
      ══════════════════════════════════════════════════════════════════ */
 
   /* role → a full set of inline type styles (inline wins over scene CSS
-     and survives the snapshot). Values reuse the page's own tokens. */
+     and survives the snapshot). These mirror the page's real type system
+     exactly — same seven roles, same tokens — so pressing a role gives the
+     owner the template's own styles, not an approximation. */
   const DS_ROLES = {
-    header:  { fontFamily: "'Playfair Display', 'Cormorant Garamond', serif", fontWeight: '600', fontStyle: 'normal', fontSize: 'clamp(2rem, 7vw, 3.4rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.2' },
-    body:    { fontFamily: "'Cormorant Garamond', serif", fontWeight: '500', fontStyle: 'normal', fontSize: 'clamp(1.1rem, 3.6vw, 1.3rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.5' },
-    subtext: { fontFamily: "'Jost', sans-serif", fontWeight: '300', fontStyle: 'normal', fontSize: 'clamp(0.72rem, 2.4vw, 0.85rem)', letterSpacing: '0.34em', textTransform: 'uppercase', lineHeight: '1.5' },
-    script:  { fontFamily: "'Sacramento', cursive", fontWeight: '400', fontStyle: 'normal', fontSize: 'clamp(1.6rem, 5.4vw, 2.4rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.3' },
+    'big-title':     { label: 'Big title',     fontFamily: 'var(--font-serif)',  fontWeight: '600', fontStyle: 'normal', fontSize: 'var(--size-title-lg)', letterSpacing: 'normal',            textTransform: 'none',      lineHeight: '1.1' },
+    'section-title': { label: 'Section title', fontFamily: 'var(--font-serif)',  fontWeight: '500', fontStyle: 'normal', fontSize: 'var(--size-title)',    letterSpacing: 'normal',            textTransform: 'none',      lineHeight: '1.15' },
+    'small-title':   { label: 'Small title',   fontFamily: 'var(--font-serif)',  fontWeight: '500', fontStyle: 'italic', fontSize: 'var(--size-voice-sm)', letterSpacing: 'normal',            textTransform: 'none',      lineHeight: '1.2' },
+    'body':          { label: 'Body',          fontFamily: 'var(--font-serif)',  fontWeight: '400', fontStyle: 'normal', fontSize: 'var(--size-body)',     letterSpacing: 'normal',            textTransform: 'none',      lineHeight: '1.6' },
+    'subtitle':      { label: 'Subtitle',      fontFamily: 'var(--font-serif)',  fontWeight: '400', fontStyle: 'italic', fontSize: 'var(--size-body)',     letterSpacing: 'normal',            textTransform: 'none',      lineHeight: '1.5' },
+    'label':         { label: 'Label',         fontFamily: 'var(--font-label)',  fontWeight: '300', fontStyle: 'normal', fontSize: 'var(--size-label)',    letterSpacing: 'var(--track-label)', textTransform: 'uppercase', lineHeight: '1.5' },
+    'script':        { label: 'Script',        fontFamily: 'var(--font-script)', fontWeight: '400', fontStyle: 'normal', fontSize: 'var(--size-script)',   letterSpacing: 'normal',            textTransform: 'none',      lineHeight: '1.3' },
   };
   const DS_ROLE_PROPS = ['fontFamily', 'fontWeight', 'fontStyle', 'fontSize', 'letterSpacing', 'textTransform', 'lineHeight'];
 
@@ -830,6 +835,12 @@
     dsRefresh();
   }
 
+  function dsApplyAlign(el, value) {
+    el.style.textAlign = value || '';
+    if (value) el.dataset.dsAlign = value; else delete el.dataset.dsAlign;
+    dsRefresh();
+  }
+
   function dsRemoveLine(el) {
     const line = dsLineOf(el);
     const parent = line.parentNode;
@@ -882,13 +893,10 @@
   styleBar.hidden = true;
   styleBar.innerHTML =
     '<div class="eds-grip" aria-hidden="true"></div>' +
-    '<div class="eds-row">' +
+    '<div class="eds-row eds-row-style">' +
       '<span class="eds-label">Style</span>' +
       '<div class="eds-seg" data-group="role">' +
-        '<button type="button" data-role="header">Header</button>' +
-        '<button type="button" data-role="body">Body</button>' +
-        '<button type="button" data-role="subtext">Subtext</button>' +
-        '<button type="button" data-role="script">Script</button>' +
+        Object.keys(DS_ROLES).map((k) => '<button type="button" data-role="' + k + '">' + DS_ROLES[k].label + '</button>').join('') +
       '</div>' +
     '</div>' +
     '<div class="eds-row">' +
@@ -896,6 +904,14 @@
       '<select class="eds-font">' +
         DS_FONTS.map((f) => '<option value="' + f[1] + '">' + f[0] + '</option>').join('') +
       '</select>' +
+    '</div>' +
+    '<div class="eds-row">' +
+      '<span class="eds-label">Align</span>' +
+      '<div class="eds-seg" data-group="align">' +
+        '<button type="button" data-align="left" title="Left" aria-label="Align left">◧</button>' +
+        '<button type="button" data-align="center" title="Centre" aria-label="Align centre">▣</button>' +
+        '<button type="button" data-align="right" title="Right" aria-label="Align right">◨</button>' +
+      '</div>' +
     '</div>' +
     '<div class="eds-row">' +
       '<span class="eds-label">Colour</span>' +
@@ -921,6 +937,12 @@
     });
     // font select
     fontSel.value = dsActive.dataset.dsFont || '';
+    // alignment highlight (from the element's own applied/computed alignment)
+    const curAlign = dsActive.style.textAlign || getComputedStyle(dsActive).textAlign || '';
+    const alignNorm = (curAlign === 'start') ? 'left' : (curAlign === 'end') ? 'right' : curAlign;
+    styleBar.querySelectorAll('.eds-seg[data-group="align"] [data-align]').forEach((b) => {
+      b.classList.toggle('is-on', b.dataset.align === alignNorm);
+    });
     // dark-only swatches (Cream) show only on the dark opening scene
     const onDark = !!dsActive.closest('.scene-opening');
     styleBar.querySelectorAll('.eds-sw[data-dark-only]').forEach((b) => {
@@ -971,9 +993,12 @@
     styleBar.hidden = false;
     document.body.classList.add('ds-bar-open');
     dsSyncBar();
-    /* Dock below the edit bar (however tall it wraps) and scroll the
+    /* iPad / desktop: the panel is docked to the right by CSS — no need to
+       reposition it or scroll the line out from under a keyboard. */
+    if (window.innerWidth >= 768) { unbindVV(); styleBar.style.top = ''; return; }
+    /* Phone: dock below the edit bar (however tall it wraps) and scroll the
        tapped line to rest just under the panel, so the words being
-       styled stay visible above the phone keyboard. Near the top of the
+       styled stay visible above the keyboard. Near the top of the
        page there's no room to push the line down — flip the panel to
        the bottom of the visual viewport instead. */
     requestAnimationFrame(() => {
@@ -1023,6 +1048,9 @@
     b.addEventListener('click', () => { if (dsActive) { dsApplyRole(dsActive, b.dataset.role); dsSyncBar(); } });
   });
   fontSel.addEventListener('change', () => { if (dsActive) { dsApplyFont(dsActive, fontSel.value); } });
+  styleBar.querySelectorAll('.eds-seg[data-group="align"] [data-align]').forEach((b) => {
+    b.addEventListener('click', () => { if (dsActive) { dsApplyAlign(dsActive, b.dataset.align); dsSyncBar(); } });
+  });
   styleBar.querySelectorAll('.eds-sw[data-color]').forEach((b) => {
     b.addEventListener('click', () => { if (dsActive) { dsApplyColor(dsActive, b.dataset.color); dsSyncBar(); } });
   });

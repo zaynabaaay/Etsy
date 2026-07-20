@@ -758,6 +758,32 @@ section.is-removed { display: none; }
 }
 body.ds-bar-open .edit-fab { opacity: 0; pointer-events: none; }
 
+/* ── iPad / desktop: the style controls become a panel docked to the right
+      edge (below the top edit bar), instead of a floating card. The phone
+      keeps the bottom-docked card that dodges the keyboard. ── */
+@media (min-width: 768px) {
+  .ed-style-bar {
+    top: calc(3.6rem + env(safe-area-inset-top, 0px)) !important;
+    right: max(0px, env(safe-area-inset-right, 0px));
+    left: auto;
+    transform: none;
+    width: 320px;
+    max-height: calc(100dvh - 4.4rem - env(safe-area-inset-top, 0px));
+    overflow-y: auto;
+    border-radius: 16px 0 0 16px;
+    gap: 0.7rem;
+    padding: 0.9rem 1.1rem 1.1rem;
+  }
+  /* roles wrap to a tidy 2-column grid in the narrow panel */
+  .ed-style-bar .eds-row-style { align-items: flex-start; }
+  .ed-style-bar .eds-seg[data-group="role"] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+  }
+  .ed-style-bar .eds-seg[data-group="role"] button { flex: none; }
+}
+
 /* ── phone-width edit bar: compact buttons that wrap instead of running
       off-screen; the Download button drops to its short label ── */
 .edit-btn-short { display: none; }
