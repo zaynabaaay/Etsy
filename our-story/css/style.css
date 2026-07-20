@@ -148,6 +148,9 @@
      the cover title, the days counter, the signature, the names. */
   --size-label:     clamp(0.68rem, 2.3vw, 0.8rem);
   --track-label:    0.38em;
+  /* Big title — the two grand serif moments (cover names + closing line).
+     One shared style so the opening and the ending rhyme. */
+  --size-title-lg:  clamp(2.6rem, 8.5vw, 4.6rem);
   --size-title:     clamp(2.2rem, 8vw, 3.8rem);
   --size-voice:     clamp(1.4rem, 4.8vw, 2.5rem);
   --size-voice-sm:  clamp(1.4rem, 4.4vw, 2.1rem);
@@ -292,7 +295,7 @@ body {
 
 /* names — the masthead / identity, the structural anchor of the cover */
 .cover-names {
-  font-size: clamp(2.6rem, 8.5vw, 4.6rem);
+  font-size: var(--size-title-lg);
   font-weight: 600;
   line-height: 1.04;
   color: var(--sepia-deep);
@@ -1599,9 +1602,9 @@ body.cinematic .scene-quiet { height: 280vh; }
 }
 
 .close-line {
-  font-family: 'Playfair Display', var(--font-serif);
+  font-family: var(--font-serif);
   font-weight: 600;
-  font-size: var(--size-title);
+  font-size: var(--size-title-lg);
   line-height: 1.24;
   color: var(--ink);
   margin-bottom: clamp(1.1rem, 2.5svh, 1.7rem);
