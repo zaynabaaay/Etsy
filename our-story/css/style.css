@@ -1636,7 +1636,9 @@ body.cinematic .scene-quiet { height: 280vh; }
 }
 .close-sparkle .sp-line:last-child { transform: scaleX(-1); }
 
-.close-line .mask { display: block; overflow: hidden; padding: 0.12em 0.06em; }
+/* extra bottom room so the script word's ("yet") deep descender isn't
+   clipped by the reveal mask's overflow:hidden */
+.close-line .mask { display: block; overflow: hidden; padding: 0.12em 0.06em 0.34em; }
 .close-line .mask-inner { display: block; }
 
 .close-script {
