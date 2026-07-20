@@ -132,7 +132,7 @@
   --paper-blend: normal;
 
   --font-serif:  'Cormorant Garamond', 'Times New Roman', serif;
-  --font-script: 'Alex Brush', 'Great Vibes', cursive;
+  --font-script: 'Sacramento', cursive;
   --font-label:  'Jost', 'Helvetica Neue', sans-serif;
 
   /* ── TYPE SCALE — one size per role, used identically in every scene ──
@@ -359,7 +359,7 @@ body {
   color: var(--sepia);
 }
 .occ-anniv {
-  font-family: 'Sacramento', var(--font-script);
+  font-family: var(--font-script);
   font-size: clamp(3rem, 11vw, 4.6rem);
   line-height: 1.05;
   color: var(--gold-deep);
@@ -790,7 +790,7 @@ body.cinematic .cover > * { opacity: 0; }
   bottom: clamp(6px, 2vw, 10px);
   padding: 0 clamp(14px, 5vw, 22px);
   text-align: center;
-  font-family: 'Ephesis', var(--font-script);
+  font-family: var(--font-script);
   font-size: var(--size-script);
   color: var(--gold-deep);
   transform: rotate(-2deg);
@@ -1150,7 +1150,7 @@ body.cinematic .cover > * { opacity: 0; }
 
 .counter-note {
   margin: 0;
-  font-family: 'Sacramento', var(--font-script);
+  font-family: var(--font-script);
   font-size: var(--size-script);
   color: var(--gold-deep);
   transform: rotate(-3deg);
@@ -1548,7 +1548,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 /* signed by hand, in the same warm ink — no gilt. Mr De Haviland is a fine
    formal hand, so it's sized up a touch to carry as a signature. */
 .sign-name {
-  font-family: 'Mr De Haviland', var(--font-script);
+  font-family: var(--font-script);
   font-size: clamp(2.9rem, 12vw, 4.4rem);
   line-height: 1.1;
   color: var(--sepia-deep);
@@ -1615,7 +1615,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 }
 /* the emphasised word in the closing line, in the gilt calligraphy script */
 .close-yet {
-  font-family: 'Pinyon Script', var(--font-script);
+  font-family: var(--font-script);
   font-weight: 400;
   font-size: 1.4em;
   line-height: 1;
@@ -1644,7 +1644,7 @@ body.cinematic .scene-quiet { height: 280vh; }
 .close-line .mask-inner { display: block; }
 
 .close-script {
-  font-family: 'Pinyon Script', var(--font-script);
+  font-family: var(--font-script);
   font-size: calc(var(--size-script-lg) * 1.05);
   line-height: 1.05;
   color: var(--gold-deep);

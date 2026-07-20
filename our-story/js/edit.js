@@ -762,7 +762,7 @@
     header:  { fontFamily: "'Playfair Display', 'Cormorant Garamond', serif", fontWeight: '600', fontStyle: 'normal', fontSize: 'clamp(2rem, 7vw, 3.4rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.2' },
     body:    { fontFamily: "'Cormorant Garamond', serif", fontWeight: '500', fontStyle: 'normal', fontSize: 'clamp(1.1rem, 3.6vw, 1.3rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.5' },
     subtext: { fontFamily: "'Jost', sans-serif", fontWeight: '300', fontStyle: 'normal', fontSize: 'clamp(0.72rem, 2.4vw, 0.85rem)', letterSpacing: '0.34em', textTransform: 'uppercase', lineHeight: '1.5' },
-    script:  { fontFamily: "'Ephesis', 'Alex Brush', cursive", fontWeight: '400', fontStyle: 'normal', fontSize: 'clamp(1.6rem, 5.4vw, 2.4rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.3' },
+    script:  { fontFamily: "'Sacramento', cursive", fontWeight: '400', fontStyle: 'normal', fontSize: 'clamp(1.6rem, 5.4vw, 2.4rem)', letterSpacing: 'normal', textTransform: 'none', lineHeight: '1.3' },
   };
   const DS_ROLE_PROPS = ['fontFamily', 'fontWeight', 'fontStyle', 'fontSize', 'letterSpacing', 'textTransform', 'lineHeight'];
 
