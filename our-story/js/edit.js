@@ -345,7 +345,8 @@
     box.querySelectorAll('img[data-orig-src]').forEach((img) => { img.setAttribute('src', img.dataset.origSrc); });
     return box.innerHTML;
   }
-  function save() { try { localStorage.setItem(SNAP, snapshotHTML()); localStorage.setItem(SNAPVER, CONTENT_VERSION); } catch (e) {} }
+  let onSave = null; // edit mode installs the undo-history recorder here
+  function save() { try { localStorage.setItem(SNAP, snapshotHTML()); localStorage.setItem(SNAPVER, CONTENT_VERSION); } catch (e) {} if (onSave) onSave(); }
 
   /* ── the always-present "Make it yours" button ── */
   const fab = document.createElement('button');
@@ -922,6 +923,10 @@
   styleBar.hidden = true;
   styleBar.innerHTML =
     '<div class="eds-grip" aria-hidden="true"></div>' +
+    '<div class="eds-history">' +
+      '<button type="button" class="eds-undo" aria-label="Undo" title="Undo">&#8630;</button>' +
+      '<button type="button" class="eds-redo" aria-label="Redo" title="Redo">&#8631;</button>' +
+    '</div>' +
     '<div class="eds-tabs" role="tablist">' +
       '<button type="button" class="eds-tab-btn" data-tab="sections">Sections</button>' +
       '<button type="button" class="eds-tab-btn" data-tab="edit">Edit</button>' +
@@ -1169,6 +1174,75 @@
   styleBar.querySelectorAll('.eds-tab-btn').forEach((b) => {
     b.addEventListener('click', () => { openDock(); setTab(b.dataset.tab); });
   });
+
+  /* ── Undo / redo ──────────────────────────────────────────────────────
+     A stack of clean snapshots in sessionStorage. Each step writes the
+     chosen snapshot to the saved slot and reloads: the reload re-runs the
+     page's normal restore, so every editor (decor, photos from IndexedDB,
+     add/remove chips) rebinds cleanly with no duplicates — which an in-place
+     swap can't guarantee. sessionStorage keeps the stack across that reload. */
+  const HKEY = 'ourstory:hist', HPOS = 'ourstory:histpos', HNAV = 'ourstory:histnav', HSCROLL = 'ourstory:histscroll';
+  const HIST_MAX = 40;
+  let hist = [], histPos = -1;
+  const undoBtn = styleBar.querySelector('.eds-undo');
+  const redoBtn = styleBar.querySelector('.eds-redo');
+  function histPersist() {
+    try { sessionStorage.setItem(HKEY, JSON.stringify(hist)); sessionStorage.setItem(HPOS, String(histPos)); } catch (e) {}
+  }
+  function updateHistButtons() {
+    undoBtn.disabled = histPos <= 0;
+    redoBtn.disabled = histPos >= hist.length - 1;
+  }
+  let pushTimer = 0;
+  function recordHistory() {
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(() => {
+      const snap = snapshotHTML();
+      if (hist[histPos] === snap) return; // nothing actually changed
+      hist = hist.slice(0, histPos + 1);
+      hist.push(snap);
+      if (hist.length > HIST_MAX) hist.shift();
+      histPos = hist.length - 1;
+      histPersist();
+      updateHistButtons();
+    }, 300);
+  }
+  function commitNav() {
+    try {
+      localStorage.setItem(SNAP, hist[histPos]);
+      localStorage.setItem(SNAPVER, CONTENT_VERSION);
+      sessionStorage.setItem(HNAV, '1');
+      sessionStorage.setItem(HSCROLL, String(window.scrollY));
+    } catch (e) {}
+    histPersist();
+    location.reload();
+  }
+  function undo() { clearTimeout(pushTimer); if (histPos > 0) { histPos--; commitNav(); } }
+  function redo() { clearTimeout(pushTimer); if (histPos < hist.length - 1) { histPos++; commitNav(); } }
+  undoBtn.addEventListener('click', undo);
+  redoBtn.addEventListener('click', redo);
+  document.addEventListener('keydown', (e) => {
+    if (!(e.metaKey || e.ctrlKey) || (e.key !== 'z' && e.key !== 'Z')) return;
+    /* while typing in a field, leave Cmd/Ctrl+Z to the browser's own text undo */
+    if (document.activeElement && document.activeElement.isContentEditable) return;
+    e.preventDefault();
+    if (e.shiftKey) redo(); else undo();
+  });
+
+  /* seed / continue the stack once the page has fully restored + bound */
+  try { hist = JSON.parse(sessionStorage.getItem(HKEY) || '[]') || []; } catch (e) { hist = []; }
+  if (!Array.isArray(hist)) hist = [];
+  histPos = parseInt(sessionStorage.getItem(HPOS) || String(hist.length - 1), 10);
+  if (isNaN(histPos)) histPos = hist.length - 1;
+  if (sessionStorage.getItem(HNAV) === '1') {
+    sessionStorage.removeItem(HNAV);
+    const y = parseInt(sessionStorage.getItem(HSCROLL) || '0', 10);
+    if (y) requestAnimationFrame(() => window.scrollTo(0, y));
+  } else if (!hist.length) {
+    hist = [snapshotHTML()]; histPos = 0; histPersist();
+  }
+  updateHistButtons();
+  onSave = recordHistory; // begin recording every change
 
   /* ── the Sections tab: show/hide + reorder the story's sections ──
      lives inside the docked panel's "Sections" tab (no separate panel). */

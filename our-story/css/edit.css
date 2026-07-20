@@ -758,6 +758,21 @@ section.is-removed { display: none; }
 }
 body.ds-bar-open .edit-fab { opacity: 0; pointer-events: none; }
 
+/* ── undo / redo ── */
+.eds-history { display: flex; gap: 0.4rem; margin: 0.1rem 0 0.2rem; }
+.eds-undo, .eds-redo {
+  width: 36px; height: 30px;
+  border: 1px solid rgba(201, 161, 95, 0.32);
+  border-radius: 8px;
+  background: transparent;
+  color: #f2e7d0;
+  font-size: 1.05rem; line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+.eds-undo:hover:not(:disabled), .eds-redo:hover:not(:disabled) { background: rgba(201, 161, 95, 0.16); }
+.eds-undo:disabled, .eds-redo:disabled { opacity: 0.26; cursor: default; }
+
 /* ── one dock, two tabs: Sections · Edit ── */
 .eds-tabs { display: flex; gap: 0.3rem; margin: 0.1rem 0 0.3rem; }
 .eds-tab-btn {
