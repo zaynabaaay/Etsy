@@ -207,39 +207,6 @@
     if (host) host.insertAdjacentHTML('afterend', savedSnap);
   }
 
-  /* ── flowers that belong to a memory's photos ──
-     The rule (matching the template's current look): 1 photo → none,
-     2 → one tucked on each, 3 → one on the third (centre) photo. Runs in
-     EVERY mode so the finished + downloaded pages show them, and again on
-     add/remove (below) so it adapts live. The flower is attached to the
-     print, so it scales with it and never drifts like the old plants. */
-  const MEM_FLOWERS = {
-    2: [
-      { photo: 1, cls: 'pair-left',  src: 'assets/decor/dried-flower-daisy.png' },
-      { photo: 2, cls: 'pair-right', src: 'assets/decor/dried-cosmos-stem.png' },
-    ],
-    3: [
-      { photo: 3, cls: 'trio-third', src: 'assets/decor/opening-babys-breath-right.png' },
-    ],
-  };
-  function applyMemoryFlowers(mem) {
-    if (!mem) return;
-    mem.querySelectorAll('.memory-photo-flower').forEach((f) => f.remove());
-    const photos = mem.querySelectorAll('.memory-photo');
-    (MEM_FLOWERS[photos.length] || []).forEach((slot) => {
-      const ph = photos[slot.photo - 1];
-      if (!ph) return;
-      const img = document.createElement('img');
-      img.className = 'memory-photo-flower memory-photo-flower--' + slot.cls;
-      img.src = slot.src;
-      img.alt = '';
-      img.setAttribute('aria-hidden', 'true');
-      img.setAttribute('draggable', 'false');
-      ph.appendChild(img);
-    });
-  }
-  document.querySelectorAll('.memories-list .memory').forEach(applyMemoryFlowers);
-
   /* ── tiny IndexedDB store (photos can be large, so not localStorage) ── */
   const DB = 'ourstory', STORE = 'photos';
   function openDB() {
@@ -627,37 +594,23 @@
      to drop in their own picture) */
   const PHOTO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23e7ddc6'/%3E%3Ctext x='50%25' y='50%25' font-family='Georgia,serif' font-size='34' fill='%23a2906f' text-anchor='middle' dominant-baseline='middle'%3EYour photo%3C/text%3E%3C/svg%3E";
   let addedSeq = 0;
-  /* a flower rides behind each added moment, cycling 1-2-3-2 by position so
-     they take turns and land on the outer side of the zig-zag (one & three
-     sit left, two sits right). Uses its own .moment-photo-flower class —
-     NOT .moment-flower, which the decor editor hijacks and deletes. */
-  const MOMENT_FLOWER_SRC = {
-    one: 'assets/decor/dried-flower-daisy.png',
-    two: 'assets/decor/dried-cosmos-stem.png',
-    three: 'assets/decor/opening-babys-breath-right.png',
-  };
-  const MOMENT_FLOWER_SEQ = ['one', 'two', 'three', 'two'];
   const makeMoment = () => {
     /* a clear tilt that alternates side to side like the originals
        (-3, 2.5, -2.5…) — never landing near straight */
     const n = document.querySelectorAll('.moments .moment').length;
     const mag = 2.5 + Math.random();
     const tilt = (n % 2 === 0 ? -mag : mag).toFixed(1);
-    const variant = MOMENT_FLOWER_SEQ[n % 4];
     const art = document.createElement('article');
     art.className = 'moment';
     art.innerHTML =
       '<p class="moment-date">Month 00 · Year</p>' +
-      '<div class="moment-photo-stage moment-photo-stage--' + variant + '">' +
-        '<img class="moment-photo-flower moment-photo-flower--' + variant + '" src="' + MOMENT_FLOWER_SRC[variant] + '" alt="" aria-hidden="true">' +
-        '<div class="polaroid" data-tilt="' + tilt + '">' +
-          '<span class="tape" aria-hidden="true"></span>' +
-          '<img alt="" loading="lazy">' +
-          '<p class="polaroid-caption">a caption</p>' +
-        '</div>' +
+      '<div class="polaroid" data-tilt="' + tilt + '">' +
+        '<span class="tape" aria-hidden="true"></span>' +
+        '<img alt="" loading="lazy">' +
+        '<p class="polaroid-caption">a caption</p>' +
       '</div>' +
       '<p class="moment-text">Tell the story of this moment.</p>';
-    const img = art.querySelector('.polaroid img');
+    const img = art.querySelector('img');
     img.dataset.photoKey = 'added-' + Date.now() + '-' + (addedSeq++);
     img.dataset.origSrc = PHOTO_PLACEHOLDER;
     img.src = PHOTO_PLACEHOLDER;
@@ -699,7 +652,6 @@
       const figs = row.querySelectorAll('.memory-photo');
       row.querySelectorAll('.ed-photo-del').forEach((b) => { b.style.display = figs.length > 1 ? '' : 'none'; });
       addBtn.style.display = figs.length >= 3 ? 'none' : '';
-      applyMemoryFlowers(mem); // re-tuck the flowers for the new photo count
     };
     const addDelChip = (fig) => {
       const del = document.createElement('button');
@@ -784,9 +736,7 @@
     document.querySelectorAll('.moments .moment'), makeMoment,
     '＋ Add a memory', '× Remove',
     (el) => {
-      /* only the real photo — NOT the .moment-photo-flower, which must stay
-         a plain decorative img (binding it wraps it in a pan/zoom clip) */
-      el.querySelectorAll('.polaroid img').forEach((img) => bindPhoto(img));
+      el.querySelectorAll('img').forEach((img) => bindPhoto(img));
       /* angle it now too, so it matches the others while editing */
       const pol = el.querySelector('.polaroid');
       if (pol && window.gsap) gsap.set(pol, { rotation: parseFloat(pol.dataset.tilt || 0) });

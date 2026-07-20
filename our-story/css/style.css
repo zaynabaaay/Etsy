@@ -695,27 +695,6 @@ body.cinematic .cover > * { opacity: 0; }
   display: none !important;
 }
 
-/* Flowers on added moments (The Beginning). A dedicated class the decor
-   editor leaves alone (unlike .moment-flower, which it converts into a
-   managed plant and the baked default deletes). Tucked behind the print
-   at the outer edge; the count/side rotation is chosen in edit.js. */
-.moment-photo-flower {
-  position: absolute;
-  z-index: 0;                /* behind the polaroid (z-index: 2) */
-  width: 52%;
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-drag: none;
-  opacity: 0.9;
-  filter: saturate(0.6) sepia(0.08) brightness(0.98);
-}
-/* the bloom emerges from behind the outer edge; the stem stays hidden
-   behind the print (so no bare stem shows) */
-.moment-photo-flower--one   { left: 18%; top: 56%; transform: translate(-50%, -50%) rotate(-62deg) scaleX(-1); }
-.moment-photo-flower--two   { left: 82%; top: 56%; transform: translate(-50%, -50%) rotate(62deg); }
-.moment-photo-flower--three { left: 15%; top: 58%; width: 56%; transform: translate(-50%, -50%) rotate(-56deg) scaleX(-1); }
-
 /* This sprig was placed by hand beside the final Beginning photo. Keep it
    anchored to the print so its relationship survives different screens and
    can no longer drift when section coordinates are recalculated. */
@@ -1298,38 +1277,6 @@ body.reduced-motion .milestone {
 /* the gentle handmade tilt, alternating side to side */
 .memory-photo:nth-child(odd)  { transform: rotate(-1.1deg); }
 .memory-photo:nth-child(even) { transform: rotate(1.2deg); }
-
-/* ── flowers attached to a memory's photos ──────────────────────────
-   The photo-count rule lives in edit.js (1 photo → none · 2 → one tucked
-   on each · 3 → one on the third photo), reproducing the template's
-   existing look. Anchored to the print so they scale with it and can no
-   longer drift off-screen the way the old section-pinned plants did.
-   Placement values below were measured from the current layout. */
-.memory-photo { position: relative; }
-/* the ancestor prefix keeps these above `.memory-photo img` (which would
-   otherwise force the flower to 100% width, 4/3, object-fit:cover) */
-.memory-photo > .memory-photo-flower {
-  position: absolute;
-  z-index: -1;               /* tuck behind the print */
-  display: block;
-  height: auto;
-  aspect-ratio: auto;        /* cancel the 4/3 meant for real photos */
-  object-fit: fill;          /* cancel the cover crop */
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-drag: none;
-  opacity: 0.82;
-  filter: saturate(0.46) sepia(0.12) brightness(1.04);
-}
-.memory-photo > .memory-photo-flower--trio-third { width: 54%; left: 80%;   top: 54%; transform: translate(-50%, -50%) rotate(66deg); }
-.memory-photo > .memory-photo-flower--pair-left  { width: 46%; left: 20%; top: 56%; transform: translate(-50%, -50%) rotate(-62deg) scaleX(-1); }
-.memory-photo > .memory-photo-flower--pair-right { width: 42%; left: 80%; top: 58%; transform: translate(-50%, -50%) rotate(62deg); }
-
-/* Phones stack the photos full-width, where an overhanging flower would run
-   off the screen — so the memory flowers are a tablet/desktop touch. */
-@media (max-width: 767px) {
-  .memory-photo > .memory-photo-flower { display: none; }
-}
 
 .mframe { overflow: hidden; position: relative; }
 
