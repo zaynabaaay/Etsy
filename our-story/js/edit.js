@@ -1253,6 +1253,13 @@
     await restored;
     const doc = document.documentElement.cloneNode(true);
 
+    /* Mark this as a finished keepsake. A published keepsake is served from the
+       SAME domain as the editor, so it would otherwise inherit the browser's
+       `ourstory:editing` flag and play in the flat, static edit-mode layout with
+       no scroll animations. This attribute tells main.js to always play the full
+       cinematic experience (accessibility's reduced-motion is still respected). */
+    doc.setAttribute('data-keepsake', '1');
+
     /* sections the owner removed are gone for good in the finished keepsake */
     doc.querySelectorAll('section.is-removed').forEach((n) => n.remove());
 

@@ -24,8 +24,12 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
 /* Edit Mode (js/edit.js) presents a calm, static, fully-revealed page
    so photos and text are easy to click — same still layout as the
-   reduced-motion experience. */
-const editing = localStorage.getItem('ourstory:editing') === '1';
+   reduced-motion experience. A finished keepsake (marked data-keepsake by the
+   export) always plays cinematically and never counts as editing, even when
+   it's served from the same domain as the editor (where the localStorage flag
+   would otherwise leak in). */
+const isKeepsake = document.documentElement.hasAttribute('data-keepsake');
+const editing = !isKeepsake && localStorage.getItem('ourstory:editing') === '1';
 const still = prefersReducedMotion || editing;
 
 /* a keepsake always plays from the title card: don't let the browser
