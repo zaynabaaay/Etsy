@@ -797,15 +797,14 @@ body.ds-bar-open .edit-fab { opacity: 0; pointer-events: none; }
       keeps the bottom-docked card that dodges the keyboard. ── */
 @media (min-width: 768px) {
   .ed-style-bar {
-    /* full-height rail on the right; JS glues top/height to the *visible*
-       viewport so it never drifts when the iPad keyboard is up (below) */
+    /* a card on the right sized to its controls; JS glues its top to the
+       *visible* viewport so it never drifts when the iPad keyboard is up */
     top: calc(3.6rem + env(safe-area-inset-top, 0px));
-    bottom: 0.6rem;
     right: max(0px, env(safe-area-inset-right, 0px));
     left: auto;
     transform: none;
     width: 320px;
-    max-height: none;
+    max-height: calc(100dvh - 4.4rem - env(safe-area-inset-top, 0px));
     overflow-y: auto;
     border-radius: 16px 0 0 16px;
     gap: 0.7rem;

@@ -1046,8 +1046,8 @@
     const vh = vv ? vv.height : window.innerHeight;
     styleBar.style.top = Math.round(offTop + DOCK_TOP) + 'px';
     styleBar.style.bottom = 'auto';
-    styleBar.style.height = Math.round(vh - DOCK_TOP - 8) + 'px';
-    styleBar.style.maxHeight = 'none';
+    styleBar.style.height = 'auto'; // fit the controls — no empty filler below
+    styleBar.style.maxHeight = Math.round(vh - DOCK_TOP - 12) + 'px'; // scroll if ever taller
   }
   let wideVVBound = false;
   function bindWideVV() {
