@@ -207,6 +207,10 @@
     if (host) host.insertAdjacentHTML('afterend', savedSnap);
   }
 
+  /* The Quiet scene was retired — strip it from any older saved snapshot so
+     it can't reappear (even hidden) in the story or the Sections list. */
+  document.querySelectorAll('.scene-quiet').forEach((s) => s.remove());
+
   /* ── tiny IndexedDB store (photos can be large, so not localStorage) ── */
   const DB = 'ourstory', STORE = 'photos';
   function openDB() {
@@ -811,6 +815,7 @@
     DS_ROLE_PROPS.forEach((p) => { el.style[p] = set[p]; });
     el.dataset.dsRole = role;
     delete el.dataset.dsFont; // the role owns the font now
+    delete el.dataset.dsScale; delete el.dataset.dsBase; // role resets any size nudge
     dsRefresh();
   }
 
@@ -838,6 +843,30 @@
   function dsApplyAlign(el, value) {
     el.style.textAlign = value || '';
     if (value) el.dataset.dsAlign = value; else delete el.dataset.dsAlign;
+    dsRefresh();
+  }
+
+  /* the element's size before any owner scaling — the role's token if it has
+     a role, otherwise its natural computed size, captured once */
+  function dsNaturalSize(el) {
+    const role = el.dataset.dsRole;
+    if (role && DS_ROLES[role]) return DS_ROLES[role].fontSize;
+    if (el.dataset.dsBase) return el.dataset.dsBase;
+    const prev = el.style.fontSize;
+    el.style.fontSize = '';
+    const px = getComputedStyle(el).fontSize;
+    el.style.fontSize = prev;
+    el.dataset.dsBase = px;
+    return px;
+  }
+  /* nudge the line bigger / smaller (dir +1 / −1), or reset (dir 0). Scales
+     the base size so it still rides the template's responsive clamps. */
+  function dsApplySize(el, dir) {
+    const base = dsNaturalSize(el);
+    let scale = parseFloat(el.dataset.dsScale || '1');
+    if (dir === 0) scale = 1; else scale = clampN(scale * (dir > 0 ? 1.08 : 1 / 1.08), 0.5, 2.2);
+    el.dataset.dsScale = scale.toFixed(3);
+    el.style.fontSize = 'calc(' + base + ' * ' + scale.toFixed(3) + ')';
     dsRefresh();
   }
 
@@ -897,6 +926,14 @@
       '<span class="eds-label">Style</span>' +
       '<div class="eds-seg" data-group="role">' +
         Object.keys(DS_ROLES).map((k) => '<button type="button" data-role="' + k + '">' + DS_ROLES[k].label + '</button>').join('') +
+      '</div>' +
+    '</div>' +
+    '<div class="eds-row">' +
+      '<span class="eds-label">Size</span>' +
+      '<div class="eds-seg" data-group="size">' +
+        '<button type="button" data-size="-1" aria-label="Smaller">A&minus;</button>' +
+        '<button type="button" data-size="0" aria-label="Reset size">Reset</button>' +
+        '<button type="button" data-size="1" aria-label="Bigger">A&#43;</button>' +
       '</div>' +
     '</div>' +
     '<div class="eds-row">' +
@@ -1051,6 +1088,9 @@
   styleBar.querySelectorAll('.eds-seg[data-group="align"] [data-align]').forEach((b) => {
     b.addEventListener('click', () => { if (dsActive) { dsApplyAlign(dsActive, b.dataset.align); dsSyncBar(); } });
   });
+  styleBar.querySelectorAll('.eds-seg[data-group="size"] [data-size]').forEach((b) => {
+    b.addEventListener('click', () => { if (dsActive) { dsApplySize(dsActive, parseInt(b.dataset.size, 10)); } });
+  });
   styleBar.querySelectorAll('.eds-sw[data-color]').forEach((b) => {
     b.addEventListener('click', () => { if (dsActive) { dsApplyColor(dsActive, b.dataset.color); dsSyncBar(); } });
   });
@@ -1126,28 +1166,9 @@
   renderPanel();
   panel.appendChild(list);
 
-  /* add another Words page (the lone-lines layout the Quiet uses),
-     then move it wherever it belongs with the arrows */
-  const addSec = document.createElement('button');
-  addSec.type = 'button';
-  addSec.className = 'ed-add ed-panel-addsec';
-  addSec.textContent = '＋ Add a Words page';
-  addSec.addEventListener('click', () => {
-    const sec = makeWordsSection();
-    if (!sec) return;
-    const secs = allSections();
-    secs[secs.length - 1].insertAdjacentElement('afterend', sec);
-    bindTextTree(sec);
-    bindWordsPage(sec);
-    renderPanel();
-    save();
-    sec.scrollIntoView({ block: 'start' });
-  });
-  panel.appendChild(addSec);
-
   const note = document.createElement('p');
   note.className = 'ed-panel-note';
-  note.textContent = 'Turn a section off to leave it out of your finished site, use the arrows to reorder the story, and add as many Words pages as you like.';
+  note.textContent = 'Turn a section off to leave it out of your finished site, and use the arrows to reorder the story.';
   panel.appendChild(note);
   document.body.appendChild(panel);
 

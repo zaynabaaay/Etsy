@@ -324,46 +324,6 @@
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════
-       SCENE 05 · THE QUIET  (optional — OFF by default)
-       A quiet "Words page": the screen pins and short lines appear one
-       beat at a time on empty paper. It ships hidden (is-removed) so the
-       default story stays tight; turn it on in edit mode (Sections), or
-       delete the "is-removed" class below to show it. This is also the
-       template behind "Add a Words page".
-       ════════════════════════════════════════════════════════════════ -->
-  <section class="scene-quiet is-removed" id="quiet" data-label="The Quiet">
-    <!-- a tall section; this inner panel sticks to the screen while you
-         scroll through it (CSS sticky — reliable on iOS, unlike JS pinning) -->
-    <div class="quiet-sticky">
-    <div class="quiet-stage">
-
-      <!-- EDIT ME · Beat one -->
-      <p class="quiet-line ql-1"><span class="mask"><span class="mask-inner">
-        The big moments made the photos.
-      </span></span></p>
-
-      <!-- EDIT ME · Beat two -->
-      <p class="quiet-line ql-2"><span class="mask"><span class="mask-inner">
-        But it&rsquo;s the small ones I&rsquo;d keep &mdash;
-      </span></span></p>
-
-      <!-- EDIT ME · The little things (three short, in a warm hand) -->
-      <div class="quiet-stack">
-        <p class="quiet-small qs-1">slow morning coffees,</p>
-        <p class="quiet-small qs-2">your humming in the kitchen,</p>
-        <p class="quiet-small qs-3">doing nothing, together.</p>
-      </div>
-
-      <!-- EDIT ME · The final line, landing alone in the warm light -->
-      <p class="quiet-line ql-final"><span class="mask"><span class="mask-inner">
-        That was the whole of it.
-      </span></span></p>
-
-    </div>
-    </div>
-  </section>
-
-  <!-- ════════════════════════════════════════════════════════════════
        SCENE 06 · THE LETTER
        The climax. The letter reveals itself paragraph by paragraph as you
        scroll, so it can only be read slowly, and is signed in script.
@@ -462,7 +422,7 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
-  <script src="js/edit.js?v=138"></script>
+  <script src="js/edit.js?v=139"></script>
   <script src="js/decor-editor.js?v=27"></script>
   <script src="js/main.js?v=123"></script>
 </body>
