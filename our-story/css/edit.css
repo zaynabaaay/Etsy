@@ -319,6 +319,24 @@ body.editing .edit-bar { display: flex; }
 
 .edit-bar-actions { display: flex; gap: 0.6rem; }
 
+/* undo / redo live in the top bar so they're always in reach */
+.edit-bar-history { display: flex; gap: 0.4rem; }
+.edit-icon-btn {
+  width: 38px; height: 34px;
+  border-radius: 9px;
+  border: 1px solid rgba(201, 161, 95, 0.5);
+  background: transparent;
+  color: #f2e7d0;
+  font-size: 1.15rem; line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+.edit-icon-btn:hover:not(:disabled) { background: rgba(201, 161, 95, 0.16); }
+.edit-icon-btn:disabled { opacity: 0.3; cursor: default; }
+/* on iPad/desktop the docked panel has its own Sections tab, so the top-bar
+   Sections button is redundant — keep it only on phones */
+@media (min-width: 768px) { .edit-btn-sections { display: none; } }
+
 .edit-btn {
   padding: 0.6rem 1.1rem;
   border-radius: 100px;

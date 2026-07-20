@@ -365,9 +365,13 @@
   const bar = document.createElement('div');
   bar.className = 'edit-bar';
   bar.innerHTML =
+    '<span class="edit-bar-history">' +
+      '<button class="edit-icon-btn" id="ed-undo" type="button" aria-label="Undo" title="Undo">&#8630;</button>' +
+      '<button class="edit-icon-btn" id="ed-redo" type="button" aria-label="Redo" title="Redo">&#8631;</button>' +
+    '</span>' +
     '<span class="edit-bar-msg"><strong>Editing</strong> · tap anything to change it</span>' +
     '<span class="edit-bar-actions">' +
-      '<button class="edit-btn" id="ed-sections" type="button">Sections</button>' +
+      '<button class="edit-btn edit-btn-sections" id="ed-sections" type="button">Sections</button>' +
       '<button class="edit-btn" id="ed-reset" type="button">Start over</button>' +
       '<button class="edit-btn edit-btn-primary" id="ed-publish" type="button">' +
         '<span class="edit-btn-long">Publish my keepsake</span><span class="edit-btn-short">Publish</span>' +
@@ -923,10 +927,6 @@
   styleBar.hidden = true;
   styleBar.innerHTML =
     '<div class="eds-grip" aria-hidden="true"></div>' +
-    '<div class="eds-history">' +
-      '<button type="button" class="eds-undo" aria-label="Undo" title="Undo">&#8630;</button>' +
-      '<button type="button" class="eds-redo" aria-label="Redo" title="Redo">&#8631;</button>' +
-    '</div>' +
     '<div class="eds-tabs" role="tablist">' +
       '<button type="button" class="eds-tab-btn" data-tab="sections">Sections</button>' +
       '<button type="button" class="eds-tab-btn" data-tab="edit">Edit</button>' +
@@ -1184,8 +1184,8 @@
   const HKEY = 'ourstory:hist', HPOS = 'ourstory:histpos', HNAV = 'ourstory:histnav', HSCROLL = 'ourstory:histscroll';
   const HIST_MAX = 40;
   let hist = [], histPos = -1;
-  const undoBtn = styleBar.querySelector('.eds-undo');
-  const redoBtn = styleBar.querySelector('.eds-redo');
+  const undoBtn = bar.querySelector('#ed-undo');
+  const redoBtn = bar.querySelector('#ed-redo');
   function histPersist() {
     try { sessionStorage.setItem(HKEY, JSON.stringify(hist)); sessionStorage.setItem(HPOS, String(histPos)); } catch (e) {}
   }
