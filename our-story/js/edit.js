@@ -361,6 +361,11 @@
       if (n.style.position === 'relative') n.style.position = '';
       if (!n.getAttribute('style')) n.removeAttribute('style');
     });
+    /* the "&" keeps any chosen colour but loses its editing affordances */
+    box.querySelectorAll('.amp').forEach((a) => {
+      a.style.cursor = ''; a.removeAttribute('title');
+      if (!a.getAttribute('style')) a.removeAttribute('style');
+    });
     /* photos revert to their filename — the real picture lives in IndexedDB */
     box.querySelectorAll('img[data-orig-src]').forEach((img) => { img.setAttribute('src', img.dataset.origSrc); });
     return box.innerHTML;
@@ -554,6 +559,16 @@
     el.addEventListener('blur', () => { save(); syncTitle(); if (window.ScrollTrigger) ScrollTrigger.refresh(); });
   }
   document.querySelectorAll(TEXT_SELECTORS.join(',')).forEach(bindText);
+
+  /* The "&" in the names (cover + closing) is a coloured accent with its own
+     style, so colouring the whole names line skips it. Make the ampersand its
+     own tappable target — tap it directly to recolour / restyle just the &. */
+  function bindAmp(amp) {
+    amp.style.cursor = 'pointer';
+    amp.title = 'Tap to style the &';
+    amp.addEventListener('click', (e) => { e.stopPropagation(); showStyleBar(amp); }, true);
+  }
+  document.querySelectorAll('.cover-names .amp, .close-title .amp').forEach(bindAmp);
 
   /* ── add / remove repeatable lines ──
      The Letter's paragraphs, the opening confession, and The Quiet's
@@ -1003,6 +1018,8 @@
 
   function dsSyncBar() {
     if (!dsActive) return;
+    // styling the "&" on its own: hide "Remove this line" (it's not a line)
+    styleBar.classList.toggle('is-amp', dsActive.classList.contains('amp'));
     // role highlight
     const role = dsActive.dataset.dsRole || '';
     styleBar.querySelectorAll('.eds-seg [data-role]').forEach((b) => {

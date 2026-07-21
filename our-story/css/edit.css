@@ -824,6 +824,8 @@ body.ds-bar-open .edit-fab { opacity: 0; pointer-events: none; }
 /* the Edit tab shows the hint until a line is selected, then the controls */
 .ed-style-bar:not(.has-sel) .eds-controls { display: none; }
 .ed-style-bar.has-sel .eds-hint { display: none; }
+/* styling just the "&": there's no line to remove */
+.ed-style-bar.is-amp .eds-remove { display: none; }
 .eds-controls { display: flex; flex-direction: column; gap: 0.5rem; }
 
 /* ── iPad / desktop: the style controls become a panel docked to the right
