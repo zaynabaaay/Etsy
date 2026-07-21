@@ -19,6 +19,15 @@ function makeId() {
   return s;
 }
 
+/* a longer secret so only the owner's device can update their keepsake */
+function makeToken() {
+  const b = new Uint8Array(24);
+  crypto.getRandomValues(b);
+  let s = '';
+  for (const x of b) s += ALPHABET[x % ALPHABET.length];
+  return s;
+}
+
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), {
     status,
@@ -48,10 +57,29 @@ export default {
       const html = await request.text();
       if (!html || html.length < 50) return json({ error: 'empty' }, 400);
       if (html.length > MAX_BYTES) return json({ error: 'too-large' }, 413);
+      const put = (id, token) => env.KEEPSAKES.put('k/' + id, html, {
+        httpMetadata: { contentType: 'text/html; charset=utf-8' },
+        customMetadata: { editToken: token },
+      });
+      /* UPDATE: a device that published before sends its id + secret edit key,
+         so re-publishing overwrites the SAME link (one stable link per
+         keepsake). Only the matching key can update — the id is public. */
+      const reqId = request.headers.get('x-keepsake-id');
+      const reqToken = request.headers.get('x-keepsake-token');
+      if (reqId && reqToken) {
+        const existing = await env.KEEPSAKES.head('k/' + reqId);
+        if (existing && existing.customMetadata && existing.customMetadata.editToken === reqToken) {
+          await put(reqId, reqToken);
+          return json({ url: '/k/' + reqId, id: reqId, token: reqToken, updated: true });
+        }
+        /* unknown id or wrong key → fall through and mint a fresh keepsake */
+      }
+      /* CREATE: a new keepsake with a fresh id + secret edit key */
       let id = makeId();
       for (let i = 0; i < 5 && (await env.KEEPSAKES.head('k/' + id)); i++) id = makeId();
-      await env.KEEPSAKES.put('k/' + id, html, { httpMetadata: { contentType: 'text/html; charset=utf-8' } });
-      return json({ url: '/k/' + id, id });
+      const token = makeToken();
+      await put(id, token);
+      return json({ url: '/k/' + id, id, token });
     }
 
     /* GET /k/<id> — serve a stored keepsake */
@@ -63,7 +91,9 @@ export default {
       return new Response(obj.body, {
         headers: {
           'content-type': 'text/html; charset=utf-8',
-          'cache-control': 'public, max-age=31536000, immutable',
+          /* short cache so an owner's re-publish shows up quickly (was
+             immutable-for-a-year, which would have frozen the old version) */
+          'cache-control': 'public, max-age=60, must-revalidate',
         },
       });
     }
