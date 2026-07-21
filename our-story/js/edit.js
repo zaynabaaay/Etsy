@@ -336,6 +336,18 @@
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   }).catch(() => {});
 
+  /* Keep the browser-tab title — and the finished keepsake's title and link
+     name — in sync with the couple's names on the cover, so it's automatically
+     personalized to whoever the buyer types. No separate title field to edit.
+     Runs in every mode (so a restored snapshot fixes the tab title) and again
+     whenever any text is edited. */
+  function syncTitle() {
+    const el = document.querySelector('.cover-names');
+    const names = el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
+    if (names) document.title = names + ' — Our Story';
+  }
+  syncTitle();
+
   /* ── build ONE clean HTML snapshot of every section (no edit chrome) ── */
   function snapshotHTML() {
     const box = document.createElement('div');
@@ -539,7 +551,7 @@
     el.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
     });
-    el.addEventListener('blur', () => { save(); if (window.ScrollTrigger) ScrollTrigger.refresh(); });
+    el.addEventListener('blur', () => { save(); syncTitle(); if (window.ScrollTrigger) ScrollTrigger.refresh(); });
   }
   document.querySelectorAll(TEXT_SELECTORS.join(',')).forEach(bindText);
 
