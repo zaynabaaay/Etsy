@@ -1647,21 +1647,31 @@
      owner a unique, shareable link that opens on any phone — no file needed.
      Falls back to a friendly message if the site isn't hosted with publishing
      enabled (e.g. opened as a local file). */
+  /* This keepsake's stable link is remembered on the device: id + a secret
+     edit key. Re-publishing sends them so the SAME link is updated instead of
+     minting a new one each time. */
+  const PUBKEY = 'ourstory:published';
+  function readPublished() {
+    try { return JSON.parse(localStorage.getItem(PUBKEY) || 'null'); } catch (e) { return null; }
+  }
+  function writePublished(id, token) {
+    try { localStorage.setItem(PUBKEY, JSON.stringify({ id: id, token: token })); } catch (e) {}
+  }
   async function publishSite() {
     const btn = document.getElementById('ed-publish');
     const label = btn && btn.innerHTML;
     if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
     try {
       const html = await buildKeepsakeHTML();
-      const res = await fetch('publish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/html' },
-        body: html,
-      });
+      const headers = { 'Content-Type': 'text/html' };
+      const prev = readPublished();
+      if (prev && prev.id && prev.token) { headers['x-keepsake-id'] = prev.id; headers['x-keepsake-token'] = prev.token; }
+      const res = await fetch('publish', { method: 'POST', headers: headers, body: html });
       if (!res.ok) throw new Error('publish failed ' + res.status);
       const data = await res.json();
+      if (data.id && data.token) writePublished(data.id, data.token); // remember for next time
       const url = new URL(data.url, location.href).href;
-      showKeepsakeLink(url);
+      showKeepsakeLink(url, !!data.updated);
     } catch (e) {
       window.alert('Publishing needs the online version of the template. Open it from your Storiel link (not a downloaded file) and try again — or use Download to save a file instead.');
     } finally {
@@ -1686,14 +1696,16 @@
     document.head.appendChild(s);
   }
 
-  function showKeepsakeLink(url) {
+  function showKeepsakeLink(url, updated) {
     ensureShareStyles();
     const wrap = document.createElement('div');
     wrap.className = 'keepsake-share';
     wrap.innerHTML =
       '<div class="keepsake-share-card">' +
-        '<div class="keepsake-share-title">Your keepsake is live ❤️</div>' +
-        '<p class="keepsake-share-sub">Open it on any phone or computer, and share the link with your someone. It stays at this link.</p>' +
+        '<div class="keepsake-share-title">' + (updated ? 'Your keepsake is updated ❤️' : 'Your keepsake is live ❤️') + '</div>' +
+        '<p class="keepsake-share-sub">' + (updated
+          ? 'Same link as before — anyone you already shared it with now sees your latest version.'
+          : 'Open it on any phone or computer, and share the link with your someone. Re-publishing later keeps this same link.') + '</p>' +
         '<input class="keepsake-share-url" readonly>' +
         '<div class="keepsake-share-actions">' +
           '<button type="button" class="keepsake-btn keepsake-copy">Copy link</button>' +
