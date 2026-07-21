@@ -15,7 +15,7 @@
        The ?v= number forces browsers to refetch the file when it changes —
        bump it if you edit the CSS/JS, so visitors never see a stale mix. -->
   <link rel="stylesheet" href="css/style.css?v=185">
-  <link rel="stylesheet" href="css/edit.css?v=121">
+  <link rel="stylesheet" href="css/edit.css?v=122">
 </head>
 <body>
 
@@ -63,8 +63,9 @@
         <div class="cover-photo">
           <span class="tape" aria-hidden="true"></span>
           <img src="assets/photos/cover.jpg?v=3" alt="Amara &amp; James" loading="eager">
-          <!-- EDIT ME · The year it began — sits in the photo's border like a stamp -->
-          <p class="cover-est">Est. July 12, 2025</p>
+          <!-- EDIT ME · your anniversary date — tap to pick it. It shows here
+               and drives the "Days Together" counter. -->
+          <p class="cover-est" data-est-date="2025-07-12">Est. July 12, 2025</p>
         </div>
       </div>
 
@@ -422,8 +423,8 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <!-- edit.js runs first: it restores any saved edits (structure + words)
        so main.js binds its animations to the final DOM -->
-  <script src="js/edit.js?v=148"></script>
+  <script src="js/edit.js?v=149"></script>
   <script src="js/decor-editor.js?v=27"></script>
-  <script src="js/main.js?v=123"></script>
+  <script src="js/main.js?v=124"></script>
 </body>
 </html>

@@ -54,6 +54,26 @@ if (!editing) {
   window.addEventListener('pageshow', toTop);
 }
 
+/* The anniversary date is chosen once (on the cover, .cover-est) and drives
+   everything: it's shown there, formatted, and feeds the Days Together
+   counter. Runs first, in all modes, so the cover and the count always agree.
+   Falls back to reading a previously hand-typed date if no picked one is set. */
+(function syncAnniversary() {
+  const est = document.querySelector('.cover-est');
+  if (!est) return;
+  let iso = est.dataset.estDate;
+  if (!iso) {
+    const p = new Date((est.textContent || '').trim());
+    if (!isNaN(p)) iso = p.getFullYear() + '-' + String(p.getMonth() + 1).padStart(2, '0') + '-' + String(p.getDate()).padStart(2, '0');
+  }
+  const d = iso ? new Date(iso + 'T00:00:00') : null;
+  if (!d || isNaN(d)) return;
+  est.dataset.estDate = iso;
+  est.textContent = 'Est. ' + d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const stat = document.querySelector('.stat[data-count-from-date]');
+  if (stat) stat.dataset.countFromDate = iso;
+})();
+
 /* live-computed stat: days since the date in data-count-from-date.
    Runs first (and in all modes) so the number is right everywhere. */
 document.querySelectorAll('[data-count-from-date]').forEach((stat) => {

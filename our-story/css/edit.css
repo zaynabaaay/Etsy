@@ -826,6 +826,20 @@ body.ds-bar-open .edit-fab { opacity: 0; pointer-events: none; }
 .ed-style-bar.has-sel .eds-hint { display: none; }
 /* styling just the "&": there's no line to remove */
 .ed-style-bar.is-amp .eds-remove { display: none; }
+
+/* the calendar popover for the cover date / Days Together counter */
+.ed-date-pop {
+  position: fixed;
+  z-index: 70;
+  font-family: 'Jost', sans-serif;
+  font-size: 1rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #c9a15f;
+  border-radius: 10px;
+  background: #fff;
+  color: #2b2118;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
 .eds-controls { display: flex; flex-direction: column; gap: 0.5rem; }
 
 /* ── iPad / desktop: the style controls become a panel docked to the right

@@ -361,8 +361,9 @@
       if (n.style.position === 'relative') n.style.position = '';
       if (!n.getAttribute('style')) n.removeAttribute('style');
     });
-    /* the "&" keeps any chosen colour but loses its editing affordances */
-    box.querySelectorAll('.amp').forEach((a) => {
+    /* the "&", the days number and the cover date keep their data but lose
+       their editing affordances (cursor/title) in the finished file */
+    box.querySelectorAll('.amp, .stat-value, .cover-est').forEach((a) => {
       a.style.cursor = ''; a.removeAttribute('title');
       if (!a.getAttribute('style')) a.removeAttribute('style');
     });
@@ -546,6 +547,8 @@
   /* ── make each piece of text tappable-to-edit ── */
   function bindText(el) {
     if (el.classList.contains('etext')) return;
+    /* the cover date is a picked date (drives the counter), not free text */
+    if (el.matches('.cover-est')) return;
     /* the "days together" number is computed live from the anniversary date
        (main.js overwrites it every load), so hand-editing it wouldn't stick —
        leave that one alone; the other milestone numbers are free text. */
@@ -569,6 +572,49 @@
     amp.addEventListener('click', (e) => { e.stopPropagation(); showStyleBar(amp); }, true);
   }
   document.querySelectorAll('.cover-names .amp, .close-title .amp').forEach(bindAmp);
+
+  /* ── the cover date is a pick-from-calendar field ──
+     It's the single anniversary date: it shows on the cover and drives the
+     "Days Together" counter, which is computed (never typed). Tap the cover
+     date to pick it; the display and the count both update, and it saves. */
+  function recomputeDays(stat) {
+    const from = new Date((stat.dataset.countFromDate || '') + 'T00:00:00');
+    if (isNaN(from)) return;
+    const days = Math.max(0, Math.floor((Date.now() - from) / 86400000));
+    stat.dataset.count = days;
+    const v = stat.querySelector('.stat-value');
+    if (v) v.textContent = days.toLocaleString('en-US');
+  }
+  function applyEstDate(iso) {
+    const est = document.querySelector('.cover-est');
+    const d = new Date(iso + 'T00:00:00');
+    if (!est || isNaN(d)) return;
+    est.dataset.estDate = iso;
+    est.textContent = 'Est. ' + d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const stat = document.querySelector('.stat[data-count-from-date]');
+    if (stat) { stat.dataset.countFromDate = iso; recomputeDays(stat); }
+    save();
+  }
+  const coverEst = document.querySelector('.cover-est');
+  if (coverEst) {
+    coverEst.style.cursor = 'pointer';
+    coverEst.title = 'Tap to pick your date';
+    coverEst.addEventListener('click', () => {
+      const r = coverEst.getBoundingClientRect();
+      const inp = document.createElement('input');
+      inp.type = 'date';
+      inp.className = 'ed-date-pop';
+      inp.value = coverEst.dataset.estDate || '';
+      inp.style.left = Math.round(Math.min(r.left, window.innerWidth - 230)) + 'px';
+      inp.style.top = Math.round(r.bottom + 8) + 'px';
+      document.body.appendChild(inp);
+      const close = () => inp.remove();
+      inp.addEventListener('change', () => { if (inp.value) applyEstDate(inp.value); close(); });
+      inp.addEventListener('blur', () => setTimeout(close, 150));
+      inp.focus();
+      if (inp.showPicker) { try { inp.showPicker(); } catch (e) {} }
+    });
+  }
 
   /* ── add / remove repeatable lines ──
      The Letter's paragraphs, the opening confession, and The Quiet's
