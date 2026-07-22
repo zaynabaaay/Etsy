@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#eee3d2">
+  <meta name="theme-color" content="#f8f5ee">
   <meta name="description" content="A private invitation to celebrate Layla and Zayn on 24 August 2027.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Layla &amp; Zayn — A Private Invitation">
@@ -32,7 +32,7 @@
     }
 
     :root {
-      --ivory: #eee3d2;
+      --ivory: #f8f5ee;
       --brown: #4b2b24;
       --muted: #66524a;
       --gold: #aa8848;
@@ -65,13 +65,14 @@
       opacity: 0;
       background:
         url("invitation-assets/invitation-background-sharp-v2.png") center / cover no-repeat,
-        #f1e8d8;
+        var(--ivory);
       pointer-events: none;
       transform: translate3d(0,0,0);
       backface-visibility: hidden;
       transition: opacity .18s ease;
     }
 
+    .invitation-opening body::before,
     .invitation-returning body::before { opacity: 1; }
 
     button { font: inherit; color: inherit; }
@@ -119,8 +120,8 @@
       visibility: hidden;
       transform: none;
       transform-origin: 50% 50%;
-      background: #f1e8d8;
-      box-shadow: inset 0 0 40px rgba(103,74,39,.05);
+      background: transparent;
+      box-shadow: none;
       pointer-events: none;
     }
 
@@ -751,7 +752,7 @@
       background:
         linear-gradient(rgba(74,35,22,.04), rgba(55,25,16,.13)),
         var(--floral-image) center 36% / cover no-repeat;
-      box-shadow: inset 0 0 0 2px rgba(243,225,197,.44);
+      box-shadow: none;
       transition: opacity .01s linear;
     }
 
@@ -985,7 +986,7 @@
         0 1px 0 rgba(63,19,16,.82),
         0 -1px 0 rgba(255,226,150,.34),
         1px 2px 2px rgba(50,12,12,.56);
-      transform: rotate(-3deg);
+      transform: none;
     }
 
     .seal-initial {
@@ -2049,7 +2050,7 @@
                   <feDropShadow dx="0" dy="-3" stdDeviation="3" flood-color="#66482d" flood-opacity=".24"/>
                 </filter>
               </defs>
-              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#floralFlap)" stroke="#e9d9be" stroke-width="8" filter="url(#openFlapShadow)"/>
+              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#floralFlap)" filter="url(#openFlapShadow)"/>
             </svg>
           </div>
         </div>
@@ -2311,6 +2312,7 @@
           invitationPage.style.setProperty('--page-start-y', `${centerY - innerHeight / 2}px`);
           invitationPage.style.setProperty('--page-start-scale-x', rect.width / innerWidth);
           invitationPage.style.setProperty('--page-start-scale-y', rect.height / innerHeight);
+          document.documentElement.classList.add('invitation-opening');
           invitationPage.setAttribute('aria-hidden', 'false');
           invitationPage.classList.add('is-revealing');
         }, 2860);
