@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#eee5d8">
+  <meta name="description" content="A reusable luxury wedding invitation opening card.">
+  <title>Wedding Opening Card</title>
+  <style>
+    @font-face {
+      font-family: "Invitation Didone";
+      src: local("Didot"), local("Bodoni 72"), local("Bodoni MT"), local("Bodoni Moda");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    :root {
+      --paper: #f7f0e5;
+      --surround: #eee5d8;
+      --ink: #4b2725;
+      --muted: #5b4139;
+      --gold: #b19054;
+      --font-display: "Invitation Didone", Didot, "Bodoni 72", "Bodoni MT", "Times New Roman", serif;
+      --font-script: "Snell Roundhand", "Apple Chancery", "Brush Script MT", cursive;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body { min-width: 100%; min-height: 100%; }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background: var(--surround);
+      font-family: var(--font-display);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .opening-card-stage {
+      display: grid;
+      width: 100%;
+      min-height: 100svh;
+      padding: clamp(12px, 3vw, 38px);
+      place-items: center;
+      overflow: visible;
+      background:
+        radial-gradient(ellipse at 50% 38%, rgba(255,255,255,.38), transparent 35rem),
+        var(--surround);
+    }
+
+    .opening-card {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      width: min(100%, 1180px, calc((100svh - 64px) * 1.54));
+      aspect-ratio: 1.54 / 1;
+      place-items: center;
+      overflow: visible;
+      padding: clamp(48px, 5vw, 82px) clamp(78px, 10vw, 166px);
+      background:
+        radial-gradient(ellipse at 52% 34%, rgba(255,255,255,.72), transparent 43%),
+        repeating-linear-gradient(94deg, rgba(99,71,41,.014) 0 1px, transparent 1px 7px),
+        var(--paper);
+      box-shadow:
+        0 22px 46px rgba(73,47,29,.14),
+        0 2px 6px rgba(73,47,29,.08),
+        inset 0 0 34px rgba(112,80,45,.045);
+    }
+
+    .opening-card::after {
+      content: "";
+      position: absolute;
+      z-index: 4;
+      inset: 0;
+      border: 1px solid rgba(142,109,64,.11);
+      box-shadow: inset 0 0 20px rgba(77,50,30,.035);
+      pointer-events: none;
+    }
+
+    .botanical {
+      position: absolute;
+      z-index: 1;
+      height: auto;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .botanical-top-left {
+      top: -6.8%;
+      left: -5.25%;
+      width: 33.2%;
+      transform: rotate(-2deg);
+      filter: brightness(1.06) saturate(.92) contrast(.97) drop-shadow(8px 14px 12px rgba(68,42,25,.14));
+    }
+
+    .botanical-bottom-right {
+      right: -4%;
+      bottom: -10%;
+      width: 34%;
+      transform: rotate(3deg);
+      filter: brightness(1.06) saturate(.92) contrast(.97) drop-shadow(-7px 13px 11px rgba(68,42,25,.14));
+    }
+
+    .opening-copy {
+      position: relative;
+      z-index: 3;
+      width: min(74%, 790px);
+      text-align: center;
+    }
+
+    .sprig {
+      display: block;
+      width: clamp(36px, 4.3vw, 54px);
+      height: auto;
+      margin: 0 auto clamp(22px, 2.7vw, 34px);
+      color: #a68a5c;
+    }
+
+    .kicker,
+    .formal-copy,
+    .date-row,
+    .time,
+    .place {
+      text-transform: uppercase;
+    }
+
+    .kicker {
+      margin: 0 0 clamp(25px, 3vw, 38px);
+      color: #50302b;
+      font-size: clamp(10px, 1.05vw, 13px);
+      line-height: 1.2;
+      letter-spacing: .42em;
+      white-space: nowrap;
+    }
+
+    .formal-copy {
+      display: grid;
+      gap: 5px;
+      margin-bottom: clamp(28px, 3.2vw, 42px);
+    }
+
+    .formal-copy p {
+      margin: 0;
+      font-size: clamp(9px, .93vw, 12px);
+      line-height: 1.35;
+      letter-spacing: .30em;
+    }
+
+    .couple-names {
+      display: flex;
+      width: 100%;
+      align-items: baseline;
+      justify-content: center;
+      gap: .16em;
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(58px, 6vw, 88px);
+      font-weight: 400;
+      line-height: .9;
+      letter-spacing: .105em;
+      text-indent: .105em;
+      white-space: nowrap;
+    }
+
+    .ampersand {
+      color: var(--gold);
+      font-family: var(--font-script);
+      font-size: .55em;
+      letter-spacing: 0;
+      text-indent: 0;
+      text-transform: lowercase;
+    }
+
+    .divider {
+      display: flex;
+      width: min(58%, 430px);
+      align-items: center;
+      gap: 14px;
+      margin: clamp(32px, 3.6vw, 50px) auto clamp(26px, 3vw, 40px);
+      color: #b49862;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: currentColor;
+      opacity: .65;
+    }
+
+    .divider span {
+      font-size: 15px;
+      transform: rotate(45deg);
+    }
+
+    .date-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      color: #4e302c;
+      font-size: clamp(12px, 1.35vw, 18px);
+      letter-spacing: .43em;
+    }
+
+    .date-row span {
+      padding-inline: clamp(14px, 2.3vw, 31px);
+      white-space: nowrap;
+    }
+
+    .date-row .day {
+      border-inline: 1px solid rgba(166,138,92,.58);
+      font-size: 1.45em;
+      letter-spacing: .16em;
+      text-indent: .16em;
+    }
+
+    .time {
+      margin: clamp(17px, 2vw, 25px) 0 0;
+      color: #5a4038;
+      font-size: clamp(8px, .88vw, 11px);
+      letter-spacing: .30em;
+    }
+
+    .venue-rule {
+      width: 38px;
+      height: 1px;
+      margin: clamp(17px, 2vw, 25px) auto clamp(12px, 1.4vw, 18px);
+      background: rgba(180,151,94,.62);
+    }
+
+    .place {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(8px, .82vw, 11px);
+      line-height: 1.3;
+      letter-spacing: .34em;
+    }
+
+    .place strong {
+      color: #684a40;
+      font-family: var(--font-script);
+      font-size: clamp(27px, 3vw, 42px);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: .01em;
+      text-transform: none;
+    }
+
+    .reception { margin-top: 3px; }
+
+    @media (max-width: 759px) {
+      .opening-card-stage { padding: 10px; }
+
+      .opening-card {
+        width: 100%;
+        min-height: calc(100svh - 20px);
+        aspect-ratio: auto;
+        padding: 96px 26px 82px;
+      }
+
+      .opening-copy { width: min(100%, 390px); }
+      .sprig { margin-bottom: 25px; }
+      .kicker { margin-bottom: 25px; font-size: 9px; letter-spacing: .30em; }
+      .formal-copy { gap: 4px; margin-bottom: 30px; }
+      .formal-copy p { font-size: 8px; letter-spacing: .20em; }
+
+      .couple-names {
+        gap: .10em;
+        font-size: clamp(38px, 11.4vw, 52px);
+        letter-spacing: .045em;
+        text-indent: .045em;
+      }
+
+      .ampersand { font-size: .60em; }
+      .divider { width: 64%; margin-block: 31px 28px; }
+      .date-row { font-size: 10px; letter-spacing: .24em; }
+      .date-row span { padding-inline: 10px; }
+      .time { max-width: 290px; margin-inline: auto; line-height: 1.6; letter-spacing: .22em; }
+      .place strong { font-size: 29px; }
+      .botanical-top-left { top: -1%; left: -2%; width: 44%; }
+      .botanical-bottom-right { right: 5%; bottom: -1%; width: 44%; }
+    }
+
+    @media (max-width: 430px) and (max-height: 740px) {
+      .opening-card { padding-block: 72px 60px; }
+      .sprig { margin-bottom: 15px; }
+      .kicker { margin-bottom: 17px; }
+      .formal-copy { margin-bottom: 20px; }
+      .divider { margin-block: 22px 19px; }
+      .time { margin-top: 13px; }
+      .venue-rule { margin-block: 13px 10px; }
+      .place { gap: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="opening-card-stage">
+    <article class="opening-card" aria-label="Wedding invitation opening card">
+      <img class="botanical botanical-top-left" src="assets/botanical-top-left.png" alt="" aria-hidden="true">
+      <img class="botanical botanical-bottom-right" src="assets/botanical-bottom-right.png" alt="" aria-hidden="true">
+
+      <div class="opening-copy">
+        <svg class="sprig" viewBox="0 0 64 30" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2">
+            <path d="M8 24C23 20 34 14 50 5"/>
+            <path d="M22 19c-6-5-8-9-7-13 6 2 9 6 9 11M32 14c-2-7 0-11 3-14 4 5 4 9 0 13M40 10c5-5 9-6 13-5-2 5-6 8-12 8M17 21c-5 1-9 0-12-3 4-3 9-2 14 1"/>
+          </g>
+        </svg>
+
+        <p class="kicker" data-field="kicker">Together with their families</p>
+
+        <div class="formal-copy">
+          <p data-field="invitationLineOne">You are joyfully invited to</p>
+          <p data-field="invitationLineTwo">Celebrate the wedding of</p>
+        </div>
+
+        <h1 class="couple-names">
+          <span data-field="firstName">Layla</span>
+          <span class="ampersand">and</span>
+          <span data-field="secondName">Zayn</span>
+        </h1>
+
+        <div class="divider" aria-hidden="true"><span>◇</span></div>
+
+        <p class="date-row">
+          <span data-field="month">August</span>
+          <span class="day" data-field="day">24</span>
+          <span data-field="year">2027</span>
+        </p>
+
+        <p class="time" data-field="time">Saturday, four thirty in the afternoon</p>
+        <div class="venue-rule" aria-hidden="true"></div>
+
+        <p class="place">
+          <strong data-field="venue">The Glasshouse Estate</strong>
+          <span data-field="location">Toronto, Ontario</span>
+          <span class="reception" data-field="reception">Reception to follow</span>
+        </p>
+      </div>
+    </article>
+  </main>
+
+  <script>
+    // Edit these values when reusing the card for another client.
+    const invitation = {
+      kicker: "Together with their families",
+      invitationLineOne: "You are joyfully invited to",
+      invitationLineTwo: "Celebrate the wedding of",
+      firstName: "Layla",
+      secondName: "Zayn",
+      month: "August",
+      day: "24",
+      year: "2027",
+      time: "Saturday, four thirty in the afternoon",
+      venue: "The Glasshouse Estate",
+      location: "Toronto, Ontario",
+      reception: "Reception to follow"
+    };
+
+    Object.entries(invitation).forEach(([field, value]) => {
+      document.querySelectorAll(`[data-field="${field}"]`).forEach((element) => {
+        element.textContent = value;
+      });
+    });
+  </script>
+</body>
+</html>
