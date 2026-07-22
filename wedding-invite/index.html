@@ -1315,15 +1315,7 @@
       background: #f5eee2;
     }
 
-    .botanical-details {
-      top: 10%;
-      left: -25%;
-      width: clamp(210px, 58vw, 430px);
-      opacity: .84;
-      transform: rotate(-10deg);
-    }
-
-    .details-section > :not(.botanical) { position: relative; z-index: 2; }
+    .details-section > * { position: relative; z-index: 2; }
     .details-section .section-title { max-width: 750px; margin-inline: auto; }
 
     .schedule {
@@ -1366,15 +1358,6 @@
     }
 
     .note-section::before { transform: scaleY(-1); top: -56px; }
-
-    .botanical-note {
-      z-index: 1;
-      right: -22%;
-      bottom: -4%;
-      width: clamp(230px, 64vw, 470px);
-      opacity: .74;
-      transform: rotate(5deg);
-    }
 
     .note-paper {
       z-index: 2;
@@ -1424,14 +1407,6 @@
     .rsvp-section .story-label { color: var(--story-gold); }
     .rsvp-section .section-title { position: relative; z-index: 2; }
     .rsvp-copy { position: relative; z-index: 2; color: var(--story-muted); }
-
-    .botanical-rsvp {
-      left: -25%;
-      bottom: -15%;
-      width: clamp(250px, 70vw, 520px);
-      opacity: .72;
-      transform: rotate(8deg);
-    }
 
     .rsvp-button {
       position: relative;
@@ -2216,7 +2191,6 @@
           </section>
 
           <section class="story-section details-section" aria-labelledby="dayTitle">
-            <img class="botanical botanical-details" src="invitation-assets/botanical-left.png" alt="" aria-hidden="true">
             <p class="story-label reveal">The wedding day</p>
             <h2 class="section-title reveal" id="dayTitle">One afternoon.<br>One unforgettable evening.</h2>
             <div class="section-rule reveal" aria-hidden="true"><span>✦</span></div>
@@ -2244,7 +2218,6 @@
           </section>
 
           <section class="story-section note-section" aria-labelledby="noteTitle">
-            <img class="botanical botanical-note" src="invitation-assets/botanical-right.png" alt="" aria-hidden="true">
             <div class="note-paper reveal">
               <p class="story-label">A note from us</p>
               <h2 class="section-title" id="noteTitle">Your presence is part of the story.</h2>
@@ -2275,7 +2248,6 @@
           </section>
 
           <section class="story-section rsvp-section" id="rsvp" aria-labelledby="rsvpTitle">
-            <img class="botanical botanical-rsvp" src="invitation-assets/botanical-left.png" alt="" aria-hidden="true">
             <p class="story-label reveal">Kindly reply</p>
             <h2 class="section-title reveal" id="rsvpTitle">Will you join us?</h2>
             <p class="rsvp-copy reveal">Please send your response by 1 August 2027. We cannot wait to celebrate with you.</p>
