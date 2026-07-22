@@ -99,7 +99,8 @@
       transform: none;
       transform-origin: 50% 50%;
       background:
-        linear-gradient(105deg, rgba(255,255,255,.25), transparent 38%, rgba(116,84,48,.025)),
+        linear-gradient(rgba(250,247,241,.08), rgba(250,247,241,.08)),
+        url("invitation-assets/invitation-background-long.png") center / cover no-repeat,
         #f1e8d8;
       box-shadow: inset 0 0 40px rgba(103,74,39,.05);
       pointer-events: none;
@@ -183,11 +184,7 @@
       min-height: 100%;
       overflow: hidden;
       color: var(--story-ink);
-      background:
-        radial-gradient(circle at 17% 5%, rgba(255,255,255,.56), transparent 25rem),
-        radial-gradient(circle at 84% 42%, rgba(193,159,104,.09), transparent 28rem),
-        repeating-linear-gradient(96deg, rgba(106,77,44,.018) 0 1px, transparent 1px 5px),
-        #f2eadc;
+      background: transparent;
       font-family: var(--font-body);
     }
 
@@ -211,12 +208,6 @@
       width: min(100%, 980px);
       margin: 0 auto;
       overflow: visible;
-      background-image:
-        linear-gradient(rgba(250,247,241,.10), rgba(250,247,241,.10)),
-        url("invitation-assets/invitation-background-long.png");
-      background-position: center top;
-      background-repeat: repeat-y;
-      background-size: 100% auto;
       box-shadow: 0 0 42px rgba(83,53,31,.06);
     }
 
@@ -1293,26 +1284,12 @@
       isolation: isolate;
     }
 
-    .note-section::before,
-    .rsvp-section::before {
-      content: "";
-      position: absolute;
-      z-index: 3;
-      top: -78px;
-      left: 0;
-      width: 100%;
-      height: 135px;
-      background: url("invitation-assets/deckled-edge.png") center top / 100% 100% no-repeat;
-      pointer-events: none;
-      filter: drop-shadow(0 7px 7px rgba(87,56,34,.06));
-    }
-
     .details-section {
       z-index: 1;
       padding-top: clamp(105px, 17vh, 165px);
       padding-bottom: clamp(135px, 22vh, 220px);
       border: 0;
-      background: #f5eee2;
+      background: transparent;
     }
 
     .details-section > * { position: relative; z-index: 2; }
@@ -1354,10 +1331,8 @@
     .note-section {
       padding-top: clamp(160px, 25vh, 250px);
       padding-bottom: clamp(145px, 23vh, 230px);
-      background: #e8dac5;
+      background: transparent;
     }
-
-    .note-section::before { transform: scaleY(-1); top: -56px; }
 
     .note-paper {
       z-index: 2;
@@ -1376,7 +1351,7 @@
     .guest-section {
       padding-top: clamp(160px, 25vh, 245px);
       padding-bottom: clamp(145px, 23vh, 230px);
-      background: #f2e9da;
+      background: transparent;
     }
 
     .guest-grid {
@@ -1400,10 +1375,8 @@
       padding-top: clamp(175px, 27vh, 265px);
       padding-bottom: clamp(155px, 25vh, 250px);
       color: var(--story-ink);
-      background: #f7efe3;
+      background: transparent;
     }
-
-    .rsvp-section::before { top: -58px; }
     .rsvp-section .story-label { color: var(--story-gold); }
     .rsvp-section .section-title { position: relative; z-index: 2; }
     .rsvp-copy { position: relative; z-index: 2; color: var(--story-muted); }
@@ -1487,8 +1460,6 @@
 
       .guest-card:last-child { border-right: 1px solid rgba(173,134,68,.42); }
       .note-paper { margin-left: 7%; }
-      .note-section::before,
-      .rsvp-section::before { top: -110px; height: 195px; }
     }
 
     @media (min-width: 1000px) {
