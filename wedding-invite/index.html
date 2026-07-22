@@ -903,7 +903,7 @@
       z-index: 7;
       left: 50%;
       top: 63.6%;
-      width: 23.15%;
+      width: 25%;
       aspect-ratio: 1;
       transform: translate(-50%, -50%);
       padding: 0;
@@ -938,8 +938,9 @@
       display: block;
       width: 100%;
       height: 100%;
-      overflow: visible;
-      filter: drop-shadow(0 5px 4px rgba(52,26,16,.34));
+      object-fit: contain;
+      transform: rotate(-3deg);
+      filter: drop-shadow(0 8px 7px rgba(52,26,16,.38));
     }
 
     .footer {
@@ -2064,46 +2065,7 @@
         </div>
 
         <div class="seal-button" id="seal" aria-hidden="true">
-          <svg class="seal-art" viewBox="0 0 200 200" aria-hidden="true">
-            <defs>
-              <radialGradient id="waxFill" cx="34%" cy="26%" r="79%">
-                <stop offset="0" stop-color="#93443f"/>
-                <stop offset=".27" stop-color="#722526"/>
-                <stop offset=".66" stop-color="#561617"/>
-                <stop offset="1" stop-color="#310809"/>
-              </radialGradient>
-              <radialGradient id="waxCenter" cx="35%" cy="27%" r="78%">
-                <stop offset="0" stop-color="#78302d"/>
-                <stop offset=".48" stop-color="#60201f"/>
-                <stop offset="1" stop-color="#401011"/>
-              </radialGradient>
-              <linearGradient id="rimLight" x1=".14" y1=".08" x2=".84" y2=".92">
-                <stop offset="0" stop-color="#d17d6d" stop-opacity=".72"/>
-                <stop offset=".34" stop-color="#8e3b36" stop-opacity=".2"/>
-                <stop offset=".7" stop-color="#260506" stop-opacity=".15"/>
-                <stop offset="1" stop-color="#190304" stop-opacity=".84"/>
-              </linearGradient>
-              <filter id="waxDepth" x="-18%" y="-18%" width="136%" height="142%">
-                <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#180203" flood-opacity=".8"/>
-                <feDropShadow dx="0" dy="7" stdDeviation="4" flood-color="#3a1710" flood-opacity=".42"/>
-              </filter>
-              <filter id="centerDepth" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="1.5" dy="2.5" stdDeviation="2.5" flood-color="#1a0203" flood-opacity=".76"/>
-              </filter>
-            </defs>
-            <path d="M100 9C107.2 9 114.2 16.8 121.7 18.9 129.3 20.9 139.2 17.6 145.5 21.2 151.8 24.8 153.8 35.1 159.4 40.6 164.9 46.2 175.2 48.2 178.8 54.5 182.4 60.8 179.1 70.7 181.1 78.3 183.2 85.8 191 92.8 191 100 191 107.2 183.2 114.2 181.1 121.7 179.1 129.3 182.4 139.2 178.8 145.5 175.2 151.8 164.9 153.8 159.4 159.4 153.8 164.9 151.8 175.2 145.5 178.8 139.2 182.4 129.3 179.1 121.7 181.1 114.2 183.2 107.2 191 100 191 92.8 191 85.8 183.2 78.3 181.1 70.7 179.1 60.8 182.4 54.5 178.8 48.2 175.2 46.2 164.9 40.6 159.4 35.1 153.8 24.8 151.8 21.2 145.5 17.6 139.2 20.9 129.3 18.9 121.7 16.8 114.2 9 107.2 9 100 9 92.8 16.8 85.8 18.9 78.3 20.9 70.7 17.6 60.8 21.2 54.5 24.8 48.2 35.1 46.2 40.6 40.6 46.2 35.1 48.2 24.8 54.5 21.2 60.8 17.6 70.7 20.9 78.3 18.9 85.8 16.8 92.8 9 100 9Z" fill="url(#waxFill)" stroke="#36090a" stroke-width="3" filter="url(#waxDepth)"/>
-            <path d="M100 9C107.2 9 114.2 16.8 121.7 18.9 129.3 20.9 139.2 17.6 145.5 21.2 151.8 24.8 153.8 35.1 159.4 40.6 164.9 46.2 175.2 48.2 178.8 54.5 182.4 60.8 179.1 70.7 181.1 78.3 183.2 85.8 191 92.8 191 100 191 107.2 183.2 114.2 181.1 121.7 179.1 129.3 182.4 139.2 178.8 145.5 175.2 151.8 164.9 153.8 159.4 159.4 153.8 164.9 151.8 175.2 145.5 178.8 139.2 182.4 129.3 179.1 121.7 181.1 114.2 183.2 107.2 191 100 191 92.8 191 85.8 183.2 78.3 181.1 70.7 179.1 60.8 182.4 54.5 178.8 48.2 175.2 46.2 164.9 40.6 159.4 35.1 153.8 24.8 151.8 21.2 145.5 17.6 139.2 20.9 129.3 18.9 121.7 16.8 114.2 9 107.2 9 100 9 92.8 16.8 85.8 18.9 78.3 20.9 70.7 17.6 60.8 21.2 54.5 24.8 48.2 35.1 46.2 40.6 40.6 46.2 35.1 48.2 24.8 54.5 21.2 60.8 17.6 70.7 20.9 78.3 18.9 85.8 16.8 92.8 9 100 9Z" fill="none" stroke="url(#rimLight)" stroke-width="8" transform="translate(100 100) scale(.88) translate(-100 -100)"/>
-            <circle cx="100" cy="100" r="73" fill="#2f090a" opacity=".88"/>
-            <circle cx="100" cy="100" r="69" fill="url(#waxCenter)" stroke="#b36a5a" stroke-opacity=".58" stroke-width="2.2" filter="url(#centerDepth)"/>
-            <circle cx="100" cy="100" r="64.5" fill="none" stroke="#250506" stroke-opacity=".76" stroke-width="1.6"/>
-            <path d="M46 69A67 67 0 0 1 151 55" fill="none" stroke="#efaa91" stroke-opacity=".2" stroke-width="3" stroke-linecap="round"/>
-            <g fill="#d7b66f" stroke="#3c0c0e" stroke-opacity=".38" stroke-width=".8" font-family="Bodoni 72, Didot, Times New Roman, serif" text-anchor="middle">
-              <text x="100" y="86" font-size="45">A</text>
-              <path d="M57 103H143" fill="none" stroke="#d7b66f" stroke-width="1.7"/>
-              <circle cx="100" cy="103" r="2.5" stroke="none"/>
-              <text x="100" y="148" font-size="45">E</text>
-            </g>
-          </svg>
+          <img class="seal-art" src="invitation-assets/wax-seal-ae.png" alt="" aria-hidden="true">
         </div>
       </div>
 
