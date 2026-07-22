@@ -60,26 +60,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      z-index: 0;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      background:
-        url("invitation-assets/invitation-background-optimized.jpg") center / cover no-repeat,
-        var(--ivory);
-      pointer-events: none;
-      transform: translate3d(0,0,0);
-      backface-visibility: hidden;
-      transition: none;
-    }
-
-    .invitation-opening body::before,
-    .invitation-returning body::before { opacity: 1; }
-
     button { font: inherit; color: inherit; }
 
     .open-control {
@@ -122,7 +102,12 @@
       visibility: hidden;
       transform: none;
       transform-origin: 50% 50%;
-      background: transparent;
+      background-color: var(--ivory);
+      background-image: url("invitation-assets/invitation-background-optimized.jpg");
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-attachment: scroll;
       box-shadow: none;
       pointer-events: none;
     }
@@ -156,7 +141,6 @@
 
     .invitation-page.is-ready,
     .invitation-returning .invitation-page {
-      background: transparent;
       box-shadow: none;
     }
 
