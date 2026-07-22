@@ -11,6 +11,7 @@
   <meta property="og:image" content="og.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="og.png">
+  <link rel="preload" href="invitation-assets/invitation-background-sharp-v2.png" as="image">
   <title>Layla &amp; Zayn — A Private Invitation</title>
   <script>
     try {
@@ -54,6 +55,25 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    body::before {
+      content: "";
+      position: fixed;
+      z-index: 0;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      background:
+        url("invitation-assets/invitation-background-sharp-v2.png") center / cover no-repeat,
+        #f1e8d8;
+      pointer-events: none;
+      transform: translate3d(0,0,0);
+      backface-visibility: hidden;
+      transition: opacity .18s ease;
+    }
+
+    .invitation-returning body::before { opacity: 1; }
+
     button { font: inherit; color: inherit; }
 
     .open-control {
@@ -80,6 +100,7 @@
 
     .page {
       position: fixed;
+      z-index: 1;
       inset: 0;
       display: grid;
       place-items: center;
@@ -98,9 +119,7 @@
       visibility: hidden;
       transform: none;
       transform-origin: 50% 50%;
-      background:
-        url("invitation-assets/invitation-background-sharp-v2.png") center / cover no-repeat,
-        #f1e8d8;
+      background: #f1e8d8;
       box-shadow: inset 0 0 40px rgba(103,74,39,.05);
       pointer-events: none;
     }
@@ -119,6 +138,12 @@
       overscroll-behavior-y: contain;
       -webkit-overflow-scrolling: touch;
       pointer-events: auto;
+    }
+
+    .invitation-page.is-ready,
+    .invitation-returning .invitation-page {
+      background: transparent;
+      box-shadow: none;
     }
 
     .invitation-returning .page { visibility: hidden; }
