@@ -1,0 +1,2069 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f8f5ee">
+  <meta name="description" content="Green sage wedding invitation for Layla and Zayn on 24 August 2027.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Green Sage – Wedding Invite — Layla &amp; Zayn">
+  <meta property="og:description" content="Join us in Toronto on 24 August 2027.">
+  <meta property="og:image" content="og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="og.png">
+  <link rel="preload" href="invitation-assets/invitation-background-optimized.jpg" as="image">
+  <link rel="preload" href="invitation-assets/envelope-liner-optimized.jpg" as="image">
+  <link rel="preload" href="invitation-assets/wax-seal-blank-optimized.png" as="image">
+  <title>Green Sage – Wedding Invite — Layla &amp; Zayn</title>
+  <script>
+    try {
+      if (localStorage.getItem('weddingInvitationOpened') === 'true') {
+        document.documentElement.classList.add('invitation-returning');
+      }
+    } catch (error) {
+      // The invitation still works when browser storage is unavailable.
+    }
+  </script>
+  <style>
+    @font-face {
+      font-family: "Invitation Didone";
+      src: local("Didot"), local("Bodoni 72"), local("Bodoni MT"), local("Bodoni Moda");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    :root {
+      --ivory: #f8f5ee;
+      --brown: #4b2b24;
+      --muted: #66524a;
+      --gold: #aa8848;
+      --floral-image: url("invitation-assets/envelope-liner-optimized.jpg");
+      --wax: #5b181a;
+      --font-display: "Invitation Didone", Didot, "Bodoni 72", "Bodoni MT", "Times New Roman", serif;
+      --font-body: Baskerville, "Baskerville Old Face", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      --font-script: "Snell Roundhand", "Apple Chancery", "Brush Script MT", cursive;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; min-height: 100%; }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 36%, rgba(255,255,255,.42), transparent 55%),
+        linear-gradient(106deg, rgba(119,88,52,.018), transparent 25%, rgba(255,255,255,.10) 53%, transparent 80%),
+        var(--ivory);
+      color: var(--brown);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; color: inherit; }
+
+    .open-control {
+      position: absolute;
+      z-index: 100;
+      left: 50%;
+      top: calc(50% + min(9.63vw, 5.42svh));
+      width: min(20.6vw, 11.59svh);
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      opacity: .001;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .open-control:checked { pointer-events: none; }
+
+    .page {
+      position: fixed;
+      z-index: 1;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .invitation-page {
+      position: fixed;
+      z-index: 60;
+      inset: 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: none;
+      transform-origin: 50% 50%;
+      background-color: var(--ivory);
+      background-image: url("invitation-assets/invitation-background-optimized.jpg");
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-attachment: scroll;
+      box-shadow: none;
+      pointer-events: none;
+    }
+
+    .invitation-page.is-preparing,
+    .invitation-page.is-revealing {
+      opacity: 1;
+      visibility: visible;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .invitation-page.is-preparing .reference-card { opacity: 0; }
+
+    .invitation-page.is-revealing .reference-card {
+      animation: openingCardReveal .86s cubic-bezier(.2,.72,.18,1) both;
+      will-change: transform, opacity;
+    }
+
+    .invitation-page.is-ready {
+      animation: none;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+      pointer-events: auto;
+    }
+
+    .invitation-page.is-ready,
+    .invitation-returning .invitation-page {
+      box-shadow: none;
+    }
+
+    .invitation-returning .page { visibility: hidden; }
+
+    .invitation-returning .invitation-page {
+      opacity: 1;
+      visibility: visible;
+      overflow-x: hidden;
+      overflow-y: auto;
+      pointer-events: auto;
+    }
+
+    .replay-opening {
+      position: fixed;
+      z-index: 80;
+      top: max(16px, env(safe-area-inset-top));
+      right: max(16px, env(safe-area-inset-right));
+      min-height: 38px;
+      padding: 10px 15px 9px;
+      border: 1px solid rgba(123,91,50,.34);
+      color: #5b3931;
+      background: rgba(248,241,230,.88);
+      box-shadow: 0 7px 18px rgba(69,44,27,.09);
+      font-family: var(--font-display);
+      font-size: 9px;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: .20em;
+      text-transform: uppercase;
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      cursor: pointer;
+      transition: color .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .replay-opening:hover,
+    .replay-opening:focus-visible {
+      border-color: #6a2a2b;
+      color: #f8f0e4;
+      background: #6a2a2b;
+      outline: none;
+    }
+
+    @media (max-width: 520px) {
+      .replay-opening {
+        top: max(10px, env(safe-area-inset-top));
+        right: max(10px, env(safe-area-inset-right));
+        min-height: 34px;
+        padding: 9px 11px 8px;
+        font-size: 8px;
+        letter-spacing: .16em;
+      }
+    }
+
+    .story-page {
+      --story-ink: #4a2824;
+      --story-muted: #756159;
+      --story-gold: #ad8644;
+      --story-wax: #651d20;
+      position: relative;
+      isolation: isolate;
+      min-height: 100%;
+      overflow: hidden;
+      color: var(--story-ink);
+      background: transparent;
+      font-family: var(--font-body);
+    }
+
+    .story-shell {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      overflow: visible;
+      box-shadow: 0 0 42px rgba(83,53,31,.06);
+    }
+
+    .story-section {
+      position: relative;
+      padding-inline: clamp(28px, 8vw, 108px);
+    }
+
+    .story-kicker,
+    .story-label {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(10px, 2.7vw, 13px);
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: .34em;
+      text-transform: uppercase;
+    }
+
+    .story-label { color: var(--story-gold); }
+
+    .hero-invite {
+      display: grid;
+      isolation: isolate;
+      min-height: 100svh;
+      align-content: center;
+      justify-items: center;
+      padding-top: max(70px, env(safe-area-inset-top));
+      padding-bottom: max(72px, env(safe-area-inset-bottom));
+      text-align: center;
+    }
+
+    .hero-invite .story-kicker {
+      max-width: 330px;
+      margin-bottom: clamp(30px, 5vh, 48px);
+      line-height: 1.7;
+    }
+
+    .couple-names {
+      margin: 0;
+      font-size: clamp(72px, 20vw, 166px);
+      font-weight: 400;
+      line-height: .78;
+      letter-spacing: -.075em;
+      text-shadow: 0 1px rgba(255,255,255,.45);
+    }
+
+    .couple-names span { display: block; }
+    .couple-names .ampersand {
+      margin: .16em 0 .12em;
+      color: var(--story-gold);
+      font-size: .58em;
+      font-style: italic;
+      letter-spacing: 0;
+    }
+
+    .hero-place {
+      margin: 10px 0 0;
+      color: var(--story-muted);
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+    }
+
+    .portrait-section {
+      display: grid;
+      gap: clamp(34px, 9vw, 74px);
+      align-items: center;
+      padding-top: clamp(90px, 18vh, 170px);
+      padding-bottom: clamp(110px, 20vh, 190px);
+    }
+
+    .portrait-card {
+      position: relative;
+      width: min(86vw, 480px);
+      margin: 0 auto;
+      padding: clamp(10px, 2.4vw, 15px);
+      background: #f7f0e4;
+      box-shadow: 0 20px 38px rgba(78,50,29,.16), 0 2px 5px rgba(78,50,29,.10);
+      transform: rotate(-2.2deg);
+    }
+
+    .portrait-art {
+      display: grid;
+      aspect-ratio: 4 / 5;
+      place-items: center;
+      overflow: hidden;
+      color: #f6e7cc;
+      background:
+        linear-gradient(170deg, rgba(60,24,22,.07), rgba(50,20,18,.55)),
+        var(--floral-image) center / cover no-repeat;
+    }
+
+    .portrait-art span {
+      display: grid;
+      width: 106px;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid rgba(239,211,157,.72);
+      border-radius: 50%;
+      background: rgba(77,22,23,.55);
+      box-shadow: 0 12px 30px rgba(34,15,12,.25);
+      backdrop-filter: blur(3px);
+      font-size: 28px;
+      letter-spacing: .18em;
+      text-indent: .18em;
+    }
+
+    .portrait-card::after {
+      content: "24 · VIII · 27";
+      display: block;
+      padding: 13px 5px 3px;
+      color: var(--story-muted);
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: .28em;
+      text-align: center;
+    }
+
+    .portrait-copy { max-width: 480px; margin: 0 auto; text-align: center; }
+    .portrait-copy h2,
+    .section-title {
+      margin: 16px 0 22px;
+      font-family: var(--font-display);
+      font-size: clamp(40px, 11.5vw, 72px);
+      font-weight: 400;
+      line-height: .98;
+      letter-spacing: -.035em;
+    }
+
+    .portrait-copy p,
+    .note-copy,
+    .rsvp-copy {
+      margin: 0;
+      color: var(--story-muted);
+      font-size: clamp(17px, 4.6vw, 21px);
+      line-height: 1.7;
+    }
+
+    .details-section {
+      padding-top: clamp(96px, 16vh, 160px);
+      padding-bottom: clamp(90px, 17vh, 170px);
+      text-align: center;
+      background: rgba(255,255,255,.16);
+      border-block: 1px solid rgba(173,135,65,.20);
+    }
+
+    .section-rule {
+      display: flex;
+      width: min(290px, 75%);
+      align-items: center;
+      gap: 12px;
+      margin: 28px auto 54px;
+      color: var(--story-gold);
+    }
+
+    .section-rule::before,
+    .section-rule::after { content: ""; height: 1px; flex: 1; background: currentColor; opacity: .62; }
+    .section-rule span { font-size: 15px; }
+
+    .schedule {
+      display: grid;
+      max-width: 780px;
+      gap: 1px;
+      margin: 0 auto;
+      background: rgba(173,135,65,.28);
+    }
+
+    .schedule-item {
+      padding: 38px 24px;
+      background: #f2eadc;
+    }
+
+    .schedule-number {
+      display: block;
+      margin-bottom: 18px;
+      color: var(--story-gold);
+      font-family: var(--font-display);
+      font-size: 35px;
+      line-height: 1;
+    }
+
+    .schedule-item h3,
+    .guest-card h3 {
+      margin: 0 0 10px;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+    }
+
+    .schedule-item p,
+    .guest-card p {
+      margin: 0;
+      color: var(--story-muted);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .venue-card {
+      max-width: 620px;
+      margin: 56px auto 0;
+      padding: 35px 26px;
+      background: rgba(255,255,255,.28);
+      box-shadow: 0 12px 28px rgba(83,53,31,.07);
+      transform: rotate(.6deg);
+    }
+
+    .venue-card strong { display: block; margin-bottom: 8px; font-family: var(--font-display); font-size: 22px; font-weight: 400; }
+    .venue-card span { color: var(--story-muted); font-family: var(--font-display); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+
+    .note-section {
+      padding-top: clamp(120px, 21vh, 210px);
+      padding-bottom: clamp(120px, 21vh, 210px);
+    }
+
+    .note-paper {
+      position: relative;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: clamp(52px, 12vw, 92px) clamp(32px, 9vw, 72px);
+      background: #eadac3;
+      box-shadow: 0 18px 44px rgba(82,47,28,.13);
+      transform: rotate(-.7deg);
+    }
+
+    .note-paper::before {
+      content: "";
+      position: absolute;
+      top: -18px;
+      right: 12%;
+      width: 84px;
+      height: 42px;
+      background: rgba(105,29,30,.78);
+      box-shadow: 0 7px 15px rgba(67,27,21,.18);
+      transform: rotate(7deg);
+      opacity: .82;
+    }
+
+    .note-paper .section-title { font-size: clamp(38px, 10vw, 66px); }
+    .note-copy { max-width: 480px; }
+
+    .guest-section {
+      padding-top: clamp(96px, 17vh, 170px);
+      padding-bottom: clamp(110px, 20vh, 190px);
+      text-align: center;
+    }
+
+    .guest-grid {
+      display: grid;
+      max-width: 780px;
+      gap: 18px;
+      margin: 54px auto 0;
+    }
+
+    .guest-card {
+      padding: 38px 26px;
+      border: 1px solid rgba(173,135,65,.30);
+      background: rgba(255,255,255,.17);
+    }
+
+    .guest-symbol {
+      display: block;
+      margin-bottom: 21px;
+      color: var(--story-gold);
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .rsvp-section {
+      padding-top: clamp(105px, 19vh, 190px);
+      padding-bottom: clamp(120px, 23vh, 220px);
+      text-align: center;
+      background: #5b1c1e;
+      color: #f2e6d3;
+    }
+
+    .rsvp-section .story-label { color: #d6ae64; }
+    .rsvp-section .section-title { margin-inline: auto; max-width: 700px; }
+    .rsvp-copy { max-width: 560px; margin-inline: auto; color: rgba(242,230,211,.76); }
+
+    .rsvp-button {
+      display: inline-flex;
+      min-width: 230px;
+      min-height: 58px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 46px;
+      border: 1px solid #d6ae64;
+      color: #f2e6d3;
+      background: transparent;
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: .3em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color .25s ease, background .25s ease;
+    }
+
+    .rsvp-button:hover,
+    .rsvp-button:focus-visible { color: #5b1c1e; background: #d6ae64; outline: 0; }
+
+    .rsvp-feedback {
+      min-height: 1.5em;
+      margin: 22px 0 0;
+      color: rgba(242,230,211,.68);
+      font-family: var(--font-display);
+      font-size: 10px;
+      line-height: 1.5;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .closing-section {
+      display: grid;
+      min-height: 80svh;
+      align-content: center;
+      justify-items: center;
+      padding-top: 110px;
+      padding-bottom: max(100px, env(safe-area-inset-bottom));
+      text-align: center;
+    }
+
+    .closing-script { margin: 0 0 28px; font-family: var(--font-script); font-size: clamp(38px, 10vw, 64px); font-style: normal; line-height: 1.1; }
+    .closing-names { margin: 0; font-family: var(--font-display); font-size: 11px; letter-spacing: .34em; text-transform: uppercase; }
+
+    .closing-seal {
+      display: grid;
+      position: relative;
+      width: 76px;
+      aspect-ratio: 1;
+      place-items: center;
+      margin-top: 52px;
+      border: 7px double #722326;
+      border-radius: 45% 55% 48% 52% / 55% 45% 53% 47%;
+      color: #d6ae64;
+      background: #5c1b1e;
+      box-shadow: 0 9px 15px rgba(70,31,22,.22);
+      font-size: 18px;
+      letter-spacing: .12em;
+      text-indent: .12em;
+      transform: rotate(-6deg);
+      --seal-letter-size: 23px;
+    }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
+    .reveal.is-visible { opacity: 1; transform: none; }
+
+    @media (min-width: 700px) {
+      .portrait-section { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); }
+      .portrait-copy { text-align: left; }
+      .schedule { grid-template-columns: repeat(3, 1fr); }
+      .guest-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .rsvp-button { transition: none; }
+    }
+
+    .artboard {
+      position: relative;
+      isolation: isolate;
+      container-type: inline-size;
+      width: min(100vw, 56.2724svh);
+      aspect-ratio: 942 / 1674;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity .24s ease;
+    }
+
+    .artboard.opening-complete {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .paper-texture {
+      position: absolute;
+      z-index: 30;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: .18;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    .heading {
+      position: absolute;
+      z-index: 5;
+      top: 14.45%;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      text-transform: uppercase;
+      transition: top 1.05s cubic-bezier(.22,.72,.18,1);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 2.82cqw;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: .44em;
+      color: #4e2c25;
+      white-space: nowrap;
+    }
+
+    .subtitle {
+      margin: 3.2% 0 0;
+      font-family: var(--font-display);
+      font-size: 1.36cqw;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: .54em;
+      color: #6b5148;
+    }
+
+    .top-ornament {
+      display: block;
+      width: 12.1%;
+      height: auto;
+      margin: 3.05% auto 0;
+      overflow: visible;
+    }
+
+    .envelope-wrap {
+      position: absolute;
+      z-index: 4;
+      top: 29.09%;
+      left: 5.52%;
+      width: 88.96%;
+      height: 41.40%;
+      perspective: 1200px;
+      transform-style: preserve-3d;
+      box-shadow:
+        7px 15px 13px rgba(77, 51, 25, .20),
+        1px 3px 4px rgba(91, 65, 37, .10);
+      transition:
+        top 1.05s cubic-bezier(.22,.72,.18,1),
+        left 1.05s cubic-bezier(.22,.72,.18,1),
+        width 1.05s cubic-bezier(.22,.72,.18,1),
+        height 1.05s cubic-bezier(.22,.72,.18,1),
+        box-shadow 1.05s ease;
+    }
+
+    .envelope-art {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .liner-body {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      opacity: 0;
+      clip-path: polygon(0 0, 100% 0, 100% 8%, 62% 56%, 57% 69%, 43% 69%, 38% 56%, 0 8%);
+      background:
+        linear-gradient(rgba(74,35,22,.04), rgba(55,25,16,.13)),
+        var(--floral-image) center 36% / cover no-repeat;
+      box-shadow: none;
+      transition: opacity .01s linear;
+    }
+
+    .liner-unified {
+      position: absolute;
+      z-index: 1;
+      top: -60.6%;
+      left: 0;
+      width: 100%;
+      height: 129.6%;
+      opacity: 0;
+      background:
+        linear-gradient(rgba(74,35,22,.035), rgba(55,25,16,.10)),
+        var(--floral-image) center / cover no-repeat;
+      clip-path: polygon(
+        0 46.8%,
+        50% 2%,
+        100% 46.8%,
+        100% 51.1%,
+        62% 76.6%,
+        57% 83.5%,
+        43% 83.5%,
+        38% 76.6%,
+        0 51.1%
+      );
+      pointer-events: none;
+      transform: translateZ(0);
+    }
+
+    .artboard.liner-ready .liner-unified { opacity: 1; }
+    .artboard.liner-ready .liner-body,
+    .artboard.liner-ready .flap-back { opacity: 0; }
+
+    .invitation-card {
+      position: absolute;
+      z-index: 2;
+      top: 9%;
+      left: 2%;
+      width: 96%;
+      height: 82%;
+      opacity: 0;
+      transform-origin: 50% 50%;
+      background:
+        linear-gradient(105deg, rgba(255,255,255,.26), transparent 34%, rgba(116,84,48,.025)),
+        #f1e8d8;
+      border: 0;
+      box-shadow:
+        0 3px 5px rgba(75,49,25,.09),
+        0 10px 18px rgba(67,44,24,.08);
+      will-change: transform, opacity;
+    }
+
+    .pocket-art {
+      position: absolute;
+      z-index: 3;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .flap {
+      position: absolute;
+      z-index: 6;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60.6%;
+      transform: rotateX(0deg);
+      transform-origin: 50% 0;
+      transform-style: preserve-3d;
+      transition: transform 1.15s cubic-bezier(.24,.68,.17,1), z-index 0s .58s;
+      will-change: transform;
+    }
+
+    .flap-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: visible;
+      -webkit-backface-visibility: visible;
+      transition: none;
+    }
+
+    .flap-face svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .flap-front { opacity: 1; }
+    .flap-back { opacity: 0; }
+
+    #openControl:checked + .artboard .heading { top: 8.78%; }
+
+    #openControl:checked + .artboard .envelope-wrap {
+      top: 42.52%;
+      left: 6.5%;
+      width: 87%;
+      height: 40.1%;
+      box-shadow:
+        7px 17px 15px rgba(77,51,25,.22),
+        1px 3px 4px rgba(91,65,37,.1);
+    }
+
+    #openControl:checked + .artboard .flap {
+      z-index: 1;
+      transform: rotateX(180deg);
+    }
+
+    #openControl:checked + .artboard .flap-front { opacity: 0; }
+    #openControl:checked + .artboard .flap-back { opacity: 1; }
+    #openControl:checked + .artboard .liner-body { opacity: 1; }
+    .artboard.card-pulling .invitation-card {
+      animation: cardJourney 2.1s linear forwards;
+    }
+
+    #openControl:checked + .artboard .envelope-wrap { z-index: 40; }
+
+    @keyframes cardJourney {
+      0% {
+        z-index: 2;
+        opacity: 0;
+        transform: translateY(0) rotate(0deg) scale(1);
+      }
+      5%, 42% {
+        z-index: 2;
+        opacity: 1;
+        transform: translateY(0) rotate(0deg) scale(1);
+      }
+      43% {
+        z-index: 2;
+        opacity: 1;
+        transform: translateY(0) rotate(0deg) scale(1);
+        animation-timing-function: cubic-bezier(.2,.72,.18,1);
+      }
+      57% {
+        z-index: 2;
+        opacity: 1;
+        transform: translateY(-67cqw) rotate(0deg) scale(1);
+      }
+      58%, 67% {
+        z-index: 8;
+        opacity: 1;
+        transform: translateY(-67cqw) rotate(0deg) scale(1);
+        animation-timing-function: cubic-bezier(.4,0,.2,1);
+      }
+      82% {
+        z-index: 8;
+        opacity: 1;
+        transform: translateY(-67cqw) rotate(90deg) scale(1);
+        animation-timing-function: cubic-bezier(.2,.72,.18,1);
+      }
+      100% {
+        z-index: 8;
+        opacity: 1;
+        transform: translateY(-67cqw) rotate(90deg) scale(1);
+      }
+    }
+
+    @keyframes openingCardReveal {
+      from {
+        opacity: 1;
+        transform:
+          translate(var(--page-start-x), var(--page-start-y))
+          scale(var(--page-start-scale-x), var(--page-start-scale-y));
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .seal-button {
+      position: absolute;
+      z-index: 7;
+      left: 50%;
+      top: 63.6%;
+      width: 25%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform .22s ease, filter .22s ease, opacity .22s ease;
+      --seal-letter-size: clamp(20px, 6.6cqw, 42px);
+    }
+
+    .seal-button:active,
+    .seal-button.is-tapped,
+    #openControl:checked + .artboard .seal-button {
+      transform: translate(-50%, -48%) scale(.86);
+      filter: brightness(.9);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .seal-button:focus-visible {
+      outline: 1px solid var(--gold);
+      outline-offset: 7px;
+    }
+
+    #openControl:focus-visible + .artboard .seal-button {
+      outline: 1px solid var(--gold);
+      outline-offset: 7px;
+    }
+
+    .seal-art {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transform: rotate(-3deg);
+      filter: drop-shadow(0 8px 7px rgba(52,26,16,.38));
+    }
+
+    .seal-initials {
+      position: absolute;
+      inset: 24%;
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      row-gap: .06em;
+      place-items: center;
+      color: #d8b56d;
+      font-family: var(--font-display);
+      font-size: var(--seal-letter-size);
+      font-weight: 400;
+      line-height: .78;
+      pointer-events: none;
+      text-shadow:
+        0 1px 0 rgba(63,19,16,.82),
+        0 -1px 0 rgba(255,226,150,.34),
+        1px 2px 2px rgba(50,12,12,.56);
+      transform: none;
+    }
+
+    .seal-initial {
+      align-self: end;
+      transform: translateY(-.1em);
+    }
+
+    .seal-initial:last-child {
+      align-self: start;
+      transform: translateY(.1em);
+    }
+
+    .seal-initial-divider {
+      width: 82%;
+      height: 1px;
+      background: #d8b56d;
+      box-shadow:
+        0 1px 0 rgba(63,19,16,.78),
+        0 -1px 0 rgba(255,226,150,.28);
+    }
+
+    .footer {
+      position: absolute;
+      z-index: 5;
+      top: 76.62%;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      text-transform: uppercase;
+      transition: top 1.05s cubic-bezier(.22,.72,.18,1);
+    }
+
+    #openControl:checked + .artboard .footer { top: 87.08%; }
+
+    .date {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 2.82cqw;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: .40em;
+      color: #4e2c25;
+      white-space: nowrap;
+    }
+
+    .vertical-ornament {
+      display: block;
+      width: 2.2%;
+      height: auto;
+      margin: 4.35% auto 3.8%;
+      overflow: visible;
+      transition: width .8s ease;
+    }
+
+    #openControl:checked + .artboard .vertical-ornament {
+      width: 1.45%;
+      margin-top: 2.2%;
+      margin-bottom: 3.5%;
+    }
+
+    .tap-copy {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.34cqw;
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: .56em;
+      color: #4c332d;
+      white-space: nowrap;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Editorial stationery layout */
+    .portrait-section {
+      isolation: isolate;
+      z-index: 4;
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(48px, 9vw, 96px);
+      min-height: 100svh;
+      margin-bottom: -24px;
+      padding-top: clamp(120px, 18vh, 205px);
+      padding-bottom: clamp(145px, 21vh, 230px);
+      background: transparent;
+    }
+
+    .portrait-card {
+      width: min(82vw, 435px);
+      margin: 0 auto;
+      padding: clamp(11px, 2.7vw, 16px) clamp(11px, 2.7vw, 16px) 0;
+      background:
+        repeating-linear-gradient(92deg, rgba(90,64,39,.018) 0 1px, transparent 1px 6px),
+        #f8f0e3;
+      box-shadow: 0 30px 58px rgba(75,46,28,.17), 0 3px 7px rgba(75,46,28,.09);
+      transform: rotate(-1.6deg);
+    }
+
+    .portrait-art {
+      position: relative;
+      z-index: 1;
+      display: block;
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      background: #d8c7ae;
+    }
+
+    .portrait-photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 45%;
+      filter: sepia(.05) saturate(.87) contrast(.97);
+    }
+
+    .portrait-art::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 34px rgba(55,35,24,.12);
+      pointer-events: none;
+    }
+
+    .portrait-card::after {
+      content: "AMARA & ELIAS  ·  SUMMER 2026";
+      display: block;
+      padding: 15px 4px 13px;
+      color: #705a50;
+      font-family: var(--font-display);
+      font-size: clamp(8px, 2vw, 10px);
+      letter-spacing: .24em;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .portrait-copy {
+      position: relative;
+      z-index: 2;
+      max-width: 465px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .portrait-copy .story-label {
+      color: var(--story-gold);
+      font-family: var(--font-display);
+      font-size: clamp(10px, 2.6vw, 12px);
+      letter-spacing: .28em;
+      text-transform: uppercase;
+    }
+
+    .portrait-copy h2 {
+      margin: clamp(21px, 4vh, 34px) 0 clamp(25px, 4.5vh, 38px);
+      color: #4d2925;
+      font-family: var(--font-display);
+      font-size: clamp(52px, 13vw, 82px);
+      font-style: italic;
+      font-weight: 400;
+      line-height: .92;
+      letter-spacing: -.045em;
+    }
+
+    .portrait-copy h2::after {
+      content: "";
+      display: block;
+      width: 78px;
+      height: 1px;
+      margin: clamp(24px, 4vh, 34px) auto 0;
+      background: var(--story-gold);
+      opacity: .72;
+    }
+
+    .portrait-copy .portrait-story,
+    .note-copy,
+    .rsvp-copy { line-height: 1.78; }
+
+    .portrait-story {
+      margin: 0;
+      color: #6d5951;
+      font-family: var(--font-body);
+      font-size: clamp(16px, 4.1vw, 20px);
+      line-height: 1.8;
+    }
+
+    .portrait-signoff {
+      display: block;
+      margin-top: 24px;
+      color: #9a793c;
+      font-family: var(--font-script);
+      font-size: 1.35em;
+      font-style: normal;
+      line-height: 1.15;
+      letter-spacing: .02em;
+    }
+
+    .details-section,
+    .note-section,
+    .guest-section,
+    .rsvp-section {
+      isolation: isolate;
+    }
+
+    .details-section {
+      z-index: 1;
+      padding-top: clamp(105px, 17vh, 165px);
+      padding-bottom: clamp(135px, 22vh, 220px);
+      border: 0;
+      background: transparent;
+    }
+
+    .details-section > * { position: relative; z-index: 2; }
+    .details-section .section-title { max-width: 750px; margin-inline: auto; }
+
+    .schedule {
+      position: relative;
+      z-index: 2;
+      gap: 0;
+      max-width: 820px;
+      background: transparent;
+    }
+
+    .schedule-item {
+      padding: 43px 18px;
+      border-top: 1px solid rgba(173,134,68,.38);
+      background: transparent;
+    }
+
+    .schedule-item:last-child { border-bottom: 1px solid rgba(173,134,68,.38); }
+
+    .schedule-number {
+      margin-bottom: 22px;
+      color: #8c6b32;
+      font-size: 38px;
+    }
+
+    .venue-card {
+      position: relative;
+      z-index: 2;
+      margin-top: 62px;
+      padding: 32px 20px;
+      border-block: 1px solid rgba(173,134,68,.48);
+      background: transparent;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .note-section {
+      padding-top: clamp(160px, 25vh, 250px);
+      padding-bottom: clamp(145px, 23vh, 230px);
+      background: transparent;
+    }
+
+    .note-paper {
+      z-index: 2;
+      max-width: 670px;
+      margin-left: 0;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .note-paper::before { content: none; }
+    .note-paper .section-title { max-width: 590px; }
+    .note-copy { max-width: 500px; }
+
+    .guest-section {
+      padding-top: clamp(160px, 25vh, 245px);
+      padding-bottom: clamp(145px, 23vh, 230px);
+      background: transparent;
+    }
+
+    .guest-grid {
+      gap: 0;
+      max-width: 820px;
+      margin-top: 70px;
+    }
+
+    .guest-card {
+      padding: 40px 22px;
+      border: 0;
+      border-top: 1px solid rgba(173,134,68,.42);
+      background: transparent;
+    }
+
+    .guest-card:last-child { border-bottom: 1px solid rgba(173,134,68,.42); }
+    .guest-symbol { margin-bottom: 24px; font-size: 24px; }
+
+    .rsvp-section {
+      overflow: hidden;
+      padding-top: clamp(175px, 27vh, 265px);
+      padding-bottom: clamp(155px, 25vh, 250px);
+      color: var(--story-ink);
+      background: transparent;
+    }
+    .rsvp-section .story-label { color: var(--story-gold); }
+    .rsvp-section .section-title { position: relative; z-index: 2; }
+    .rsvp-copy { position: relative; z-index: 2; color: var(--story-muted); }
+
+    .rsvp-button {
+      position: relative;
+      z-index: 2;
+      border-color: #641d20;
+      color: #f7efe3;
+      background: #641d20;
+      box-shadow: 0 12px 24px rgba(87,31,28,.13);
+    }
+
+    .rsvp-button:hover,
+    .rsvp-button:focus-visible { color: #641d20; background: transparent; }
+    .rsvp-feedback { position: relative; z-index: 2; color: var(--story-muted); }
+
+    .closing-section {
+      min-height: 88svh;
+      padding-top: 145px;
+      background:
+        radial-gradient(circle at 50% 48%, rgba(255,255,255,.50), transparent 19rem),
+        transparent;
+    }
+
+    .closing-script { font-size: clamp(44px, 11vw, 70px); }
+
+    .closing-seal {
+      display: grid;
+      width: clamp(108px, 28vw, 146px);
+      height: auto;
+      aspect-ratio: 1;
+      margin-top: 54px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      filter: drop-shadow(0 13px 10px rgba(67,31,22,.28));
+      transform: rotate(-5deg);
+      --seal-letter-size: clamp(31px, 8.2vw, 42px);
+    }
+
+    .closing-seal-art {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .closing-seal .seal-initials {
+      transform: none;
+    }
+
+    @media (min-width: 700px) {
+      .couple-names {
+        display: flex;
+        align-items: baseline;
+        gap: .18em;
+        font-size: clamp(92px, 12vw, 160px);
+        line-height: .9;
+        letter-spacing: -.06em;
+      }
+
+      .couple-names .ampersand { margin: 0; font-size: .58em; }
+      .schedule-item {
+        border-top: 1px solid rgba(173,134,68,.38);
+        border-bottom: 1px solid rgba(173,134,68,.38);
+        border-left: 1px solid rgba(173,134,68,.38);
+      }
+
+      .schedule-item:last-child { border-right: 1px solid rgba(173,134,68,.38); }
+
+      .guest-card {
+        border-top: 1px solid rgba(173,134,68,.42);
+        border-bottom: 1px solid rgba(173,134,68,.42);
+        border-left: 1px solid rgba(173,134,68,.42);
+      }
+
+      .guest-card:last-child { border-right: 1px solid rgba(173,134,68,.42); }
+      .note-paper { margin-left: 7%; }
+    }
+
+    @media (min-width: 1000px) {
+      .portrait-section {
+        grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+      }
+
+      .portrait-copy { text-align: left; }
+      .portrait-copy h2::after { margin-left: 0; }
+    }
+
+    /* Reference-matched opening invitation */
+    .reference-invite {
+      display: grid;
+      width: 100%;
+      min-height: 100svh;
+      margin: 0;
+      padding: clamp(12px, 3vw, 38px);
+      place-items: center;
+      overflow: visible;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .reference-card {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      width: min(100%, 1180px, calc((100svh - 64px) * 1.54));
+      aspect-ratio: 1.54 / 1;
+      place-items: center;
+      overflow: visible;
+      padding: clamp(48px, 5vw, 82px) clamp(78px, 10vw, 166px);
+      background: transparent;
+      box-shadow: none;
+      transform-origin: 50% 50%;
+    }
+
+    .reference-card::after {
+      content: none;
+    }
+
+    .reference-copy {
+      position: relative;
+      z-index: 3;
+      width: min(74%, 790px);
+      text-align: center;
+    }
+
+    .reference-sprig {
+      display: block;
+      width: clamp(36px, 4.3vw, 54px);
+      height: auto;
+      margin: 0 auto clamp(22px, 2.7vw, 34px);
+      color: #a68a5c;
+    }
+
+    .reference-invite .story-kicker {
+      margin: 0 0 clamp(25px, 3vw, 38px);
+      color: #50302b;
+      font-family: var(--font-display);
+      font-size: clamp(10px, 1.05vw, 13px);
+      line-height: 1.2;
+      letter-spacing: .42em;
+      white-space: nowrap;
+    }
+
+    .reference-invite .hero-formal-copy {
+      position: relative;
+      z-index: 3;
+      display: grid;
+      gap: 5px;
+      margin-bottom: clamp(28px, 3.2vw, 42px);
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .reference-invite .hero-formal-copy p {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(9px, .93vw, 12px);
+      font-weight: 400;
+      line-height: 1.35;
+      letter-spacing: .30em;
+    }
+
+    .reference-invite .couple-names {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      width: 100%;
+      align-items: baseline;
+      justify-content: center;
+      gap: .16em;
+      margin: 0;
+      color: #4b2725;
+      font-family: var(--font-display);
+      font-size: clamp(58px, 6vw, 88px);
+      font-weight: 400;
+      line-height: .9;
+      letter-spacing: .105em;
+      text-indent: .105em;
+      font-kerning: normal;
+      font-feature-settings: "kern" 1, "liga" 1;
+      white-space: nowrap;
+    }
+
+    .reference-invite .couple-names .ampersand {
+      margin: 0;
+      color: #b19054;
+      font-family: var(--font-script);
+      font-size: .55em;
+      font-style: normal;
+      letter-spacing: 0;
+      text-indent: 0;
+      text-transform: lowercase;
+    }
+
+    .reference-invite .hero-divider {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      width: min(58%, 430px);
+      align-items: center;
+      gap: 14px;
+      margin: clamp(32px, 3.6vw, 50px) auto clamp(26px, 3vw, 40px);
+      color: #b49862;
+    }
+
+    .reference-invite .hero-divider::before,
+    .reference-invite .hero-divider::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: currentColor;
+      opacity: .65;
+    }
+
+    .reference-invite .hero-divider span {
+      font-size: 15px;
+      transform: rotate(45deg);
+    }
+
+    .reference-date-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      color: #4e302c;
+      font-family: var(--font-display);
+      font-size: clamp(12px, 1.35vw, 18px);
+      letter-spacing: .43em;
+      text-transform: uppercase;
+    }
+
+    .reference-date-row span {
+      padding-inline: clamp(14px, 2.3vw, 31px);
+      white-space: nowrap;
+    }
+
+    .reference-date-row .reference-day {
+      border-inline: 1px solid rgba(166,138,92,.58);
+      font-size: 1.45em;
+      letter-spacing: .16em;
+      text-indent: .16em;
+    }
+
+    .reference-time {
+      margin: clamp(17px, 2vw, 25px) 0 0;
+      color: #5a4038;
+      font-family: var(--font-display);
+      font-size: clamp(8px, .88vw, 11px);
+      letter-spacing: .30em;
+      text-transform: uppercase;
+    }
+
+    .reference-venue-rule {
+      width: 38px;
+      height: 1px;
+      margin: clamp(17px, 2vw, 25px) auto clamp(12px, 1.4vw, 18px);
+      background: rgba(180,151,94,.62);
+    }
+
+    .reference-invite .hero-place {
+      position: relative;
+      z-index: 3;
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      color: #5b4139;
+      font-family: var(--font-display);
+      font-size: clamp(8px, .82vw, 11px);
+      line-height: 1.3;
+      letter-spacing: .34em;
+      text-transform: uppercase;
+    }
+
+    .reference-invite .hero-place strong {
+      color: #684a40;
+      font-family: var(--font-script);
+      font-size: clamp(27px, 3vw, 42px);
+      font-style: normal;
+      line-height: 1.05;
+      letter-spacing: .01em;
+      text-transform: none;
+    }
+
+    .reference-reception { margin-top: 3px; }
+
+    @media (max-width: 759px) {
+      .reference-invite { padding: 10px; }
+
+      .reference-card {
+        width: 100%;
+        min-height: calc(100svh - 20px);
+        aspect-ratio: auto;
+        padding: 96px 26px 82px;
+      }
+
+      .reference-copy { width: min(100%, 390px); }
+      .reference-sprig { margin-bottom: 25px; }
+
+      .reference-invite .story-kicker {
+        margin-bottom: 25px;
+        font-size: 9px;
+        letter-spacing: .30em;
+      }
+
+      .reference-invite .hero-formal-copy {
+        gap: 4px;
+        margin-bottom: 30px;
+      }
+
+      .reference-invite .hero-formal-copy p {
+        font-size: 8px;
+        letter-spacing: .20em;
+      }
+
+      .reference-invite .couple-names {
+        gap: .10em;
+        font-size: clamp(38px, 11.4vw, 52px);
+        letter-spacing: .045em;
+        text-indent: .045em;
+      }
+
+      .reference-invite .couple-names .ampersand { font-size: .60em; }
+      .reference-invite .hero-divider { width: 64%; margin-block: 31px 28px; }
+
+      .reference-date-row {
+        font-size: 10px;
+        letter-spacing: .24em;
+      }
+
+      .reference-date-row span { padding-inline: 10px; }
+      .reference-time { max-width: 290px; margin-inline: auto; line-height: 1.6; letter-spacing: .22em; }
+      .reference-invite .hero-place strong { font-size: 29px; }
+
+    }
+
+    @media (max-width: 430px) and (max-height: 740px) {
+      .reference-card { padding-block: 72px 60px; }
+      .reference-sprig { margin-bottom: 15px; }
+      .reference-invite .story-kicker { margin-bottom: 17px; }
+      .reference-invite .hero-formal-copy { margin-bottom: 20px; }
+      .reference-invite .hero-divider { margin-block: 22px 19px; }
+      .reference-time { margin-top: 13px; }
+      .reference-venue-rule { margin-block: 13px 10px; }
+      .reference-invite .hero-place { gap: 5px; }
+    }
+
+    @supports not (font-size: 1cqw) {
+      h1, .date { font-size: 2.82vw; }
+      .subtitle { font-size: 1.36vw; }
+      .tap-copy { font-size: 1.34vw; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .seal-button,
+      .flap,
+      .envelope-wrap,
+      .heading,
+      .footer,
+      .liner-body,
+      .invitation-card,
+      .artboard { transition-duration: .01ms !important; }
+
+      .invitation-page.is-revealing .reference-card,
+      .artboard.card-pulling .invitation-card { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <input class="open-control" id="openControl" type="checkbox" aria-label="Open the private invitation">
+    <section class="artboard" aria-label="Private invitation">
+      <header class="heading">
+        <h1>A Private Invitation</h1>
+        <p class="subtitle">Prepared for you</p>
+        <svg class="top-ornament" viewBox="0 0 114 22" aria-hidden="true">
+          <g fill="none" stroke="#aa8848" stroke-width="1.35">
+            <path d="M0 11H42M72 11h42" opacity=".82"/>
+            <path d="M57 2c1.3 5.1 3.9 7.7 9 9-5.1 1.3-7.7 3.9-9 9-1.3-5.1-3.9-7.7-9-9 5.1-1.3 7.7-3.9 9-9Z"/>
+          </g>
+          <circle cx="43.7" cy="11" r="1.8" fill="#aa8848"/>
+          <circle cx="70.3" cy="11" r="1.8" fill="#aa8848"/>
+        </svg>
+      </header>
+
+      <div class="envelope-wrap">
+        <svg class="envelope-art" viewBox="0 0 838 693" preserveAspectRatio="none" role="img" aria-label="A large cream paper envelope">
+          <defs>
+            <linearGradient id="bodyPaper" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#eee3d0"/>
+              <stop offset=".46" stop-color="#e7dac5"/>
+              <stop offset="1" stop-color="#dfcfb6"/>
+            </linearGradient>
+          </defs>
+          <rect x="1" y="1" width="836" height="691" rx="1" fill="url(#bodyPaper)" stroke="#d9c8ad" stroke-width="2"/>
+        </svg>
+
+        <div class="liner-body" aria-hidden="true"></div>
+        <div class="liner-unified" aria-hidden="true"></div>
+        <div class="invitation-card" aria-hidden="true"></div>
+
+        <svg class="pocket-art" viewBox="0 0 838 693" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="sideLeft" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f0e5d2"/>
+              <stop offset="1" stop-color="#e4d4bb"/>
+            </linearGradient>
+            <linearGradient id="sideRight" x1="1" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#eadcc5"/>
+              <stop offset="1" stop-color="#dfceb3"/>
+            </linearGradient>
+            <linearGradient id="lowerPocket" x1=".12" y1="0" x2=".82" y2="1">
+              <stop offset="0" stop-color="#efe4d1"/>
+              <stop offset=".55" stop-color="#e8dac3"/>
+              <stop offset="1" stop-color="#dcc9ad"/>
+            </linearGradient>
+          </defs>
+          <path d="M1 1 352 315 1 693Z" fill="url(#sideLeft)" stroke="#f8efe0" stroke-width="1.6"/>
+          <path d="M837 1 486 315 837 693Z" fill="url(#sideRight)" stroke="#d0bda0" stroke-opacity=".55" stroke-width="1.3"/>
+          <path d="M1 693V646Q5 615 29 581L335 299Q349 286 365 306L389 331Q399 342 416 342H422Q439 342 449 331L473 306Q489 286 503 299L809 581Q833 615 837 646V693Z" fill="url(#lowerPocket)" stroke="#f7edde" stroke-width="2"/>
+          <path d="M1 693V646Q5 615 29 581L335 299" fill="none" stroke="#c8b394" stroke-opacity=".42" stroke-width="1.35"/>
+          <path d="M837 693V646Q833 615 809 581L503 299" fill="none" stroke="#b9a486" stroke-opacity=".40" stroke-width="1.35"/>
+        </svg>
+
+        <div class="flap" aria-hidden="true">
+          <div class="flap-face flap-front">
+            <svg viewBox="0 0 838 420" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="closedFlap" x1=".08" y1="0" x2=".86" y2="1">
+                  <stop offset="0" stop-color="#f2e9da"/>
+                  <stop offset=".49" stop-color="#eadfcd"/>
+                  <stop offset="1" stop-color="#dccbb2"/>
+                </linearGradient>
+                <filter id="closedFlapShadow" x="-7%" y="-6%" width="114%" height="120%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#674829" flood-opacity=".28"/>
+                </filter>
+              </defs>
+              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#closedFlap)" stroke="#fbf3e6" stroke-width="1.5" filter="url(#closedFlapShadow)"/>
+            </svg>
+          </div>
+          <div class="flap-face flap-back">
+            <svg viewBox="0 0 838 420" preserveAspectRatio="none">
+              <defs>
+                <pattern id="floralFlap" width="838" height="838" patternUnits="userSpaceOnUse" patternTransform="translate(0 -185)">
+                  <image width="838" height="838" href="invitation-assets/envelope-liner-optimized.jpg" preserveAspectRatio="xMidYMid slice"/>
+                </pattern>
+                <filter id="openFlapShadow" x="-7%" y="-7%" width="114%" height="120%">
+                  <feDropShadow dx="0" dy="-3" stdDeviation="3" flood-color="#66482d" flood-opacity=".24"/>
+                </filter>
+              </defs>
+              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#floralFlap)" filter="url(#openFlapShadow)"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="seal-button" id="seal" aria-hidden="true">
+          <img class="seal-art" src="invitation-assets/wax-seal-blank-optimized.png" alt="" aria-hidden="true">
+          <span class="seal-initials" aria-hidden="true">
+            <span class="seal-initial" data-seal-initial="first">A</span>
+            <span class="seal-initial-divider"></span>
+            <span class="seal-initial" data-seal-initial="second">E</span>
+          </span>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <p class="date">24 · 08 · 2027</p>
+        <svg class="vertical-ornament" viewBox="0 0 20 132" aria-hidden="true">
+          <g fill="none" stroke="#aa8848" stroke-width="1.25">
+            <path d="M10 0V48M10 84v48"/>
+            <path d="M10 48c1.7 10 4.8 15 10 18-5.2 3-8.3 8-10 18-1.7-10-4.8-15-10-18 5.2-3 8.3-8 10-18Z"/>
+          </g>
+          <circle cx="10" cy="1.5" r="1.6" fill="#aa8848"/>
+          <circle cx="10" cy="130.5" r="1.6" fill="#aa8848"/>
+        </svg>
+        <p class="tap-copy">Tap the seal to open</p>
+      </footer>
+
+      <svg class="paper-texture" viewBox="0 0 942 1674" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <filter id="pagePaper" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence type="fractalNoise" baseFrequency=".012 .34" numOctaves="5" seed="31" result="fibers"/>
+            <feColorMatrix in="fibers" type="matrix" values=".45 0 0 0 .22  0 .38 0 0 .17  0 0 .28 0 .12  0 0 0 .28 0"/>
+          </filter>
+        </defs>
+        <rect width="942" height="1674" fill="#8d7654" filter="url(#pagePaper)" opacity=".58"/>
+      </svg>
+
+      <p class="sr-only" id="status" role="status" aria-live="polite"></p>
+    </section>
+    <div class="invitation-page" id="invitationPage" aria-hidden="true">
+      <button class="replay-opening" id="replayOpening" type="button">View envelope</button>
+      <article class="story-page" aria-label="Wedding invitation">
+        <div class="story-shell">
+          <section class="story-section hero-invite reference-invite" aria-labelledby="coupleNames">
+            <div class="reference-card">
+              <div class="reference-copy">
+                <svg class="reference-sprig" viewBox="0 0 64 30" aria-hidden="true">
+                  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2">
+                    <path d="M8 24C23 20 34 14 50 5"/>
+                    <path d="M22 19c-6-5-8-9-7-13 6 2 9 6 9 11M32 14c-2-7 0-11 3-14 4 5 4 9 0 13M40 10c5-5 9-6 13-5-2 5-6 8-12 8M17 21c-5 1-9 0-12-3 4-3 9-2 14 1"/>
+                  </g>
+                </svg>
+                <p class="story-kicker">Together with their families</p>
+                <div class="hero-formal-copy">
+                  <p>You are joyfully invited to</p>
+                  <p>Celebrate the wedding of</p>
+                </div>
+                <h2 class="couple-names" id="coupleNames">
+                  <span>LAYLA</span>
+                  <span class="ampersand">and</span>
+                  <span>ZAYN</span>
+                </h2>
+                <div class="hero-divider" aria-hidden="true"><span>◇</span></div>
+                <p class="reference-date-row">
+                  <span>August</span>
+                  <span class="reference-day">24</span>
+                  <span>2027</span>
+                </p>
+                <p class="reference-time">Saturday, four thirty in the afternoon</p>
+                <div class="reference-venue-rule" aria-hidden="true"></div>
+                <p class="hero-place">
+                  <strong>The Glasshouse Estate</strong>
+                  <span>Toronto, Ontario</span>
+                  <span class="reference-reception">Reception to follow</span>
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section class="story-section portrait-section" aria-labelledby="beginningTitle">
+            <figure class="portrait-card reveal">
+              <div class="portrait-art">
+                <img class="portrait-photo" src="invitation-assets/couple-portrait-optimized.jpg" alt="Amara and Elias sharing a quiet moment together in a meadow" loading="lazy" decoding="async">
+              </div>
+            </figure>
+            <div class="portrait-copy reveal">
+              <p class="story-label">Our beginning</p>
+              <h2 id="beginningTitle">From this day forward.</h2>
+              <p class="portrait-story">Some stories arrive quietly, and then change everything. We found a home in one another. On this day, surrounded by the people we love most, we begin our next chapter together.<span class="portrait-signoff">With love, Amara &amp; Elias</span></p>
+            </div>
+          </section>
+
+          <section class="story-section details-section" aria-labelledby="dayTitle">
+            <p class="story-label reveal">The wedding day</p>
+            <h2 class="section-title reveal" id="dayTitle">One afternoon.<br>One unforgettable evening.</h2>
+            <div class="section-rule reveal" aria-hidden="true"><span>✦</span></div>
+            <div class="schedule">
+              <article class="schedule-item reveal">
+                <span class="schedule-number">04:30</span>
+                <h3>The ceremony</h3>
+                <p>Please arrive with time to be seated before the vows begin.</p>
+              </article>
+              <article class="schedule-item reveal">
+                <span class="schedule-number">06:00</span>
+                <h3>Dinner</h3>
+                <p>A candlelit supper with the people we love most.</p>
+              </article>
+              <article class="schedule-item reveal">
+                <span class="schedule-number">08:00</span>
+                <h3>Dancing</h3>
+                <p>Music, celebration, and a very full dance floor.</p>
+              </article>
+            </div>
+            <div class="venue-card reveal">
+              <strong>The Glasshouse Estate</strong>
+              <span>123 Rosewood Lane · Toronto, Ontario</span>
+            </div>
+          </section>
+
+          <section class="story-section note-section" aria-labelledby="noteTitle">
+            <div class="note-paper reveal">
+              <p class="story-label">A note from us</p>
+              <h2 class="section-title" id="noteTitle">Your presence is part of the story.</h2>
+              <p class="note-copy">This celebration would not feel complete without the family and friends who have stood beside us. We hope you will spend the day laughing, dining, and making memories with us.</p>
+            </div>
+          </section>
+
+          <section class="story-section guest-section" id="guest-details" aria-labelledby="guestTitle">
+            <p class="story-label reveal">For our guests</p>
+            <h2 class="section-title reveal" id="guestTitle">A few thoughtful details.</h2>
+            <div class="guest-grid">
+              <article class="guest-card reveal">
+                <span class="guest-symbol" aria-hidden="true">◇</span>
+                <h3>Dress</h3>
+                <p>Formal attire in warm, evening tones.</p>
+              </article>
+              <article class="guest-card reveal">
+                <span class="guest-symbol" aria-hidden="true">✧</span>
+                <h3>Gifts</h3>
+                <p>Your company is the gift we value most.</p>
+              </article>
+              <article class="guest-card reveal">
+                <span class="guest-symbol" aria-hidden="true">⌁</span>
+                <h3>Questions</h3>
+                <p>Travel and accommodation notes will be shared here.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="story-section rsvp-section" id="rsvp" aria-labelledby="rsvpTitle">
+            <p class="story-label reveal">Kindly reply</p>
+            <h2 class="section-title reveal" id="rsvpTitle">Will you join us?</h2>
+            <p class="rsvp-copy reveal">Please send your response by 1 August 2027. We cannot wait to celebrate with you.</p>
+            <button class="rsvp-button reveal" id="rsvpButton" type="button">Respond to the invitation</button>
+            <p class="rsvp-feedback" id="rsvpFeedback" role="status" aria-live="polite"></p>
+          </section>
+
+          <footer class="story-section closing-section">
+            <p class="closing-script reveal">With love, always.</p>
+            <p class="closing-names reveal">Amara &amp; Elias</p>
+            <span class="closing-seal reveal" role="img" aria-label="Client initials wax seal">
+              <img class="closing-seal-art" src="invitation-assets/wax-seal-blank-optimized.png" alt="" aria-hidden="true">
+              <span class="seal-initials" aria-hidden="true">
+                <span class="seal-initial" data-seal-initial="first">A</span>
+                <span class="seal-initial-divider"></span>
+                <span class="seal-initial" data-seal-initial="second">E</span>
+              </span>
+            </span>
+          </footer>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      // Change these two values for each client. Both wax seals update automatically.
+      const sealInitials = { first: 'A', second: 'E' };
+      document.querySelectorAll('[data-seal-initial]').forEach((initial) => {
+        initial.textContent = sealInitials[initial.dataset.sealInitial];
+      });
+
+      const root = document.documentElement;
+      const artboard = document.querySelector('.artboard');
+      const seal = document.getElementById('seal');
+      const status = document.getElementById('status');
+      const control = document.getElementById('openControl');
+      const invitationPage = document.getElementById('invitationPage');
+      const card = document.querySelector('.invitation-card');
+      const flap = document.querySelector('.flap');
+      const referenceCard = document.querySelector('.reference-card');
+      const rsvpButton = document.getElementById('rsvpButton');
+      const rsvpFeedback = document.getElementById('rsvpFeedback');
+      const replayOpening = document.getElementById('replayOpening');
+      const revealItems = document.querySelectorAll('.reveal');
+      const openedStorageKey = 'weddingInvitationOpened';
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let opened = false;
+
+      const invitationBackground = new Image();
+      invitationBackground.src = 'invitation-assets/invitation-background-optimized.jpg';
+
+      const waitForImage = image => {
+        if (image.complete && image.naturalWidth > 0) return Promise.resolve();
+
+        return new Promise(resolve => {
+          const finish = () => resolve();
+          image.addEventListener('load', finish, { once: true });
+          image.addEventListener('error', finish, { once: true });
+
+          if (typeof image.decode === 'function') {
+            image.decode().then(finish).catch(finish);
+          }
+        });
+      };
+
+      const backgroundReady = waitForImage(invitationBackground);
+      const fontsReady = document.fonts?.ready ?? Promise.resolve();
+      const nextPaint = () => new Promise(resolve => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      });
+
+      const readOpenedState = () => {
+        try {
+          return localStorage.getItem(openedStorageKey) === 'true';
+        } catch (error) {
+          return false;
+        }
+      };
+
+      const writeOpenedState = value => {
+        try {
+          if (value) localStorage.setItem(openedStorageKey, 'true');
+          else localStorage.removeItem(openedStorageKey);
+        } catch (error) {
+          // Browser storage is optional; the invitation remains usable without it.
+        }
+      };
+
+      const showInvitationImmediately = () => {
+        opened = true;
+        control.checked = true;
+        control.setAttribute('aria-label', 'Invitation opened');
+        invitationPage.setAttribute('aria-hidden', 'false');
+        invitationPage.classList.remove('is-preparing', 'is-revealing');
+        invitationPage.classList.add('is-ready');
+        invitationPage.scrollTop = 0;
+        status.textContent = 'Invitation ready.';
+        artboard.classList.add('opening-complete');
+        root.classList.remove('invitation-opening');
+        root.classList.add('invitation-returning');
+      };
+
+      const finishInvitation = () => {
+        invitationPage.classList.remove('is-preparing', 'is-revealing');
+        invitationPage.classList.add('is-ready');
+        invitationPage.scrollTop = 0;
+        control.setAttribute('aria-label', 'Invitation opened');
+        status.textContent = 'Invitation ready.';
+        writeOpenedState(true);
+        root.classList.remove('invitation-opening');
+        root.classList.add('invitation-returning');
+      };
+
+      const revealInvitation = async () => {
+        const sourceRect = card.getBoundingClientRect();
+
+        await Promise.all([backgroundReady, fontsReady]);
+        root.classList.add('invitation-opening');
+        artboard.classList.add('opening-complete');
+        invitationPage.setAttribute('aria-hidden', 'false');
+        invitationPage.classList.add('is-preparing');
+        invitationPage.scrollTop = 0;
+
+        await nextPaint();
+
+        const targetRect = referenceCard.getBoundingClientRect();
+        const sourceCenterX = sourceRect.left + sourceRect.width / 2;
+        const sourceCenterY = sourceRect.top + sourceRect.height / 2;
+        const targetCenterX = targetRect.left + targetRect.width / 2;
+        const targetCenterY = targetRect.top + targetRect.height / 2;
+
+        referenceCard.style.setProperty('--page-start-x', `${sourceCenterX - targetCenterX}px`);
+        referenceCard.style.setProperty('--page-start-y', `${sourceCenterY - targetCenterY}px`);
+        referenceCard.style.setProperty('--page-start-scale-x', sourceRect.width / targetRect.width);
+        referenceCard.style.setProperty('--page-start-scale-y', sourceRect.height / targetRect.height);
+
+        if (reduceMotion) {
+          finishInvitation();
+          return;
+        }
+
+        const handleRevealEnd = event => {
+          if (event.animationName !== 'openingCardReveal') return;
+          referenceCard.removeEventListener('animationend', handleRevealEnd);
+          finishInvitation();
+        };
+
+        referenceCard.addEventListener('animationend', handleRevealEnd);
+        invitationPage.classList.remove('is-preparing');
+        invitationPage.classList.add('is-revealing');
+      };
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { root: invitationPage, threshold: .14, rootMargin: '0px 0px -6% 0px' });
+        revealItems.forEach(item => observer.observe(item));
+      } else {
+        revealItems.forEach(item => item.classList.add('is-visible'));
+      }
+
+      rsvpButton.addEventListener('click', () => {
+        rsvpFeedback.textContent = 'The response form will be connected when your final guest details are added.';
+      });
+
+      const openInvitation = () => {
+        if (opened) return;
+        opened = true;
+        seal.classList.add('is-tapped');
+        status.textContent = 'Opening the invitation.';
+
+        if (reduceMotion) {
+          artboard.classList.add('liner-ready');
+          revealInvitation();
+          return;
+        }
+
+        const startCardPull = () => {
+          artboard.classList.add('liner-ready');
+
+          const handleCardEnd = event => {
+            if (event.animationName !== 'cardJourney') return;
+            card.removeEventListener('animationend', handleCardEnd);
+            revealInvitation();
+          };
+
+          card.addEventListener('animationend', handleCardEnd);
+          artboard.classList.add('card-pulling');
+        };
+
+        const handleFlapEnd = event => {
+          if (event.propertyName !== 'transform') return;
+          flap.removeEventListener('transitionend', handleFlapEnd);
+          flap.removeEventListener('transitioncancel', handleFlapCancel);
+          startCardPull();
+        };
+
+        const handleFlapCancel = () => {
+          flap.removeEventListener('transitionend', handleFlapEnd);
+          flap.removeEventListener('transitioncancel', handleFlapCancel);
+          startCardPull();
+        };
+
+        flap.addEventListener('transitionend', handleFlapEnd);
+        flap.addEventListener('transitioncancel', handleFlapCancel);
+      };
+      control.addEventListener('change', () => {
+        if (control.checked) openInvitation();
+      });
+      control.addEventListener('keydown', event => {
+        if ((event.key === 'Enter' || event.key === ' ') && !control.checked) {
+          event.preventDefault();
+          control.checked = true;
+          control.dispatchEvent(new Event('change'));
+        }
+      });
+
+      replayOpening.addEventListener('click', () => {
+        writeOpenedState(false);
+        root.classList.remove('invitation-opening', 'invitation-returning');
+        window.location.reload();
+      });
+
+      if (readOpenedState()) showInvitationImmediately();
+    })();
+  </script>
+</body>
+</html>
