@@ -732,7 +732,10 @@
 
     .artboard.liner-ready .liner-unified { opacity: 1; }
     .artboard.liner-ready .liner-body,
-    .artboard.liner-ready .flap-back { opacity: 0; }
+    .artboard.liner-ready .flap-back {
+      opacity: 0;
+      visibility: hidden;
+    }
 
     .invitation-card {
       position: absolute;
@@ -765,24 +768,22 @@
 
     .flap {
       position: absolute;
-      z-index: 6;
       top: 0;
       left: 0;
       width: 100%;
       height: 60.6%;
-      transform: rotateX(0deg);
-      transform-origin: 50% 0;
-      transform-style: preserve-3d;
-      transition: transform 1.15s cubic-bezier(.24,.68,.17,1);
-      will-change: transform;
+      pointer-events: none;
     }
 
     .flap-face {
       position: absolute;
+      z-index: 6;
       inset: 0;
+      transform-origin: 50% 0;
+      transform-style: preserve-3d;
       backface-visibility: visible;
       -webkit-backface-visibility: visible;
-      transition: none;
+      will-change: transform, opacity;
     }
 
     .flap-face svg {
@@ -792,8 +793,16 @@
       overflow: visible;
     }
 
-    .flap-front { opacity: 1; }
-    .flap-back { opacity: 0; }
+    .flap-front {
+      opacity: 1;
+      transform: rotateX(0deg);
+    }
+
+    .flap-back {
+      z-index: 1;
+      opacity: 0;
+      transform: rotateX(90deg);
+    }
 
     #openControl:checked + .artboard .heading { top: 8.78%; }
 
@@ -807,20 +816,46 @@
         1px 3px 4px rgba(91,65,37,.1);
     }
 
-    #openControl:checked + .artboard .flap {
-      transform: rotateX(180deg);
+    #openControl:checked + .artboard .flap-front {
+      animation: flapFrontOpen .56s cubic-bezier(.36,.05,.64,.95) forwards;
     }
 
-    .artboard.flap-behind .flap { z-index: 1; }
+    #openControl:checked + .artboard .flap-back {
+      animation: flapBackOpen .59s .56s cubic-bezier(.24,.68,.17,1) forwards;
+    }
 
-    #openControl:checked + .artboard .flap-front { opacity: 0; }
-    #openControl:checked + .artboard .flap-back { opacity: 1; }
     #openControl:checked + .artboard .liner-body { opacity: 1; }
     .artboard.card-pulling .invitation-card {
       animation: cardJourney 2.1s linear forwards;
     }
 
     #openControl:checked + .artboard .envelope-wrap { z-index: 40; }
+
+    @keyframes flapFrontOpen {
+      0% {
+        opacity: 1;
+        transform: rotateX(0deg);
+      }
+      99% {
+        opacity: 1;
+        transform: rotateX(90deg);
+      }
+      100% {
+        opacity: 0;
+        transform: rotateX(90deg);
+      }
+    }
+
+    @keyframes flapBackOpen {
+      0% {
+        opacity: 1;
+        transform: rotateX(90deg);
+      }
+      100% {
+        opacity: 1;
+        transform: rotateX(180deg);
+      }
+    }
 
     @keyframes cardJourney {
       0% {
@@ -2139,9 +2174,6 @@
         seal.disabled = true;
         seal.classList.add('is-tapped');
         status.textContent = 'Opening the invitation.';
-        window.setTimeout(() => {
-          artboard.classList.add('flap-behind');
-        }, reduceMotion ? 0 : 360);
 
         if (reduceMotion) {
           artboard.classList.add('liner-ready');
@@ -2172,13 +2204,13 @@
 
         const finishFlap = () => {
           window.clearTimeout(flapFallback);
-          flap.removeEventListener('transitionend', handleFlapEnd);
-          flap.removeEventListener('transitioncancel', handleFlapCancel);
+          flap.removeEventListener('animationend', handleFlapEnd);
+          flap.removeEventListener('animationcancel', handleFlapCancel);
           startCardPull();
         };
 
         const handleFlapEnd = event => {
-          if (event.propertyName !== 'transform') return;
+          if (event.animationName !== 'flapBackOpen') return;
           finishFlap();
         };
 
@@ -2187,8 +2219,8 @@
         };
 
         const flapFallback = window.setTimeout(finishFlap, 1400);
-        flap.addEventListener('transitionend', handleFlapEnd);
-        flap.addEventListener('transitioncancel', handleFlapCancel);
+        flap.addEventListener('animationend', handleFlapEnd);
+        flap.addEventListener('animationcancel', handleFlapCancel);
       };
 
       const requestOpening = event => {
