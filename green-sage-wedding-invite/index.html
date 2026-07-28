@@ -579,6 +579,7 @@
     }
 
     .artboard {
+      --card-pull-distance: -67cqw;
       position: relative;
       isolation: isolate;
       container-type: inline-size;
@@ -825,24 +826,24 @@
       57% {
         z-index: 2;
         opacity: 1;
-        transform: translateY(-67cqw) rotate(0deg) scale(1);
+        transform: translateY(var(--card-pull-distance)) rotate(0deg) scale(1);
       }
       58%, 67% {
         z-index: 8;
         opacity: 1;
-        transform: translateY(-67cqw) rotate(0deg) scale(1);
+        transform: translateY(var(--card-pull-distance)) rotate(0deg) scale(1);
         animation-timing-function: cubic-bezier(.4,0,.2,1);
       }
       82% {
         z-index: 8;
         opacity: 1;
-        transform: translateY(-67cqw) rotate(90deg) scale(1);
+        transform: translateY(var(--card-pull-distance)) rotate(90deg) scale(1);
         animation-timing-function: cubic-bezier(.2,.72,.18,1);
       }
       100% {
         z-index: 8;
         opacity: 1;
-        transform: translateY(-67cqw) rotate(90deg) scale(1);
+        transform: translateY(var(--card-pull-distance)) rotate(90deg) scale(1);
       }
     }
 
@@ -1577,6 +1578,79 @@
       .reference-time { margin-top: 13px; }
       .reference-venue-rule { margin-block: 13px 10px; }
       .reference-invite .hero-place { gap: 5px; }
+    }
+
+    @media (min-width: 900px) {
+      .open-control {
+        top: 62.5%;
+        width: 11.45vw;
+        max-width: 150px;
+      }
+
+      .artboard {
+        --card-pull-distance: -38svh;
+        width: 100vw;
+        height: 100svh;
+        aspect-ratio: auto;
+      }
+
+      .heading { top: 13.8%; }
+
+      h1 {
+        font-size: clamp(28px, 2.8vw, 42px);
+        letter-spacing: .32em;
+      }
+
+      .subtitle {
+        margin-top: 1.35%;
+        font-size: clamp(10px, .95vw, 14px);
+      }
+
+      .top-ornament {
+        width: min(14.5%, 186px);
+        margin-top: 1.8%;
+      }
+
+      .envelope-wrap {
+        top: 35.2%;
+        left: 27.1%;
+        width: 45.8%;
+        height: 42.9%;
+      }
+
+      #openControl:checked + .artboard .heading { top: 8.78%; }
+
+      #openControl:checked + .artboard .envelope-wrap {
+        top: 42.52%;
+        left: 27.1%;
+        width: 45.8%;
+        height: 42.9%;
+      }
+
+      .footer { top: 82.6%; }
+      #openControl:checked + .artboard .footer { top: 87.08%; }
+
+      .date {
+        font-size: clamp(18px, 1.8vw, 26px);
+        letter-spacing: .40em;
+      }
+
+      .vertical-ornament {
+        width: min(.95%, 13px);
+        margin-top: 1.7%;
+        margin-bottom: 1.35%;
+      }
+
+      #openControl:checked + .artboard .vertical-ornament {
+        width: min(.72%, 10px);
+        margin-top: 1.1%;
+        margin-bottom: 1.4%;
+      }
+
+      .tap-copy {
+        font-size: clamp(9px, .76vw, 11px);
+        letter-spacing: .56em;
+      }
     }
 
     @supports not (font-size: 1cqw) {
