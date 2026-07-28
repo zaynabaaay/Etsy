@@ -1996,6 +1996,9 @@
       const openedStorageKey = 'weddingInvitationOpened';
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       let opened = false;
+      let cardPullStarted = false;
+      let revealStarted = false;
+      let invitationFinished = false;
 
       const invitationBackground = new Image();
       invitationBackground.src = 'invitation-assets/invitation-background-optimized.jpg';
@@ -2052,6 +2055,8 @@
       };
 
       const finishInvitation = () => {
+        if (invitationFinished) return;
+        invitationFinished = true;
         invitationPage.classList.remove('is-preparing', 'is-revealing');
         invitationPage.classList.add('is-ready');
         invitationPage.scrollTop = 0;
@@ -2063,6 +2068,8 @@
       };
 
       const revealInvitation = async () => {
+        if (revealStarted) return;
+        revealStarted = true;
         const sourceRect = card.getBoundingClientRect();
 
         await Promise.all([backgroundReady, fontsReady]);
@@ -2092,9 +2099,15 @@
 
         const handleRevealEnd = event => {
           if (event.animationName !== 'openingCardReveal') return;
+          window.clearTimeout(revealFallback);
           referenceCard.removeEventListener('animationend', handleRevealEnd);
           finishInvitation();
         };
+
+        const revealFallback = window.setTimeout(() => {
+          referenceCard.removeEventListener('animationend', handleRevealEnd);
+          finishInvitation();
+        }, 1100);
 
         referenceCard.addEventListener('animationend', handleRevealEnd);
         invitationPage.classList.remove('is-preparing');
@@ -2133,41 +2146,57 @@
         }
 
         const startCardPull = () => {
+          if (cardPullStarted) return;
+          cardPullStarted = true;
           artboard.classList.add('liner-ready');
 
           const handleCardEnd = event => {
             if (event.animationName !== 'cardJourney') return;
+            window.clearTimeout(cardFallback);
             card.removeEventListener('animationend', handleCardEnd);
             revealInvitation();
           };
+
+          const cardFallback = window.setTimeout(() => {
+            card.removeEventListener('animationend', handleCardEnd);
+            revealInvitation();
+          }, 2300);
 
           card.addEventListener('animationend', handleCardEnd);
           artboard.classList.add('card-pulling');
         };
 
-        const handleFlapEnd = event => {
-          if (event.propertyName !== 'transform') return;
+        const finishFlap = () => {
+          window.clearTimeout(flapFallback);
           flap.removeEventListener('transitionend', handleFlapEnd);
           flap.removeEventListener('transitioncancel', handleFlapCancel);
           startCardPull();
+        };
+
+        const handleFlapEnd = event => {
+          if (event.propertyName !== 'transform') return;
+          finishFlap();
         };
 
         const handleFlapCancel = () => {
-          flap.removeEventListener('transitionend', handleFlapEnd);
-          flap.removeEventListener('transitioncancel', handleFlapCancel);
-          startCardPull();
+          finishFlap();
         };
 
+        const flapFallback = window.setTimeout(finishFlap, 1400);
         flap.addEventListener('transitionend', handleFlapEnd);
         flap.addEventListener('transitioncancel', handleFlapCancel);
       };
 
-      seal.addEventListener('click', () => {
+      const requestOpening = event => {
         if (opened) return;
+        if (event.type === 'pointerup' && event.button !== 0) return;
+        if (event.type === 'pointerup') event.preventDefault();
         control.checked = true;
-        control.dispatchEvent(new Event('change', { bubbles: true }));
-      });
+        openInvitation();
+      };
 
+      seal.addEventListener('pointerup', requestOpening);
+      seal.addEventListener('click', requestOpening);
       control.addEventListener('change', () => {
         if (control.checked) openInvitation();
       });
