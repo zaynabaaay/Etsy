@@ -773,7 +773,7 @@
       transform: rotateX(0deg);
       transform-origin: 50% 0;
       transform-style: preserve-3d;
-      transition: transform 1.15s cubic-bezier(.24,.68,.17,1), z-index 0s .58s;
+      transition: transform 1.15s cubic-bezier(.24,.68,.17,1);
       will-change: transform;
     }
 
@@ -808,9 +808,10 @@
     }
 
     #openControl:checked + .artboard .flap {
-      z-index: 1;
       transform: rotateX(180deg);
     }
+
+    .artboard.flap-behind .flap { z-index: 1; }
 
     #openControl:checked + .artboard .flap-front { opacity: 0; }
     #openControl:checked + .artboard .flap-back { opacity: 1; }
@@ -2138,6 +2139,9 @@
         seal.disabled = true;
         seal.classList.add('is-tapped');
         status.textContent = 'Opening the invitation.';
+        window.setTimeout(() => {
+          artboard.classList.add('flap-behind');
+        }, reduceMotion ? 0 : 360);
 
         if (reduceMotion) {
           artboard.classList.add('liner-ready');
