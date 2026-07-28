@@ -704,39 +704,6 @@
       transition: opacity .01s linear;
     }
 
-    .liner-unified {
-      position: absolute;
-      z-index: 1;
-      top: -60.6%;
-      left: 0;
-      width: 100%;
-      height: 129.6%;
-      opacity: 0;
-      background:
-        linear-gradient(rgba(255,249,239,.09), rgba(112,101,83,.07)),
-        var(--lace-image) center / cover no-repeat;
-      clip-path: polygon(
-        0 46.8%,
-        50% 2%,
-        100% 46.8%,
-        100% 51.1%,
-        62% 76.6%,
-        57% 83.5%,
-        43% 83.5%,
-        38% 76.6%,
-        0 51.1%
-      );
-      pointer-events: none;
-      transform: translateZ(0);
-    }
-
-    .artboard.liner-ready .liner-unified { opacity: 1; }
-    .artboard.liner-ready .liner-body,
-    .artboard.liner-ready .flap-back {
-      opacity: 0;
-      visibility: hidden;
-    }
-
     .invitation-card {
       position: absolute;
       z-index: 2;
@@ -1770,7 +1737,6 @@
         </svg>
 
         <div class="liner-body" aria-hidden="true"></div>
-        <div class="liner-unified" aria-hidden="true"></div>
         <div class="invitation-card" aria-hidden="true"></div>
 
         <svg class="pocket-art" viewBox="0 0 838 693" preserveAspectRatio="none" aria-hidden="true">
@@ -1796,8 +1762,8 @@
           <path d="M1 1 352 315 1 693Z" fill="url(#sideLeft)" stroke="#ffffff" stroke-opacity=".72" stroke-width="1.6"/>
           <path d="M837 1 486 315 837 693Z" fill="url(#pocketLacePattern)"/>
           <path d="M837 1 486 315 837 693Z" fill="url(#sideRight)" stroke="#c9c8c2" stroke-opacity=".44" stroke-width="1.3"/>
-          <path d="M1 693V646Q5 615 29 581L335 299Q349 286 365 306L389 331Q399 342 416 342H422Q439 342 449 331L473 306Q489 286 503 299L809 581Q833 615 837 646V693Z" fill="url(#pocketLacePattern)"/>
-          <path d="M1 693V646Q5 615 29 581L335 299Q349 286 365 306L389 331Q399 342 416 342H422Q439 342 449 331L473 306Q489 286 503 299L809 581Q833 615 837 646V693Z" fill="url(#lowerPocket)" stroke="#ffffff" stroke-opacity=".78" stroke-width="2"/>
+          <path d="M1 693V646Q5 615 29 581L335 299H503L809 581Q833 615 837 646V693Z" fill="url(#pocketLacePattern)"/>
+          <path d="M1 693V646Q5 615 29 581L335 299H503L809 581Q833 615 837 646V693Z" fill="url(#lowerPocket)" stroke="#ffffff" stroke-opacity=".78" stroke-width="2"/>
           <path d="M1 693V646Q5 615 29 581L335 299" fill="none" stroke="#b8b7b1" stroke-opacity=".38" stroke-width="1.35"/>
           <path d="M837 693V646Q833 615 809 581L503 299" fill="none" stroke="#aaa9a3" stroke-opacity=".38" stroke-width="1.35"/>
         </svg>
@@ -2176,7 +2142,6 @@
         status.textContent = 'Opening the invitation.';
 
         if (reduceMotion) {
-          artboard.classList.add('liner-ready');
           revealInvitation();
           return;
         }
@@ -2184,7 +2149,6 @@
         const startCardPull = () => {
           if (cardPullStarted) return;
           cardPullStarted = true;
-          artboard.classList.add('liner-ready');
 
           const handleCardEnd = event => {
             if (event.animationName !== 'cardJourney') return;
