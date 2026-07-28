@@ -11,7 +11,7 @@
   <meta property="og:image" content="og.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="og.png">
-  <link rel="preload" href="invitation-assets/invitation-background-optimized.jpg" as="image">
+  <link rel="preload" href="invitation-assets/invitation-background-sage-chained-v2.jpg" as="image">
   <link rel="preload" href="invitation-assets/envelope-liner-optimized.jpg" as="image">
   <link rel="preload" href="invitation-assets/envelope-lace-white.jpg" as="image">
   <link rel="preload" href="invitation-assets/wax-seal-blank-optimized.png" as="image">
@@ -99,11 +99,7 @@
       transform: none;
       transform-origin: 50% 50%;
       background-color: var(--ivory);
-      background-image: url("invitation-assets/invitation-background-optimized.jpg");
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-attachment: scroll;
+      background-image: none;
       box-shadow: none;
       pointer-events: none;
     }
@@ -202,7 +198,13 @@
       min-height: 100%;
       overflow: hidden;
       color: var(--story-ink);
-      background: transparent;
+      background-color: #f8f6f0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04), rgba(255,255,255,.04)),
+        url("invitation-assets/invitation-background-sage-chained-v2.jpg");
+      background-position: center top;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
       font-family: var(--font-body);
     }
 
@@ -2003,7 +2005,7 @@
       let invitationFinished = false;
 
       const invitationBackground = new Image();
-      invitationBackground.src = 'invitation-assets/invitation-background-optimized.jpg';
+      invitationBackground.src = 'invitation-assets/invitation-background-sage-chained-v2.jpg';
 
       const waitForImage = image => {
         if (image.complete && image.naturalWidth > 0) return Promise.resolve();
