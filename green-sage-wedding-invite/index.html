@@ -11,7 +11,6 @@
   <meta property="og:image" content="og.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="og.png">
-  <link rel="preload" href="invitation-assets/invitation-background-sage-chained-v2.jpg" as="image">
   <link rel="preload" href="invitation-assets/envelope-liner-optimized.jpg" as="image">
   <link rel="preload" href="invitation-assets/envelope-lace-white.jpg" as="image">
   <link rel="preload" href="invitation-assets/wax-seal-blank-optimized.png" as="image">
@@ -36,12 +35,12 @@
 
     :root {
       --ivory: #f8f5ee;
-      --brown: #4b2b24;
-      --muted: #66524a;
-      --gold: #aa8848;
+      --brown: #454437;
+      --muted: #676858;
+      --gold: #a37e46;
       --floral-image: url("invitation-assets/envelope-liner-optimized.jpg");
       --lace-image: url("invitation-assets/envelope-lace-white.jpg");
-      --wax: #5b181a;
+      --wax: #a37e46;
       --font-display: "Invitation Didone", Didot, "Bodoni 72", "Bodoni MT", "Times New Roman", serif;
       --font-body: Baskerville, "Baskerville Old Face", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
       --font-script: "Snell Roundhand", "Apple Chancery", "Brush Script MT", cursive;
@@ -153,8 +152,8 @@
       right: max(16px, env(safe-area-inset-right));
       min-height: 38px;
       padding: 10px 15px 9px;
-      border: 1px solid rgba(123,91,50,.34);
-      color: #5b3931;
+      border: 1px solid rgba(111,115,87,.34);
+      color: #57594a;
       background: rgba(248,241,230,.88);
       box-shadow: 0 7px 18px rgba(69,44,27,.09);
       font-family: var(--font-display);
@@ -171,9 +170,9 @@
 
     .replay-opening:hover,
     .replay-opening:focus-visible {
-      border-color: #6a2a2b;
+      border-color: #6f7357;
       color: #f8f0e4;
-      background: #6a2a2b;
+      background: #6f7357;
       outline: none;
     }
 
@@ -189,45 +188,26 @@
     }
 
     .story-page {
-      --story-ink: #4a2824;
-      --story-muted: #756159;
-      --story-gold: #ad8644;
-      --story-wax: #651d20;
+      --story-ink: #454437;
+      --story-muted: #6c6b5d;
+      --story-gold: #a37e46;
+      --story-wax: #a37e46;
       position: relative;
       isolation: isolate;
       min-height: 100%;
       overflow: hidden;
       color: var(--story-ink);
-      background-color: #f8f6f0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.04), rgba(255,255,255,.04)),
-        url("invitation-assets/invitation-background-sage-chained-v2.jpg");
-      background-position: center top;
-      background-repeat: no-repeat;
-      background-size: 100% 100%;
+      background: #f7f4ec;
       font-family: var(--font-body);
     }
 
     .story-shell {
       position: relative;
       z-index: 2;
-      width: min(calc(100% - clamp(20px, 4vw, 56px)), 1120px);
+      width: 100%;
       margin: 0 auto;
       overflow: visible;
-      border-inline: 1px solid rgba(255,255,255,.58);
-      background:
-        linear-gradient(
-          112deg,
-          rgba(255,255,255,.58) 0%,
-          rgba(249,247,240,.46) 48%,
-          rgba(255,255,255,.54) 100%
-        );
-      box-shadow:
-        0 0 0 1px rgba(116,93,67,.06),
-        0 20px 70px rgba(83,53,31,.10),
-        inset 0 1px 0 rgba(255,255,255,.72);
-      -webkit-backdrop-filter: blur(10px) saturate(.78);
-      backdrop-filter: blur(10px) saturate(.78);
+      background: rgba(247,244,236,.52);
     }
 
     .story-section {
@@ -502,7 +482,7 @@
       padding-top: clamp(105px, 19vh, 190px);
       padding-bottom: clamp(120px, 23vh, 220px);
       text-align: center;
-      background: #5b1c1e;
+      background: #6f7357;
       color: #f2e6d3;
     }
 
@@ -529,7 +509,7 @@
     }
 
     .rsvp-button:hover,
-    .rsvp-button:focus-visible { color: #5b1c1e; background: #d6ae64; outline: 0; }
+    .rsvp-button:focus-visible { color: #6f7357; background: #d6ae64; outline: 0; }
 
     .rsvp-feedback {
       min-height: 1.5em;
@@ -562,10 +542,10 @@
       aspect-ratio: 1;
       place-items: center;
       margin-top: 52px;
-      border: 7px double #722326;
+      border: 7px double #806538;
       border-radius: 45% 55% 48% 52% / 55% 45% 53% 47%;
       color: #d6ae64;
-      background: #5c1b1e;
+      background: #a37e46;
       box-shadow: 0 9px 15px rgba(70,31,22,.22);
       font-size: 18px;
       letter-spacing: .12em;
@@ -634,7 +614,7 @@
       font-size: inherit;
       font-weight: 400;
       line-height: 1;
-      color: #4e2c25;
+      color: #454437;
       white-space: nowrap;
     }
 
@@ -665,7 +645,7 @@
       font-weight: 400;
       line-height: 1;
       letter-spacing: .54em;
-      color: #6b5148;
+      color: #676858;
     }
 
     .top-ornament {
@@ -938,7 +918,14 @@
       height: 100%;
       object-fit: contain;
       transform: rotate(-3deg);
-      filter: drop-shadow(0 8px 7px rgba(52,26,16,.38));
+      filter:
+        grayscale(1)
+        sepia(1)
+        saturate(1.55)
+        hue-rotate(355deg)
+        brightness(1.42)
+        contrast(.88)
+        drop-shadow(0 8px 7px rgba(62,50,30,.34));
     }
 
     .seal-initials {
@@ -948,16 +935,16 @@
       grid-template-rows: 1fr auto 1fr;
       row-gap: .06em;
       place-items: center;
-      color: #d8b56d;
+      color: #f4e6c8;
       font-family: var(--font-display);
       font-size: var(--seal-letter-size);
       font-weight: 400;
       line-height: .78;
       pointer-events: none;
       text-shadow:
-        0 1px 0 rgba(63,19,16,.82),
-        0 -1px 0 rgba(255,226,150,.34),
-        1px 2px 2px rgba(50,12,12,.56);
+        0 1px 0 rgba(70,56,30,.82),
+        0 -1px 0 rgba(255,243,205,.40),
+        1px 2px 2px rgba(49,41,24,.52);
       transform: none;
     }
 
@@ -974,10 +961,10 @@
     .seal-initial-divider {
       width: 82%;
       height: 1px;
-      background: #d8b56d;
+      background: #f4e6c8;
       box-shadow:
-        0 1px 0 rgba(63,19,16,.78),
-        0 -1px 0 rgba(255,226,150,.28);
+        0 1px 0 rgba(70,56,30,.78),
+        0 -1px 0 rgba(255,243,205,.30);
     }
 
     .footer {
@@ -1000,7 +987,7 @@
       font-weight: 400;
       line-height: 1;
       letter-spacing: .40em;
-      color: #4e2c25;
+      color: #454437;
       white-space: nowrap;
     }
 
@@ -1026,7 +1013,7 @@
       font-weight: 400;
       line-height: 1;
       letter-spacing: .56em;
-      color: #4c332d;
+      color: #454437;
       white-space: nowrap;
     }
 
@@ -1096,7 +1083,7 @@
       content: "AMARA & ELIAS  ·  SUMMER 2026";
       display: block;
       padding: 15px 4px 13px;
-      color: #705a50;
+      color: #666758;
       font-family: var(--font-display);
       font-size: clamp(8px, 2vw, 10px);
       letter-spacing: .24em;
@@ -1123,7 +1110,7 @@
 
     .portrait-copy h2 {
       margin: clamp(21px, 4vh, 34px) 0 clamp(25px, 4.5vh, 38px);
-      color: #4d2925;
+      color: #454437;
       font-family: var(--font-display);
       font-size: clamp(52px, 13vw, 82px);
       font-style: italic;
@@ -1148,7 +1135,7 @@
 
     .portrait-story {
       margin: 0;
-      color: #6d5951;
+      color: #6c6b5d;
       font-family: var(--font-body);
       font-size: clamp(16px, 4.1vw, 20px);
       line-height: 1.8;
@@ -1272,14 +1259,14 @@
     .rsvp-button {
       position: relative;
       z-index: 2;
-      border-color: #641d20;
+      border-color: #6f7357;
       color: #f7efe3;
-      background: #641d20;
-      box-shadow: 0 12px 24px rgba(87,31,28,.13);
+      background: #6f7357;
+      box-shadow: 0 12px 24px rgba(74,77,58,.13);
     }
 
     .rsvp-button:hover,
-    .rsvp-button:focus-visible { color: #641d20; background: transparent; }
+    .rsvp-button:focus-visible { color: #6f7357; background: transparent; }
     .rsvp-feedback { position: relative; z-index: 2; color: var(--story-muted); }
 
     .closing-section {
@@ -1312,6 +1299,13 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
+      filter:
+        grayscale(1)
+        sepia(1)
+        saturate(1.55)
+        hue-rotate(355deg)
+        brightness(1.42)
+        contrast(.88);
     }
 
     .closing-seal .seal-initials {
@@ -1360,6 +1354,8 @@
     .reference-invite {
       display: grid;
       width: 100%;
+      min-width: 0;
+      max-width: 100%;
       min-height: 100svh;
       margin: 0;
       padding: clamp(12px, 3vw, 38px);
@@ -1374,6 +1370,8 @@
       isolation: isolate;
       display: grid;
       width: min(100%, 1180px, calc((100svh - 64px) * 1.54));
+      min-width: 0;
+      max-width: 100%;
       aspect-ratio: 1.54 / 1;
       place-items: center;
       overflow: visible;
@@ -1391,6 +1389,8 @@
       position: relative;
       z-index: 3;
       width: min(74%, 790px);
+      min-width: 0;
+      max-width: 100%;
       text-align: center;
     }
 
@@ -1403,8 +1403,10 @@
     }
 
     .reference-invite .story-kicker {
+      width: 100%;
+      max-width: none;
       margin: 0 0 clamp(25px, 3vw, 38px);
-      color: #50302b;
+      color: #555647;
       font-family: var(--font-display);
       font-size: clamp(10px, 1.05vw, 13px);
       line-height: 1.2;
@@ -1434,13 +1436,13 @@
     .reference-invite .couple-names {
       position: relative;
       z-index: 3;
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       width: 100%;
       align-items: baseline;
-      justify-content: center;
       gap: .16em;
       margin: 0;
-      color: #4b2725;
+      color: #454437;
       font-family: var(--font-display);
       font-size: clamp(58px, 6vw, 88px);
       font-weight: 400;
@@ -1451,6 +1453,9 @@
       font-feature-settings: "kern" 1, "liga" 1;
       white-space: nowrap;
     }
+
+    .reference-invite .couple-names > span:first-child { justify-self: end; }
+    .reference-invite .couple-names > span:last-child { justify-self: start; }
 
     .reference-invite .couple-names .ampersand {
       margin: 0;
@@ -1493,7 +1498,7 @@
       align-items: center;
       justify-content: center;
       margin: 0;
-      color: #4e302c;
+      color: #454437;
       font-family: var(--font-display);
       font-size: clamp(12px, 1.35vw, 18px);
       letter-spacing: .43em;
@@ -1514,7 +1519,7 @@
 
     .reference-time {
       margin: clamp(17px, 2vw, 25px) 0 0;
-      color: #5a4038;
+      color: #5f6051;
       font-family: var(--font-display);
       font-size: clamp(8px, .88vw, 11px);
       letter-spacing: .30em;
@@ -1534,7 +1539,7 @@
       display: grid;
       gap: 7px;
       margin: 0;
-      color: #5b4139;
+      color: #5f6051;
       font-family: var(--font-display);
       font-size: clamp(8px, .82vw, 11px);
       line-height: 1.3;
@@ -1543,7 +1548,7 @@
     }
 
     .reference-invite .hero-place strong {
-      color: #684a40;
+      color: #656752;
       font-family: var(--font-script);
       font-size: clamp(27px, 3vw, 42px);
       font-style: normal;
@@ -1561,7 +1566,7 @@
         width: 100%;
         min-height: calc(100svh - 20px);
         aspect-ratio: auto;
-        padding: 96px 26px 82px;
+        padding: 96px 12px 82px;
       }
 
       .reference-copy { width: min(100%, 390px); }
@@ -1584,6 +1589,7 @@
       }
 
       .reference-invite .couple-names {
+        min-width: 0;
         gap: .10em;
         font-size: clamp(38px, 11.4vw, 52px);
         letter-spacing: .045em;
@@ -1625,13 +1631,19 @@
     }
 
     .portrait-section {
-      border-bottom: 1px solid rgba(113,133,101,.22);
-      background: rgba(183,200,173,.46);
+      border-bottom: 1px solid rgba(111,115,87,.16);
+      background:
+        linear-gradient(
+          112deg,
+          rgba(247,244,236,.54),
+          rgba(195,202,184,.22) 52%,
+          rgba(237,231,217,.46)
+        );
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.44),
-        inset 0 -1px 0 rgba(255,255,255,.28);
-      -webkit-backdrop-filter: blur(6px) saturate(.90);
-      backdrop-filter: blur(6px) saturate(.90);
+        inset 0 1px 0 rgba(255,255,255,.58),
+        inset 0 -1px 0 rgba(255,255,255,.36);
+      -webkit-backdrop-filter: blur(7px) saturate(.84);
+      backdrop-filter: blur(7px) saturate(.84);
     }
 
     @media (min-width: 900px) {
@@ -2039,27 +2051,9 @@
       let scrollSaveFrame = 0;
       let openingFallback = 0;
 
-      const invitationBackground = new Image();
-      invitationBackground.src = 'invitation-assets/invitation-background-sage-chained-v2.jpg';
-
-      const waitForImage = image => {
-        if (image.complete && image.naturalWidth > 0) return Promise.resolve();
-
-        return new Promise(resolve => {
-          const finish = () => resolve();
-          image.addEventListener('load', finish, { once: true });
-          image.addEventListener('error', finish, { once: true });
-
-          if (typeof image.decode === 'function') {
-            image.decode().then(finish).catch(finish);
-          }
-        });
-      };
-
-      const backgroundReady = waitForImage(invitationBackground);
       const fontsReady = document.fonts?.ready ?? Promise.resolve();
       const openingAssetsReady = Promise.race([
-        Promise.all([backgroundReady, fontsReady]),
+        fontsReady,
         new Promise(resolve => window.setTimeout(resolve, 1200))
       ]);
       const nextPaint = () => new Promise(resolve => {
