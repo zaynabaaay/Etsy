@@ -1436,12 +1436,13 @@
     .reference-invite .couple-names {
       position: relative;
       z-index: 3;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      width: 100%;
+      display: flex;
+      width: max-content;
+      max-width: 100%;
       align-items: baseline;
+      justify-content: center;
       gap: .16em;
-      margin: 0;
+      margin: 0 auto;
       color: #454437;
       font-family: var(--font-display);
       font-size: clamp(58px, 6vw, 88px);
@@ -1453,9 +1454,6 @@
       font-feature-settings: "kern" 1, "liga" 1;
       white-space: nowrap;
     }
-
-    .reference-invite .couple-names > span:first-child { justify-self: end; }
-    .reference-invite .couple-names > span:last-child { justify-self: start; }
 
     .reference-invite .couple-names .ampersand {
       margin: 0;
@@ -1591,7 +1589,7 @@
       .reference-invite .couple-names {
         min-width: 0;
         gap: .10em;
-        font-size: clamp(38px, 11.4vw, 52px);
+        font-size: clamp(34px, 11.4vw, 52px);
         letter-spacing: .045em;
         text-indent: .045em;
       }
