@@ -2282,12 +2282,14 @@
         flap.addEventListener('animationcancel', handleFlapCancel);
       };
 
-      const requestOpening = () => {
+      const requestOpening = event => {
+        if (event.type === 'mousedown' && event.button !== 0) return;
         if (opened) return;
         control.checked = true;
         openInvitation();
       };
 
+      seal.addEventListener('mousedown', requestOpening);
       seal.addEventListener('click', requestOpening);
 
       replayOpening.addEventListener('click', () => {
