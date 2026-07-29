@@ -2037,6 +2037,7 @@
       let revealStarted = false;
       let invitationFinished = false;
       let scrollSaveFrame = 0;
+      let openingFallback = 0;
 
       const invitationBackground = new Image();
       invitationBackground.src = 'invitation-assets/invitation-background-sage-chained-v2.jpg';
@@ -2057,6 +2058,10 @@
 
       const backgroundReady = waitForImage(invitationBackground);
       const fontsReady = document.fonts?.ready ?? Promise.resolve();
+      const openingAssetsReady = Promise.race([
+        Promise.all([backgroundReady, fontsReady]),
+        new Promise(resolve => window.setTimeout(resolve, 1200))
+      ]);
       const nextPaint = () => new Promise(resolve => {
         requestAnimationFrame(() => requestAnimationFrame(resolve));
       });
@@ -2111,7 +2116,7 @@
       };
 
       const restoreScrollAfterLayout = async () => {
-        await Promise.all([backgroundReady, fontsReady]);
+        await openingAssetsReady;
         await nextPaint();
         restoreScrollPosition();
       };
@@ -2140,6 +2145,7 @@
       const finishInvitation = () => {
         if (invitationFinished) return;
         invitationFinished = true;
+        window.clearTimeout(openingFallback);
         invitationPage.classList.remove('is-preparing', 'is-revealing');
         invitationPage.classList.add('is-ready');
         invitationPage.scrollTop = 0;
@@ -2156,7 +2162,7 @@
         revealStarted = true;
         const sourceRect = card.getBoundingClientRect();
 
-        await Promise.all([backgroundReady, fontsReady]);
+        await openingAssetsReady;
         root.classList.add('invitation-opening');
         artboard.classList.add('opening-complete');
         invitationPage.setAttribute('aria-hidden', 'false');
@@ -2222,6 +2228,13 @@
         seal.disabled = true;
         seal.classList.add('is-tapped');
         status.textContent = 'Opening the invitation.';
+
+        openingFallback = window.setTimeout(() => {
+          if (invitationFinished) return;
+          artboard.classList.add('opening-complete');
+          invitationPage.setAttribute('aria-hidden', 'false');
+          finishInvitation();
+        }, 5200);
 
         if (reduceMotion) {
           revealInvitation();
