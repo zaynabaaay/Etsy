@@ -2269,19 +2269,13 @@
         flap.addEventListener('animationcancel', handleFlapCancel);
       };
 
-      const requestOpening = event => {
+      const requestOpening = () => {
         if (opened) return;
-        if (event.type === 'pointerup' && event.button !== 0) return;
-        if (event.type === 'pointerup') event.preventDefault();
         control.checked = true;
         openInvitation();
       };
 
-      seal.addEventListener('pointerup', requestOpening);
       seal.addEventListener('click', requestOpening);
-      control.addEventListener('change', () => {
-        if (control.checked) openInvitation();
-      });
 
       replayOpening.addEventListener('click', () => {
         writeOpenedState(false);
