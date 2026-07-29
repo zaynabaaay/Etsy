@@ -2030,11 +2030,13 @@
       const replayOpening = document.getElementById('replayOpening');
       const revealItems = document.querySelectorAll('.reveal');
       const openedStorageKey = 'weddingInvitationOpened';
+      const scrollStorageKey = 'weddingInvitationScrollTop';
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       let opened = false;
       let cardPullStarted = false;
       let revealStarted = false;
       let invitationFinished = false;
+      let scrollSaveFrame = 0;
 
       const invitationBackground = new Image();
       invitationBackground.src = 'invitation-assets/invitation-background-sage-chained-v2.jpg';
@@ -2076,18 +2078,63 @@
         }
       };
 
+      const readScrollPosition = () => {
+        try {
+          const storedPosition = localStorage.getItem(scrollStorageKey);
+          if (storedPosition === null) return 0;
+          const position = Number.parseInt(storedPosition, 10);
+          return Number.isFinite(position) && position > 0 ? position : 0;
+        } catch (error) {
+          return 0;
+        }
+      };
+
+      const writeScrollPosition = position => {
+        try {
+          localStorage.setItem(scrollStorageKey, String(Math.max(0, Math.round(position))));
+        } catch (error) {
+          // Browser storage is optional; the invitation remains usable without it.
+        }
+      };
+
+      const clearScrollPosition = () => {
+        try {
+          localStorage.removeItem(scrollStorageKey);
+        } catch (error) {
+          // Browser storage is optional; the invitation remains usable without it.
+        }
+      };
+
+      const restoreScrollPosition = () => {
+        const maximumScroll = Math.max(0, invitationPage.scrollHeight - invitationPage.clientHeight);
+        invitationPage.scrollTop = Math.min(readScrollPosition(), maximumScroll);
+      };
+
+      const restoreScrollAfterLayout = async () => {
+        await Promise.all([backgroundReady, fontsReady]);
+        await nextPaint();
+        restoreScrollPosition();
+      };
+
+      const saveCurrentScrollPosition = () => {
+        if (!opened || !invitationPage.classList.contains('is-ready')) return;
+        writeScrollPosition(invitationPage.scrollTop);
+      };
+
       const showInvitationImmediately = () => {
         opened = true;
+        invitationFinished = true;
         control.checked = true;
         control.setAttribute('aria-label', 'Invitation opened');
         invitationPage.setAttribute('aria-hidden', 'false');
         invitationPage.classList.remove('is-preparing', 'is-revealing');
         invitationPage.classList.add('is-ready');
-        invitationPage.scrollTop = 0;
+        restoreScrollPosition();
         status.textContent = 'Invitation ready.';
         artboard.classList.add('opening-complete');
         root.classList.remove('invitation-opening');
         root.classList.add('invitation-returning');
+        restoreScrollAfterLayout();
       };
 
       const finishInvitation = () => {
@@ -2096,6 +2143,7 @@
         invitationPage.classList.remove('is-preparing', 'is-revealing');
         invitationPage.classList.add('is-ready');
         invitationPage.scrollTop = 0;
+        writeScrollPosition(0);
         control.setAttribute('aria-label', 'Invitation opened');
         status.textContent = 'Invitation ready.';
         writeOpenedState(true);
@@ -2237,8 +2285,26 @@
 
       replayOpening.addEventListener('click', () => {
         writeOpenedState(false);
+        clearScrollPosition();
         root.classList.remove('invitation-opening', 'invitation-returning');
         window.location.reload();
+      });
+
+      invitationPage.addEventListener('scroll', () => {
+        if (scrollSaveFrame) return;
+        scrollSaveFrame = window.requestAnimationFrame(() => {
+          scrollSaveFrame = 0;
+          saveCurrentScrollPosition();
+        });
+      }, { passive: true });
+
+      window.addEventListener('pagehide', saveCurrentScrollPosition);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          saveCurrentScrollPosition();
+        } else if (readOpenedState()) {
+          restoreScrollAfterLayout();
+        }
       });
 
       if (readOpenedState()) showInvitationImmediately();
