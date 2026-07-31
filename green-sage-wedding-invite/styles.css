@@ -1724,3 +1724,125 @@
       .invitation-page.is-revealing .reference-card,
       .artboard.card-pulling .invitation-card { animation: none !important; }
     }
+
+    /* Schedule showcase: flat sage field with a crisp, responsive timeline. */
+    html.standalone-invitation .schedule-showcase {
+      position: relative;
+      display: block;
+      min-height: clamp(430px, 46vw, 620px);
+      padding: clamp(72px, 9vw, 132px) clamp(22px, 7vw, 112px) clamp(80px, 9vw, 132px);
+      overflow: hidden;
+      background: #aeb3a0;
+      color: #f7f4ec;
+      text-align: center;
+    }
+
+    html.standalone-invitation .schedule-kicker {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 22px;
+      color: #f7f4ec;
+      font-family: var(--font-display);
+      font-size: clamp(10px, 1vw, 14px);
+      letter-spacing: .48em;
+      text-transform: uppercase;
+    }
+
+    html.standalone-invitation .schedule-heading {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: #f7f4ec;
+      font-family: var(--font-display);
+      font-size: clamp(42px, 6vw, 88px);
+      font-weight: 400;
+      letter-spacing: -.035em;
+      line-height: .98;
+    }
+
+    html.standalone-invitation .schedule-line {
+      position: relative;
+      z-index: 1;
+      height: 1px;
+      margin: clamp(90px, 10vw, 138px) 0 0;
+      background: #c6a45f;
+    }
+
+    html.standalone-invitation .schedule-line::before,
+    html.standalone-invitation .schedule-line::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 13px;
+      height: 13px;
+      border: 1px solid #c6a45f;
+      border-radius: 50%;
+      background: #aeb3a0;
+      transform: translateY(-50%);
+    }
+
+    html.standalone-invitation .schedule-line::before { left: 16.6%; }
+    html.standalone-invitation .schedule-line::after { left: 83.3%; }
+
+    html.standalone-invitation .schedule-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(14px, 3vw, 48px);
+      margin-top: 0;
+    }
+
+    html.standalone-invitation .schedule-event {
+      position: relative;
+      padding-top: 38px;
+    }
+
+    html.standalone-invitation .schedule-event::before {
+      content: "";
+      position: absolute;
+      top: -7px;
+      left: 50%;
+      width: 14px;
+      height: 14px;
+      border: 1px solid #c6a45f;
+      border-radius: 50%;
+      background: #aeb3a0;
+      transform: translateX(-50%);
+    }
+
+    html.standalone-invitation .schedule-event time {
+      display: block;
+      color: #c6a45f;
+      font-family: var(--font-display);
+      font-size: clamp(16px, 1.6vw, 24px);
+      letter-spacing: .16em;
+    }
+
+    html.standalone-invitation .schedule-event h3 {
+      margin: 18px 0 10px;
+      color: #f7f4ec;
+      font-family: var(--font-display);
+      font-size: clamp(16px, 1.7vw, 25px);
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    html.standalone-invitation .schedule-event p {
+      margin: 0;
+      color: #5f6258;
+      font-family: var(--font-display);
+      font-size: clamp(14px, 1.35vw, 20px);
+      font-style: italic;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 700px) {
+      html.standalone-invitation .schedule-showcase { padding-inline: 18px; }
+      html.standalone-invitation .schedule-line { margin-top: 64px; }
+      html.standalone-invitation .schedule-grid { gap: 26px 8px; }
+      html.standalone-invitation .schedule-event { padding-top: 28px; }
+      html.standalone-invitation .schedule-event h3 { letter-spacing: .08em; }
+      html.standalone-invitation .schedule-event p { font-size: 12px; }
+    }
