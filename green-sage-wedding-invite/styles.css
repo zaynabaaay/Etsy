@@ -1732,7 +1732,7 @@
       min-height: clamp(430px, 46vw, 620px);
       padding: clamp(72px, 9vw, 132px) clamp(22px, 7vw, 112px) clamp(80px, 9vw, 132px);
       overflow: hidden;
-      background: #aeb3a0;
+      background: #898b78;
       color: #f7f4ec;
       text-align: center;
     }
@@ -1777,7 +1777,7 @@
       height: 13px;
       border: 1px solid #c6a45f;
       border-radius: 50%;
-      background: #aeb3a0;
+      background: #898b78;
       transform: translateY(-50%);
     }
 
@@ -1807,7 +1807,7 @@
       height: 14px;
       border: 1px solid #c6a45f;
       border-radius: 50%;
-      background: #aeb3a0;
+      background: #898b78;
       transform: translateX(-50%);
     }
 
@@ -1831,7 +1831,7 @@
 
     html.standalone-invitation .schedule-event p {
       margin: 0;
-      color: #5f6258;
+      color: #e7e3d8;
       font-family: var(--font-display);
       font-size: clamp(14px, 1.35vw, 20px);
       font-style: italic;
