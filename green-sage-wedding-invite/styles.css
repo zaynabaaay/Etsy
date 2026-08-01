@@ -1,3 +1,5 @@
+    @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&display=swap");
+
     @font-face {
       font-family: "Invitation Didone";
       src: local("Didot"), local("Bodoni 72"), local("Bodoni MT"), local("Bodoni Moda");
@@ -1953,5 +1955,60 @@
       html.standalone-invitation .reference-scroll {
         margin-top: 14px;
         font-size: 7px;
+      }
+    }
+
+    html.standalone-invitation .reference-invite .hero-formal-copy p,
+    html.standalone-invitation .reference-invite .couple-names,
+    html.standalone-invitation .reference-date-row,
+    html.standalone-invitation .reference-scroll {
+      font-family: "Cormorant Garamond", Garamond, Georgia, serif;
+    }
+
+    html.standalone-invitation .reference-invite .couple-names {
+      font-weight: 300;
+      letter-spacing: .16em;
+      text-indent: .16em;
+    }
+
+    html.standalone-invitation .reference-invite .couple-names .ampersand {
+      font-family: "Cormorant Garamond", Garamond, Georgia, serif;
+      font-size: .46em;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-indent: 0;
+    }
+
+    html.standalone-invitation .reference-name-motif {
+      display: block;
+      width: clamp(50px, 4.8vw, 66px);
+      height: auto;
+      margin: clamp(28px, 3vw, 40px) auto clamp(24px, 2.6vw, 34px);
+      color: #747961;
+    }
+
+    html.standalone-invitation .reference-city {
+      margin: clamp(12px, 1.4vw, 18px) 0 0;
+      color: #5f6051;
+      font-family: "Cormorant Garamond", Garamond, Georgia, serif;
+      font-size: clamp(8px, .82vw, 11px);
+      letter-spacing: .34em;
+      text-transform: uppercase;
+    }
+
+    @media (min-width: 760px) and (max-height: 600px) {
+      html.standalone-invitation .reference-name-motif {
+        width: 64px;
+        margin-block: 16px 13px;
+      }
+
+      html.standalone-invitation .reference-city {
+        margin-top: 7px;
+        font-size: 7px;
+      }
+
+      html.standalone-invitation .reference-scroll {
+        margin-top: 28px;
       }
     }
