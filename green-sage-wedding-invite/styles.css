@@ -1846,3 +1846,112 @@
       html.standalone-invitation .schedule-event h3 { letter-spacing: .08em; }
       html.standalone-invitation .schedule-event p { font-size: 12px; }
     }
+
+    /* Opening invitation copy: stacked names with no monogram or venue details. */
+    html.standalone-invitation .reference-invite .reference-copy {
+      width: min(72%, 700px);
+    }
+
+    html.standalone-invitation .reference-invite .hero-formal-copy {
+      margin-bottom: clamp(30px, 3.3vw, 46px);
+    }
+
+    html.standalone-invitation .reference-invite .couple-names {
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(18px, 2.2vw, 30px);
+      font-size: clamp(48px, 5.5vw, 80px);
+      line-height: .95;
+      white-space: normal;
+    }
+
+    html.standalone-invitation .reference-invite .couple-names .ampersand {
+      display: flex;
+      width: min(48%, 250px);
+      align-items: center;
+      gap: 18px;
+      justify-content: center;
+      font-size: .52em;
+    }
+
+    html.standalone-invitation .reference-invite .couple-names .ampersand::before,
+    html.standalone-invitation .reference-invite .couple-names .ampersand::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: currentColor;
+      opacity: .45;
+    }
+
+    html.standalone-invitation .reference-date-compact span {
+      position: relative;
+      padding-inline: clamp(13px, 1.8vw, 24px);
+    }
+
+    html.standalone-invitation .reference-date-compact span + span::before {
+      content: "·";
+      position: absolute;
+      left: -.14em;
+      color: #b19054;
+    }
+
+    html.standalone-invitation .reference-scroll {
+      margin: clamp(30px, 3.5vw, 48px) 0 0;
+      color: #5f6051;
+      font-family: var(--font-display);
+      font-size: clamp(8px, .8vw, 11px);
+      letter-spacing: .35em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 759px) {
+      html.standalone-invitation .reference-invite .reference-copy { width: min(100%, 410px); }
+      html.standalone-invitation .reference-invite .couple-names {
+        gap: 17px;
+        font-size: clamp(38px, 13vw, 56px);
+        letter-spacing: .08em;
+      }
+      html.standalone-invitation .reference-invite .couple-names .ampersand { width: min(55%, 190px); }
+      html.standalone-invitation .reference-invite .hero-divider { margin-block: 26px 24px; }
+      html.standalone-invitation .reference-scroll { margin-top: 28px; }
+    }
+
+    @media (min-width: 760px) and (max-height: 600px) {
+      html.standalone-invitation .reference-card {
+        padding-block: 24px 20px;
+      }
+
+      html.standalone-invitation .reference-invite .hero-formal-copy {
+        gap: 3px;
+        margin-bottom: 15px;
+      }
+
+      html.standalone-invitation .reference-invite .hero-formal-copy p {
+        font-size: 8px;
+      }
+
+      html.standalone-invitation .reference-invite .couple-names {
+        gap: 8px;
+        font-size: clamp(42px, 5vw, 58px);
+      }
+
+      html.standalone-invitation .reference-invite .couple-names .ampersand {
+        width: min(35%, 180px);
+      }
+
+      html.standalone-invitation .reference-invite .hero-divider {
+        width: min(42%, 270px);
+        margin-block: 14px 13px;
+      }
+
+      html.standalone-invitation .reference-date-row {
+        font-size: 10px;
+      }
+
+      html.standalone-invitation .reference-scroll {
+        margin-top: 14px;
+        font-size: 7px;
+      }
+    }
