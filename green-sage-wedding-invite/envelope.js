@@ -111,13 +111,7 @@
     flapFallback = window.setTimeout(finishFlap, 1500);
   };
 
-  const requestOpening = (event) => {
-    if (event.type === 'mousedown' && event.button !== 0) return;
-    openInvitation();
-  };
-
-  seal.addEventListener('mousedown', requestOpening);
-  seal.addEventListener('click', requestOpening);
+  seal.addEventListener('click', openInvitation);
 
   resetEnvelope();
   window.addEventListener('pageshow', (event) => {
