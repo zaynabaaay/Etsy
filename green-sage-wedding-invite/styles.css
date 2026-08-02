@@ -722,7 +722,11 @@
       --seal-letter-size: clamp(20px, 6.6cqw, 42px);
     }
 
-    .seal-button:active,
+    .seal-button:active {
+      transform: translate(-50%, -49%) scale(.94);
+      filter: brightness(.96);
+    }
+
     .seal-button.is-tapped,
     #openControl:checked + .artboard .seal-button {
       transform: translate(-50%, -48%) scale(.86);
