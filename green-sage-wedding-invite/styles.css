@@ -534,11 +534,11 @@
         7px 15px 13px rgba(77, 51, 25, .20),
         1px 3px 4px rgba(91, 65, 37, .10);
       transition:
-        top 1.05s cubic-bezier(.22,.72,.18,1),
-        left 1.05s cubic-bezier(.22,.72,.18,1),
-        width 1.05s cubic-bezier(.22,.72,.18,1),
-        height 1.05s cubic-bezier(.22,.72,.18,1),
-        box-shadow 1.05s ease;
+        top 1.2s cubic-bezier(.22,.72,.18,1),
+        left 1.2s cubic-bezier(.22,.72,.18,1),
+        width 1.2s cubic-bezier(.22,.72,.18,1),
+        height 1.2s cubic-bezier(.22,.72,.18,1),
+        box-shadow 1.2s ease;
     }
 
     .envelope-art {
@@ -561,7 +561,7 @@
         linear-gradient(rgba(255,249,239,.10), rgba(112,101,83,.08)),
         var(--lace-image) center 36% / cover no-repeat;
       box-shadow: none;
-      transition: opacity .01s linear;
+      transition: opacity .55s .85s ease;
     }
 
     .invitation-card {
@@ -644,11 +644,11 @@
     }
 
     #openControl:checked + .artboard .flap-front {
-      animation: flapFrontOpen .56s cubic-bezier(.36,.05,.64,.95) forwards;
+      animation: flapFrontOpen .82s .18s cubic-bezier(.42,0,.58,1) forwards;
     }
 
     #openControl:checked + .artboard .flap-back {
-      animation: flapBackOpen .59s .56s cubic-bezier(.24,.68,.17,1) forwards;
+      animation: flapBackOpen .9s 1s cubic-bezier(.42,0,.58,1) forwards;
     }
 
     #openControl:checked + .artboard .liner-body { opacity: 1; }
@@ -741,7 +741,7 @@
       background: transparent;
       cursor: pointer;
       touch-action: manipulation;
-      transition: transform .22s ease, filter .22s ease, opacity .22s ease;
+      transition: transform .3s ease, filter .3s ease, opacity .3s ease;
       --seal-letter-size: clamp(20px, 6.6cqw, 42px);
     }
 

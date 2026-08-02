@@ -4,10 +4,10 @@
   const control = document.getElementById('openControl');
   const artboard = document.querySelector('.artboard');
   const card = document.querySelector('.invitation-card');
-  const flap = document.querySelector('.flap');
+  const flapBack = document.querySelector('.flap-back');
   const status = document.getElementById('status');
 
-  if (!seal || !control || !artboard || !card || !flap || !status) return;
+  if (!seal || !control || !artboard || !card || !flapBack || !status) return;
 
   document.querySelectorAll('[data-seal-initial]').forEach((initial) => {
     initial.textContent = sealInitials[initial.dataset.sealInitial] || '';
@@ -18,11 +18,34 @@
   let cardPullStarted = false;
   let navigationStarted = false;
   let openingFallback = 0;
+  let flapFallback = 0;
+  let cardFallback = 0;
+
+  const resetEnvelope = () => {
+    window.clearTimeout(openingFallback);
+    window.clearTimeout(flapFallback);
+    window.clearTimeout(cardFallback);
+
+    openingStarted = false;
+    cardPullStarted = false;
+    navigationStarted = false;
+    openingFallback = 0;
+    flapFallback = 0;
+    cardFallback = 0;
+
+    control.checked = false;
+    seal.disabled = false;
+    seal.classList.remove('is-tapped');
+    artboard.classList.remove('card-pulling');
+    status.textContent = '';
+  };
 
   const finishOpening = () => {
     if (navigationStarted) return;
     navigationStarted = true;
     window.clearTimeout(openingFallback);
+    window.clearTimeout(flapFallback);
+    window.clearTimeout(cardFallback);
     window.location.assign('invitation.html');
   };
 
@@ -33,11 +56,12 @@
     const finishCardPull = (event) => {
       if (event && event.animationName !== 'cardJourney') return;
       card.removeEventListener('animationend', finishCardPull);
+      window.clearTimeout(cardFallback);
       finishOpening();
     };
 
     card.addEventListener('animationend', finishCardPull);
-    window.setTimeout(finishCardPull, 2300);
+    cardFallback = window.setTimeout(finishCardPull, 2600);
     artboard.classList.add('card-pulling');
   };
 
@@ -54,29 +78,31 @@
       return;
     }
 
-    openingFallback = window.setTimeout(finishOpening, 4600);
+    openingFallback = window.setTimeout(finishOpening, 5600);
 
     const finishFlap = (event) => {
-      if (event && event.type === 'animationend' && event.animationName !== 'flapBackOpen') return;
-      flap.removeEventListener('animationend', finishFlap);
-      flap.removeEventListener('animationcancel', finishFlap);
-      startCardPull();
+      if (event?.type === 'animationend' && event.animationName !== 'flapBackOpen') return;
+      flapBack.removeEventListener('animationend', finishFlap);
+      flapBack.removeEventListener('animationcancel', finishFlap);
+      window.clearTimeout(flapFallback);
+      window.setTimeout(startCardPull, 180);
     };
 
-    flap.addEventListener('animationend', finishFlap);
-    flap.addEventListener('animationcancel', finishFlap);
-    window.setTimeout(finishFlap, 1400);
+    flapBack.addEventListener('animationend', finishFlap);
+    flapBack.addEventListener('animationcancel', finishFlap);
+    flapFallback = window.setTimeout(finishFlap, 2400);
   };
 
   const requestOpening = (event) => {
-    if (event.type === 'mousedown' && event.button !== 0) return;
+    if (event.type === 'pointerdown' && event.button !== 0) return;
     openInvitation();
   };
 
-  seal.addEventListener('mousedown', requestOpening);
+  seal.addEventListener('pointerdown', requestOpening, { passive: true });
   seal.addEventListener('click', requestOpening);
 
+  resetEnvelope();
   window.addEventListener('pageshow', (event) => {
-    if (event.persisted) window.location.reload();
+    if (event.persisted) resetEnvelope();
   });
 })();
