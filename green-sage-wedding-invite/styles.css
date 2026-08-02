@@ -64,60 +64,29 @@
       background: transparent;
     }
 
+    html.standalone-invitation body {
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: #f7f4ec;
+    }
+
+    html.standalone-invitation .page {
+      position: relative;
+      inset: auto;
+      display: block;
+      width: 100%;
+      min-height: 100%;
+      overflow: visible;
+    }
+
     .invitation-page {
-      position: fixed;
+      position: relative;
       z-index: 60;
-      inset: 0;
-      opacity: 0;
-      visibility: hidden;
-      transform: none;
-      transform-origin: 50% 50%;
-      background-color: var(--ivory);
-      background-image: none;
-      box-shadow: none;
-      pointer-events: none;
-    }
-
-    .invitation-page.is-preparing,
-    .invitation-page.is-revealing {
-      opacity: 1;
-      visibility: visible;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .invitation-page.is-preparing .reference-card { opacity: 0; }
-
-    .invitation-page.is-revealing .reference-card {
-      animation: openingCardReveal .86s cubic-bezier(.2,.72,.18,1) both;
-      will-change: transform, opacity;
-    }
-
-    .invitation-page.is-ready {
-      animation: none;
-      opacity: 1;
-      visibility: visible;
-      transform: none;
-      overflow-x: hidden;
-      overflow-y: auto;
-      overscroll-behavior-y: contain;
-      -webkit-overflow-scrolling: touch;
-      pointer-events: auto;
-    }
-
-    .invitation-page.is-ready,
-    .invitation-returning .invitation-page {
-      box-shadow: none;
-    }
-
-    .invitation-returning .page { visibility: hidden; }
-
-    .invitation-returning .invitation-page {
-      opacity: 1;
-      visibility: visible;
-      overflow-x: hidden;
-      overflow-y: auto;
-      pointer-events: auto;
+      width: 100%;
+      min-height: 100dvh;
+      background: var(--ivory);
     }
 
     .replay-opening {
@@ -190,7 +159,6 @@
       padding-inline: clamp(28px, 8vw, 108px);
     }
 
-    .story-kicker,
     .story-label {
       margin: 0;
       font-family: var(--font-display);
@@ -214,12 +182,6 @@
       text-align: center;
     }
 
-    .hero-invite .story-kicker {
-      max-width: 330px;
-      margin-bottom: clamp(30px, 5vh, 48px);
-      line-height: 1.7;
-    }
-
     .couple-names {
       margin: 0;
       font-size: clamp(72px, 20vw, 166px);
@@ -236,15 +198,6 @@
       font-size: .58em;
       font-style: italic;
       letter-spacing: 0;
-    }
-
-    .hero-place {
-      margin: 10px 0 0;
-      color: var(--story-muted);
-      font-family: var(--font-display);
-      font-size: 11px;
-      letter-spacing: .26em;
-      text-transform: uppercase;
     }
 
     .portrait-section {
@@ -322,50 +275,6 @@
       line-height: 1.7;
     }
 
-    .details-section {
-      padding-top: clamp(96px, 16vh, 160px);
-      padding-bottom: clamp(90px, 17vh, 170px);
-      text-align: center;
-      background: rgba(255,255,255,.16);
-      border-block: 1px solid rgba(173,135,65,.20);
-    }
-
-    .section-rule {
-      display: flex;
-      width: min(290px, 75%);
-      align-items: center;
-      gap: 12px;
-      margin: 28px auto 54px;
-      color: var(--story-gold);
-    }
-
-    .section-rule::before,
-    .section-rule::after { content: ""; height: 1px; flex: 1; background: currentColor; opacity: .62; }
-    .section-rule span { font-size: 15px; }
-
-    .schedule {
-      display: grid;
-      max-width: 780px;
-      gap: 1px;
-      margin: 0 auto;
-      background: rgba(173,135,65,.28);
-    }
-
-    .schedule-item {
-      padding: 38px 24px;
-      background: #f2eadc;
-    }
-
-    .schedule-number {
-      display: block;
-      margin-bottom: 18px;
-      color: var(--story-gold);
-      font-family: var(--font-display);
-      font-size: 35px;
-      line-height: 1;
-    }
-
-    .schedule-item h3,
     .guest-card h3 {
       margin: 0 0 10px;
       font-family: var(--font-display);
@@ -375,25 +284,12 @@
       text-transform: uppercase;
     }
 
-    .schedule-item p,
     .guest-card p {
       margin: 0;
       color: var(--story-muted);
       font-size: 16px;
       line-height: 1.55;
     }
-
-    .venue-card {
-      max-width: 620px;
-      margin: 56px auto 0;
-      padding: 35px 26px;
-      background: rgba(255,255,255,.28);
-      box-shadow: 0 12px 28px rgba(83,53,31,.07);
-      transform: rotate(.6deg);
-    }
-
-    .venue-card strong { display: block; margin-bottom: 8px; font-family: var(--font-display); font-size: 22px; font-weight: 400; }
-    .venue-card span { color: var(--story-muted); font-family: var(--font-display); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
 
     .note-section {
       padding-top: clamp(120px, 21vh, 210px);
@@ -535,7 +431,6 @@
     @media (min-width: 700px) {
       .portrait-section { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); }
       .portrait-copy { text-align: left; }
-      .schedule { grid-template-columns: repeat(3, 1fr); }
       .guest-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
@@ -554,11 +449,6 @@
       overflow: hidden;
       opacity: 1;
       transition: opacity .24s ease;
-    }
-
-    .artboard.opening-complete {
-      opacity: 0;
-      pointer-events: none;
     }
 
     .paper-texture {
@@ -835,19 +725,6 @@
       }
     }
 
-    @keyframes openingCardReveal {
-      from {
-        opacity: 1;
-        transform:
-          translate(var(--page-start-x), var(--page-start-y))
-          scale(var(--page-start-scale-x), var(--page-start-scale-y));
-      }
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-
     .seal-button {
       position: absolute;
       z-index: 7;
@@ -1055,7 +932,7 @@
     }
 
     .portrait-card::after {
-      content: "AMARA & ELIAS  ·  SUMMER 2026";
+      content: "ALEXANDRA & GABRIEL  ·  SUMMER 2027";
       display: block;
       padding: 15px 4px 13px;
       color: #666758;
@@ -1127,55 +1004,10 @@
       letter-spacing: .02em;
     }
 
-    .details-section,
     .note-section,
     .guest-section,
     .rsvp-section {
       isolation: isolate;
-    }
-
-    .details-section {
-      z-index: 1;
-      padding-top: clamp(105px, 17vh, 165px);
-      padding-bottom: clamp(135px, 22vh, 220px);
-      border: 0;
-      background: transparent;
-    }
-
-    .details-section > * { position: relative; z-index: 2; }
-    .details-section .section-title { max-width: 750px; margin-inline: auto; }
-
-    .schedule {
-      position: relative;
-      z-index: 2;
-      gap: 0;
-      max-width: 820px;
-      background: transparent;
-    }
-
-    .schedule-item {
-      padding: 43px 18px;
-      border-top: 1px solid rgba(173,134,68,.38);
-      background: transparent;
-    }
-
-    .schedule-item:last-child { border-bottom: 1px solid rgba(173,134,68,.38); }
-
-    .schedule-number {
-      margin-bottom: 22px;
-      color: #8c6b32;
-      font-size: 38px;
-    }
-
-    .venue-card {
-      position: relative;
-      z-index: 2;
-      margin-top: 62px;
-      padding: 32px 20px;
-      border-block: 1px solid rgba(173,134,68,.48);
-      background: transparent;
-      box-shadow: none;
-      transform: none;
     }
 
     .note-section {
@@ -1298,14 +1130,6 @@
       }
 
       .couple-names .ampersand { margin: 0; font-size: .58em; }
-      .schedule-item {
-        border-top: 1px solid rgba(173,134,68,.38);
-        border-bottom: 1px solid rgba(173,134,68,.38);
-        border-left: 1px solid rgba(173,134,68,.38);
-      }
-
-      .schedule-item:last-child { border-right: 1px solid rgba(173,134,68,.38); }
-
       .guest-card {
         border-top: 1px solid rgba(173,134,68,.42);
         border-bottom: 1px solid rgba(173,134,68,.42);
@@ -1373,26 +1197,6 @@
       text-align: center;
     }
 
-    .reference-sprig {
-      display: block;
-      width: clamp(36px, 4.3vw, 54px);
-      height: auto;
-      margin: 0 auto clamp(22px, 2.7vw, 34px);
-      color: #a68a5c;
-    }
-
-    .reference-invite .story-kicker {
-      width: 100%;
-      max-width: none;
-      margin: 0 0 clamp(25px, 3vw, 38px);
-      color: #555647;
-      font-family: var(--font-display);
-      font-size: clamp(10px, 1.05vw, 13px);
-      line-height: 1.2;
-      letter-spacing: .42em;
-      white-space: nowrap;
-    }
-
     .reference-invite .hero-formal-copy {
       position: relative;
       z-index: 3;
@@ -1445,31 +1249,6 @@
       text-transform: lowercase;
     }
 
-    .reference-invite .hero-divider {
-      position: relative;
-      z-index: 3;
-      display: flex;
-      width: min(58%, 430px);
-      align-items: center;
-      gap: 14px;
-      margin: clamp(32px, 3.6vw, 50px) auto clamp(26px, 3vw, 40px);
-      color: #b49862;
-    }
-
-    .reference-invite .hero-divider::before,
-    .reference-invite .hero-divider::after {
-      content: "";
-      height: 1px;
-      flex: 1;
-      background: currentColor;
-      opacity: .65;
-    }
-
-    .reference-invite .hero-divider span {
-      font-size: 15px;
-      transform: rotate(45deg);
-    }
-
     .reference-date-row {
       display: flex;
       align-items: center;
@@ -1487,55 +1266,6 @@
       white-space: nowrap;
     }
 
-    .reference-date-row .reference-day {
-      border-inline: 1px solid rgba(166,138,92,.58);
-      font-size: 1.45em;
-      letter-spacing: .16em;
-      text-indent: .16em;
-    }
-
-    .reference-time {
-      margin: clamp(17px, 2vw, 25px) 0 0;
-      color: #5f6051;
-      font-family: var(--font-display);
-      font-size: clamp(8px, .88vw, 11px);
-      letter-spacing: .30em;
-      text-transform: uppercase;
-    }
-
-    .reference-venue-rule {
-      width: 38px;
-      height: 1px;
-      margin: clamp(17px, 2vw, 25px) auto clamp(12px, 1.4vw, 18px);
-      background: rgba(180,151,94,.62);
-    }
-
-    .reference-invite .hero-place {
-      position: relative;
-      z-index: 3;
-      display: grid;
-      gap: 7px;
-      margin: 0;
-      color: #5f6051;
-      font-family: var(--font-display);
-      font-size: clamp(8px, .82vw, 11px);
-      line-height: 1.3;
-      letter-spacing: .34em;
-      text-transform: uppercase;
-    }
-
-    .reference-invite .hero-place strong {
-      color: #656752;
-      font-family: var(--font-script);
-      font-size: clamp(27px, 3vw, 42px);
-      font-style: normal;
-      line-height: 1.05;
-      letter-spacing: .01em;
-      text-transform: none;
-    }
-
-    .reference-reception { margin-top: 3px; }
-
     @media (max-width: 759px) {
       .reference-invite { padding: 10px; }
 
@@ -1547,14 +1277,6 @@
       }
 
       .reference-copy { width: min(100%, 390px); }
-      .reference-sprig { margin-bottom: 25px; }
-
-      .reference-invite .story-kicker {
-        margin-bottom: 25px;
-        font-size: 9px;
-        letter-spacing: .30em;
-      }
-
       .reference-invite .hero-formal-copy {
         gap: 4px;
         margin-bottom: 30px;
@@ -1574,28 +1296,17 @@
       }
 
       .reference-invite .couple-names .ampersand { font-size: .60em; }
-      .reference-invite .hero-divider { width: 64%; margin-block: 31px 28px; }
-
       .reference-date-row {
         font-size: 10px;
         letter-spacing: .24em;
       }
 
       .reference-date-row span { padding-inline: 10px; }
-      .reference-time { max-width: 290px; margin-inline: auto; line-height: 1.6; letter-spacing: .22em; }
-      .reference-invite .hero-place strong { font-size: 29px; }
-
     }
 
     @media (max-width: 430px) and (max-height: 740px) {
       .reference-card { padding-block: 72px 60px; }
-      .reference-sprig { margin-bottom: 15px; }
-      .reference-invite .story-kicker { margin-bottom: 17px; }
       .reference-invite .hero-formal-copy { margin-bottom: 20px; }
-      .reference-invite .hero-divider { margin-block: 22px 19px; }
-      .reference-time { margin-top: 13px; }
-      .reference-venue-rule { margin-block: 13px 10px; }
-      .reference-invite .hero-place { gap: 5px; }
     }
 
     /* First two translucent invitation chapters */
@@ -1723,7 +1434,6 @@
       .invitation-card,
       .artboard { transition-duration: .01ms !important; }
 
-      .invitation-page.is-revealing .reference-card,
       .artboard.card-pulling .invitation-card { animation: none !important; }
     }
 
@@ -1950,7 +1660,6 @@
         letter-spacing: .08em;
       }
       html.standalone-invitation .reference-invite .couple-names .ampersand { width: min(55%, 190px); }
-      html.standalone-invitation .reference-invite .hero-divider { margin-block: 26px 24px; }
       html.standalone-invitation .reference-scroll { margin-top: 42px; }
     }
 
@@ -1975,11 +1684,6 @@
 
       html.standalone-invitation .reference-invite .couple-names .ampersand {
         width: min(35%, 180px);
-      }
-
-      html.standalone-invitation .reference-invite .hero-divider {
-        width: min(42%, 270px);
-        margin-block: 14px 13px;
       }
 
       html.standalone-invitation .reference-date-row {

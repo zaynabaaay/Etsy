@@ -11,10 +11,10 @@
   <meta property="og:image" content="og.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="og.png">
+  <link rel="icon" href="data:,">
   <link rel="preload" href="invitation-assets/envelope-liner-optimized.jpg" as="image">
   <link rel="preload" href="invitation-assets/envelope-lace-white.jpg" as="image">
   <link rel="preload" href="invitation-assets/wax-seal-blank-optimized.png" as="image">
-  <link rel="preload" href="invitation-assets/opening-background-sage-flatlay.png" as="image">
   <title>Green Sage – Wedding Invite — Alexandra &amp; Gabriel</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -128,7 +128,7 @@
           <span class="seal-initials" aria-hidden="true">
             <span class="seal-initial" data-seal-initial="first">A</span>
             <span class="seal-initial-divider"></span>
-            <span class="seal-initial" data-seal-initial="second">E</span>
+            <span class="seal-initial" data-seal-initial="second">G</span>
           </span>
         </button>
       </div>
@@ -158,183 +158,7 @@
 
       <p class="sr-only" id="status" role="status" aria-live="polite"></p>
     </section>
-    <div class="invitation-page" id="invitationPage" aria-hidden="true">
-      <article class="story-page" aria-label="Wedding invitation opening">
-        <div class="story-shell">
-          <section class="story-section hero-invite reference-invite" aria-labelledby="coupleNames">
-            <div class="reference-card">
-              <div class="reference-copy">
-                <svg class="reference-sprig" viewBox="0 0 64 30" aria-hidden="true">
-                  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2">
-                    <path d="M8 24C23 20 34 14 50 5"/>
-                    <path d="M22 19c-6-5-8-9-7-13 6 2 9 6 9 11M32 14c-2-7 0-11 3-14 4 5 4 9 0 13M40 10c5-5 9-6 13-5-2 5-6 8-12 8M17 21c-5 1-9 0-12-3 4-3 9-2 14 1"/>
-                  </g>
-                </svg>
-                <p class="story-kicker">Together with their families</p>
-                <div class="hero-formal-copy">
-                  <p>You are joyfully invited to</p>
-                  <p>Celebrate the wedding of</p>
-                </div>
-                <h2 class="couple-names" id="coupleNames">
-                  <span>ALEXANDRA</span>
-                  <span class="ampersand">and</span>
-                  <span>GABRIEL</span>
-                </h2>
-                <div class="hero-divider" aria-hidden="true"><span>◇</span></div>
-                <p class="reference-date-row">
-                  <span>August</span>
-                  <span class="reference-day">24</span>
-                  <span>2027</span>
-                </p>
-                <p class="reference-time">Saturday, four thirty in the afternoon</p>
-                <div class="reference-venue-rule" aria-hidden="true"></div>
-                <p class="hero-place">
-                  <strong>The Glasshouse Estate</strong>
-                  <span>Toronto, Ontario</span>
-                  <span class="reference-reception">Reception to follow</span>
-                </p>
-              </div>
-            </div>
-          </section>
-        </div>
-      </article>
-    </div>
   </main>
-
-  <script>
-    (() => {
-      const sealInitials = { first: 'A', second: 'E' };
-      document.querySelectorAll('[data-seal-initial]').forEach((initial) => {
-        initial.textContent = sealInitials[initial.dataset.sealInitial];
-      });
-
-      const root = document.documentElement;
-      const artboard = document.querySelector('.artboard');
-      const seal = document.getElementById('seal');
-      const status = document.getElementById('status');
-      const control = document.getElementById('openControl');
-      const invitationPage = document.getElementById('invitationPage');
-      const card = document.querySelector('.invitation-card');
-      const flap = document.querySelector('.flap');
-      const referenceCard = document.querySelector('.reference-card');
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      let openingStarted = false;
-      let cardPullStarted = false;
-      let revealStarted = false;
-      let navigationStarted = false;
-      let openingFallback = 0;
-
-      const fontsReady = document.fonts?.ready ?? Promise.resolve();
-      const openingAssetsReady = Promise.race([
-        fontsReady,
-        new Promise((resolve) => window.setTimeout(resolve, 1200))
-      ]);
-      const nextPaint = () => new Promise((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve));
-      });
-
-      const finishOpening = () => {
-        if (navigationStarted) return;
-        navigationStarted = true;
-        window.clearTimeout(openingFallback);
-        window.location.assign('invitation.html');
-      };
-
-      const revealInvitation = async () => {
-        if (revealStarted) return;
-        revealStarted = true;
-        const sourceRect = card.getBoundingClientRect();
-
-        await openingAssetsReady;
-        root.classList.add('invitation-opening');
-        artboard.classList.add('opening-complete');
-        invitationPage.setAttribute('aria-hidden', 'false');
-        invitationPage.classList.add('is-preparing');
-
-        await nextPaint();
-
-        const targetRect = referenceCard.getBoundingClientRect();
-        const sourceCenterX = sourceRect.left + sourceRect.width / 2;
-        const sourceCenterY = sourceRect.top + sourceRect.height / 2;
-        const targetCenterX = targetRect.left + targetRect.width / 2;
-        const targetCenterY = targetRect.top + targetRect.height / 2;
-
-        referenceCard.style.setProperty('--page-start-x', `${sourceCenterX - targetCenterX}px`);
-        referenceCard.style.setProperty('--page-start-y', `${sourceCenterY - targetCenterY}px`);
-        referenceCard.style.setProperty('--page-start-scale-x', sourceRect.width / targetRect.width);
-        referenceCard.style.setProperty('--page-start-scale-y', sourceRect.height / targetRect.height);
-
-        if (reduceMotion) {
-          finishOpening();
-          return;
-        }
-
-        const finishReveal = (event) => {
-          if (event && event.animationName !== 'openingCardReveal') return;
-          referenceCard.removeEventListener('animationend', finishReveal);
-          finishOpening();
-        };
-
-        referenceCard.addEventListener('animationend', finishReveal);
-        window.setTimeout(() => finishReveal(), 1100);
-        invitationPage.classList.remove('is-preparing');
-        invitationPage.classList.add('is-revealing');
-      };
-
-      const openInvitation = () => {
-        if (openingStarted) return;
-        openingStarted = true;
-        seal.disabled = true;
-        seal.classList.add('is-tapped');
-        control.checked = true;
-        status.textContent = 'Opening the invitation.';
-
-        openingFallback = window.setTimeout(finishOpening, 5200);
-
-        if (reduceMotion) {
-          revealInvitation();
-          return;
-        }
-
-        const startCardPull = () => {
-          if (cardPullStarted) return;
-          cardPullStarted = true;
-
-          const finishCardPull = (event) => {
-            if (event && event.animationName !== 'cardJourney') return;
-            card.removeEventListener('animationend', finishCardPull);
-            revealInvitation();
-          };
-
-          card.addEventListener('animationend', finishCardPull);
-          window.setTimeout(() => finishCardPull(), 2300);
-          artboard.classList.add('card-pulling');
-        };
-
-        const finishFlap = (event) => {
-          if (event && event.type === 'animationend' && event.animationName !== 'flapBackOpen') return;
-          flap.removeEventListener('animationend', finishFlap);
-          flap.removeEventListener('animationcancel', finishFlap);
-          startCardPull();
-        };
-
-        flap.addEventListener('animationend', finishFlap);
-        flap.addEventListener('animationcancel', finishFlap);
-        window.setTimeout(() => finishFlap(), 1400);
-      };
-
-      const requestOpening = (event) => {
-        if (event.type === 'mousedown' && event.button !== 0) return;
-        openInvitation();
-      };
-
-      seal.addEventListener('mousedown', requestOpening);
-      seal.addEventListener('click', requestOpening);
-
-      window.addEventListener('pageshow', (event) => {
-        if (event.persisted) window.location.reload();
-      });
-    })();
-  </script>
+  <script src="envelope.js" defer></script>
 </body>
 </html>
