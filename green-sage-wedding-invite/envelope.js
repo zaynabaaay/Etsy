@@ -47,7 +47,7 @@
     window.clearTimeout(openingFallback);
     window.clearTimeout(flapFallback);
     window.clearTimeout(cardStageFallback);
-    window.location.assign('invitation.html?v=20260802-seamless-invite');
+    window.location.assign('invitation.html?v=20260802-instant-invite');
   };
 
   const runCardStage = (className, animationName, fallbackDelay, nextStage) => {
@@ -78,7 +78,7 @@
 
     runCardStage('card-rising', 'cardRise', 1300, () => {
       runCardStage('card-turning', 'cardTurn', 900, () => {
-        runCardStage('card-approaching', 'cardApproach', 1000, finishOpening);
+        runCardStage('card-approaching', 'cardApproach', 700, finishOpening);
       });
     });
   };

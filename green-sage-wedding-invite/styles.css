@@ -658,7 +658,7 @@
     .artboard.card-approaching .invitation-card {
       z-index: 50;
       transform: translateY(var(--card-pull-distance)) rotate(90deg) scale(1);
-      animation: cardApproach .8s cubic-bezier(.2,.72,.18,1) forwards;
+      animation: cardApproach .48s cubic-bezier(.2,.72,.18,1) forwards;
     }
 
     @keyframes flapFrontOpen {
