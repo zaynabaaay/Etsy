@@ -635,6 +635,10 @@
 
     #openControl:checked + .artboard .liner-body { opacity: 1; }
 
+    #openControl:checked + .artboard .envelope-wrap {
+      z-index: 40;
+    }
+
     .artboard.card-rising .envelope-wrap,
     .artboard.card-turning .envelope-wrap,
     .artboard.card-approaching .envelope-wrap {
