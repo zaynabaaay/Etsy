@@ -14,29 +14,30 @@
   });
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cardStageClasses = ['card-rising', 'card-turning', 'card-approaching'];
   let openingStarted = false;
-  let cardPullStarted = false;
+  let cardSequenceStarted = false;
   let navigationStarted = false;
   let openingFallback = 0;
   let flapFallback = 0;
-  let cardFallback = 0;
+  let cardStageFallback = 0;
 
   const resetEnvelope = () => {
     window.clearTimeout(openingFallback);
     window.clearTimeout(flapFallback);
-    window.clearTimeout(cardFallback);
+    window.clearTimeout(cardStageFallback);
 
     openingStarted = false;
-    cardPullStarted = false;
+    cardSequenceStarted = false;
     navigationStarted = false;
     openingFallback = 0;
     flapFallback = 0;
-    cardFallback = 0;
+    cardStageFallback = 0;
 
     control.checked = false;
     seal.disabled = false;
     seal.classList.remove('is-tapped');
-    artboard.classList.remove('card-pulling');
+    artboard.classList.remove(...cardStageClasses);
     status.textContent = '';
   };
 
@@ -45,24 +46,41 @@
     navigationStarted = true;
     window.clearTimeout(openingFallback);
     window.clearTimeout(flapFallback);
-    window.clearTimeout(cardFallback);
+    window.clearTimeout(cardStageFallback);
     window.location.assign('invitation.html');
   };
 
-  const startCardPull = () => {
-    if (cardPullStarted) return;
-    cardPullStarted = true;
+  const runCardStage = (className, animationName, fallbackDelay, nextStage) => {
+    let stageFinished = false;
 
-    const finishCardPull = (event) => {
-      if (event && event.animationName !== 'cardJourney') return;
-      card.removeEventListener('animationend', finishCardPull);
-      window.clearTimeout(cardFallback);
-      finishOpening();
+    const finishStage = (event) => {
+      if (stageFinished) return;
+      if (event && event.animationName !== animationName) return;
+
+      stageFinished = true;
+      card.removeEventListener('animationend', finishStage);
+      card.removeEventListener('animationcancel', finishStage);
+      window.clearTimeout(cardStageFallback);
+      cardStageFallback = 0;
+      nextStage();
     };
 
-    card.addEventListener('animationend', finishCardPull);
-    cardFallback = window.setTimeout(finishCardPull, 2300);
-    artboard.classList.add('card-pulling');
+    artboard.classList.remove(...cardStageClasses);
+    artboard.classList.add(className);
+    card.addEventListener('animationend', finishStage);
+    card.addEventListener('animationcancel', finishStage);
+    cardStageFallback = window.setTimeout(finishStage, fallbackDelay);
+  };
+
+  const startCardSequence = () => {
+    if (cardSequenceStarted) return;
+    cardSequenceStarted = true;
+
+    runCardStage('card-rising', 'cardRise', 1300, () => {
+      runCardStage('card-turning', 'cardTurn', 900, () => {
+        runCardStage('card-approaching', 'cardApproach', 1000, finishOpening);
+      });
+    });
   };
 
   const openInvitation = () => {
@@ -78,14 +96,14 @@
       return;
     }
 
-    openingFallback = window.setTimeout(finishOpening, 4800);
+    openingFallback = window.setTimeout(finishOpening, 6500);
 
     const finishFlap = (event) => {
       if (event?.type === 'animationend' && event.animationName !== 'flapBackOpen') return;
       flap.removeEventListener('animationend', finishFlap);
       flap.removeEventListener('animationcancel', finishFlap);
       window.clearTimeout(flapFallback);
-      startCardPull();
+      startCardSequence();
     };
 
     flap.addEventListener('animationend', finishFlap);

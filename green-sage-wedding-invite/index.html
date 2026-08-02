@@ -16,7 +16,7 @@
   <link rel="preload" href="invitation-assets/envelope-lace-white.jpg" as="image">
   <link rel="preload" href="invitation-assets/wax-seal-blank-optimized.png" as="image">
   <title>Green Sage – Wedding Invite — Alexandra &amp; Gabriel</title>
-  <link rel="stylesheet" href="styles.css?v=20260802-envelope-stationary">
+  <link rel="stylesheet" href="styles.css?v=20260802-envelope-closed-fix">
 </head>
 <body>
   <main class="page">
@@ -99,11 +99,8 @@
                 <pattern id="flapFrontLacePattern" width="838" height="420" patternUnits="userSpaceOnUse">
                   <image x="0" y="-209" width="838" height="838" href="invitation-assets/envelope-lace-white.jpg" preserveAspectRatio="xMidYMid slice"/>
                 </pattern>
-                <filter id="closedFlapShadow" x="-7%" y="-6%" width="114%" height="120%">
-                  <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#5b554c" flood-opacity=".20"/>
-                </filter>
               </defs>
-              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#flapFrontLacePattern)" stroke="#ffffff" stroke-width="1.5" filter="url(#closedFlapShadow)"/>
+              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#flapFrontLacePattern)" stroke="#ffffff" stroke-width="1.5"/>
               <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#closedFlap)"/>
             </svg>
           </div>
@@ -113,11 +110,8 @@
                 <pattern id="flapBackLacePattern" width="838" height="420" patternUnits="userSpaceOnUse">
                   <image x="0" y="-160" width="838" height="838" href="invitation-assets/envelope-lace-white.jpg" preserveAspectRatio="xMidYMid slice"/>
                 </pattern>
-                <filter id="openFlapShadow" x="-7%" y="-7%" width="114%" height="120%">
-                  <feDropShadow dx="0" dy="-3" stdDeviation="3" flood-color="#5b554c" flood-opacity=".20"/>
-                </filter>
               </defs>
-              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#flapBackLacePattern)" stroke="#f5f4ef" stroke-width="1.4" filter="url(#openFlapShadow)"/>
+              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#flapBackLacePattern)" stroke="#f5f4ef" stroke-width="1.4"/>
               <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="#fff4e6" opacity=".09"/>
             </svg>
           </div>
@@ -159,6 +153,6 @@
       <p class="sr-only" id="status" role="status" aria-live="polite"></p>
     </section>
   </main>
-  <script src="envelope.js?v=20260802-envelope-stable" defer></script>
+  <script src="envelope.js?v=20260802-envelope-sequence" defer></script>
 </body>
 </html>
