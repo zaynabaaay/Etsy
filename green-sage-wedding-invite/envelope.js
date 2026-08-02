@@ -47,7 +47,7 @@
     window.clearTimeout(openingFallback);
     window.clearTimeout(flapFallback);
     window.clearTimeout(cardStageFallback);
-    window.location.assign('invitation.html?v=20260802-instant-invite');
+    window.location.assign('invitation.html?v=20260802-invitation-handoff');
   };
 
   const runCardStage = (className, animationName, fallbackDelay, nextStage) => {
