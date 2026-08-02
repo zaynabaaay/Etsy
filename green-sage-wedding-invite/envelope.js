@@ -4,10 +4,10 @@
   const control = document.getElementById('openControl');
   const artboard = document.querySelector('.artboard');
   const card = document.querySelector('.invitation-card');
-  const flapBack = document.querySelector('.flap-back');
+  const flap = document.querySelector('.flap');
   const status = document.getElementById('status');
 
-  if (!seal || !control || !artboard || !card || !flapBack || !status) return;
+  if (!seal || !control || !artboard || !card || !flap || !status) return;
 
   document.querySelectorAll('[data-seal-initial]').forEach((initial) => {
     initial.textContent = sealInitials[initial.dataset.sealInitial] || '';
@@ -61,7 +61,7 @@
     };
 
     card.addEventListener('animationend', finishCardPull);
-    cardFallback = window.setTimeout(finishCardPull, 2600);
+    cardFallback = window.setTimeout(finishCardPull, 2300);
     artboard.classList.add('card-pulling');
   };
 
@@ -78,27 +78,27 @@
       return;
     }
 
-    openingFallback = window.setTimeout(finishOpening, 5600);
+    openingFallback = window.setTimeout(finishOpening, 4800);
 
     const finishFlap = (event) => {
       if (event?.type === 'animationend' && event.animationName !== 'flapBackOpen') return;
-      flapBack.removeEventListener('animationend', finishFlap);
-      flapBack.removeEventListener('animationcancel', finishFlap);
+      flap.removeEventListener('animationend', finishFlap);
+      flap.removeEventListener('animationcancel', finishFlap);
       window.clearTimeout(flapFallback);
-      window.setTimeout(startCardPull, 180);
+      startCardPull();
     };
 
-    flapBack.addEventListener('animationend', finishFlap);
-    flapBack.addEventListener('animationcancel', finishFlap);
-    flapFallback = window.setTimeout(finishFlap, 2400);
+    flap.addEventListener('animationend', finishFlap);
+    flap.addEventListener('animationcancel', finishFlap);
+    flapFallback = window.setTimeout(finishFlap, 1500);
   };
 
   const requestOpening = (event) => {
-    if (event.type === 'pointerdown' && event.button !== 0) return;
+    if (event.type === 'mousedown' && event.button !== 0) return;
     openInvitation();
   };
 
-  seal.addEventListener('pointerdown', requestOpening, { passive: true });
+  seal.addEventListener('mousedown', requestOpening);
   seal.addEventListener('click', requestOpening);
 
   resetEnvelope();
