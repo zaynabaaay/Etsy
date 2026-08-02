@@ -528,17 +528,9 @@
       left: 5.52%;
       width: 88.96%;
       height: 41.40%;
-      perspective: 1200px;
-      transform-style: preserve-3d;
       box-shadow:
         7px 15px 13px rgba(77, 51, 25, .20),
         1px 3px 4px rgba(91, 65, 37, .10);
-      transition:
-        top 1.05s cubic-bezier(.22,.72,.18,1),
-        left 1.05s cubic-bezier(.22,.72,.18,1),
-        width 1.05s cubic-bezier(.22,.72,.18,1),
-        height 1.05s cubic-bezier(.22,.72,.18,1),
-        box-shadow 1.05s ease;
     }
 
     .envelope-art {
@@ -599,6 +591,7 @@
       left: 0;
       width: 100%;
       height: 60.6%;
+      perspective: 1200px;
       pointer-events: none;
     }
 
@@ -633,16 +626,6 @@
 
     #openControl:checked + .artboard .heading { top: 8.78%; }
 
-    #openControl:checked + .artboard .envelope-wrap {
-      top: 42.52%;
-      left: 6.5%;
-      width: 87%;
-      height: 40.1%;
-      box-shadow:
-        7px 17px 15px rgba(77,51,25,.22),
-        1px 3px 4px rgba(91,65,37,.1);
-    }
-
     #openControl:checked + .artboard .flap-front {
       animation: flapFrontOpen .56s cubic-bezier(.36,.05,.64,.95) forwards;
     }
@@ -655,8 +638,6 @@
     .artboard.card-pulling .invitation-card {
       animation: cardJourney 2.1s linear forwards;
     }
-
-    #openControl:checked + .artboard .envelope-wrap { z-index: 40; }
 
     @keyframes flapFrontOpen {
       0% {
@@ -1374,21 +1355,15 @@
 
       .envelope-wrap {
         top: 35.2%;
-        left: 50%;
+        right: 0;
+        left: 0;
         width: min(45.8vw, 53.625svh);
         height: auto;
         aspect-ratio: 5 / 4;
-        transform: translateX(-50%);
+        margin-inline: auto;
       }
 
       #openControl:checked + .artboard .heading { top: 8.78%; }
-
-      #openControl:checked + .artboard .envelope-wrap {
-        top: 42.52%;
-        left: 50%;
-        width: min(45.8vw, 53.625svh);
-        height: auto;
-      }
 
       .footer { top: 82.6%; }
       #openControl:checked + .artboard .footer { top: 87.08%; }
@@ -1427,7 +1402,6 @@
     @media (prefers-reduced-motion: reduce) {
       .seal-button,
       .flap,
-      .envelope-wrap,
       .heading,
       .footer,
       .liner-body,
