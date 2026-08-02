@@ -47,7 +47,7 @@
     window.clearTimeout(openingFallback);
     window.clearTimeout(flapFallback);
     window.clearTimeout(cardStageFallback);
-    window.location.assign('invitation.html');
+    window.location.assign('invitation.html?v=20260802-seamless-invite');
   };
 
   const runCardStage = (className, animationName, fallbackDelay, nextStage) => {
