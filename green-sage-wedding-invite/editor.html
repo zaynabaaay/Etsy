@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f1ea">
+  <title>Edit Green Sage Invitation</title>
+  <link rel="stylesheet" href="editor.css?v=20260804-editor-foundation">
+</head>
+<body>
+  <main class="editor-app">
+    <header class="editor-header">
+      <div class="editor-brand">
+        <span class="editor-mark">A · G</span>
+        <div>
+          <strong>Green Sage</strong>
+          <span>Invitation editor</span>
+        </div>
+      </div>
+      <div class="editor-history" aria-label="Editing history">
+        <button class="toolbar-button" id="undoButton" type="button">Undo</button>
+        <button class="toolbar-button" id="resetButton" type="button">Reset</button>
+      </div>
+      <div class="device-switcher" aria-label="Preview size">
+        <button class="device-button is-active" type="button" data-device="desktop">Desktop</button>
+        <button class="device-button" type="button" data-device="tablet">iPad</button>
+        <button class="device-button" type="button" data-device="mobile">Mobile</button>
+      </div>
+      <a class="preview-link" href="invitation.html" target="_blank" rel="noopener">Open preview</a>
+    </header>
+
+    <aside class="editor-sidebar">
+      <div class="save-status" id="saveStatus" role="status">Saved in this browser</div>
+      <label class="field-label" for="sectionSelect">Editing section</label>
+      <select class="section-select" id="sectionSelect">
+        <option value="opening">Opening</option>
+        <option value="schedule">Schedule</option>
+        <option value="story">Our story</option>
+        <option value="details">Guest message</option>
+        <option value="wax">Wax seal</option>
+      </select>
+
+      <p class="locked-note"><span aria-hidden="true">◇</span> Envelope design is locked for this template.</p>
+
+      <div id="controls"></div>
+    </aside>
+
+    <section class="preview-stage" aria-label="Live invitation preview">
+      <div class="preview-frame device-desktop" id="previewFrame">
+        <iframe id="preview" src="invitation.html?editor=1" title="Live wedding invitation preview"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script src="template-config.js?v=20260804-editor-foundation"></script>
+  <script src="editor.js?v=20260804-editor-foundation"></script>
+</body>
+</html>

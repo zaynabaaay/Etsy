@@ -15,7 +15,7 @@
   <link rel="preload" href="invitation-assets/opening-background-sage-flatlay.png" as="image">
   <link rel="preload" href="invitation-assets/couple-portrait-optimized.jpg" as="image">
   <title>Alexandra &amp; Gabriel — Wedding Invitation</title>
-  <link rel="stylesheet" href="styles.css?v=20260802-invitation-handoff">
+  <link rel="stylesheet" href="styles.css?v=20260804-editor-foundation">
 </head>
 <body>
   <main class="page">
@@ -23,7 +23,7 @@
       <button class="replay-opening" id="replayOpening" type="button">View envelope</button>
       <article class="story-page" aria-label="Wedding invitation">
         <div class="story-shell">
-          <section class="story-section hero-invite reference-invite" aria-labelledby="coupleNames">
+          <section class="story-section hero-invite reference-invite" data-template-section="opening" aria-labelledby="coupleNames">
             <div class="reference-card">
               <div class="reference-copy">
                 <div class="hero-formal-copy">
@@ -31,9 +31,9 @@
                   <p>To the wedding of</p>
                 </div>
                 <h2 class="couple-names" id="coupleNames">
-                  <span>ALEXANDRA</span>
+                  <span data-template-text="couple.firstName">ALEXANDRA</span>
                   <span class="ampersand">and</span>
-                  <span>GABRIEL</span>
+                  <span data-template-text="couple.secondName">GABRIEL</span>
                 </h2>
                 <svg class="reference-name-motif" viewBox="0 0 94 38" aria-hidden="true">
                   <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -42,11 +42,11 @@
                   </g>
                 </svg>
                 <p class="reference-date-row reference-date-compact">
-                  <span>24</span>
-                  <span>08</span>
-                  <span>2027</span>
+                  <span data-template-text="date.day">24</span>
+                  <span data-template-text="date.month">08</span>
+                  <span data-template-text="date.year">2027</span>
                 </p>
-                <p class="reference-city">Toronto, Ontario</p>
+                <p class="reference-city" data-template-text="location.city">Toronto, Ontario</p>
                 <p class="reference-scroll">
                   Scroll to begin
                   <span class="scroll-arrow" aria-hidden="true"></span>
@@ -55,35 +55,35 @@
             </div>
           </section>
 
-          <section class="story-section schedule-showcase" aria-labelledby="scheduleTitle">
+          <section class="story-section schedule-showcase" data-template-section="schedule" aria-labelledby="scheduleTitle">
             <p class="schedule-kicker reveal">Schedule</p>
-            <h2 class="schedule-heading reveal" id="scheduleTitle">The Celebration</h2>
+            <h2 class="schedule-heading reveal" id="scheduleTitle" data-template-text="schedule.title">The Celebration</h2>
             <div class="schedule-line" aria-hidden="true"></div>
             <div class="schedule-grid">
               <article class="schedule-event reveal">
-                <time datetime="2027-08-24T16:00">4:00 PM</time>
-                <h3>Ceremony</h3>
-                <p>The Glasshouse Estate</p>
+                <time datetime="2027-08-24T16:00" data-template-text="schedule.events.0.time">4:00 PM</time>
+                <h3 data-template-text="schedule.events.0.title">Ceremony</h3>
+                <p data-template-text="schedule.events.0.place">The Glasshouse Estate</p>
               </article>
               <article class="schedule-event reveal">
-                <time datetime="2027-08-24T17:30">5:30 PM</time>
-                <h3>Cocktail Hour</h3>
-                <p>The Olive Terrace</p>
+                <time datetime="2027-08-24T17:30" data-template-text="schedule.events.1.time">5:30 PM</time>
+                <h3 data-template-text="schedule.events.1.title">Cocktail Hour</h3>
+                <p data-template-text="schedule.events.1.place">The Olive Terrace</p>
               </article>
               <article class="schedule-event reveal">
-                <time datetime="2027-08-24T19:00">7:00 PM</time>
-                <h3>Dinner</h3>
-                <p>The Conservatory</p>
+                <time datetime="2027-08-24T19:00" data-template-text="schedule.events.2.time">7:00 PM</time>
+                <h3 data-template-text="schedule.events.2.title">Dinner</h3>
+                <p data-template-text="schedule.events.2.place">The Conservatory</p>
               </article>
               <article class="schedule-event reveal">
-                <time datetime="2027-08-24T21:00">9:00 PM</time>
-                <h3>Dancing</h3>
-                <p>Under the Stars</p>
+                <time datetime="2027-08-24T21:00" data-template-text="schedule.events.3.time">9:00 PM</time>
+                <h3 data-template-text="schedule.events.3.title">Dancing</h3>
+                <p data-template-text="schedule.events.3.place">Under the Stars</p>
               </article>
             </div>
           </section>
 
-          <section class="story-section portrait-section" aria-labelledby="beginningTitle">
+          <section class="story-section portrait-section" data-template-section="story" aria-labelledby="beginningTitle">
             <figure class="portrait-card reveal">
               <div class="portrait-art">
                 <img class="portrait-photo" src="invitation-assets/couple-portrait-optimized.jpg" alt="Alexandra and Gabriel sharing a quiet moment together in a meadow" loading="lazy" decoding="async">
@@ -91,16 +91,16 @@
             </figure>
             <div class="portrait-copy reveal">
               <p class="story-label">Our beginning</p>
-              <h2 id="beginningTitle">From this day forward.</h2>
-              <p class="portrait-story">Some stories arrive quietly, and then change everything. We found a home in one another. On this day, surrounded by the people we love most, we begin our next chapter together.<span class="portrait-signoff">With love, Alexandra &amp; Gabriel</span></p>
+              <h2 id="beginningTitle" data-template-text="story.title">From this day forward.</h2>
+              <p class="portrait-story"><span data-template-text="story.body">Some stories arrive quietly, and then change everything. We found a home in one another. On this day, surrounded by the people we love most, we begin our next chapter together.</span><span class="portrait-signoff" data-template-text="story.signoff">With love, Alexandra &amp; Gabriel</span></p>
             </div>
           </section>
 
-          <section class="story-section note-section" aria-labelledby="noteTitle">
+          <section class="story-section note-section" data-template-section="details" aria-labelledby="noteTitle">
             <div class="note-paper reveal">
               <p class="story-label">A note from us</p>
-              <h2 class="section-title" id="noteTitle">Your presence is part of the story.</h2>
-              <p class="note-copy">This celebration would not feel complete without the family and friends who have stood beside us. We hope you will spend the day laughing, dining, and making memories with us.</p>
+              <h2 class="section-title" id="noteTitle" data-template-text="details.title">Your presence is part of the story.</h2>
+              <p class="note-copy" data-template-text="details.body">This celebration would not feel complete without the family and friends who have stood beside us. We hope you will spend the day laughing, dining, and making memories with us.</p>
             </div>
           </section>
 
@@ -136,7 +136,7 @@
 
           <footer class="story-section closing-section">
             <p class="closing-script reveal">With love, always.</p>
-            <p class="closing-names reveal">Alexandra &amp; Gabriel</p>
+            <p class="closing-names reveal" data-template-text="closing.names">Alexandra &amp; Gabriel</p>
             <span class="closing-seal reveal" role="img" aria-label="Client initials wax seal">
               <img class="closing-seal-art" src="invitation-assets/wax-seal-blank-optimized.png" alt="" aria-hidden="true">
               <span class="seal-initials" aria-hidden="true">
@@ -151,6 +151,8 @@
     </div>
   </main>
 
+  <script src="template-config.js?v=20260804-editor-foundation" defer></script>
+  <script src="template-runtime.js?v=20260804-editor-foundation" defer></script>
   <script src="invitation.js" defer></script>
 </body>
 </html>

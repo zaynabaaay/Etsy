@@ -142,6 +142,8 @@
       outline: none;
     }
 
+    html.editor-preview .replay-opening { display: none; }
+
     @media (max-width: 520px) {
       .replay-opening {
         top: max(10px, env(safe-area-inset-top));
