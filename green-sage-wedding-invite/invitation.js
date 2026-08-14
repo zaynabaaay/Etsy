@@ -1,4 +1,6 @@
 (() => {
+  document.documentElement.classList.add('opening-animation-ready');
+
   const envelopeButton = document.getElementById('replayOpening');
 
   envelopeButton?.addEventListener('click', () => {
