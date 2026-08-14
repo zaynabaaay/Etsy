@@ -14,6 +14,21 @@
   <link rel="icon" href="data:,">
   <link rel="preload" href="invitation-assets/opening-background-ivory-silk-4k.png" as="image">
   <title>Alexandra &amp; Gabriel — Wedding Invitation</title>
+  <style id="opening-animation-critical">
+    html.opening-animation-ready .reference-invite .hero-formal-copy p,
+    html.opening-animation-ready .reference-invite .couple-names .ampersand,
+    html.opening-animation-ready .reference-name-motif,
+    html.opening-animation-ready .reference-date-row,
+    html.opening-animation-ready .reference-city {
+      opacity: 0;
+    }
+
+    html.opening-animation-ready .reference-invite .couple-names > span:first-child,
+    html.opening-animation-ready .reference-invite .couple-names > span:last-child {
+      clip-path: inset(0 0 100% 0);
+      transform: translateY(18px);
+    }
+  </style>
   <link rel="stylesheet" href="styles.css?v=20260813-opening-sequence">
 </head>
 <body>
