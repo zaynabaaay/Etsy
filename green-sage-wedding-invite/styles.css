@@ -1710,46 +1710,94 @@
       text-transform: uppercase;
     }
 
+    /* Opening support type: readable at every size while remaining secondary
+       to the names, which intentionally keep their existing scale. */
+    html.standalone-invitation .reference-invite .hero-formal-copy p {
+      font-size: clamp(12px, 1.05vw, 15px);
+      letter-spacing: clamp(.22em, .28vw, .34em);
+    }
+
+    html.standalone-invitation .reference-date-row {
+      font-size: clamp(15px, 1.55vw, 22px);
+      letter-spacing: clamp(.28em, .43vw, .50em);
+    }
+
+    html.standalone-invitation .reference-city {
+      font-size: clamp(12px, .95vw, 15px);
+      letter-spacing: clamp(.24em, .34vw, .42em);
+    }
+
+    @media (min-width: 760px) and (max-width: 1199px) {
+      html.standalone-invitation .reference-invite .hero-formal-copy p {
+        font-size: clamp(11px, 1.7vw, 14px);
+      }
+
+      html.standalone-invitation .reference-date-row {
+        font-size: clamp(14px, 2vw, 18px);
+      }
+
+      html.standalone-invitation .reference-city {
+        font-size: clamp(12px, 1.4vw, 14px);
+      }
+    }
+
+    @media (max-width: 759px) {
+      html.standalone-invitation .reference-invite .hero-formal-copy p {
+        font-size: clamp(10px, 3vw, 12px);
+        letter-spacing: clamp(.18em, .26em, .30em);
+      }
+
+      html.standalone-invitation .reference-date-row {
+        font-size: clamp(13px, 4vw, 16px);
+        letter-spacing: clamp(.20em, .30em, .38em);
+      }
+
+      html.standalone-invitation .reference-city {
+        font-size: clamp(11px, 3.2vw, 14px);
+        letter-spacing: clamp(.20em, .28em, .36em);
+      }
+    }
+
     /* Opening reveal: animation-only treatment; the resting layout is unchanged. */
     html.standalone-invitation.opening-animation-ready .reference-invite .hero-formal-copy p {
       opacity: 0;
-      animation: openingInvitationFade .58s ease-out .16s forwards;
+      animation: openingInvitationFade .82s cubic-bezier(.22,.66,.2,1) .42s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span:first-child {
       clip-path: inset(0 0 100% 0);
       transform: translateY(18px);
-      animation: openingNameReveal .78s cubic-bezier(.22,.72,.2,1) .52s forwards;
+      animation: openingNameReveal 1.05s cubic-bezier(.22,.72,.2,1) 1.12s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-invite .couple-names .ampersand {
       opacity: 0;
       transform: translateY(10px);
-      animation: openingInvitationFade .5s ease-out .96s forwards;
+      animation: openingInvitationFade .72s cubic-bezier(.22,.66,.2,1) 2.00s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span:last-child {
       clip-path: inset(0 0 100% 0);
       transform: translateY(18px);
-      animation: openingNameReveal .78s cubic-bezier(.22,.72,.2,1) 1.16s forwards;
+      animation: openingNameReveal 1.05s cubic-bezier(.22,.72,.2,1) 2.28s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-name-motif {
       opacity: 0;
       transform: translateY(8px);
-      animation: openingInvitationFade .56s ease-out 1.9s forwards;
+      animation: openingInvitationFade .78s cubic-bezier(.22,.66,.2,1) 3.62s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-date-row {
       opacity: 0;
       transform: translateY(8px);
-      animation: openingInvitationFade .58s ease-out 2.14s forwards;
+      animation: openingInvitationFade .82s cubic-bezier(.22,.66,.2,1) 4.10s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-city {
       opacity: 0;
       transform: translateY(8px);
-      animation: openingInvitationFade .58s ease-out 2.34s forwards;
+      animation: openingInvitationFade .82s cubic-bezier(.22,.66,.2,1) 4.48s both;
     }
 
     /* The hidden iframe supplies only the seamless handoff background. Keep its
