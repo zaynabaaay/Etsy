@@ -11,7 +11,7 @@
   const deviceButtons = [...document.querySelectorAll('[data-device]')];
 
   const backgrounds = [
-    { name: 'Ivory silk flatlay', src: 'invitation-assets/opening-background-ivory-silk-4k.png' },
+    { name: 'Reference neutral flatlay', src: 'invitation-assets/opening-background-reference.jpg' },
     { name: 'Soft ivory', src: 'design-previews/desktop-background-01-plain-white-v2.png' },
     { name: 'Paper garden', src: 'invitation-assets/invitation-background-optimized.jpg' },
     { name: 'Botanical paper', src: 'invitation-assets/invitation-background-sharp-v2.png' },
