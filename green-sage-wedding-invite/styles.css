@@ -1758,6 +1758,24 @@
       animation: openingInvitationFade .58s ease-out 2.34s forwards;
     }
 
+    /* The hidden iframe supplies only the seamless handoff background. Keep its
+       copy concealed so a completed preload animation cannot flash on screen. */
+    html.standalone-invitation.invitation-handoff-preview .reference-invite .hero-formal-copy p,
+    html.standalone-invitation.invitation-handoff-preview .reference-invite .couple-names .ampersand,
+    html.standalone-invitation.invitation-handoff-preview .reference-name-motif,
+    html.standalone-invitation.invitation-handoff-preview .reference-date-row,
+    html.standalone-invitation.invitation-handoff-preview .reference-city {
+      opacity: 0;
+      animation: none;
+    }
+
+    html.standalone-invitation.invitation-handoff-preview .reference-invite .couple-names > span:first-child,
+    html.standalone-invitation.invitation-handoff-preview .reference-invite .couple-names > span:last-child {
+      clip-path: inset(0 0 100% 0);
+      transform: translateY(18px);
+      animation: none;
+    }
+
     @keyframes openingInvitationFade {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }

@@ -14,6 +14,11 @@
   <link rel="icon" href="data:,">
   <link rel="preload" href="invitation-assets/opening-background-ivory-silk-4k.png" as="image">
   <title>Alexandra &amp; Gabriel — Wedding Invitation</title>
+  <script>
+    if (new URLSearchParams(window.location.search).has('handoff')) {
+      document.documentElement.classList.add('invitation-handoff-preview');
+    }
+  </script>
   <style id="opening-animation-critical">
     html.opening-animation-ready .reference-invite .hero-formal-copy p,
     html.opening-animation-ready .reference-invite .couple-names .ampersand,
@@ -29,7 +34,7 @@
       transform: translateY(18px);
     }
   </style>
-  <link rel="stylesheet" href="styles.css?v=20260813-opening-sequence">
+  <link rel="stylesheet" href="styles.css?v=20260814-no-text-flash">
 </head>
 <body>
   <main class="page">
