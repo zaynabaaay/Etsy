@@ -1727,6 +1727,11 @@
       letter-spacing: clamp(.24em, .34vw, .42em);
     }
 
+    html.standalone-invitation .reference-scroll {
+      font-size: clamp(10px, .9vw, 13px);
+      letter-spacing: clamp(.22em, .34em, .42em);
+    }
+
     @media (min-width: 760px) and (max-width: 1199px) {
       html.standalone-invitation .reference-invite .hero-formal-copy p {
         font-size: clamp(11px, 1.7vw, 14px);
@@ -1755,6 +1760,11 @@
       html.standalone-invitation .reference-city {
         font-size: clamp(11px, 3.2vw, 14px);
         letter-spacing: clamp(.20em, .28em, .36em);
+      }
+
+      html.standalone-invitation .reference-scroll {
+        font-size: clamp(10px, 3vw, 12px);
+        letter-spacing: clamp(.18em, .28em, .36em);
       }
     }
 
@@ -1800,6 +1810,12 @@
       animation: openingInvitationFade .82s cubic-bezier(.22,.66,.2,1) 4.48s both;
     }
 
+    html.standalone-invitation.opening-animation-ready .reference-scroll {
+      opacity: 0;
+      transform: translateY(8px);
+      animation: openingInvitationFade .82s cubic-bezier(.22,.66,.2,1) 4.92s both;
+    }
+
     /* The hidden iframe supplies only the seamless handoff background. Keep its
        copy concealed so a completed preload animation cannot flash on screen. */
     html.standalone-invitation.invitation-handoff-preview .reference-invite .hero-formal-copy p,
@@ -1807,6 +1823,11 @@
     html.standalone-invitation.invitation-handoff-preview .reference-name-motif,
     html.standalone-invitation.invitation-handoff-preview .reference-date-row,
     html.standalone-invitation.invitation-handoff-preview .reference-city {
+      opacity: 0;
+      animation: none;
+    }
+
+    html.standalone-invitation.invitation-handoff-preview .reference-scroll {
       opacity: 0;
       animation: none;
     }
@@ -1850,6 +1871,12 @@
       html.standalone-invitation.opening-animation-ready .reference-city {
         opacity: 1;
         clip-path: inset(0);
+        transform: none;
+        animation: none;
+      }
+
+      html.standalone-invitation.opening-animation-ready .reference-scroll {
+        opacity: 1;
         transform: none;
         animation: none;
       }

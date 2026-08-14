@@ -40,8 +40,13 @@
       visibility: hidden;
       pointer-events: none;
     }
+
+    html.opening-animation-ready .reference-scroll {
+      opacity: 0;
+      transform: translateY(8px);
+    }
   </style>
-  <link rel="stylesheet" href="styles.css?v=20260814-opening-cinematic-v2">
+  <link rel="stylesheet" href="styles.css?v=20260814-opening-cinematic-v3">
 </head>
 <body>
   <main class="page">
@@ -73,6 +78,7 @@
                   <span data-template-text="date.year">2027</span>
                 </p>
                 <p class="reference-city" data-template-text="location.city">Toronto, Ontario</p>
+                <p class="reference-scroll">Scroll to view <span class="scroll-arrow" aria-hidden="true"></span></p>
               </div>
             </div>
           </section>
