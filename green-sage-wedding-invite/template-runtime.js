@@ -38,9 +38,6 @@
       applyBackground(section, state.sections?.[section.dataset.templateSection]);
     });
 
-    document.querySelectorAll('.seal-art, .closing-seal-art').forEach((seal) => {
-      seal.style.filter = state.wax?.filter || 'none';
-    });
   };
 
   const editorMode = new URLSearchParams(window.location.search).has('editor');

@@ -12,56 +12,13 @@
     location: {
       city: 'Toronto, Ontario'
     },
-    schedule: {
-      title: 'The Celebration',
-      events: [
-        { time: '4:00 PM', title: 'Ceremony', place: 'The Glasshouse Estate' },
-        { time: '5:30 PM', title: 'Cocktail Hour', place: 'The Olive Terrace' },
-        { time: '7:00 PM', title: 'Dinner', place: 'The Conservatory' },
-        { time: '9:00 PM', title: 'Dancing', place: 'Under the Stars' }
-      ]
-    },
-    story: {
-      title: 'From this day forward.',
-      body: 'Some stories arrive quietly, and then change everything. We found a home in one another. On this day, surrounded by the people we love most, we begin our next chapter together.',
-      signoff: 'With love, Alexandra & Gabriel'
-    },
-    details: {
-      title: 'Your presence is part of the story.',
-      body: 'This celebration would not feel complete without the family and friends who have stood beside us. We hope you will spend the day laughing, dining, and making memories with us.'
-    },
-    closing: {
-      names: 'Alexandra & Gabriel'
-    },
     sections: {
       opening: {
         background: 'invitation-assets/opening-background-sage-flatlay.png',
         positionX: 50,
         positionY: 50,
         zoom: 100
-      },
-      schedule: {
-        background: '',
-        positionX: 50,
-        positionY: 50,
-        zoom: 100
-      },
-      story: {
-        background: '',
-        positionX: 50,
-        positionY: 50,
-        zoom: 100
-      },
-      details: {
-        background: '',
-        positionX: 50,
-        positionY: 50,
-        zoom: 100
       }
-    },
-    wax: {
-      name: 'Antique gold',
-      filter: 'none'
     }
   };
 

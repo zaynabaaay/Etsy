@@ -5,7 +5,6 @@
   const preview = document.getElementById('preview');
   const previewFrame = document.getElementById('previewFrame');
   const controls = document.getElementById('controls');
-  const sectionSelect = document.getElementById('sectionSelect');
   const saveStatus = document.getElementById('saveStatus');
   const undoButton = document.getElementById('undoButton');
   const resetButton = document.getElementById('resetButton');
@@ -20,15 +19,6 @@
     { name: 'Frosted vellum', src: 'invitation-assets/letter-previews/05-frosted-glass.png' }
   ];
 
-  const waxOptions = [
-    { name: 'Antique gold', color: '#a37e46', filter: 'none' },
-    { name: 'Champagne', color: '#c4aa78', filter: 'sepia(.35) saturate(.72) brightness(1.16)' },
-    { name: 'Sage', color: '#777b63', filter: 'sepia(.3) saturate(.55) hue-rotate(42deg) brightness(.84)' },
-    { name: 'Bronze', color: '#765233', filter: 'sepia(.5) saturate(1.1) brightness(.72)' },
-    { name: 'Pearl', color: '#ddd8ca', filter: 'grayscale(.85) brightness(1.45)' },
-    { name: 'Charcoal', color: '#49483f', filter: 'grayscale(1) brightness(.52)' }
-  ];
-
   const sectionFields = {
     opening: [
       ['First name', 'couple.firstName'],
@@ -37,30 +27,6 @@
       ['Month', 'date.month'],
       ['Year', 'date.year'],
       ['City', 'location.city']
-    ],
-    schedule: [
-      ['Section title', 'schedule.title'],
-      ['Ceremony time', 'schedule.events.0.time'],
-      ['Ceremony label', 'schedule.events.0.title'],
-      ['Ceremony location', 'schedule.events.0.place'],
-      ['Cocktail time', 'schedule.events.1.time'],
-      ['Cocktail label', 'schedule.events.1.title'],
-      ['Cocktail location', 'schedule.events.1.place'],
-      ['Dinner time', 'schedule.events.2.time'],
-      ['Dinner label', 'schedule.events.2.title'],
-      ['Dinner location', 'schedule.events.2.place'],
-      ['Dancing time', 'schedule.events.3.time'],
-      ['Dancing label', 'schedule.events.3.title'],
-      ['Dancing location', 'schedule.events.3.place']
-    ],
-    story: [
-      ['Heading', 'story.title'],
-      ['Story', 'story.body', 'textarea'],
-      ['Sign-off', 'story.signoff']
-    ],
-    details: [
-      ['Heading', 'details.title'],
-      ['Message to guests', 'details.body', 'textarea']
     ]
   };
 
@@ -113,9 +79,7 @@
   };
 
   const focusPreviewSection = () => {
-    const section = sectionSelect.value;
-    if (section === 'wax') return;
-    preview.contentWindow?.postMessage({ type: 'green-sage-template:focus-section', section }, '*');
+    preview.contentWindow?.postMessage({ type: 'green-sage-template:focus-section', section: 'opening' }, '*');
   };
 
   const commit = (nextState, recordHistory = true) => {
@@ -126,7 +90,7 @@
     save();
   };
 
-  const createField = ([label, path, type = 'text']) => {
+  const createField = ([label, path]) => {
     const wrapper = document.createElement('div');
     wrapper.className = 'control-field';
     const fieldId = `field-${path.replaceAll('.', '-')}`;
@@ -136,9 +100,9 @@
     labelElement.textContent = label;
     labelElement.htmlFor = fieldId;
 
-    const input = document.createElement(type === 'textarea' ? 'textarea' : 'input');
+    const input = document.createElement('input');
     input.id = fieldId;
-    input.className = type === 'textarea' ? 'textarea-control' : 'text-control';
+    input.className = 'text-control';
     input.value = getValue(state, path) ?? '';
     let editStart = null;
     input.addEventListener('focus', () => { editStart = clone(state); });
@@ -162,7 +126,7 @@
   const createRange = (label, property, min, max, suffix = '%') => {
     const wrapper = document.createElement('div');
     wrapper.className = 'control-field';
-    const rangeId = `range-${sectionSelect.value}-${property}`;
+    const rangeId = `range-opening-${property}`;
     const labelElement = document.createElement('label');
     labelElement.className = 'control-label';
     labelElement.textContent = label;
@@ -174,7 +138,7 @@
     input.type = 'range';
     input.min = min;
     input.max = max;
-    input.value = state.sections[sectionSelect.value][property];
+    input.value = state.sections.opening[property];
     let rangeStart = null;
     const output = document.createElement('output');
     output.textContent = `${input.value}${suffix}`;
@@ -183,7 +147,7 @@
     input.addEventListener('input', () => {
       output.textContent = `${input.value}${suffix}`;
       const nextState = clone(state);
-      nextState.sections[sectionSelect.value][property] = Number(input.value);
+      nextState.sections.opening[property] = Number(input.value);
       state = nextState;
       updatePreview();
       save();
@@ -242,57 +206,20 @@
     return group;
   };
 
-  const createWaxControls = () => {
-    const group = document.createElement('section');
-    group.className = 'control-group';
-    group.innerHTML = '<h2 class="control-heading">Wax colour</h2>';
-    const grid = document.createElement('div');
-    grid.className = 'wax-grid';
-    waxOptions.forEach((option) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'wax-option';
-      const isActive = state.wax.name === option.name;
-      button.setAttribute('aria-pressed', String(isActive));
-      if (isActive) button.classList.add('is-active');
-      button.innerHTML = `<span class="wax-swatch" style="background:${option.color}"></span><span>${option.name}</span>`;
-      button.addEventListener('click', () => {
-        const nextState = clone(state);
-        nextState.wax = { name: option.name, filter: option.filter };
-        commit(nextState);
-        renderControls();
-      });
-      grid.append(button);
-    });
-    group.append(grid);
-    return group;
-  };
-
   function renderControls() {
-    const section = sectionSelect.value;
     controls.replaceChildren();
-
-    if (section === 'wax') {
-      controls.append(createWaxControls());
-      return;
-    }
 
     const contentGroup = document.createElement('section');
     contentGroup.className = 'control-group';
     contentGroup.innerHTML = '<h2 class="control-heading">Text</h2>';
-    sectionFields[section].forEach((field) => contentGroup.append(createField(field)));
-    controls.append(contentGroup, createBackgroundControls(section));
+    sectionFields.opening.forEach((field) => contentGroup.append(createField(field)));
+    controls.append(contentGroup, createBackgroundControls('opening'));
   }
 
   preview.addEventListener('load', () => {
     updatePreview();
     focusPreviewSection();
   });
-  sectionSelect.addEventListener('change', () => {
-    renderControls();
-    focusPreviewSection();
-  });
-
   deviceButtons.forEach((button) => {
     button.addEventListener('click', () => {
       deviceButtons.forEach((item) => {

@@ -131,7 +131,6 @@ input[type="file"] { cursor: pointer; }
 
 .locked-note span { margin-right: 5px; color: var(--editor-gold); }
 
-.field-label,
 .control-label {
   display: block;
   margin: 0 0 7px;
@@ -141,9 +140,7 @@ input[type="file"] { cursor: pointer; }
   letter-spacing: .04em;
 }
 
-.section-select,
-.text-control,
-.textarea-control {
+.text-control {
   width: 100%;
   border: 1px solid var(--editor-line);
   border-radius: 8px;
@@ -152,13 +149,9 @@ input[type="file"] { cursor: pointer; }
   outline: none;
 }
 
-.section-select,
 .text-control { min-height: 42px; padding: 9px 11px; }
-.textarea-control { min-height: 104px; resize: vertical; padding: 11px; line-height: 1.45; }
 
-.section-select:focus,
-.text-control:focus,
-.textarea-control:focus { border-color: var(--editor-sage); box-shadow: 0 0 0 3px rgba(116,121,99,.12); }
+.text-control:focus { border-color: var(--editor-sage); box-shadow: 0 0 0 3px rgba(116,121,99,.12); }
 
 .control-group {
   margin-top: 20px;
@@ -173,6 +166,8 @@ input[type="file"] { cursor: pointer; }
   font-weight: 500;
 }
 
+.editor-section-title { margin-bottom: 0; }
+
 .control-field + .control-field { margin-top: 13px; }
 
 .range-row {
@@ -185,8 +180,7 @@ input[type="file"] { cursor: pointer; }
 .range-row output { color: var(--editor-muted); font-size: 11px; text-align: right; }
 input[type="range"] { width: 100%; accent-color: var(--editor-sage); }
 
-.background-grid,
-.wax-grid {
+.background-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
@@ -217,20 +211,6 @@ input[type="range"] { width: 100%; accent-color: var(--editor-sage); }
 }
 
 .upload-control input { width: 100%; margin-top: 8px; font-size: 11px; }
-
-.wax-option {
-  display: grid;
-  aspect-ratio: 1;
-  place-items: center;
-  padding: 7px;
-  border: 2px solid transparent;
-  border-radius: 9px;
-  background: #f5f2ea;
-}
-
-.wax-option.is-active { border-color: var(--editor-sage); }
-.wax-swatch { width: 34px; height: 34px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12), 0 2px 5px rgba(0,0,0,.14); }
-.wax-option span:last-child { margin-top: 6px; color: var(--editor-muted); font-size: 9px; }
 
 .preview-stage {
   display: grid;
