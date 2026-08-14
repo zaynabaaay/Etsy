@@ -90,6 +90,11 @@
     save();
   };
 
+  const commitAndRender = (nextState, recordHistory = true) => {
+    commit(nextState, recordHistory);
+    renderControls();
+  };
+
   const createField = ([label, path]) => {
     const wrapper = document.createElement('div');
     wrapper.className = 'control-field';
@@ -180,8 +185,7 @@
       button.addEventListener('click', () => {
         const nextState = clone(state);
         nextState.sections[section].background = background.src;
-        commit(nextState);
-        renderControls();
+        commitAndRender(nextState);
       });
       grid.append(button);
     });
@@ -196,8 +200,7 @@
       reader.addEventListener('load', () => {
         const nextState = clone(state);
         nextState.sections[section].background = reader.result;
-        commit(nextState);
-        renderControls();
+        commitAndRender(nextState);
       });
       reader.readAsDataURL(file);
     });
@@ -259,9 +262,8 @@
     resetButton.dataset.armed = 'false';
     resetButton.textContent = 'Reset';
     history = [];
-    commit(template.cloneDefaults(), false);
+    commitAndRender(template.cloneDefaults(), false);
     undoButton.disabled = true;
-    renderControls();
   });
 
   deviceButtons.forEach((button) => {

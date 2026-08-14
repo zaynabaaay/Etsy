@@ -33,8 +33,15 @@
       clip-path: inset(0 0 100% 0);
       transform: translateY(18px);
     }
+
+    /* The preloaded handoff iframe is background-only. Hide its copy before
+       the external stylesheet can load so it cannot flash on first paint. */
+    html.invitation-handoff-preview .reference-copy {
+      visibility: hidden;
+      pointer-events: none;
+    }
   </style>
-  <link rel="stylesheet" href="styles.css?v=20260814-no-text-flash">
+  <link rel="stylesheet" href="styles.css?v=20260814-no-text-flash-v3">
 </head>
 <body>
   <main class="page">

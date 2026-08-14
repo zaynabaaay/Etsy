@@ -47,7 +47,7 @@
     window.clearTimeout(openingFallback);
     window.clearTimeout(flapFallback);
     window.clearTimeout(cardStageFallback);
-    window.location.assign('invitation.html?v=20260814-no-text-flash');
+    window.location.assign('invitation.html?v=20260814-no-text-flash-v3');
   };
 
   const runCardStage = (className, animationName, fallbackDelay, nextStage) => {
