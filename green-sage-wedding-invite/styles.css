@@ -287,6 +287,109 @@
       outline: none;
     }
 
+    /* Day / schedule section */
+    .schedule-section {
+      display: grid;
+      min-height: min(78svh, 720px);
+      align-content: center;
+      justify-items: center;
+      padding: clamp(96px, 11vw, 156px) clamp(28px, 8vw, 108px);
+      background: #99927c;
+      color: #f5f1e9;
+      text-align: center;
+    }
+
+    .schedule-content {
+      width: min(100%, 1080px);
+    }
+
+    .schedule-label {
+      margin: 0;
+      color: #f5f1e9;
+      font-family: var(--font-serif);
+      font-size: clamp(10px, .9vw, 13px);
+      font-weight: 400;
+      letter-spacing: clamp(.28em, .4em, .52em);
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+
+    .schedule-mark {
+      display: block;
+      margin: clamp(22px, 3vw, 34px) auto clamp(42px, 5vw, 68px);
+      color: rgba(245,241,233,.78);
+      font-family: Georgia, serif;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .schedule-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .schedule-event {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      padding: 0 clamp(20px, 4vw, 64px);
+    }
+
+    .schedule-event + .schedule-event::before {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 0;
+      width: 1px;
+      background: rgba(245,241,233,.42);
+      content: "";
+    }
+
+    .schedule-event-name {
+      color: #fffaf1;
+      font-family: "Cormorant Garamond", Garamond, Georgia, serif;
+      font-size: clamp(25px, 2.7vw, 38px);
+      font-weight: 400;
+      letter-spacing: .015em;
+      line-height: 1.1;
+    }
+
+    .schedule-event-time {
+      color: rgba(245,241,233,.9);
+      font-family: var(--font-serif);
+      font-size: clamp(11px, 1vw, 14px);
+      font-weight: 400;
+      letter-spacing: clamp(.16em, .23em, .32em);
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+      .schedule-section { min-height: 0; }
+      .schedule-event { padding-inline: 18px; }
+      .schedule-event-name { font-size: clamp(23px, 3.4vw, 32px); }
+    }
+
+    @media (max-width: 759px) {
+      .schedule-section { padding-block: 92px; }
+      .schedule-mark { margin-block: 22px 42px; }
+      .schedule-list { grid-template-columns: 1fr; gap: 34px; }
+      .schedule-event { gap: 10px; padding-inline: 0; }
+      .schedule-event + .schedule-event::before {
+        top: -18px;
+        right: 34%;
+        bottom: auto;
+        left: 34%;
+        width: auto;
+        height: 1px;
+      }
+      .schedule-event-name { font-size: clamp(28px, 8vw, 36px); }
+    }
+
     @media (min-width: 760px) and (max-width: 1366px) {
       .ceremony-section { padding-block: 72px; }
       .ceremony-art-slot {
