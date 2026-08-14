@@ -14,7 +14,7 @@
     },
     sections: {
       opening: {
-        background: 'invitation-assets/opening-background-sage-flatlay.png',
+        background: 'invitation-assets/opening-background-ivory-silk-4k.png',
         positionX: 50,
         positionY: 50,
         zoom: 100
