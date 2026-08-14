@@ -287,6 +287,15 @@
       outline: none;
     }
 
+    @media (min-width: 760px) and (max-width: 1199px) {
+      .ceremony-section { padding-block: 72px; }
+      .ceremony-art-slot {
+        width: min(48vw, 350px);
+        height: 228px;
+        margin-block: 30px 24px;
+      }
+    }
+
     @media (max-width: 759px) {
       .ceremony-section { padding-inline: 24px; }
       .ceremony-venue { font-size: clamp(38px, 11vw, 54px); }
