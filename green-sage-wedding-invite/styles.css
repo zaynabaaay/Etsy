@@ -1585,7 +1585,7 @@
     }
 
     html.standalone-invitation .reference-scroll {
-      margin: clamp(44px, 5vw, 72px) 0 0;
+      margin: clamp(56px, 6vw, 88px) 0 0;
       color: #5f6051;
       font-family: var(--font-display);
       font-size: clamp(8px, .8vw, 11px);
@@ -1635,7 +1635,7 @@
         letter-spacing: .08em;
       }
       html.standalone-invitation .reference-invite .couple-names .ampersand { width: min(55%, 190px); }
-      html.standalone-invitation .reference-scroll { margin-top: 42px; }
+      html.standalone-invitation .reference-scroll { margin-top: 56px; }
     }
 
     @media (min-width: 760px) and (max-height: 600px) {
@@ -1728,8 +1728,14 @@
     }
 
     html.standalone-invitation .reference-scroll {
-      font-size: clamp(10px, .9vw, 13px);
+      font-size: clamp(9px, .72vw, 11px);
       letter-spacing: clamp(.22em, .34em, .42em);
+    }
+
+    html.standalone-invitation .scroll-arrow {
+      width: 10px;
+      height: 15px;
+      margin-top: 8px;
     }
 
     @media (min-width: 760px) and (max-width: 1199px) {
@@ -1763,8 +1769,8 @@
       }
 
       html.standalone-invitation .reference-scroll {
-        font-size: clamp(10px, 3vw, 12px);
-        letter-spacing: clamp(.18em, .28em, .36em);
+        font-size: clamp(8px, 2.4vw, 10px);
+        letter-spacing: clamp(.18em, .24em, .32em);
       }
     }
 
