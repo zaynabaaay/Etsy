@@ -294,8 +294,8 @@
       align-content: center;
       justify-items: center;
       padding: clamp(96px, 11vw, 156px) clamp(28px, 8vw, 108px);
-      background: #99927c;
-      color: #f5f1e9;
+      background: #d4cbbf;
+      color: #45402b;
       text-align: center;
     }
 
@@ -305,7 +305,7 @@
 
     .schedule-label {
       margin: 0;
-      color: #f5f1e9;
+      color: #45402b;
       font-family: var(--font-serif);
       font-size: clamp(10px, .9vw, 13px);
       font-weight: 400;
@@ -317,7 +317,7 @@
     .schedule-mark {
       display: block;
       margin: clamp(22px, 3vw, 34px) auto clamp(42px, 5vw, 68px);
-      color: rgba(245,241,233,.78);
+      color: rgba(69,64,43,.62);
       font-family: Georgia, serif;
       font-size: 12px;
       line-height: 1;
@@ -345,12 +345,12 @@
       bottom: 4px;
       left: 0;
       width: 1px;
-      background: rgba(245,241,233,.42);
+      background: rgba(69,64,43,.26);
       content: "";
     }
 
     .schedule-event-name {
-      color: #fffaf1;
+      color: #45402b;
       font-family: "Cormorant Garamond", Garamond, Georgia, serif;
       font-size: clamp(25px, 2.7vw, 38px);
       font-weight: 400;
@@ -359,7 +359,7 @@
     }
 
     .schedule-event-time {
-      color: rgba(245,241,233,.9);
+      color: rgba(69,64,43,.84);
       font-family: var(--font-serif);
       font-size: clamp(11px, 1vw, 14px);
       font-weight: 400;
