@@ -104,6 +104,32 @@
   margin-top: clamp(68px, 6.5vw, 86px) !important;
 }
 
+.reference-scroll .scroll-arrow {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 10px auto 0 !important;
+  border: 0 !important;
+  color: rgba(98, 103, 83, .86) !important;
+  background: none !important;
+  transform: none !important;
+}
+
+.reference-scroll .scroll-arrow::before {
+  display: block !important;
+  content: "↓" !important;
+  font-family: var(--invite-display) !important;
+  font-size: clamp(18px, 1.45vw, 22px) !important;
+  font-weight: 300 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+}
+
+.reference-scroll .scroll-arrow::after {
+  display: none !important;
+  content: none !important;
+}
+
 .ceremony-label { margin: 0 !important; }
 .ceremony-venue {
   max-width: 760px !important;
@@ -183,6 +209,8 @@
   .reference-date-row { margin-top: 25px !important; font-size: 12.5px !important; }
   .reference-city { font-size: 10.5px !important; }
   .reference-scroll { margin-top: 56px !important; }
+  .reference-scroll .scroll-arrow { margin-top: 8px !important; }
+  .reference-scroll .scroll-arrow::before { font-size: 18px !important; }
   .ceremony-venue { font-size: clamp(42px, 11.5vw, 56px) !important; }
   .schedule-event-name { font-size: clamp(30px, 9vw, 38px) !important; }
 }
