@@ -12,6 +12,12 @@
     location: {
       city: 'Toronto, Ontario'
     },
+    ceremony: {
+      venue: 'Venue Name',
+      time: 'Ceremony Time',
+      address: 'Street Address',
+      location: 'City, Region'
+    },
     sections: {
       opening: {
         background: 'invitation-assets/opening-background-reference.jpg',
