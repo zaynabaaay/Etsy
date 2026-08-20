@@ -38,14 +38,22 @@
   letter-spacing: -.045em !important;
 }
 
+.reference-invite .couple-names > span:first-child {
+  margin-bottom: .08em !important;
+}
+
 .reference-invite .couple-names .ampersand {
-  margin: .12em 0 .08em !important;
+  margin: .20em 0 .18em !important;
   font-family: var(--invite-script) !important;
   font-size: .42em !important;
   font-style: normal !important;
   font-weight: 400 !important;
   letter-spacing: 0 !important;
   line-height: 1 !important;
+}
+
+.reference-invite .couple-names > span:last-child {
+  margin-top: .03em !important;
 }
 
 .reference-name-motif,
@@ -56,26 +64,31 @@
 }
 
 .reference-name-motif {
-  margin: clamp(16px, 1.7vw, 22px) auto 0 !important;
+  margin: clamp(24px, 2.4vw, 30px) auto 0 !important;
 }
 
 .reference-date-row {
-  margin-top: clamp(28px, 3vw, 38px) !important;
+  margin-top: clamp(30px, 3.2vw, 42px) !important;
   font-family: var(--invite-support) !important;
-  font-size: clamp(13px, 1.1vw, 17px) !important;
+  font-size: clamp(14px, 1.15vw, 18px) !important;
   font-weight: 400 !important;
-  letter-spacing: .24em !important;
+  letter-spacing: .25em !important;
   line-height: 1.4 !important;
 }
 
 .reference-city {
-  margin-top: 10px !important;
+  margin-top: 9px !important;
   font-family: var(--invite-support) !important;
-  font-size: var(--invite-detail-size) !important;
+  font-size: clamp(11px, .9vw, 13px) !important;
   font-weight: 400 !important;
   letter-spacing: .22em !important;
   line-height: 1.5 !important;
   text-transform: uppercase !important;
+  opacity: .9 !important;
+}
+
+.reference-scroll {
+  margin-top: clamp(70px, 7vw, 92px) !important;
 }
 
 /* Section 2 hierarchy */
@@ -163,6 +176,18 @@
     font-size: clamp(66px, 9vw, 96px) !important;
   }
 
+  .reference-date-row {
+    font-size: clamp(14px, 1.35vw, 17px) !important;
+  }
+
+  .reference-city {
+    font-size: 11px !important;
+  }
+
+  .reference-scroll {
+    margin-top: 76px !important;
+  }
+
   .ceremony-venue {
     font-size: clamp(48px, 5.5vw, 64px) !important;
   }
@@ -185,8 +210,25 @@
     line-height: .84 !important;
   }
 
+  .reference-invite .couple-names .ampersand {
+    margin: .18em 0 .16em !important;
+  }
+
+  .reference-name-motif {
+    margin-top: 20px !important;
+  }
+
   .reference-date-row {
+    margin-top: 28px !important;
     font-size: 12px !important;
+  }
+
+  .reference-city {
+    font-size: 10px !important;
+  }
+
+  .reference-scroll {
+    margin-top: 58px !important;
   }
 
   .ceremony-venue {
