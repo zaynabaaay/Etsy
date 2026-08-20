@@ -63,22 +63,43 @@
   color: #626753;
 }
 
-.rsvp-button {
+.rsvp-button,
+.rsvp-button:link,
+.rsvp-button:visited,
+.rsvp-button:hover,
+.rsvp-button:focus,
+.rsvp-button:focus-visible,
+.rsvp-button:active {
+  -webkit-appearance: none !important;
+  appearance: none !important;
   position: relative;
-  display: inline-block;
-  margin-top: clamp(34px, 3.2vw, 40px);
-  padding: 0 0 6px;
-  border: 0;
-  color: #626753;
-  background: transparent;
-  font-family: var(--invite-support, "Libre Baskerville", Georgia, serif);
-  font-size: clamp(9px, .72vw, 10.5px);
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: .24em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: color .2s ease;
+  display: inline-block !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin-top: clamp(34px, 3.2vw, 40px) !important;
+  padding: 0 0 6px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  color: #626753 !important;
+  background: transparent !important;
+  background-image: none !important;
+  font-family: var(--invite-support, "Libre Baskerville", Georgia, serif) !important;
+  font-size: clamp(9px, .72vw, 10.5px) !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  letter-spacing: .24em !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rsvp-button::before {
+  display: none !important;
+  content: none !important;
 }
 
 .rsvp-button::after {
@@ -86,8 +107,10 @@
   right: 0;
   bottom: 0;
   left: 0;
+  display: block !important;
   height: 1px;
   background: currentColor;
+  box-shadow: none !important;
   content: "";
   opacity: .34;
   transform: scaleX(.62);
@@ -97,9 +120,7 @@
 
 .rsvp-button:hover,
 .rsvp-button:focus-visible {
-  color: #3F4037;
-  background: transparent;
-  outline: none;
+  color: #3F4037 !important;
 }
 
 .rsvp-button:hover::after,
@@ -136,9 +157,15 @@
     line-height: 1.78;
   }
 
-  .rsvp-button {
-    margin-top: 32px;
-    padding-bottom: 6px;
-    font-size: 9px;
+  .rsvp-button,
+  .rsvp-button:link,
+  .rsvp-button:visited,
+  .rsvp-button:hover,
+  .rsvp-button:focus,
+  .rsvp-button:focus-visible,
+  .rsvp-button:active {
+    margin-top: 32px !important;
+    padding-bottom: 6px !important;
+    font-size: 9px !important;
   }
 }
