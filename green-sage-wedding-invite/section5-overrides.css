@@ -1,0 +1,121 @@
+.rsvp-section {
+  display: grid;
+  min-height: 82svh;
+  place-items: center;
+  padding: clamp(92px, 9vw, 132px) clamp(24px, 7vw, 104px) !important;
+  background: #E6E3DC;
+  color: #3F4037;
+}
+
+.rsvp-inner {
+  width: min(100%, 760px);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.rsvp-label {
+  margin: 0;
+  color: #626753;
+  font-family: var(--invite-support, "Libre Baskerville", Georgia, serif);
+  font-size: var(--invite-label-size, clamp(10px, .78vw, 12px));
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+}
+
+.rsvp-motif {
+  display: block;
+  width: var(--invite-motif-width, clamp(118px, 11vw, 150px));
+  height: auto;
+  margin: 16px auto clamp(28px, 2.5vw, 34px);
+  color: #626753;
+  opacity: .62;
+}
+
+.rsvp-heading {
+  margin: 0 0 clamp(24px, 2.4vw, 30px);
+  color: #3F4037;
+  font-family: var(--invite-display, "Cormorant Garamond", Georgia, serif);
+  font-size: clamp(52px, 5.4vw, 74px);
+  font-weight: 400;
+  line-height: .95;
+  letter-spacing: -.02em;
+}
+
+.rsvp-body {
+  display: grid;
+  gap: 9px;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.rsvp-body p {
+  margin: 0;
+  color: #3F4037;
+  font-family: var(--invite-support, "Libre Baskerville", Georgia, serif);
+  font-size: clamp(13px, 1vw, 16px);
+  font-weight: 400;
+  line-height: 1.8;
+}
+
+.rsvp-deadline {
+  color: #626753;
+}
+
+.rsvp-button {
+  position: relative;
+  display: inline-block;
+  margin-top: clamp(30px, 3vw, 38px);
+  padding: 15px 32px 14px;
+  border: 1px solid rgba(98, 103, 83, .38);
+  color: #3F4037;
+  background: transparent;
+  font-family: var(--invite-support, "Libre Baskerville", Georgia, serif);
+  font-size: clamp(9px, .76vw, 11px);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.rsvp-button:hover,
+.rsvp-button:focus-visible {
+  border-color: rgba(98, 103, 83, .62);
+  color: #3F4037;
+  background: rgba(98, 103, 83, .07);
+  outline: none;
+}
+
+@media (max-width: 759px) {
+  .rsvp-section {
+    min-height: 0;
+    padding: 82px 24px 92px !important;
+  }
+
+  .rsvp-inner {
+    width: min(100%, 440px);
+  }
+
+  .rsvp-motif {
+    margin-bottom: 25px;
+  }
+
+  .rsvp-heading {
+    margin-bottom: 22px;
+    font-size: clamp(46px, 13vw, 62px);
+  }
+
+  .rsvp-body p {
+    font-size: 13.5px;
+    line-height: 1.75;
+  }
+
+  .rsvp-button {
+    margin-top: 28px;
+    padding: 14px 27px 13px;
+    font-size: 9.5px;
+  }
+}
