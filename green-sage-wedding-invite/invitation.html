@@ -44,6 +44,145 @@
       transform: translateY(8px);
     }
   </style>
+  <style id="ceremony-refinements">
+    .ceremony-section {
+      min-height: 100svh;
+      padding-block: clamp(72px, 8vw, 112px) !important;
+      background: #E6E3DC !important;
+      color: #3F4037 !important;
+    }
+
+    .ceremony-content {
+      width: min(100% - 48px, 820px) !important;
+    }
+
+    .ceremony-label {
+      color: #626753 !important;
+      letter-spacing: .34em !important;
+    }
+
+    .ceremony-venue {
+      max-width: 760px !important;
+      margin-top: clamp(14px, 1.6vw, 20px) !important;
+      color: #3F4037 !important;
+      font-size: clamp(46px, 5.4vw, 74px) !important;
+      line-height: .96 !important;
+    }
+
+    .ceremony-motif {
+      width: min(32vw, 150px) !important;
+      margin: clamp(14px, 1.8vw, 20px) auto 0 !important;
+      color: #626753 !important;
+      opacity: .62 !important;
+    }
+
+    .ceremony-art-slot {
+      width: min(68vw, 500px) !important;
+      height: clamp(230px, 27vw, 320px) !important;
+      margin: clamp(22px, 3vw, 34px) auto clamp(24px, 3vw, 34px) !important;
+      transition: height .2s ease, margin .2s ease;
+    }
+
+    .ceremony-art-slot.is-empty {
+      width: 1px !important;
+      height: clamp(72px, 8vw, 96px) !important;
+      margin: clamp(16px, 2vw, 24px) auto clamp(12px, 1.6vw, 18px) !important;
+      overflow: hidden !important;
+    }
+
+    .ceremony-time {
+      color: #626753 !important;
+      font-size: clamp(13px, 1.15vw, 17px) !important;
+      font-weight: 400 !important;
+      letter-spacing: .30em !important;
+    }
+
+    .ceremony-address,
+    .ceremony-location {
+      color: #626753 !important;
+      font-size: clamp(10px, .88vw, 13px) !important;
+      letter-spacing: .24em !important;
+    }
+
+    .ceremony-address {
+      margin-top: clamp(16px, 1.8vw, 22px) !important;
+    }
+
+    .ceremony-location {
+      margin-top: 5px !important;
+    }
+
+    .ceremony-map {
+      position: relative;
+      min-height: 0 !important;
+      margin-top: clamp(24px, 2.8vw, 34px) !important;
+      padding: 0 0 5px !important;
+      border: 0 !important;
+      color: #626753 !important;
+      background: transparent !important;
+      font-size: clamp(9px, .78vw, 11px) !important;
+      letter-spacing: .25em !important;
+      text-decoration: none !important;
+    }
+
+    .ceremony-map::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 1px;
+      background: currentColor;
+      opacity: .36;
+      content: "";
+      transform: scaleX(.62);
+      transform-origin: center;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .ceremony-map:hover,
+    .ceremony-map:focus-visible {
+      border: 0 !important;
+      color: #3F4037 !important;
+      background: transparent !important;
+      outline: none !important;
+    }
+
+    .ceremony-map:hover::after,
+    .ceremony-map:focus-visible::after {
+      opacity: .75;
+      transform: scaleX(1);
+    }
+
+    @media (min-width: 760px) and (max-width: 1366px) {
+      .ceremony-section { padding-block: 68px !important; }
+      .ceremony-art-slot {
+        width: min(52vw, 460px) !important;
+        height: 250px !important;
+        margin-block: 24px 26px !important;
+      }
+      .ceremony-art-slot.is-empty {
+        height: 80px !important;
+        margin-block: 18px 12px !important;
+      }
+    }
+
+    @media (max-width: 759px) {
+      .ceremony-section { padding: 76px 24px !important; }
+      .ceremony-content { width: 100% !important; }
+      .ceremony-venue { font-size: clamp(40px, 11vw, 56px) !important; }
+      .ceremony-motif { width: 132px !important; margin-top: 14px !important; }
+      .ceremony-art-slot {
+        width: min(88vw, 380px) !important;
+        height: 220px !important;
+        margin-block: 24px 24px !important;
+      }
+      .ceremony-art-slot.is-empty {
+        height: 62px !important;
+        margin-block: 16px 10px !important;
+      }
+      .ceremony-map { margin-top: 24px !important; }
+    }
+  </style>
   <link rel="stylesheet" href="styles.css?v=20260814-opening-cinematic-v14">
 </head>
 <body>
@@ -64,7 +203,7 @@
                   <span class="ampersand">and</span>
                   <span data-template-text="couple.secondName">GABRIEL</span>
                 </h2>
-                <svg class="reference-name-motif" viewBox="0 0 220 18" aria-hidden="true" style="display:block;width:min(32vw,150px);height:auto;margin:20px auto 0;color:#626753;opacity:.72;overflow:visible">
+                <svg class="system-motif reference-name-motif" viewBox="0 0 220 18" aria-hidden="true">
                   <line x1="0" y1="9" x2="91" y2="9" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
                   <path d="M110 2 C111.5 6 113 7.5 117 9 C113 10.5 111.5 12 110 16 C108.5 12 107 10.5 103 9 C107 7.5 108.5 6 110 2Z" fill="currentColor"/>
                   <line x1="129" y1="9" x2="220" y2="9" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
@@ -83,24 +222,24 @@
             <div class="ceremony-content">
               <p class="ceremony-label system-label">The Ceremony</p>
               <h2 class="ceremony-venue system-heading system-heading--section" id="ceremonyHeading" data-template-text="ceremony.venue">Miller Lash House</h2>
-              <svg class="ceremony-motif" viewBox="0 0 220 18" aria-hidden="true" style="display:block;width:min(32vw,150px);height:auto;margin:16px auto 0;color:#626753;opacity:.72;overflow:visible">
+              <svg class="ceremony-motif" viewBox="0 0 220 18" aria-hidden="true">
                 <line x1="0" y1="9" x2="91" y2="9" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
                 <path d="M110 2 C111.5 6 113 7.5 117 9 C113 10.5 111.5 12 110 16 C108.5 12 107 10.5 103 9 C107 7.5 108.5 6 110 2Z" fill="currentColor"/>
                 <line x1="129" y1="9" x2="220" y2="9" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
               </svg>
               <div class="ceremony-art-slot">
-                <img src="assets/ceremony-chapel-wide.png?v=20260820" alt="Illustration of a stone chapel surrounded by cypress trees and flowers">
+                <img src="assets/ceremony-chapel-wide.png?v=20260820" alt="Illustration of a stone chapel surrounded by cypress trees and flowers" onerror="this.closest('.ceremony-art-slot').classList.add('is-empty')">
               </div>
               <p class="ceremony-time system-time" data-template-text="ceremony.time">4:30 PM</p>
               <p class="ceremony-address system-detail" data-template-text="ceremony.address">130 Old Kingston Road</p>
               <p class="ceremony-location system-detail" data-template-text="ceremony.location">Toronto, Ontario</p>
-              <a class="ceremony-map system-link" href="https://www.google.com/maps/search/?api=1&amp;query=130+Old+Kingston+Road+Toronto+Ontario" target="_blank" rel="noopener">View Map</a>
+              <a class="ceremony-map system-link" href="https://www.google.com/maps/search/?api=1&amp;query=130+Old+Kingston+Road+Toronto+Ontario" target="_blank" rel="noopener">View Map →</a>
             </div>
           </section>
           <section class="story-section schedule-section" aria-labelledby="scheduleHeading">
             <div class="schedule-content">
               <p class="schedule-label system-label" id="scheduleHeading">The Day</p>
-              <svg class="schedule-motif" viewBox="0 0 220 18" aria-hidden="true" style="display:block;width:min(32vw,150px);height:auto;margin:24px auto 50px;color:rgba(243,242,237,.82);overflow:visible">
+              <svg class="system-motif schedule-motif" viewBox="0 0 220 18" aria-hidden="true">
                 <line x1="0" y1="9" x2="91" y2="9" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
                 <path d="M110 2 C111.5 6 113 7.5 117 9 C113 10.5 111.5 12 110 16 C108.5 12 107 10.5 103 9 C107 7.5 108.5 6 110 2Z" fill="currentColor"/>
                 <line x1="129" y1="9" x2="220" y2="9" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
