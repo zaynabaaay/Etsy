@@ -1,1 +1,138 @@
-PLACEHOLDER
+<!doctype html>
+<html class="standalone-invitation opening-animation-ready" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f8f5ee">
+  <meta name="description" content="Green sage wedding invitation for Alexandra and Gabriel on 24 August 2027.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Green Sage – Wedding Invite — Alexandra &amp; Gabriel">
+  <meta property="og:description" content="Join us in Toronto on 24 August 2027.">
+  <meta property="og:image" content="og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="og.png">
+  <link rel="icon" href="data:,">
+  <link rel="preload" href="invitation-assets/opening-background-reference.jpg" as="image">
+  <title>Alexandra &amp; Gabriel — Wedding Invitation</title>
+  <script>
+    if (new URLSearchParams(window.location.search).has('handoff')) {
+      document.documentElement.classList.add('invitation-handoff-preview');
+    }
+  </script>
+  <style id="opening-animation-critical">
+    html.opening-animation-ready .reference-invite .hero-formal-copy p,
+    html.opening-animation-ready .reference-invite .couple-names .ampersand,
+    html.opening-animation-ready .reference-name-motif,
+    html.opening-animation-ready .reference-date-row,
+    html.opening-animation-ready .reference-city {
+      opacity: 0;
+    }
+
+    html.opening-animation-ready .reference-invite .couple-names > span:first-child,
+    html.opening-animation-ready .reference-invite .couple-names > span:last-child {
+      clip-path: inset(0 0 100% 0);
+      transform: translateY(18px);
+    }
+
+    /* The preloaded handoff iframe is background-only. Hide its copy before
+       the external stylesheet can load so it cannot flash on first paint. */
+    html.invitation-handoff-preview .reference-copy {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    html.opening-animation-ready .reference-scroll {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  </style>
+  <link rel="stylesheet" href="styles.css?v=20260814-opening-cinematic-v14">
+</head>
+<body>
+  <main class="page">
+    <div class="invitation-page">
+      <button class="replay-opening system-link" id="replayOpening" type="button">View envelope</button>
+      <article class="story-page" aria-label="Wedding invitation">
+        <div class="story-shell">
+          <section class="story-section hero-invite reference-invite" data-template-section="opening" aria-labelledby="coupleNames">
+            <div class="reference-card">
+              <div class="reference-copy">
+                <div class="hero-formal-copy">
+                  <p class="system-label">We joyfully invite you</p>
+                  <p class="system-label">To the wedding of</p>
+                </div>
+                <h2 class="couple-names system-heading system-heading--hero" id="coupleNames">
+                  <span data-template-text="couple.firstName">ALEXANDRA</span>
+                  <span class="ampersand">and</span>
+                  <span data-template-text="couple.secondName">GABRIEL</span>
+                </h2>
+                <svg class="system-motif reference-name-motif" viewBox="0 0 94 38" aria-hidden="true">
+                  <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 32C34 29 58 19 82 5" fill="none" stroke-width="1.45"/>
+                    <path d="M32 26C26 23 23 18 24 13c6 1 10 6 8 13ZM40 23c2 6 7 9 13 8-1-6-6-10-13-8ZM50 19c-4-5-4-11-1-15 5 4 6 10 1 15ZM58 16c4 5 9 7 15 4-3-5-8-7-15-4ZM69 11c1-6 5-10 11-10 0 6-4 10-11 10Z" fill="currentColor" stroke="none"/>
+                  </g>
+                </svg>
+                <p class="reference-date-row reference-date-compact system-time system-time--feature">
+                  <span data-template-text="date.day">24</span>
+                  <span data-template-text="date.month">08</span>
+                  <span data-template-text="date.year">2027</span>
+                </p>
+                <p class="reference-city system-detail" data-template-text="location.city">Toronto, Ontario</p>
+                <p class="reference-scroll">Scroll to view <span class="scroll-arrow" aria-hidden="true"></span></p>
+              </div>
+            </div>
+          </section>
+          <section class="story-section ceremony-section" aria-labelledby="ceremonyHeading">
+            <div class="ceremony-content">
+              <p class="ceremony-label system-label">The Ceremony</p>
+              <h2 class="ceremony-venue system-heading system-heading--section" id="ceremonyHeading">Venue Name</h2>
+              <svg class="system-motif ceremony-motif" viewBox="0 0 94 38" aria-hidden="true">
+                <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 32C34 29 58 19 82 5" fill="none" stroke-width="1.45"/>
+                  <path d="M32 26C26 23 23 18 24 13c6 1 10 6 8 13ZM40 23c2 6 7 9 13 8-1-6-6-10-13-8ZM50 19c-4-5-4-11-1-15 5 4 6 10 1 15ZM58 16c4 5 9 7 15 4-3-5-8-7-15-4ZM69 11c1-6 5-10 11-10 0 6-4 10-11 10Z" fill="currentColor" stroke="none"/>
+                  </g>
+                </svg>
+              <div class="ceremony-art-slot">
+                <img src="assets/ceremony-chapel-wide.png?v=20260820" alt="Illustration of a stone chapel surrounded by cypress trees and flowers">
+              </div>
+              <p class="ceremony-time system-time">4:30 PM</p>
+              <p class="ceremony-address system-detail">1234 Garden Path</p>
+              <p class="ceremony-location system-detail">Toronto, Ontario</p>
+              <a class="ceremony-map system-link" href="https://www.google.com/maps/search/?api=1&amp;query=1234+Garden+Path+Toronto+Ontario" target="_blank" rel="noopener">View Map</a>
+            </div>
+          </section>
+          <section class="story-section schedule-section" aria-labelledby="scheduleHeading">
+            <div class="schedule-content">
+              <p class="schedule-label system-label" id="scheduleHeading">The Day</p>
+              <svg class="system-motif schedule-motif" viewBox="0 0 94 38" aria-hidden="true">
+                <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 32C34 29 58 19 82 5" fill="none" stroke-width="1.45"/>
+                  <path d="M32 26C26 23 23 18 24 13c6 1 10 6 8 13ZM40 23c2 6 7 9 13 8-1-6-6-10-13-8ZM50 19c-4-5-4-11-1-15 5 4 6 10 1 15ZM58 16c4 5 9 7 15 4-3-5-8-7-15-4ZM69 11c1-6 5-10 11-10 0 6-4 10-11 10Z" fill="currentColor" stroke="none"/>
+                  </g>
+                </svg>
+              <ol class="schedule-list">
+                <li class="schedule-event">
+                  <span class="schedule-event-name system-heading system-heading--item">Ceremony</span>
+                  <span class="schedule-event-time system-time">4:30 PM</span>
+                </li>
+                <li class="schedule-event">
+                  <span class="schedule-event-name system-heading system-heading--item">Cocktail Hour</span>
+                  <span class="schedule-event-time system-time">5:30 PM</span>
+                </li>
+                <li class="schedule-event">
+                  <span class="schedule-event-name system-heading system-heading--item">Dinner &amp; Dancing</span>
+                  <span class="schedule-event-time system-time">6:30 PM</span>
+                </li>
+              </ol>
+            </div>
+          </section>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <script src="template-config.js?v=20260804-editor-foundation" defer></script>
+  <script src="template-runtime.js?v=20260804-editor-foundation" defer></script>
+  <script src="invitation.js?v=20260813-opening-sequence" defer></script>
+</body>
+</html>
