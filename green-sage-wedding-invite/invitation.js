@@ -13,7 +13,7 @@
 
   const typographyStyles = document.createElement('link');
   typographyStyles.rel = 'stylesheet';
-  typographyStyles.href = 'typography-system.css?v=20260820-v1';
+  typographyStyles.href = 'typography-system.css?v=20260820-v2';
   document.head.appendChild(typographyStyles);
 
   const scheduleList = document.querySelector('.schedule-list');
