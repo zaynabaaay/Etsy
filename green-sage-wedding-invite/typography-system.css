@@ -1,0 +1,199 @@
+:root {
+  --invite-display: "Cormorant Garamond", Garamond, Georgia, serif;
+  --invite-support: "Libre Baskerville", Baskerville, Georgia, serif;
+  --invite-script: "Snell Roundhand", "Apple Chancery", "Brush Script MT", cursive;
+
+  --invite-label-size: clamp(10px, .78vw, 12px);
+  --invite-detail-size: clamp(10px, .82vw, 12px);
+  --invite-time-size: clamp(10px, .86vw, 13px);
+  --invite-motif-width: clamp(118px, 11vw, 150px);
+}
+
+/* One typography language across the invitation */
+.story-section .system-label,
+.ceremony-label,
+.schedule-label {
+  font-family: var(--invite-support) !important;
+  font-size: var(--invite-label-size) !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+  letter-spacing: .34em !important;
+  text-transform: uppercase !important;
+}
+
+.reference-invite .hero-formal-copy {
+  display: grid;
+  gap: 7px;
+}
+
+.reference-invite .hero-formal-copy p {
+  margin: 0;
+}
+
+.reference-invite .couple-names {
+  font-family: var(--invite-display) !important;
+  font-size: clamp(62px, 10.5vw, 126px) !important;
+  font-weight: 400 !important;
+  line-height: .82 !important;
+  letter-spacing: -.045em !important;
+}
+
+.reference-invite .couple-names .ampersand {
+  margin: .12em 0 .08em !important;
+  font-family: var(--invite-script) !important;
+  font-size: .42em !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  line-height: 1 !important;
+}
+
+.reference-name-motif,
+.ceremony-motif,
+.schedule-motif {
+  width: var(--invite-motif-width) !important;
+  height: auto !important;
+}
+
+.reference-name-motif {
+  margin: clamp(16px, 1.7vw, 22px) auto 0 !important;
+}
+
+.reference-date-row {
+  margin-top: clamp(28px, 3vw, 38px) !important;
+  font-family: var(--invite-support) !important;
+  font-size: clamp(13px, 1.1vw, 17px) !important;
+  font-weight: 400 !important;
+  letter-spacing: .24em !important;
+  line-height: 1.4 !important;
+}
+
+.reference-city {
+  margin-top: 10px !important;
+  font-family: var(--invite-support) !important;
+  font-size: var(--invite-detail-size) !important;
+  font-weight: 400 !important;
+  letter-spacing: .22em !important;
+  line-height: 1.5 !important;
+  text-transform: uppercase !important;
+}
+
+/* Section 2 hierarchy */
+.ceremony-label {
+  margin: 0 !important;
+}
+
+.ceremony-venue {
+  max-width: 760px !important;
+  margin-top: clamp(15px, 1.5vw, 20px) !important;
+  font-family: var(--invite-display) !important;
+  font-size: clamp(48px, 5vw, 70px) !important;
+  font-weight: 400 !important;
+  line-height: .98 !important;
+  letter-spacing: 0 !important;
+}
+
+.ceremony-motif {
+  margin-top: clamp(15px, 1.6vw, 20px) !important;
+  opacity: .62 !important;
+}
+
+.ceremony-time {
+  font-family: var(--invite-support) !important;
+  font-size: var(--invite-time-size) !important;
+  font-weight: 400 !important;
+  letter-spacing: .28em !important;
+  line-height: 1.5 !important;
+  text-transform: uppercase !important;
+}
+
+.ceremony-address,
+.ceremony-location,
+.ceremony-map {
+  font-family: var(--invite-support) !important;
+  font-size: var(--invite-detail-size) !important;
+  font-weight: 400 !important;
+  line-height: 1.55 !important;
+  text-transform: uppercase !important;
+}
+
+.ceremony-address,
+.ceremony-location {
+  letter-spacing: .20em !important;
+}
+
+.ceremony-map {
+  letter-spacing: .22em !important;
+}
+
+/* Section 3 hierarchy */
+.schedule-label {
+  margin: 0 !important;
+}
+
+.schedule-motif {
+  margin-top: 16px !important;
+  margin-bottom: clamp(42px, 4vw, 56px) !important;
+}
+
+.schedule-event-name {
+  font-family: var(--invite-script) !important;
+  font-size: clamp(27px, 2.05vw, 34px) !important;
+  font-weight: 400 !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0 !important;
+}
+
+.schedule-event-time {
+  font-family: var(--invite-support) !important;
+  font-size: clamp(9px, .72vw, 10px) !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+  letter-spacing: .25em !important;
+  text-transform: uppercase !important;
+}
+
+.schedule-icon {
+  margin-bottom: 2px;
+}
+
+/* Device tuning */
+@media (min-width: 760px) and (max-width: 1100px) {
+  .reference-invite .couple-names {
+    font-size: clamp(66px, 9vw, 96px) !important;
+  }
+
+  .ceremony-venue {
+    font-size: clamp(48px, 5.5vw, 64px) !important;
+  }
+
+  .schedule-event-name {
+    font-size: clamp(24px, 2.7vw, 30px) !important;
+  }
+}
+
+@media (max-width: 759px) {
+  :root {
+    --invite-label-size: 9px;
+    --invite-detail-size: 10px;
+    --invite-time-size: 10px;
+    --invite-motif-width: 126px;
+  }
+
+  .reference-invite .couple-names {
+    font-size: clamp(52px, 16vw, 82px) !important;
+    line-height: .84 !important;
+  }
+
+  .reference-date-row {
+    font-size: 12px !important;
+  }
+
+  .ceremony-venue {
+    font-size: clamp(42px, 11.5vw, 56px) !important;
+  }
+
+  .schedule-event-name {
+    font-size: clamp(30px, 9vw, 38px) !important;
+  }
+}
