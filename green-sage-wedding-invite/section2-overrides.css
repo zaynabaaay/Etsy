@@ -1,0 +1,123 @@
+:root {
+  --palette-cool-ivory: #F3F2ED;
+  --palette-soft-greige: #E6E3DC;
+  --palette-mushroom-stone: #D2CEC5;
+  --palette-dusty-sage: #9EA596;
+  --palette-cool-olive: #626753;
+  --palette-deep-charcoal-olive: #3F4037;
+  --palette-muted-champagne: #AD9B78;
+}
+
+/* Section 2 — Ceremony */
+.ceremony-section {
+  padding-block: clamp(96px, 10vw, 144px);
+  background: var(--palette-soft-greige);
+  color: var(--palette-deep-charcoal-olive);
+}
+
+.ceremony-content {
+  width: min(100%, 760px);
+}
+
+.ceremony-label {
+  color: var(--palette-cool-olive);
+  letter-spacing: .34em;
+}
+
+.ceremony-motif {
+  margin-top: clamp(18px, 2vw, 24px);
+  color: var(--palette-cool-olive);
+}
+
+.ceremony-venue {
+  margin-top: clamp(14px, 1.8vw, 22px);
+  color: var(--palette-deep-charcoal-olive);
+  font-size: clamp(44px, 5.8vw, 76px);
+  line-height: .96;
+}
+
+.ceremony-art-slot {
+  width: min(82vw, 560px);
+  height: clamp(250px, 31vw, 350px);
+  margin: clamp(30px, 3.5vw, 44px) auto clamp(42px, 4.5vw, 62px);
+}
+
+.ceremony-time {
+  color: var(--palette-cool-olive);
+  font-size: clamp(14px, 1.25vw, 18px);
+  letter-spacing: .26em;
+}
+
+.ceremony-address,
+.ceremony-location {
+  color: rgba(98, 103, 83, .86);
+  letter-spacing: .19em;
+}
+
+.ceremony-address {
+  margin-top: clamp(16px, 1.8vw, 22px);
+}
+
+.ceremony-location {
+  margin-top: 5px;
+}
+
+.ceremony-map {
+  min-height: 0;
+  margin-top: clamp(28px, 3vw, 38px);
+  padding: 0 0 5px;
+  border: 0;
+  border-bottom: 1px solid rgba(98, 103, 83, .42);
+  color: var(--palette-cool-olive);
+  background: transparent;
+  letter-spacing: .22em;
+  transition: color .2s ease, border-color .2s ease, opacity .2s ease;
+}
+
+.ceremony-map::after {
+  margin-left: 9px;
+  content: "→";
+  font-size: .95em;
+  letter-spacing: 0;
+  transform: translateY(-1px);
+}
+
+.ceremony-map:hover,
+.ceremony-map:focus-visible {
+  border-color: var(--palette-deep-charcoal-olive);
+  color: var(--palette-deep-charcoal-olive);
+  background: transparent;
+  outline: none;
+}
+
+@media (min-width: 760px) and (max-width: 1366px) {
+  .ceremony-section {
+    padding-block: 82px;
+  }
+
+  .ceremony-art-slot {
+    width: min(58vw, 500px);
+    height: 290px;
+    margin: 28px auto 46px;
+  }
+}
+
+@media (max-width: 759px) {
+  .ceremony-section {
+    padding: 88px 24px 96px;
+  }
+
+  .ceremony-venue {
+    font-size: clamp(42px, 12vw, 58px);
+  }
+
+  .ceremony-art-slot {
+    width: min(92vw, 420px);
+    height: 245px;
+    margin: 28px auto 42px;
+  }
+
+  .ceremony-map {
+    margin-top: 28px;
+  }
+}
