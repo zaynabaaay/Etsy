@@ -183,6 +183,120 @@
       .ceremony-map { margin-top: 24px !important; }
     }
   </style>
+  <style id="schedule-refinements">
+    .schedule-section {
+      min-height: clamp(560px, 74svh, 720px) !important;
+      padding: clamp(92px, 9vw, 126px) clamp(28px, 8vw, 108px) !important;
+      background: #9EA596 !important;
+      color: #F3F2ED !important;
+    }
+
+    .schedule-content {
+      width: min(100%, 1080px) !important;
+    }
+
+    .schedule-label {
+      color: #F3F2ED !important;
+      font-size: clamp(10px, .82vw, 12px) !important;
+      letter-spacing: .42em !important;
+      opacity: .94;
+    }
+
+    .schedule-motif {
+      width: min(30vw, 142px) !important;
+      margin: clamp(16px, 1.8vw, 22px) auto clamp(42px, 4.5vw, 58px) !important;
+      color: #F3F2ED !important;
+      opacity: .55 !important;
+    }
+
+    .schedule-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      align-items: stretch;
+    }
+
+    .schedule-event {
+      min-height: 132px;
+      align-content: center;
+      gap: clamp(14px, 1.5vw, 20px) !important;
+      padding: 0 clamp(26px, 4.2vw, 62px) !important;
+    }
+
+    .schedule-event + .schedule-event::before {
+      top: 12px !important;
+      bottom: 12px !important;
+      background: rgba(243, 242, 237, .26) !important;
+    }
+
+    .schedule-event-name {
+      max-width: 260px;
+      color: #F3F2ED !important;
+      font-size: clamp(31px, 3.1vw, 44px) !important;
+      font-weight: 400 !important;
+      line-height: 1.02 !important;
+      letter-spacing: .01em !important;
+    }
+
+    .schedule-event-time {
+      color: rgba(243, 242, 237, .82) !important;
+      font-size: clamp(10px, .88vw, 12px) !important;
+      letter-spacing: .30em !important;
+    }
+
+    @media (min-width: 760px) and (max-width: 1000px) {
+      .schedule-section {
+        min-height: 560px !important;
+        padding-block: 86px !important;
+      }
+      .schedule-event {
+        min-height: 120px;
+        padding-inline: 22px !important;
+      }
+      .schedule-event-name {
+        font-size: clamp(27px, 3.4vw, 34px) !important;
+      }
+    }
+
+    @media (max-width: 759px) {
+      .schedule-section {
+        min-height: 0 !important;
+        padding: 82px 28px 88px !important;
+      }
+
+      .schedule-motif {
+        width: 126px !important;
+        margin: 16px auto 42px !important;
+      }
+
+      .schedule-list {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+      }
+
+      .schedule-event {
+        min-height: 0;
+        gap: 10px !important;
+        padding: 26px 0 !important;
+      }
+
+      .schedule-event + .schedule-event::before {
+        top: 0 !important;
+        right: 30% !important;
+        bottom: auto !important;
+        left: 30% !important;
+        width: auto !important;
+        height: 1px !important;
+        background: rgba(243, 242, 237, .24) !important;
+      }
+
+      .schedule-event-name {
+        font-size: clamp(31px, 8.5vw, 40px) !important;
+      }
+
+      .schedule-event-time {
+        font-size: 10px !important;
+      }
+    }
+  </style>
   <link rel="stylesheet" href="styles.css?v=20260814-opening-cinematic-v14">
 </head>
 <body>
