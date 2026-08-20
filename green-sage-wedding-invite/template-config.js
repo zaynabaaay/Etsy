@@ -1,8 +1,8 @@
 (() => {
   const defaults = {
     couple: {
-      firstName: 'ALEXANDRA',
-      secondName: 'GABRIEL'
+      firstName: 'ISABELLA',
+      secondName: 'JULIAN'
     },
     date: {
       day: '24',
