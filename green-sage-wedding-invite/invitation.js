@@ -64,7 +64,7 @@
             <p class="our-story-signoff">With love, Isabella &amp; Julian</p>
           </div>
           <div class="our-story-photo-wrap">
-            <img class="our-story-photo" src="assets/our-story-photo.jpg?v=20260820-2" alt="Couple sharing a warm moment" loading="lazy" decoding="async">
+            <img class="our-story-photo" src="https://images.unsplash.com/photo-1616687818402-c768b3638374?auto=format&fit=crop&fm=jpg&q=90&w=1800" alt="Couple sharing a warm moment" loading="lazy" decoding="async">
           </div>
         </div>
       </section>
