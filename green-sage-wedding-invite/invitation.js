@@ -8,7 +8,7 @@
 
   const sectionThreeStyles = document.createElement('link');
   sectionThreeStyles.rel = 'stylesheet';
-  sectionThreeStyles.href = 'section3-overrides.css?v=20260820-v1';
+  sectionThreeStyles.href = 'section3-overrides.css?v=20260820-v2';
   document.head.appendChild(sectionThreeStyles);
 
   const scheduleList = document.querySelector('.schedule-list');
@@ -53,13 +53,13 @@
 
     if (!scheduleContent.querySelector('.schedule-flow')) {
       scheduleContent.insertAdjacentHTML('beforeend', `
-        <svg class="schedule-flow" viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M20 90 C90 90 110 62 190 62 S310 112 400 112 S520 54 610 54 S730 104 820 104 S920 74 980 74"/>
-          <circle cx="100" cy="78" r="3"/>
-          <circle cx="300" cy="91" r="3"/>
-          <circle cx="500" cy="84" r="3"/>
-          <circle cx="700" cy="79" r="3"/>
-          <circle cx="900" cy="86" r="3"/>
+        <svg class="schedule-flow" viewBox="0 0 1000 82" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M20 42 C105 42 130 36 200 36 S330 48 400 48 S530 34 600 34 S730 46 800 46 S915 40 980 40"/>
+          <circle cx="100" cy="40" r="2.4"/>
+          <circle cx="300" cy="42" r="2.4"/>
+          <circle cx="500" cy="40" r="2.4"/>
+          <circle cx="700" cy="40" r="2.4"/>
+          <circle cx="900" cy="41" r="2.4"/>
         </svg>
       `);
     }
