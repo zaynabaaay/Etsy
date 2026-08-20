@@ -13,10 +13,10 @@
       city: 'Toronto, Ontario'
     },
     ceremony: {
-      venue: 'Venue Name',
-      time: 'Ceremony Time',
-      address: 'Street Address',
-      location: 'City, Region'
+      venue: 'Miller Lash House',
+      time: '4:30 PM',
+      address: '130 Old Kingston Road',
+      location: 'Toronto, Ontario'
     },
     sections: {
       opening: {
