@@ -1,6 +1,4 @@
 (() => {
-  document.documentElement.classList.add('opening-animation-ready');
-
   const sectionTwoStyles = document.createElement('link');
   sectionTwoStyles.rel = 'stylesheet';
   sectionTwoStyles.href = 'section2-overrides.css?v=20260820';
