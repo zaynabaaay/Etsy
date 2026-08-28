@@ -726,7 +726,6 @@
     .artboard {
       --card-pull-distance: -67cqw;
       --card-focus-distance: 4cqw;
-      --card-turn-scale: 1.45;
       --card-approach-scale: 4;
       position: relative;
       isolation: isolate;
@@ -924,12 +923,12 @@
     .artboard.card-turning .invitation-card {
       z-index: 8;
       transform: perspective(1200px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(0deg) scale(.85);
-      animation: cardTurn .7s cubic-bezier(.36,.08,.72,.84) forwards;
+      animation: cardTurn .7s cubic-bezier(.4,0,.2,1) forwards;
     }
 
     .artboard.card-approaching .invitation-card {
       z-index: 50;
-      transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(var(--card-turn-scale));
+      transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(1);
       animation: cardApproach .48s cubic-bezier(.28,.16,.48,1) forwards;
     }
 
@@ -966,13 +965,11 @@
 
     @keyframes cardTurn {
       from { transform: perspective(1200px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(0deg) scale(.85); }
-      28% { transform: perspective(1350px) translateY(calc(var(--card-pull-distance) - 1cqw)) rotateX(.5deg) rotate(2deg) scale(.85); }
-      58% { transform: perspective(1600px) translateY(calc(var(--card-pull-distance) - 1cqw)) rotateX(2.5deg) rotate(47deg) scale(1.12); }
-      to { transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(var(--card-turn-scale)); }
+      to { transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(1); }
     }
 
     @keyframes cardApproach {
-      from { transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(var(--card-turn-scale)); }
+      from { transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(1); }
       to { transform: perspective(3200px) translateY(var(--card-focus-distance)) rotateX(0deg) rotate(90deg) scale(var(--card-approach-scale)); }
     }
 
