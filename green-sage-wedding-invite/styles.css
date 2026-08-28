@@ -1,4 +1,4 @@
-    @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Libre+Baskerville:wght@400;700&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Instrument+Sans:wght@400&family=Instrument+Serif:ital@0;1&family=Libre+Baskerville:wght@400;700&display=swap");
 
     @font-face {
       font-family: "Invitation Didone";
@@ -764,6 +764,7 @@
     .heading-kicker,
     .heading-title {
       display: block;
+      font-family: "Instrument Serif", serif;
       font-weight: 400;
       text-indent: .25em;
     }
@@ -783,7 +784,7 @@
 
     .subtitle {
       margin: 3.2% 0 0;
-      font-family: var(--font-display);
+      font-family: "Instrument Sans", sans-serif;
       font-size: 1.36cqw;
       font-weight: 400;
       line-height: 1;
@@ -1108,7 +1109,7 @@
 
     .tap-copy {
       margin: 0;
-      font-family: var(--font-display);
+      font-family: "Instrument Sans", sans-serif;
       font-size: 1.34cqw;
       font-weight: 400;
       line-height: 1;
