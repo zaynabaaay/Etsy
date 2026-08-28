@@ -777,7 +777,7 @@
     }
 
     .heading-kicker {
-      font-size: 1.34cqw;
+      font-size: 1.41cqw;
       line-height: 1;
       letter-spacing: .38em;
     }
@@ -1096,10 +1096,10 @@
     .tap-copy {
       margin: calc(19.8% - 40px) 0 0;
       font-family: "Instrument Sans", sans-serif;
-      font-size: 1.34cqw;
+      font-size: 1.41cqw;
       font-weight: 400;
       line-height: 1;
-      letter-spacing: .56em;
+      letter-spacing: .54em;
       color: #454437;
       white-space: nowrap;
     }
@@ -1580,7 +1580,7 @@
       .heading { top: 15.3%; }
 
       .heading-kicker {
-        font-size: clamp(9px, .82vw, 12px);
+        font-size: clamp(9.5px, .86vw, 12.6px);
         letter-spacing: .38em;
       }
 
@@ -1615,8 +1615,8 @@
 
       .tap-copy {
         margin-top: calc(1.45vw + min(6.27vw, 85.8px) - 40px);
-        font-size: clamp(9px, .76vw, 11px);
-        letter-spacing: .56em;
+        font-size: clamp(9.5px, .8vw, 11.6px);
+        letter-spacing: .54em;
       }
     }
 
@@ -1628,11 +1628,11 @@
     }
 
     @supports not (font-size: 1cqw) {
-      .heading-kicker { font-size: 1.34vw; }
+      .heading-kicker { font-size: 1.41vw; }
       .heading-title { font-size: 4.65vw; }
       .date { font-size: 2.82vw; }
       .subtitle { font-size: 1.36vw; }
-      .tap-copy { font-size: 1.34vw; }
+      .tap-copy { font-size: 1.41vw; }
     }
 
     @media (prefers-reduced-motion: reduce) {
