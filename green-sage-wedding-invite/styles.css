@@ -966,7 +966,8 @@
 
     @keyframes cardTurn {
       from { transform: perspective(1200px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(0deg) scale(.85); }
-      52% { transform: perspective(1600px) translateY(var(--card-pull-distance)) rotateX(2.5deg) rotate(47deg) scale(1.12); }
+      28% { transform: perspective(1350px) translateY(calc(var(--card-pull-distance) - 1cqw)) rotateX(.5deg) rotate(2deg) scale(.85); }
+      58% { transform: perspective(1600px) translateY(calc(var(--card-pull-distance) - 1cqw)) rotateX(2.5deg) rotate(47deg) scale(1.12); }
       to { transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(var(--card-turn-scale)); }
     }
 
