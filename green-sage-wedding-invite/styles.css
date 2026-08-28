@@ -772,14 +772,14 @@
     .heading-kicker {
       font-size: 1.34cqw;
       line-height: 1;
-      letter-spacing: .56em;
+      letter-spacing: .38em;
     }
 
     .heading-title {
-      margin-top: 2.2%;
+      margin-top: 1.55%;
       font-size: 4.65cqw;
       line-height: .94;
-      letter-spacing: .26em;
+      letter-spacing: .22em;
     }
 
     .subtitle {
@@ -790,14 +790,6 @@
       line-height: 1;
       letter-spacing: .54em;
       color: #676858;
-    }
-
-    .top-ornament {
-      display: block;
-      width: 12.1%;
-      height: auto;
-      margin: 3.05% auto 0;
-      overflow: visible;
     }
 
     .envelope-wrap {
@@ -1099,16 +1091,8 @@
       white-space: nowrap;
     }
 
-    .vertical-ornament {
-      display: block;
-      width: 2.2%;
-      height: auto;
-      margin: 4.35% auto 3.8%;
-      overflow: visible;
-    }
-
     .tap-copy {
-      margin: 0;
+      margin: 22.67% 0 0;
       font-family: "Instrument Sans", sans-serif;
       font-size: 1.34cqw;
       font-weight: 400;
@@ -1595,24 +1579,19 @@
 
       .heading-kicker {
         font-size: clamp(9px, .82vw, 12px);
-        letter-spacing: .58em;
+        letter-spacing: .38em;
       }
 
       .heading-title {
-        margin-top: 1.45%;
+        margin-top: 1%;
         font-size: clamp(36px, 3.55vw, 52px);
-        letter-spacing: .27em;
+        letter-spacing: .23em;
       }
 
       .subtitle {
         margin-top: 1.65%;
         font-size: clamp(9px, .82vw, 12px);
         letter-spacing: .58em;
-      }
-
-      .top-ornament {
-        width: min(14.5%, 186px);
-        margin-top: 1.8%;
       }
 
       .envelope-wrap {
@@ -1632,13 +1611,8 @@
         letter-spacing: .40em;
       }
 
-      .vertical-ornament {
-        width: min(.95%, 13px);
-        margin-top: 1.7%;
-        margin-bottom: 1.35%;
-      }
-
       .tap-copy {
+        margin-top: calc(3.05vw + min(6.27vw, 85.8px));
         font-size: clamp(9px, .76vw, 11px);
         letter-spacing: .56em;
       }
@@ -1648,10 +1622,7 @@
     @media (min-width: 900px) and (max-width: 1366px) and (max-height: 1050px) {
       .footer { top: 80.6%; }
 
-      .vertical-ornament {
-        margin-top: 1%;
-        margin-bottom: .7%;
-      }
+      .tap-copy { margin-top: calc(1.7vw + min(6.27vw, 85.8px)); }
     }
 
     @supports not (font-size: 1cqw) {
