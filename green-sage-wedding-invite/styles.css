@@ -53,6 +53,13 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    html:not(.standalone-invitation) body {
+      background:
+        radial-gradient(ellipse at 50% 36%, rgba(255,255,255,.26), transparent 56%),
+        linear-gradient(112deg, rgba(230,227,220,.50), rgba(243,242,237,.70) 52%, rgba(210,206,197,.24)),
+        #f3f2ed;
+    }
+
     button { font: inherit; color: inherit; }
 
     .open-control {
