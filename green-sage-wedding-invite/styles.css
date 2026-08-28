@@ -966,7 +966,7 @@
 
     @keyframes cardRise {
       from { z-index: 2; transform: translateY(0) rotate(0deg) scale(1); }
-      to { z-index: 2; transform: translateY(var(--card-pull-distance)) rotate(0deg) scale(.9); }
+      to { z-index: 2; transform: translateY(var(--card-pull-distance)) rotate(0deg) scale(.85); }
     }
 
     @keyframes cardTurn {
