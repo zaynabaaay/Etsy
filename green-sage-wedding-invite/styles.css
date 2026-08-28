@@ -923,6 +923,8 @@
       z-index: 40;
     }
 
+    .artboard.card-rising .flap { z-index: 6; }
+
     .artboard.card-rising .invitation-card {
       animation: cardRise 1.1s cubic-bezier(.2,.72,.18,1) forwards;
     }
