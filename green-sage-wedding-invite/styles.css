@@ -1643,6 +1643,16 @@
       }
     }
 
+    /* Keep the complete opening footer inside short tablet landscape viewports. */
+    @media (min-width: 900px) and (max-width: 1366px) and (max-height: 1050px) {
+      .footer { top: 80.6%; }
+
+      .vertical-ornament {
+        margin-top: 1%;
+        margin-bottom: .7%;
+      }
+    }
+
     @supports not (font-size: 1cqw) {
       .heading-kicker { font-size: 1.34vw; }
       .heading-title { font-size: 4.65vw; }
