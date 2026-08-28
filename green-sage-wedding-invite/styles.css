@@ -802,7 +802,7 @@
     .envelope-wrap {
       position: absolute;
       z-index: 4;
-      top: 28.25%;
+      top: calc(28.25% - 13px);
       left: 5.52%;
       width: 88.96%;
       height: 41.40%;
@@ -1094,7 +1094,7 @@
     }
 
     .tap-copy {
-      margin: 19.8% 0 0;
+      margin: calc(19.8% - 40px) 0 0;
       font-family: "Instrument Sans", sans-serif;
       font-size: 1.34cqw;
       font-weight: 400;
@@ -1597,7 +1597,7 @@
       }
 
       .envelope-wrap {
-        top: 34.2%;
+        top: calc(34.2% - 13px);
         right: 0;
         left: 0;
         width: min(45.8vw, 53.625svh);
@@ -1614,7 +1614,7 @@
       }
 
       .tap-copy {
-        margin-top: calc(1.45vw + min(6.27vw, 85.8px));
+        margin-top: calc(1.45vw + min(6.27vw, 85.8px) - 40px);
         font-size: clamp(9px, .76vw, 11px);
         letter-spacing: .56em;
       }
@@ -1624,7 +1624,7 @@
     @media (min-width: 900px) and (max-width: 1366px) and (max-height: 1050px) {
       .footer { top: 80.6%; }
 
-      .tap-copy { margin-top: min(6.27vw, 85.8px); }
+      .tap-copy { margin-top: calc(min(6.27vw, 85.8px) - 40px); }
     }
 
     @supports not (font-size: 1cqw) {
