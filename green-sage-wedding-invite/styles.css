@@ -809,8 +809,8 @@
       perspective: 1200px;
       transform-style: preserve-3d;
       box-shadow:
-        7px 15px 13px rgba(77, 51, 25, .20),
-        1px 3px 4px rgba(91, 65, 37, .10);
+        0 17px 22px rgba(70, 66, 58, .14),
+        0 4px 8px rgba(70, 66, 58, .08);
     }
 
     .envelope-art {
@@ -882,6 +882,7 @@
       transform-style: preserve-3d;
       backface-visibility: visible;
       -webkit-backface-visibility: visible;
+      filter: drop-shadow(0 4px 3px rgba(70, 66, 58, .12));
     }
 
     .flap-face svg {
