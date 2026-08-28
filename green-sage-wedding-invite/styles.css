@@ -917,12 +917,7 @@
       z-index: 40;
     }
 
-    .artboard.card-rising .envelope-wrap,
-    .artboard.card-turning .envelope-wrap,
-    .artboard.card-approaching .envelope-wrap {
-      z-index: 40;
-    }
-
+    /* Keep the opened flap above the card only while it remains contained. */
     .artboard.card-rising .flap { z-index: 6; }
 
     .artboard.card-rising .invitation-card {
@@ -968,8 +963,8 @@
     }
 
     @keyframes cardRise {
-      from { z-index: 2; transform: translateY(0) rotate(0deg) scale(1); }
-      to { z-index: 2; transform: translateY(var(--card-pull-distance)) rotate(0deg) scale(.85); }
+      from { transform: translateY(0) rotate(0deg) scale(1); }
+      to { transform: translateY(var(--card-pull-distance)) rotate(0deg) scale(.85); }
     }
 
     @keyframes cardTurn {
