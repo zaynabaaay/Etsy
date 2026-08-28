@@ -103,7 +103,7 @@
 
     .artboard.card-approaching + .invitation-handoff {
       visibility: visible;
-      animation: revealInvitationHandoff .12s .08s linear forwards;
+      animation: revealInvitationHandoff .18s .28s ease-out forwards;
     }
 
     @keyframes revealInvitationHandoff {
@@ -726,6 +726,7 @@
     .artboard {
       --card-pull-distance: -67cqw;
       --card-focus-distance: 4cqw;
+      --card-turn-scale: 1.45;
       --card-approach-scale: 4;
       position: relative;
       isolation: isolate;
@@ -928,14 +929,14 @@
 
     .artboard.card-turning .invitation-card {
       z-index: 8;
-      transform: translateY(var(--card-pull-distance)) rotate(0deg) scale(1);
-      animation: cardTurn .7s cubic-bezier(.4,0,.2,1) forwards;
+      transform: perspective(1200px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(0deg) scale(.85);
+      animation: cardTurn .7s cubic-bezier(.36,.08,.72,.84) forwards;
     }
 
     .artboard.card-approaching .invitation-card {
       z-index: 50;
-      transform: translateY(var(--card-pull-distance)) rotate(90deg) scale(1);
-      animation: cardApproach .48s cubic-bezier(.2,.72,.18,1) forwards;
+      transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(var(--card-turn-scale));
+      animation: cardApproach .48s cubic-bezier(.28,.16,.48,1) forwards;
     }
 
     @keyframes flapFrontOpen {
@@ -970,13 +971,14 @@
     }
 
     @keyframes cardTurn {
-      from { transform: translateY(var(--card-pull-distance)) rotate(0deg) scale(1); }
-      to { transform: translateY(var(--card-pull-distance)) rotate(90deg) scale(1); }
+      from { transform: perspective(1200px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(0deg) scale(.85); }
+      52% { transform: perspective(1600px) translateY(var(--card-pull-distance)) rotateX(2.5deg) rotate(47deg) scale(1.12); }
+      to { transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(var(--card-turn-scale)); }
     }
 
     @keyframes cardApproach {
-      from { transform: translateY(var(--card-pull-distance)) rotate(90deg) scale(1); }
-      to { transform: translateY(var(--card-focus-distance)) rotate(90deg) scale(var(--card-approach-scale)); }
+      from { transform: perspective(2400px) translateY(var(--card-pull-distance)) rotateX(0deg) rotate(90deg) scale(var(--card-turn-scale)); }
+      to { transform: perspective(3200px) translateY(var(--card-focus-distance)) rotateX(0deg) rotate(90deg) scale(var(--card-approach-scale)); }
     }
 
     .seal-button {
