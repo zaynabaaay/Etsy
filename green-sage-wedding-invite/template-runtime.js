@@ -18,7 +18,8 @@
 
     if (settings.background) {
       const background = settings.background === 'invitation-assets/opening-background-reference.jpg'
-        ? 'invitation-assets/opening-background-reference.jpg?v=20260830-hero-v1'
+        || settings.background === 'invitation-assets/opening-background-reference.jpg?v=20260830-hero-v1'
+        ? 'invitation-assets/opening-background-reference.jpg?v=20260830-hero-v2'
         : settings.background;
       section.style.backgroundImage = `url("${String(background).replaceAll('"', '%22')}")`;
     } else {
