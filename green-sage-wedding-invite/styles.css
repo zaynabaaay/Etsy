@@ -2089,6 +2089,15 @@
       text-decoration: none;
     }
 
+    html.standalone-invitation .replay-opening {
+      min-height: 40px;
+      padding: 9px 14px 8px;
+      border-color: rgba(69,64,43,.18);
+      color: var(--system-olive);
+      background: rgba(248,241,230,.76);
+      box-shadow: 0 5px 14px rgba(69,44,27,.06);
+    }
+
     html.standalone-invitation .system-link:hover,
     html.standalone-invitation .system-link:focus-visible {
       border-color: var(--system-olive);
