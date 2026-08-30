@@ -1026,10 +1026,10 @@
       filter:
         grayscale(1)
         sepia(1)
-        saturate(.82)
+        saturate(.65)
         hue-rotate(35deg)
-        brightness(1.42)
-        contrast(.88)
+        brightness(2.05)
+        contrast(.78)
         drop-shadow(0 8px 7px rgba(49,53,40,.34));
     }
 
