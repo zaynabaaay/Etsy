@@ -20,7 +20,7 @@
     },
     sections: {
       opening: {
-        background: 'invitation-assets/opening-background-reference.jpg',
+        background: 'invitation-assets/opening-background-reference.jpg?v=20260830-hero-v1',
         positionX: 50,
         positionY: 50,
         zoom: 100

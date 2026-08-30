@@ -1544,7 +1544,7 @@
       background-color: var(--system-ivory);
       background-image:
         linear-gradient(rgba(255,255,255,.08), rgba(255,255,255,.08)),
-        url("invitation-assets/opening-background-reference.jpg");
+        url("invitation-assets/opening-background-reference.jpg?v=20260830-hero-v1");
       background-position: center;
       background-repeat: no-repeat;
       background-size: cover;
