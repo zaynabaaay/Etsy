@@ -9,6 +9,11 @@
   sectionThreeStyles.href = 'section3-overrides.css?v=20260831-schedule-height-v1';
   document.head.appendChild(sectionThreeStyles);
 
+  const detailsStyles = document.createElement('link');
+  detailsStyles.rel = 'stylesheet';
+  detailsStyles.href = 'section-details-overrides.css?v=20260831-details-static-v1';
+  document.head.appendChild(detailsStyles);
+
   const sectionFourStyles = document.createElement('link');
   sectionFourStyles.rel = 'stylesheet';
   sectionFourStyles.href = 'section4-overrides.css?v=20260820-v2';
@@ -25,8 +30,9 @@
   document.head.appendChild(typographyStyles);
 
   const scheduleSection = document.querySelector('.schedule-section');
-  if (scheduleSection && !document.querySelector('.our-story-section')) {
-    scheduleSection.insertAdjacentHTML('afterend', `
+  const storyInsertAnchor = document.querySelector('.details-section') || scheduleSection;
+  if (storyInsertAnchor && !document.querySelector('.our-story-section')) {
+    storyInsertAnchor.insertAdjacentHTML('afterend', `
       <section class="story-section our-story-section" aria-labelledby="ourStoryHeading">
         <div class="our-story-inner">
           <div class="our-story-copy">

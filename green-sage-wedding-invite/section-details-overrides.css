@@ -1,0 +1,142 @@
+/* Details: a clean practical reset after the sage schedule. */
+.details-section {
+  display: grid !important;
+  place-items: center !important;
+  min-height: clamp(460px, 56svh, 540px) !important;
+  padding: clamp(82px, 7vw, 104px) 48px !important;
+  overflow: hidden;
+  background: #F4EFE7 !important;
+  color: #474232 !important;
+}
+
+.details-section .details-content {
+  width: min(100%, 1040px) !important;
+  margin: 0 auto;
+}
+
+.details-section .details-label.system-label {
+  margin: 0 !important;
+  color: rgba(107, 106, 84, .9) !important;
+  font-family: "Instrument Sans", sans-serif !important;
+  font-size: clamp(10px, .82vw, 12px) !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  letter-spacing: .32em !important;
+  text-transform: uppercase !important;
+}
+
+.details-section .details-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  margin: clamp(48px, 4.5vw, 58px) auto 0;
+  padding: 0;
+}
+
+.details-section .details-item {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 106px;
+  margin: 0;
+  padding: 2px clamp(28px, 3.5vw, 48px) 0;
+  text-align: center;
+}
+
+.details-section .details-item + .details-item {
+  border-left: 1px solid rgba(216, 206, 193, .82);
+}
+
+.details-section .details-item-label {
+  margin: 0;
+  color: #474232;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: clamp(13px, 1.08vw, 15px);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: .11em;
+}
+
+.details-section .details-item-copy {
+  max-width: 250px;
+  margin: 0;
+  color: rgba(71, 66, 50, .74);
+  font-family: "Instrument Sans", sans-serif;
+  font-size: clamp(12px, .98vw, 14px);
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: .025em;
+  text-wrap: balance;
+}
+
+@media (min-width: 760px) and (max-width: 1100px) {
+  .details-section {
+    min-height: clamp(440px, 58svh, 500px) !important;
+    padding: 72px 48px !important;
+  }
+
+  .details-section .details-content {
+    width: min(100%, 920px) !important;
+  }
+
+  .details-section .details-list {
+    margin-top: 48px;
+  }
+
+  .details-section .details-item {
+    gap: 13px;
+    min-height: 102px;
+    padding-inline: 30px;
+  }
+
+  .details-section .details-item-label {
+    font-size: 13.5px;
+  }
+
+  .details-section .details-item-copy {
+    font-size: 12.5px;
+  }
+}
+
+@media (max-width: 759px) {
+  .details-section {
+    min-height: 0 !important;
+    padding: 78px 24px 84px !important;
+  }
+
+  .details-section .details-content {
+    width: min(100%, 390px) !important;
+  }
+
+  .details-section .details-list {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    width: min(100%, 342px);
+    margin-top: 40px;
+  }
+
+  .details-section .details-item {
+    justify-items: start;
+    gap: 9px;
+    min-height: 0;
+    padding: 0;
+    text-align: left;
+  }
+
+  .details-section .details-item + .details-item {
+    border-left: 0;
+  }
+
+  .details-section .details-item-label {
+    font-size: 13.5px;
+  }
+
+  .details-section .details-item-copy {
+    max-width: 310px;
+    font-size: 13px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+}

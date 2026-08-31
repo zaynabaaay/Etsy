@@ -29,6 +29,14 @@
         { time: '10:00 PM', name: 'Late Night' }
       ]
     },
+    details: {
+      label: 'DETAILS',
+      items: [
+        { label: 'Dress Code', copy: 'Formal attire' },
+        { label: 'Parking', copy: 'Complimentary parking is available on site.' },
+        { label: 'Adults Only', copy: 'We kindly request an adults-only celebration.' }
+      ]
+    },
     sections: {
       opening: {
         background: 'invitation-assets/opening-background-reference.jpg?v=20260830-hero-v2',
