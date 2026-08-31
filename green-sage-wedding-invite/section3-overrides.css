@@ -77,8 +77,8 @@
   grid-column: 1;
   grid-row: 2;
   color: #F4EFE7 !important;
-  font-family: "Instrument Sans", sans-serif !important;
-  font-size: clamp(20px, 1.7vw, 23px) !important;
+  font-family: "Instrument Serif", Georgia, serif !important;
+  font-size: clamp(22px, 1.9vw, 26px) !important;
   font-style: normal !important;
   font-weight: 400 !important;
   line-height: 1.25 !important;
@@ -113,7 +113,7 @@
   }
 
   .schedule-section .schedule-event-name {
-    font-size: 20px !important;
+    font-size: 22px !important;
   }
 }
 
@@ -161,7 +161,7 @@
   .schedule-section .schedule-event-name {
     grid-column: 2;
     grid-row: 1;
-    font-size: 19px !important;
+    font-size: 21px !important;
     text-align: left !important;
     white-space: normal;
   }
