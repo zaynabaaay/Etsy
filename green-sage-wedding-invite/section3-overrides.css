@@ -1,7 +1,7 @@
 /* Section 3 — The Day: responsive editorial schedule. */
 .schedule-section {
-  min-height: 100svh !important;
-  padding: clamp(78px, 8vw, 108px) 48px !important;
+  min-height: clamp(480px, 58svh, 540px) !important;
+  padding: clamp(68px, 6vw, 82px) 48px !important;
   overflow: hidden;
   background: #A3A792 !important;
   color: #F4EFE7 !important;
@@ -90,7 +90,8 @@
 
 @media (min-width: 760px) and (max-width: 1100px) {
   .schedule-section {
-    padding: 72px 48px !important;
+    min-height: clamp(440px, 60svh, 500px) !important;
+    padding: 64px 48px !important;
   }
 
   .schedule-section .schedule-content {
