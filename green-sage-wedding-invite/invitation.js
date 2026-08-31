@@ -1,7 +1,7 @@
 (() => {
   const sectionTwoStyles = document.createElement('link');
   sectionTwoStyles.rel = 'stylesheet';
-  sectionTwoStyles.href = 'section2-overrides.css?v=20260831-ceremony-illustration-v1';
+  sectionTwoStyles.href = 'section2-overrides.css?v=20260831-ceremony-illustration-v3';
   document.head.appendChild(sectionTwoStyles);
 
   const sectionThreeStyles = document.createElement('link');
