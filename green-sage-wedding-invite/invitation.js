@@ -21,7 +21,7 @@
 
   const typographyStyles = document.createElement('link');
   typographyStyles.rel = 'stylesheet';
-  typographyStyles.href = 'typography-system.css?v=20260830-hero-copy-v1';
+  typographyStyles.href = 'typography-system.css?v=20260830-prata-test-v1';
   document.head.appendChild(typographyStyles);
 
   const scheduleList = document.querySelector('.schedule-list');
