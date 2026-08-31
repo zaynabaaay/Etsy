@@ -6,7 +6,7 @@
 
   const sectionThreeStyles = document.createElement('link');
   sectionThreeStyles.rel = 'stylesheet';
-  sectionThreeStyles.href = 'section3-overrides.css?v=20260831-schedule-static-v1';
+  sectionThreeStyles.href = 'section3-overrides.css?v=20260831-schedule-pairing-v1';
   document.head.appendChild(sectionThreeStyles);
 
   const sectionFourStyles = document.createElement('link');

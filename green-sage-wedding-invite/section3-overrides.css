@@ -14,7 +14,7 @@
 
 .schedule-section .schedule-label.system-label {
   margin: 0 !important;
-  color: rgba(244, 239, 231, .9) !important;
+  color: rgba(244, 239, 231, .94) !important;
   font-family: "Instrument Sans", sans-serif !important;
   font-size: clamp(10px, .82vw, 12px) !important;
   font-weight: 400 !important;
@@ -38,7 +38,7 @@
   grid-template-columns: clamp(92px, 9vw, 116px) minmax(0, 1fr) !important;
   align-items: baseline !important;
   justify-items: stretch !important;
-  gap: 0 clamp(30px, 4vw, 54px) !important;
+  gap: 0 clamp(26px, 2.8vw, 36px) !important;
   min-height: 0 !important;
   padding: 0 !important;
   text-align: left !important;
