@@ -1,14 +1,14 @@
-/* Section 3 — The Day: static, editable vertical schedule. */
+/* Section 3 — The Day: responsive editorial schedule. */
 .schedule-section {
   min-height: 100svh !important;
-  padding: clamp(78px, 8vw, 108px) 32px !important;
+  padding: clamp(78px, 8vw, 108px) 48px !important;
   overflow: hidden;
   background: #A3A792 !important;
   color: #F4EFE7 !important;
 }
 
 .schedule-section .schedule-content {
-  width: min(100%, 640px) !important;
+  width: min(100%, 1120px) !important;
   margin: 0 auto;
 }
 
@@ -25,23 +25,27 @@
 
 .schedule-section .schedule-list {
   display: grid !important;
-  grid-template-columns: 1fr !important;
-  gap: clamp(26px, 2.4vw, 32px) !important;
-  width: min(100%, 520px) !important;
-  margin: clamp(42px, 4.2vw, 54px) auto 0 !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  width: 100% !important;
+  margin: clamp(54px, 4.8vw, 64px) auto 0 !important;
   padding: 0 !important;
 }
 
 .schedule-section .schedule-event,
 .schedule-section .schedule-event:nth-child(even) {
+  position: relative;
   display: grid !important;
-  grid-template-columns: clamp(92px, 9vw, 116px) minmax(0, 1fr) !important;
-  align-items: baseline !important;
-  justify-items: stretch !important;
-  gap: 0 clamp(26px, 2.8vw, 36px) !important;
-  min-height: 0 !important;
-  padding: 0 !important;
-  text-align: left !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto auto !important;
+  align-content: center !important;
+  align-items: center !important;
+  justify-items: center !important;
+  gap: clamp(15px, 1.5vw, 19px) 0 !important;
+  min-height: clamp(108px, 10vw, 128px) !important;
+  padding: 0 clamp(18px, 2.2vw, 30px) !important;
+  border: 0 !important;
+  text-align: center !important;
 }
 
 .schedule-section .schedule-event::before,
@@ -51,12 +55,17 @@
   content: none !important;
 }
 
+.schedule-section .schedule-event + .schedule-event {
+  border-left: 1px solid rgba(244, 239, 231, .18) !important;
+}
+
 .schedule-section .schedule-event-time {
   grid-column: 1;
-  justify-self: end;
+  grid-row: 1;
+  justify-self: center;
   color: rgba(244, 239, 231, .72) !important;
   font-family: "Instrument Sans", sans-serif !important;
-  font-size: clamp(11px, .88vw, 13px) !important;
+  font-size: clamp(10.5px, .84vw, 12px) !important;
   font-weight: 400 !important;
   line-height: 1.4 !important;
   letter-spacing: .16em !important;
@@ -65,24 +74,46 @@
 }
 
 .schedule-section .schedule-event-name {
-  grid-column: 2;
+  grid-column: 1;
+  grid-row: 2;
   color: #F4EFE7 !important;
   font-family: "Instrument Sans", sans-serif !important;
-  font-size: clamp(19px, 1.65vw, 23px) !important;
+  font-size: clamp(20px, 1.7vw, 23px) !important;
   font-style: normal !important;
   font-weight: 400 !important;
   line-height: 1.25 !important;
-  letter-spacing: .02em !important;
+  letter-spacing: .015em !important;
+  text-align: center !important;
   text-transform: none !important;
+  white-space: nowrap;
 }
 
 @media (min-width: 760px) and (max-width: 1100px) {
   .schedule-section {
-    padding: 72px 32px !important;
+    padding: 72px 48px !important;
+  }
+
+  .schedule-section .schedule-content {
+    width: min(100%, 940px) !important;
   }
 
   .schedule-section .schedule-list {
-    width: min(100%, 500px) !important;
+    margin-top: 52px !important;
+  }
+
+  .schedule-section .schedule-event,
+  .schedule-section .schedule-event:nth-child(even) {
+    gap: 16px 0 !important;
+    min-height: 112px !important;
+    padding-inline: 18px !important;
+  }
+
+  .schedule-section .schedule-event-time {
+    font-size: 10.5px !important;
+  }
+
+  .schedule-section .schedule-event-name {
+    font-size: 20px !important;
   }
 }
 
@@ -97,6 +128,7 @@
   }
 
   .schedule-section .schedule-list {
+    grid-template-columns: 1fr !important;
     gap: 24px !important;
     width: min(100%, 360px) !important;
     margin-top: 40px !important;
@@ -105,6 +137,32 @@
   .schedule-section .schedule-event,
   .schedule-section .schedule-event:nth-child(even) {
     grid-template-columns: 82px minmax(0, 1fr) !important;
-    column-gap: 24px !important;
+    grid-template-rows: auto !important;
+    align-items: baseline !important;
+    justify-items: stretch !important;
+    gap: 0 24px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    text-align: left !important;
+  }
+
+  .schedule-section .schedule-event + .schedule-event {
+    border-left: 0 !important;
+  }
+
+  .schedule-section .schedule-event-time {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+    font-size: 11px !important;
+  }
+
+  .schedule-section .schedule-event-name {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 19px !important;
+    text-align: left !important;
+    white-space: normal;
   }
 }
