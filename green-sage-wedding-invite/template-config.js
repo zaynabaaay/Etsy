@@ -19,6 +19,16 @@
       address: '123 Example Street',
       location: 'Ottawa, Ontario'
     },
+    schedule: {
+      label: 'THE DAY',
+      events: [
+        { time: '3:00 PM', name: 'Ceremony' },
+        { time: '4:00 PM', name: 'Cocktail Hour' },
+        { time: '5:30 PM', name: 'Dinner' },
+        { time: '7:00 PM', name: 'Dancing' },
+        { time: '10:00 PM', name: 'Late Night' }
+      ]
+    },
     sections: {
       opening: {
         background: 'invitation-assets/opening-background-reference.jpg?v=20260830-hero-v2',
