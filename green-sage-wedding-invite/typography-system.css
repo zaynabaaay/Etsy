@@ -247,20 +247,24 @@
 }
 
 .reference-invite .couple-names {
-  font-family: "Prata", Georgia, serif !important;
-  line-height: .88 !important;
+  gap: clamp(10px, 1.2vw, 16px) !important;
+  font-family: "Baskervville", Baskerville, Georgia, serif !important;
+  font-size: clamp(60px, 8.8vw, 106px) !important;
+  line-height: .92 !important;
+  letter-spacing: .018em !important;
+  text-indent: .018em !important;
 }
 
 .reference-invite .couple-names .ampersand {
-  margin: .17em 0 .15em !important;
+  margin: .04em 0 .02em !important;
   color: rgba(98, 103, 83, .76) !important;
   font-family: "Instrument Serif", Georgia, serif !important;
-  font-size: .34em !important;
+  font-size: .32em !important;
   font-style: italic !important;
 }
 
 .reference-invite .reference-date-row {
-  margin-top: clamp(42px, 4vw, 56px) !important;
+  margin-top: clamp(36px, 3.4vw, 46px) !important;
   font-family: "Instrument Sans", sans-serif !important;
   font-size: clamp(12px, 1vw, 15px) !important;
   line-height: 1.45 !important;
@@ -286,7 +290,7 @@
 }
 
 .reference-invite .reference-scroll {
-  margin-top: clamp(54px, 5.5vw, 74px) !important;
+  margin-top: clamp(50px, 4.8vw, 64px) !important;
   font-family: "Instrument Sans", sans-serif !important;
   font-size: clamp(8px, .62vw, 10px) !important;
   letter-spacing: .24em !important;
@@ -309,5 +313,11 @@
 
   .reference-invite .reference-scroll {
     margin-top: 48px !important;
+  }
+}
+
+@media (min-width: 760px) and (max-width: 1100px) {
+  .reference-invite .couple-names {
+    font-size: clamp(60px, 7.8vw, 86px) !important;
   }
 }
