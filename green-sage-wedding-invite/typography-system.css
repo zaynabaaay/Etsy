@@ -130,15 +130,16 @@
 
 .reference-scroll .scroll-arrow::after {
   position: absolute !important;
-  right: 3px !important;
+  right: auto !important;
   bottom: 1px !important;
+  left: 50% !important;
   display: block !important;
   width: 10px !important;
   height: 10px !important;
   border-right: 1px solid currentColor !important;
   border-bottom: 1px solid currentColor !important;
   content: "" !important;
-  transform: rotate(45deg) !important;
+  transform: translateX(-50%) rotate(45deg) !important;
   transform-origin: center !important;
 }
 
