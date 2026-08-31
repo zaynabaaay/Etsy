@@ -247,7 +247,7 @@
 }
 
 .reference-invite .couple-names {
-  gap: clamp(10px, 1.2vw, 16px) !important;
+  gap: clamp(8px, .9vw, 12px) !important;
   font-family: "Baskervville", Baskerville, Georgia, serif !important;
   font-size: clamp(60px, 8.8vw, 106px) !important;
   line-height: .92 !important;
