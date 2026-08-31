@@ -8,116 +8,112 @@
   --palette-muted-champagne: #AD9B78;
 }
 
-/* Section 2 — Ceremony */
+/* Section 2 — Ceremony: static hierarchy and spacing only. */
 .ceremony-section {
-  padding-block: clamp(96px, 10vw, 144px);
-  background: var(--palette-soft-greige);
-  color: var(--palette-deep-charcoal-olive);
+  min-height: 100svh;
+  padding: clamp(88px, 9vw, 124px) 32px !important;
+  background: var(--palette-soft-greige) !important;
+  color: var(--palette-deep-charcoal-olive) !important;
 }
 
-.ceremony-content {
-  width: min(100%, 760px);
+.ceremony-section .ceremony-content {
+  display: grid;
+  width: min(100%, 720px) !important;
+  justify-items: center;
 }
 
-.ceremony-label {
-  color: var(--palette-cool-olive);
-  letter-spacing: .34em;
+.ceremony-section .ceremony-content .ceremony-label {
+  margin: 0 !important;
+  color: var(--palette-cool-olive) !important;
+  font-family: "Instrument Sans", sans-serif !important;
+  font-size: clamp(10px, .82vw, 12px) !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  letter-spacing: .30em !important;
+  text-transform: uppercase !important;
 }
 
-.ceremony-motif {
-  margin-top: clamp(18px, 2vw, 24px);
-  color: var(--palette-cool-olive);
+.ceremony-section .ceremony-content .ceremony-time {
+  margin: clamp(22px, 2vw, 28px) 0 0 !important;
+  color: var(--palette-cool-olive) !important;
+  font-family: "Instrument Sans", sans-serif !important;
+  font-size: clamp(13px, 1.05vw, 15px) !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  letter-spacing: .18em !important;
+  text-transform: uppercase !important;
 }
 
-.ceremony-venue {
-  margin-top: clamp(14px, 1.8vw, 22px);
-  color: var(--palette-deep-charcoal-olive);
-  font-size: clamp(44px, 5.8vw, 76px);
-  line-height: .96;
+.ceremony-section .ceremony-content .ceremony-venue {
+  max-width: 720px !important;
+  margin: clamp(20px, 2.2vw, 28px) 0 0 !important;
+  color: var(--palette-deep-charcoal-olive) !important;
+  font-family: "Baskervville", Baskerville, Georgia, serif !important;
+  font-size: clamp(50px, 5.2vw, 68px) !important;
+  font-weight: 400 !important;
+  line-height: .98 !important;
+  letter-spacing: .01em !important;
 }
 
-.ceremony-art-slot {
-  width: min(82vw, 560px);
-  height: clamp(250px, 31vw, 350px);
-  margin: clamp(30px, 3.5vw, 44px) auto clamp(42px, 4.5vw, 62px);
+.ceremony-section .ceremony-content .ceremony-motif {
+  width: clamp(112px, 10vw, 138px) !important;
+  margin: clamp(18px, 2vw, 24px) auto 0 !important;
+  color: var(--palette-cool-olive) !important;
+  opacity: .52 !important;
 }
 
-.ceremony-time {
-  color: var(--palette-cool-olive);
-  font-size: clamp(14px, 1.25vw, 18px);
-  letter-spacing: .26em;
+.ceremony-section .ceremony-content .ceremony-address,
+.ceremony-section .ceremony-content .ceremony-location {
+  margin: 0 !important;
+  color: rgba(63, 64, 55, .88) !important;
+  font-family: "Instrument Sans", sans-serif !important;
+  font-size: clamp(11px, .9vw, 13px) !important;
+  font-weight: 400 !important;
+  line-height: 1.55 !important;
+  letter-spacing: .08em !important;
+  text-transform: none !important;
 }
 
-.ceremony-address,
-.ceremony-location {
-  color: rgba(98, 103, 83, .86);
-  letter-spacing: .19em;
+.ceremony-section .ceremony-content .ceremony-address {
+  margin-top: clamp(30px, 3.2vw, 40px) !important;
 }
 
-.ceremony-address {
-  margin-top: clamp(16px, 1.8vw, 22px);
+.ceremony-section .ceremony-content .ceremony-location {
+  margin-top: 5px !important;
 }
 
-.ceremony-location {
-  margin-top: 5px;
+.ceremony-section .ceremony-content .ceremony-note {
+  margin: clamp(26px, 2.8vw, 34px) 0 0 !important;
+  color: rgba(98, 103, 83, .9) !important;
+  font-family: "Instrument Serif", Georgia, serif !important;
+  font-size: clamp(15px, 1.25vw, 18px) !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+  letter-spacing: .01em !important;
+  text-transform: none !important;
 }
 
-.ceremony-map {
-  min-height: 0;
-  margin-top: clamp(28px, 3vw, 38px);
-  padding: 0 0 5px;
-  border: 0;
-  border-bottom: 1px solid rgba(98, 103, 83, .42);
-  color: var(--palette-cool-olive);
-  background: transparent;
-  letter-spacing: .22em;
-  transition: color .2s ease, border-color .2s ease, opacity .2s ease;
-}
-
-.ceremony-map::after {
-  margin-left: 9px;
-  content: "→";
-  font-size: .95em;
-  letter-spacing: 0;
-  transform: translateY(-1px);
-}
-
-.ceremony-map:hover,
-.ceremony-map:focus-visible {
-  border-color: var(--palette-deep-charcoal-olive);
-  color: var(--palette-deep-charcoal-olive);
-  background: transparent;
-  outline: none;
-}
-
-@media (min-width: 760px) and (max-width: 1366px) {
+@media (min-width: 760px) and (max-width: 1100px) {
   .ceremony-section {
-    padding-block: 82px;
+    padding: 72px 32px !important;
   }
 
-  .ceremony-art-slot {
-    width: min(58vw, 500px);
-    height: 290px;
-    margin: 28px auto 46px;
+  .ceremony-section .ceremony-content .ceremony-venue {
+    font-size: clamp(48px, 5.5vw, 58px) !important;
   }
 }
 
 @media (max-width: 759px) {
   .ceremony-section {
-    padding: 88px 24px 96px;
+    padding: 80px 24px 88px !important;
   }
 
-  .ceremony-venue {
-    font-size: clamp(42px, 12vw, 58px);
+  .ceremony-section .ceremony-content {
+    width: 100% !important;
   }
 
-  .ceremony-art-slot {
-    width: min(92vw, 420px);
-    height: 245px;
-    margin: 28px auto 42px;
-  }
-
-  .ceremony-map {
-    margin-top: 28px;
+  .ceremony-section .ceremony-content .ceremony-venue {
+    font-size: clamp(44px, 12vw, 56px) !important;
   }
 }

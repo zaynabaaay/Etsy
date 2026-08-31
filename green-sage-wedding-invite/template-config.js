@@ -14,10 +14,10 @@
       city: 'Ottawa, Ontario'
     },
     ceremony: {
-      venue: 'Miller Lash House',
-      time: '4:30 PM',
-      address: '130 Old Kingston Road',
-      location: 'Toronto, Ontario'
+      venue: 'The Glasshouse',
+      time: '3:00 PM',
+      address: '123 Example Street',
+      location: 'Ottawa, Ontario'
     },
     sections: {
       opening: {
