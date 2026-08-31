@@ -7,7 +7,9 @@
   const readSavedState = () => {
     try {
       const saved = window.localStorage.getItem(template.storageKey);
-      return template.normalize(saved ? JSON.parse(saved) : null);
+      const state = saved ? JSON.parse(saved) : null;
+      if (state?.location?.city === 'Toronto, Ontario') state.location.city = 'Ottawa, Ontario';
+      return template.normalize(state);
     } catch {
       return template.cloneDefaults();
     }

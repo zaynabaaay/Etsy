@@ -7,10 +7,11 @@
     date: {
       day: '24',
       month: '08',
-      year: '2027'
+      year: '2027',
+      display: 'Saturday, August 24, 2027'
     },
     location: {
-      city: 'Toronto, Ontario'
+      city: 'Ottawa, Ontario'
     },
     ceremony: {
       venue: 'Miller Lash House',

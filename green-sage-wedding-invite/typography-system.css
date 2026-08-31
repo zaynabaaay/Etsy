@@ -225,3 +225,89 @@
   .ceremony-venue { font-size: clamp(42px, 11.5vw, 56px) !important; }
   .schedule-event-name { font-size: clamp(30px, 9vw, 38px) !important; }
 }
+
+/* Opening-section hierarchy: scoped here so later invitation sections retain
+   their established type and spacing. */
+.reference-invite .reference-copy {
+  width: min(82%, 820px) !important;
+  transform: translateY(clamp(-18px, -1.5svh, -10px));
+}
+
+.reference-invite .hero-formal-copy {
+  gap: 5px !important;
+  margin-bottom: clamp(28px, 2.6vw, 38px) !important;
+}
+
+.reference-invite .hero-formal-copy p {
+  font-family: "Instrument Sans", sans-serif !important;
+  font-size: clamp(10px, .82vw, 12px) !important;
+  line-height: 1.55 !important;
+  letter-spacing: .10em !important;
+  text-transform: none !important;
+}
+
+.reference-invite .couple-names {
+  font-family: "Instrument Serif", Georgia, serif !important;
+  line-height: .88 !important;
+}
+
+.reference-invite .couple-names .ampersand {
+  margin: .17em 0 .15em !important;
+  color: rgba(98, 103, 83, .76) !important;
+  font-family: "Instrument Serif", Georgia, serif !important;
+  font-size: .34em !important;
+  font-style: italic !important;
+}
+
+.reference-invite .reference-date-row {
+  margin-top: clamp(42px, 4vw, 56px) !important;
+  font-family: "Instrument Sans", sans-serif !important;
+  font-size: clamp(12px, 1vw, 15px) !important;
+  line-height: 1.45 !important;
+  letter-spacing: .08em !important;
+  text-transform: none !important;
+}
+
+.reference-invite .reference-date-compact span {
+  padding-inline: 0 !important;
+}
+
+.reference-invite .reference-date-compact span::before {
+  content: none !important;
+}
+
+.reference-invite .reference-city {
+  margin-top: 8px !important;
+  font-family: "Instrument Sans", sans-serif !important;
+  font-size: clamp(10px, .82vw, 12px) !important;
+  line-height: 1.5 !important;
+  letter-spacing: .12em !important;
+  text-transform: none !important;
+}
+
+.reference-invite .reference-scroll {
+  margin-top: clamp(54px, 5.5vw, 74px) !important;
+  font-family: "Instrument Sans", sans-serif !important;
+  font-size: clamp(8px, .62vw, 10px) !important;
+  letter-spacing: .24em !important;
+}
+
+@media (max-width: 759px) {
+  .reference-invite .reference-copy {
+    width: min(94%, 430px) !important;
+    transform: translateY(-8px);
+  }
+
+  .reference-invite .hero-formal-copy {
+    margin-bottom: 24px !important;
+  }
+
+  .reference-invite .reference-date-row {
+    margin-top: 36px !important;
+    font-size: 12px !important;
+  }
+
+  .reference-invite .reference-scroll {
+    margin-top: 48px !important;
+  }
+}
