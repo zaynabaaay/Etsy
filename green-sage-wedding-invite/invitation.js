@@ -21,7 +21,7 @@
 
   const typographyStyles = document.createElement('link');
   typographyStyles.rel = 'stylesheet';
-  typographyStyles.href = 'typography-system.css?v=20260830-hero-type-v1';
+  typographyStyles.href = 'typography-system.css?v=20260831-hero-intro-v1';
   document.head.appendChild(typographyStyles);
 
   const scheduleList = document.querySelector('.schedule-list');

@@ -240,9 +240,9 @@
 
 .reference-invite .hero-formal-copy p {
   font-family: "Instrument Sans", sans-serif !important;
-  font-size: clamp(10px, .82vw, 12px) !important;
+  font-size: clamp(11px, 1vw, 13px) !important;
   line-height: 1.55 !important;
-  letter-spacing: .10em !important;
+  letter-spacing: .09em !important;
   text-transform: none !important;
 }
 
