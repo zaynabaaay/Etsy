@@ -28,7 +28,11 @@
       opacity: 0;
     }
 
-    html.opening-animation-ready .reference-invite .couple-names > span:first-child,
+    html.opening-animation-ready .reference-invite .couple-names > span:first-child {
+      clip-path: inset(-8px 0 calc(100% + 8px) 0);
+      transform: translateY(18px);
+    }
+
     html.opening-animation-ready .reference-invite .couple-names > span:last-child {
       clip-path: inset(0 0 100% 0);
       transform: translateY(18px);
@@ -297,7 +301,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="styles.css?v=20260830-prata-test-v1">
+  <link rel="stylesheet" href="styles.css?v=20260830-prata-clip-v1">
 </head>
 <body>
   <main class="page">

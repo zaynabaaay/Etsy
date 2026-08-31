@@ -1899,9 +1899,9 @@
     }
 
     html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span:first-child {
-      clip-path: inset(0 0 100% 0);
+      clip-path: inset(-8px 0 calc(100% + 8px) 0);
       transform: translateY(18px);
-      animation: openingNameReveal 1.05s cubic-bezier(.22,.72,.2,1) 1.12s both;
+      animation: openingFirstNameReveal 1.05s cubic-bezier(.22,.72,.2,1) 1.12s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-invite .couple-names .ampersand {
@@ -1987,6 +1987,17 @@
       }
     }
 
+    @keyframes openingFirstNameReveal {
+      from {
+        clip-path: inset(-8px 0 calc(100% + 8px) 0);
+        transform: translateY(18px);
+      }
+      to {
+        clip-path: inset(-8px 0 0 0);
+        transform: translateY(0);
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html.standalone-invitation.opening-animation-ready .reference-invite .hero-formal-copy p,
       html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span,
@@ -2003,6 +2014,10 @@
         opacity: 1;
         transform: none;
         animation: none;
+      }
+
+      html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span:first-child {
+        clip-path: inset(-8px 0 0);
       }
     }
 
