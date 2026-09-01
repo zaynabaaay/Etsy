@@ -12,11 +12,21 @@
   const deleteButton = document.getElementById('deleteButton');
   const emptyState = document.getElementById('emptyState');
   const selectionControls = document.getElementById('selectionControls');
-  const fontFamily = document.getElementById('fontFamily');
+  const fontPickerButton = document.getElementById('fontPickerButton');
+  const fontPickerValue = document.getElementById('fontPickerValue');
+  const fontPickerPopover = document.getElementById('fontPickerPopover');
+  const fontCategoryFilters = document.getElementById('fontCategoryFilters');
+  const fontList = document.getElementById('fontList');
   const fontSize = document.getElementById('fontSize');
+  const fontSizeDecrease = document.getElementById('fontSizeDecrease');
+  const fontSizeIncrease = document.getElementById('fontSizeIncrease');
+  const fontSizePresets = document.getElementById('fontSizePresets');
   const textColor = document.getElementById('textColor');
   const textColorValue = document.getElementById('textColorValue');
+  const formattingControls = document.getElementById('formattingControls');
   const alignmentControls = document.getElementById('alignmentControls');
+  const lineHeight = document.getElementById('lineHeight');
+  const letterSpacing = document.getElementById('letterSpacing');
   const horizontalPositionControls = document.getElementById('horizontalPositionControls');
   const verticalPositionControls = document.getElementById('verticalPositionControls');
   const previewStage = document.querySelector('.visual-preview-stage');
@@ -27,6 +37,7 @@
   const isSameOrigin = (origin) => origin === window.location.origin
     || (window.location.origin === 'null' && origin === 'null');
   const history = { past: [], future: [] };
+  const fontSizeValues = Object.freeze([8, 10, 12, 14, 16, 18, 21, 24, 28, 32, 36, 42, 48, 56, 64, 72, 84, 96, 120]);
 
   let state = model.load();
   let selectedElementId = null;
@@ -36,6 +47,10 @@
   let revision = 0;
   let stylePreviewToken = 0;
   let canvasScrollLock = null;
+  let activeFontCategory = 'all';
+  let fontPreviewObserver = null;
+  let workspaceScrollGesture = null;
+  let styleCommitQueue = Promise.resolve();
 
   const snapshot = (label = '') => ({
     state: clone(state),
@@ -80,15 +95,98 @@
 
   const selectedElement = () => state.elements[selectedElementId] || null;
 
+  const ensureFontLoaded = async (fontName, weight = 400, style = 'normal', sample = 'Aa') => {
+    await model.loadFont(fontName, { weight, style, sample, document });
+  };
+
+  const closeFontPicker = () => {
+    fontPickerPopover.hidden = true;
+    fontPickerButton.setAttribute('aria-expanded', 'false');
+    fontPreviewObserver?.disconnect();
+  };
+
+  const renderFontList = () => {
+    fontPreviewObserver?.disconnect();
+    fontList.replaceChildren();
+    const selectedFont = selectedElement()?.style.fontFamily;
+    const fonts = model.fontCatalog.filter((font) => activeFontCategory === 'all' || font.category === activeFontCategory);
+
+    let previousCategory = '';
+    fonts.forEach((font) => {
+      if (activeFontCategory === 'all' && font.category !== previousCategory) {
+        const heading = document.createElement('div');
+        heading.className = 'visual-font-category-heading';
+        heading.textContent = model.fontCategories.find((category) => category.id === font.category)?.label || font.category;
+        fontList.append(heading);
+        previousCategory = font.category;
+      }
+      const button = document.createElement('button');
+      button.className = 'visual-font-option';
+      button.type = 'button';
+      button.dataset.fontName = font.name;
+      button.setAttribute('role', 'option');
+      button.setAttribute('aria-selected', String(font.name === selectedFont));
+      button.classList.toggle('is-selected', font.name === selectedFont);
+      button.style.fontFamily = model.fontStack(font.name);
+      const label = document.createElement('span');
+      label.textContent = font.displayName;
+      const selectedMark = document.createElement('span');
+      selectedMark.setAttribute('aria-hidden', 'true');
+      selectedMark.textContent = font.name === selectedFont ? '✓' : '';
+      button.append(label, selectedMark);
+      fontList.append(button);
+    });
+
+    fontPreviewObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const option = entry.target;
+        fontPreviewObserver.unobserve(option);
+        ensureFontLoaded(option.dataset.fontName, 400, 'normal', option.dataset.fontName)
+          .then(() => option.classList.add('is-loaded'))
+          .catch(() => {});
+      });
+    }, { root: fontList, rootMargin: '80px 0px' });
+    fontList.querySelectorAll('.visual-font-option').forEach((option) => fontPreviewObserver.observe(option));
+  };
+
+  const openFontPicker = () => {
+    fontSizePresets.hidden = true;
+    fontSize.setAttribute('aria-expanded', 'false');
+    fontPickerPopover.hidden = false;
+    fontPickerButton.setAttribute('aria-expanded', 'true');
+    renderFontList();
+  };
+
+  const closeSizePresets = () => {
+    fontSizePresets.hidden = true;
+    fontSize.setAttribute('aria-expanded', 'false');
+  };
+
+  const openSizePresets = () => {
+    closeFontPicker();
+    fontSizePresets.hidden = false;
+    fontSize.setAttribute('aria-expanded', 'true');
+  };
+
   const renderSelectionControls = () => {
     const element = selectedElement();
     emptyState.hidden = Boolean(element);
     selectionControls.hidden = !element;
 
-    if (!element) return;
+    if (!element) {
+      closeFontPicker();
+      closeSizePresets();
+      return;
+    }
 
-    fontFamily.value = element.style.fontFamily;
+    const font = model.getFont(element.style.fontFamily);
+    fontPickerValue.textContent = font.displayName;
+    fontPickerValue.style.fontFamily = model.fontStack(font.name);
+    ensureFontLoaded(font.name, element.style.fontWeight, element.style.fontStyle, element.content).catch(() => {});
     fontSize.value = String(element.style.fontSize);
+    lineHeight.value = String(element.style.lineHeight);
+    letterSpacing.value = String(element.style.letterSpacing);
     textColor.value = element.style.color;
     textColorValue.textContent = element.style.color.toUpperCase();
     duplicateButton.disabled = element.permissions.locked;
@@ -102,9 +200,34 @@
       button.classList.toggle('is-active', isActive);
       button.setAttribute('aria-pressed', String(isActive));
     });
+
+    const boldButton = formattingControls.querySelector('[data-format="bold"]');
+    const italicButton = formattingControls.querySelector('[data-format="italic"]');
+    const editable = !element.permissions.locked && element.permissions.editable;
+    const supportsBold = font.weights.includes(700);
+    const supportsItalic = font.styles.includes('italic');
+    fontPickerButton.disabled = !editable;
+    fontSize.disabled = !editable;
+    lineHeight.disabled = !editable;
+    letterSpacing.disabled = !editable;
+    boldButton.disabled = !editable || !supportsBold;
+    italicButton.disabled = !editable || !supportsItalic;
+    boldButton.classList.toggle('is-active', supportsBold && element.style.fontWeight === 700);
+    italicButton.classList.toggle('is-active', supportsItalic && element.style.fontStyle === 'italic');
+    boldButton.setAttribute('aria-pressed', String(supportsBold && element.style.fontWeight === 700));
+    italicButton.setAttribute('aria-pressed', String(supportsItalic && element.style.fontStyle === 'italic'));
+    fontSizeDecrease.disabled = !editable || element.style.fontSize <= 8;
+    fontSizeIncrease.disabled = !editable || element.style.fontSize >= 180;
+    fontSizePresets.querySelectorAll('[data-font-size]').forEach((button) => {
+      const isSelected = Number(button.dataset.fontSize) === element.style.fontSize;
+      button.classList.toggle('is-selected', isSelected);
+      button.setAttribute('aria-selected', String(isSelected));
+    });
   };
 
   const setSelection = (elementId, sync = true) => {
+    closeFontPicker();
+    closeSizePresets();
     selectedElementId = state.elements[elementId] ? elementId : null;
     renderSelectionControls();
     if (sync) syncCanvas();
@@ -160,22 +283,34 @@
   };
 
   const waitForFont = async (element) => {
-    if (!element || !document.fonts?.load) return;
-    const family = String(element.style.fontFamily).replaceAll('"', '');
-    await document.fonts.load(`${element.style.fontSize}px "${family}"`, element.content || 'Text');
+    if (!element) return;
+    await ensureFontLoaded(
+      element.style.fontFamily,
+      element.style.fontWeight,
+      element.style.fontStyle,
+      element.content || 'Text'
+    );
   };
 
-  const commitSelectedStyle = async (style, label) => {
-    const element = selectedElement();
-    if (!element || element.permissions.locked || !element.permissions.editable) return;
-    const next = clone(state);
-    next.elements[element.id].style = {
-      ...next.elements[element.id].style,
-      ...style
+  const commitSelectedStyle = (styleOrUpdater, label) => {
+    const elementId = selectedElementId;
+    const commit = async () => {
+      const element = state.elements[elementId];
+      if (!element || element.permissions.locked || !element.permissions.editable) return;
+      const style = typeof styleOrUpdater === 'function'
+        ? styleOrUpdater(element.style)
+        : styleOrUpdater;
+      const next = clone(state);
+      next.elements[elementId].style = {
+        ...next.elements[elementId].style,
+        ...style
+      };
+      const normalized = model.normalize(next);
+      await waitForFont(normalized.elements[elementId]);
+      commitState(normalized, label);
     };
-    const normalized = model.normalize(next);
-    await waitForFont(normalized.elements[element.id]);
-    commitState(normalized, label);
+    styleCommitQueue = styleCommitQueue.then(commit, commit);
+    return styleCommitQueue;
   };
 
   const beginControlTransaction = (label) => {
@@ -267,11 +402,55 @@
     previewStage?.classList.remove('is-manipulating');
   };
 
-  model.fontCatalog.forEach((family) => {
-    const option = document.createElement('option');
-    option.value = family;
-    option.textContent = family;
-    fontFamily.append(option);
+  const scrollCanvasBy = (deltaY) => {
+    if (!Number.isFinite(deltaY) || deltaY === 0) return;
+    postToCanvas({ type: 'green-sage-visual:scroll-by', deltaY });
+  };
+
+  previewStage?.addEventListener('wheel', (event) => {
+    if (canvasScrollLock || previewFrame.contains(event.target)) return;
+    event.preventDefault();
+    scrollCanvasBy(event.deltaY);
+  }, { passive: false });
+
+  previewStage?.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse'
+      || canvasScrollLock
+      || event.target !== previewStage) return;
+    workspaceScrollGesture = {
+      pointerId: event.pointerId,
+      lastY: event.clientY
+    };
+    previewStage.setPointerCapture?.(event.pointerId);
+  });
+
+  previewStage?.addEventListener('pointermove', (event) => {
+    if (!workspaceScrollGesture || workspaceScrollGesture.pointerId !== event.pointerId) return;
+    event.preventDefault();
+    const deltaY = workspaceScrollGesture.lastY - event.clientY;
+    workspaceScrollGesture.lastY = event.clientY;
+    scrollCanvasBy(deltaY);
+  }, { passive: false });
+
+  const endWorkspaceScroll = (event) => {
+    if (!workspaceScrollGesture || workspaceScrollGesture.pointerId !== event.pointerId) return;
+    workspaceScrollGesture = null;
+    try {
+      previewStage.releasePointerCapture?.(event.pointerId);
+    } catch {
+      // Safari may release capture before pointercancel is delivered.
+    }
+  };
+  previewStage?.addEventListener('pointerup', endWorkspaceScroll);
+  previewStage?.addEventListener('pointercancel', endWorkspaceScroll);
+
+  fontSizeValues.forEach((value) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.fontSize = String(value);
+    button.setAttribute('role', 'option');
+    button.textContent = String(value);
+    fontSizePresets.append(button);
   });
 
   addTextButton.addEventListener('click', () => {
@@ -333,16 +512,102 @@
     commitState(next, 'Delete text', null);
   });
 
-  fontFamily.addEventListener('change', () => {
-    commitSelectedStyle({ fontFamily: fontFamily.value }, 'Change font family');
+  fontPickerButton.addEventListener('click', () => {
+    if (fontPickerPopover.hidden) openFontPicker();
+    else closeFontPicker();
   });
 
-  fontSize.addEventListener('focus', () => beginControlTransaction('Change font size'));
+  fontCategoryFilters.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-font-category]');
+    if (!button) return;
+    activeFontCategory = button.dataset.fontCategory;
+    fontCategoryFilters.querySelectorAll('[data-font-category]').forEach((item) => {
+      item.classList.toggle('is-active', item === button);
+    });
+    renderFontList();
+  });
+
+  fontList.addEventListener('click', async (event) => {
+    const option = event.target.closest('[data-font-name]');
+    if (!option) return;
+    const fontName = option.dataset.fontName;
+    closeFontPicker();
+    await commitSelectedStyle({ fontFamily: fontName }, 'Change font family');
+  });
+
+  document.addEventListener('pointerdown', (event) => {
+    if (!fontPickerPopover.hidden
+      && !fontPickerPopover.contains(event.target)
+      && !fontPickerButton.contains(event.target)) closeFontPicker();
+    if (!fontSizePresets.hidden
+      && !fontSizePresets.contains(event.target)
+      && !fontSize.contains(event.target)) closeSizePresets();
+  });
+
+  fontSize.addEventListener('focus', () => {
+    beginControlTransaction('Change font size');
+    openSizePresets();
+  });
+  fontSize.addEventListener('click', openSizePresets);
   fontSize.addEventListener('input', () => {
-    previewSelectedStyle({ fontSize: Number(fontSize.value) }, 'Change font size');
+    const value = Number(fontSize.value);
+    if (fontSize.value !== '' && Number.isFinite(value)) {
+      previewSelectedStyle({ fontSize: value }, 'Change font size');
+    }
   });
   fontSize.addEventListener('change', () => finalizeActiveTransaction());
-  fontSize.addEventListener('blur', () => finalizeActiveTransaction());
+  fontSize.addEventListener('blur', () => {
+    finalizeActiveTransaction();
+    renderSelectionControls();
+  });
+
+  const adjustFontSize = (delta) => {
+    const element = selectedElement();
+    if (!element) return;
+    finalizeActiveTransaction(false);
+    commitSelectedStyle(
+      (style) => ({ fontSize: style.fontSize + delta }),
+      delta < 0 ? 'Decrease font size' : 'Increase font size'
+    );
+  };
+
+  fontSizeDecrease.addEventListener('click', () => adjustFontSize(-1));
+  fontSizeIncrease.addEventListener('click', () => adjustFontSize(1));
+
+  fontSizePresets.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-font-size]');
+    if (!button) return;
+    finalizeActiveTransaction(false);
+    closeSizePresets();
+    commitSelectedStyle({ fontSize: Number(button.dataset.fontSize) }, 'Choose font size');
+  });
+
+  formattingControls.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-format]');
+    const element = selectedElement();
+    if (!button || !element || button.disabled) return;
+    if (button.dataset.format === 'bold') {
+      commitSelectedStyle({ fontWeight: element.style.fontWeight === 700 ? 400 : 700 }, 'Toggle bold');
+    } else if (button.dataset.format === 'italic') {
+      commitSelectedStyle({ fontStyle: element.style.fontStyle === 'italic' ? 'normal' : 'italic' }, 'Toggle italic');
+    }
+  });
+
+  const bindNumericStyleControl = (control, property, label) => {
+    control.addEventListener('focus', () => beginControlTransaction(label));
+    control.addEventListener('input', () => {
+      const value = Number(control.value);
+      if (control.value !== '' && Number.isFinite(value)) previewSelectedStyle({ [property]: value }, label);
+    });
+    control.addEventListener('change', () => finalizeActiveTransaction());
+    control.addEventListener('blur', () => {
+      finalizeActiveTransaction();
+      renderSelectionControls();
+    });
+  };
+
+  bindNumericStyleControl(lineHeight, 'lineHeight', 'Change line height');
+  bindNumericStyleControl(letterSpacing, 'letterSpacing', 'Change letter spacing');
 
   textColor.addEventListener('input', () => {
     textColorValue.textContent = textColor.value.toUpperCase();
@@ -481,6 +746,12 @@
   });
 
   window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && (!fontPickerPopover.hidden || !fontSizePresets.hidden)) {
+      closeFontPicker();
+      closeSizePresets();
+      event.preventDefault();
+      return;
+    }
     const modifier = event.metaKey || event.ctrlKey;
     if (!modifier || event.key.toLowerCase() !== 'z') return;
     if (event.shiftKey) {

@@ -21,24 +21,24 @@
     window.parent.postMessage(message, messageOrigin);
   };
 
-  const fontStack = (family) => {
-    if (family === 'Instrument Sans') return '"Instrument Sans", sans-serif';
-    if (family === 'Cormorant Garamond') return '"Cormorant Garamond", Garamond, Georgia, serif';
-    if (family === 'Baskervville') return 'Baskervville, Georgia, serif';
-    if (family === 'Libre Baskerville') return '"Libre Baskerville", Georgia, serif';
-    return '"Instrument Serif", Georgia, serif';
+  const ensureFontLoaded = async (element) => {
+    await model.loadFont(element.style.fontFamily, {
+      weight: element.style.fontWeight,
+      style: element.style.fontStyle,
+      size: element.style.fontSize,
+      sample: element.content || 'Text',
+      document
+    });
   };
 
   const waitForFonts = async (state) => {
-    if (!document.fonts?.load) return;
     const requests = [];
     const seen = new Set();
     Object.values(state.elements).forEach((element) => {
-      const key = `${element.style.fontSize}:${element.style.fontFamily}`;
+      const key = `${element.style.fontSize}:${element.style.fontFamily}:${element.style.fontWeight}:${element.style.fontStyle}`;
       if (seen.has(key)) return;
       seen.add(key);
-      const family = String(element.style.fontFamily).replaceAll('"', '');
-      requests.push(document.fonts.load(`${element.style.fontSize}px "${family}"`, element.content || 'Text'));
+      requests.push(ensureFontLoaded(element));
     });
     await Promise.allSettled(requests);
   };
@@ -455,9 +455,10 @@
     content.setAttribute('aria-label', 'Edit text');
     content.setAttribute('aria-multiline', 'true');
     content.setAttribute('contenteditable', 'false');
-    content.style.fontFamily = fontStack(element.style.fontFamily);
+    content.style.fontFamily = model.fontStack(element.style.fontFamily);
     content.style.fontSize = `${element.style.fontSize}px`;
     content.style.fontWeight = String(element.style.fontWeight);
+    content.style.fontStyle = element.style.fontStyle;
     content.style.color = element.style.color;
     content.style.textAlign = element.style.textAlign;
     content.style.lineHeight = String(element.style.lineHeight);
@@ -578,8 +579,14 @@
 
   window.addEventListener('message', (event) => {
     if (event.source !== window.parent || !isSameOrigin(event.origin)) return;
-    if (event.data?.type !== 'green-sage-visual:state') return;
-    render(event.data.state, event.data.selectedElementId);
+    if (event.data?.type === 'green-sage-visual:scroll-by') {
+      const deltaY = Number(event.data.deltaY);
+      if (Number.isFinite(deltaY)) window.scrollBy({ top: deltaY, left: 0, behavior: 'auto' });
+      return;
+    }
+    if (event.data?.type === 'green-sage-visual:state') {
+      render(event.data.state, event.data.selectedElementId);
+    }
   });
 
   window.addEventListener('resize', () => {

@@ -7,9 +7,9 @@
   <title>Green Sage Visual Text Editor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;1,400&amp;family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&amp;family=Instrument+Sans:wght@400&amp;family=Instrument+Serif:ital@0;1&amp;family=Libre+Baskerville:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="editor.css?v=20260804-editor-foundation">
-  <link rel="stylesheet" href="visual-editor.css?v=20260831-object-position-v1">
+  <link rel="stylesheet" href="visual-editor.css?v=20260901-typography-v3">
 </head>
 <body>
   <main class="editor-app visual-editor-app">
@@ -53,16 +53,38 @@
         <section class="visual-control-group">
           <h2 class="control-heading">Selected text</h2>
 
-          <div class="control-field">
-            <label class="control-label" for="fontFamily">Font family</label>
-            <select class="visual-select" id="fontFamily"></select>
+          <div class="control-field visual-popover-field">
+            <span class="control-label" id="fontPickerLabel">Font family</span>
+            <button class="visual-font-trigger" id="fontPickerButton" type="button" aria-labelledby="fontPickerLabel fontPickerValue" aria-haspopup="listbox" aria-expanded="false">
+              <span id="fontPickerValue">Instrument Serif</span>
+              <span aria-hidden="true">⌄</span>
+            </button>
+            <div class="visual-font-popover" id="fontPickerPopover" hidden>
+              <div class="visual-font-filters" id="fontCategoryFilters" role="group" aria-label="Filter fonts by category">
+                <button class="is-active" type="button" data-font-category="all">All</button>
+                <button type="button" data-font-category="serif">Serif</button>
+                <button type="button" data-font-category="sans">Sans</button>
+                <button type="button" data-font-category="script">Script</button>
+              </div>
+              <div class="visual-font-list" id="fontList" role="listbox" aria-labelledby="fontPickerLabel"></div>
+            </div>
+          </div>
+
+          <div class="control-field visual-popover-field">
+            <label class="control-label" for="fontSize">Font size</label>
+            <div class="visual-font-size-control">
+              <button id="fontSizeDecrease" type="button" aria-label="Decrease font size">−</button>
+              <input id="fontSize" type="number" min="8" max="180" step="1" inputmode="decimal" aria-haspopup="listbox" aria-expanded="false">
+              <button id="fontSizeIncrease" type="button" aria-label="Increase font size">+</button>
+            </div>
+            <div class="visual-size-presets" id="fontSizePresets" role="listbox" aria-label="Preset font sizes" hidden></div>
           </div>
 
           <div class="control-field">
-            <label class="control-label" for="fontSize">Font size</label>
-            <div class="visual-number-row">
-              <input class="text-control" id="fontSize" type="number" min="8" max="180" step="1">
-              <span>px</span>
+            <span class="control-label">Style</span>
+            <div class="visual-formatting" id="formattingControls" role="group" aria-label="Text style">
+              <button type="button" data-format="bold" aria-label="Bold"><strong>B</strong></button>
+              <button type="button" data-format="italic" aria-label="Italic"><em>I</em></button>
             </div>
           </div>
 
@@ -80,6 +102,20 @@
               <button type="button" data-align="left">Left</button>
               <button type="button" data-align="center">Center</button>
               <button type="button" data-align="right">Right</button>
+            </div>
+          </div>
+
+          <div class="visual-spacing-controls" aria-labelledby="spacingHeading">
+            <h3 class="control-subheading" id="spacingHeading">Spacing</h3>
+            <div class="visual-spacing-grid">
+              <label class="control-field" for="lineHeight">
+                <span class="control-label">Line height</span>
+                <input class="text-control" id="lineHeight" type="number" min="0.7" max="3" step="0.05" inputmode="decimal">
+              </label>
+              <label class="control-field" for="letterSpacing">
+                <span class="control-label">Letter spacing</span>
+                <input class="text-control" id="letterSpacing" type="number" min="-10" max="30" step="0.1" inputmode="decimal">
+              </label>
             </div>
           </div>
 
@@ -122,7 +158,7 @@
     </section>
   </main>
 
-  <script src="visual-document.js?v=20260831-visual-proof-v1"></script>
-  <script src="visual-editor.js?v=20260831-object-position-v1"></script>
+  <script src="visual-document.js?v=20260901-typography-v3"></script>
+  <script src="visual-editor.js?v=20260901-typography-v3"></script>
 </body>
 </html>
