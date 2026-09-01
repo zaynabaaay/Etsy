@@ -18,14 +18,16 @@ body {
 }
 
 html {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
   background: #f4efe7;
 }
 
 body {
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
+  overscroll-behavior: none;
   color: #474232;
   background: #f4efe7;
   font-family: "Instrument Sans", sans-serif;
