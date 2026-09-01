@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f1ea">
+  <title>Green Sage Visual Text Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;1,400&amp;family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&amp;family=Instrument+Sans:wght@400&amp;family=Instrument+Serif:ital@0;1&amp;family=Libre+Baskerville:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="editor.css?v=20260804-editor-foundation">
+  <link rel="stylesheet" href="visual-editor.css?v=20260831-visual-proof-v1">
+</head>
+<body>
+  <main class="editor-app visual-editor-app">
+    <header class="editor-header visual-editor-header">
+      <div class="editor-brand">
+        <span class="editor-mark">Aa</span>
+        <div>
+          <strong>Green Sage</strong>
+          <span>Direct text editing proof</span>
+        </div>
+      </div>
+
+      <div class="editor-history" aria-label="Editing history">
+        <button class="toolbar-button" id="undoButton" type="button" disabled>Undo</button>
+        <button class="toolbar-button" id="redoButton" type="button" disabled>Redo</button>
+      </div>
+
+      <div class="device-switcher" aria-label="Preview size">
+        <button class="device-button" type="button" data-device="desktop">Desktop</button>
+        <button class="device-button" type="button" data-device="tablet">iPad</button>
+        <button class="device-button is-active" type="button" data-device="mobile">Mobile</button>
+      </div>
+
+      <a class="preview-link" href="editor.html">Invitation controls</a>
+    </header>
+
+    <aside class="editor-sidebar visual-editor-sidebar">
+      <div class="save-status" id="saveStatus" role="status">Saved in this browser</div>
+
+      <section class="visual-control-group visual-add-group">
+        <h1 class="control-heading">Text</h1>
+        <button class="visual-primary-button" id="addTextButton" type="button">Add Text</button>
+      </section>
+
+      <section class="visual-empty-state" id="emptyState">
+        <p>Select a text box on the invitation to edit it.</p>
+        <p>Tap once to select. Tap selected text again to place the caret.</p>
+      </section>
+
+      <div id="selectionControls" hidden>
+        <section class="visual-control-group">
+          <h2 class="control-heading">Selected text</h2>
+
+          <div class="control-field">
+            <label class="control-label" for="fontFamily">Font family</label>
+            <select class="visual-select" id="fontFamily"></select>
+          </div>
+
+          <div class="control-field">
+            <label class="control-label" for="fontSize">Font size</label>
+            <div class="visual-number-row">
+              <input class="text-control" id="fontSize" type="number" min="8" max="180" step="1">
+              <span>px</span>
+            </div>
+          </div>
+
+          <div class="control-field">
+            <label class="control-label" for="textColor">Text color</label>
+            <div class="visual-color-row">
+              <input id="textColor" type="color">
+              <output id="textColorValue"></output>
+            </div>
+          </div>
+
+          <div class="control-field">
+            <span class="control-label">Alignment</span>
+            <div class="visual-alignment" id="alignmentControls" role="group" aria-label="Text alignment">
+              <button type="button" data-align="left">Left</button>
+              <button type="button" data-align="center">Center</button>
+              <button type="button" data-align="right">Right</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="visual-control-group visual-object-actions" aria-label="Text object actions">
+          <button class="toolbar-button" id="duplicateButton" type="button">Duplicate</button>
+          <button class="toolbar-button visual-danger-button" id="deleteButton" type="button">Delete</button>
+        </section>
+      </div>
+
+      <p class="visual-proof-note"><span aria-hidden="true">◇</span> This isolated canvas does not alter the public invitation.</p>
+    </aside>
+
+    <section class="preview-stage visual-preview-stage" aria-label="Direct-editing canvas">
+      <div class="preview-frame device-mobile" id="previewFrame">
+        <iframe id="visualCanvas" src="visual-canvas.html?editor=1" title="Editable text canvas"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script src="visual-document.js?v=20260831-visual-proof-v1"></script>
+  <script src="visual-editor.js?v=20260831-visual-proof-v1"></script>
+</body>
+</html>
