@@ -17,6 +17,9 @@
   const textColor = document.getElementById('textColor');
   const textColorValue = document.getElementById('textColorValue');
   const alignmentControls = document.getElementById('alignmentControls');
+  const horizontalPositionControls = document.getElementById('horizontalPositionControls');
+  const verticalPositionControls = document.getElementById('verticalPositionControls');
+  const previewStage = document.querySelector('.visual-preview-stage');
   const deviceButtons = [...document.querySelectorAll('[data-device]')];
 
   const clone = model.clone;
@@ -32,6 +35,7 @@
   let saveTimer = 0;
   let revision = 0;
   let stylePreviewToken = 0;
+  let canvasScrollLock = null;
 
   const snapshot = (label = '') => ({
     state: clone(state),
@@ -89,6 +93,9 @@
     textColorValue.textContent = element.style.color.toUpperCase();
     duplicateButton.disabled = element.permissions.locked;
     deleteButton.disabled = element.permissions.locked || !element.permissions.deletable;
+    const positionDisabled = element.permissions.locked || !element.permissions.movable;
+    [...horizontalPositionControls.querySelectorAll('button'), ...verticalPositionControls.querySelectorAll('button')]
+      .forEach((button) => { button.disabled = positionDisabled; });
 
     [...alignmentControls.querySelectorAll('[data-align]')].forEach((button) => {
       const isActive = button.dataset.align === element.style.textAlign;
@@ -201,6 +208,65 @@
     save();
   };
 
+  const roundPosition = (value) => Math.round(value * 10) / 10;
+
+  const positionSelectedElement = (axis, position) => {
+    const element = selectedElement();
+    if (!element || element.permissions.locked || !element.permissions.movable) return;
+    const section = state.sections[element.sectionId];
+    if (!section) return;
+
+    const next = clone(state);
+    const target = next.elements[element.id];
+    if (axis === 'x') {
+      const pageWidth = state.document.canvas.baseWidth;
+      const positions = {
+        left: 0,
+        center: (pageWidth - element.frame.width) / 2,
+        right: pageWidth - element.frame.width
+      };
+      if (!(position in positions)) return;
+      target.frame.x = roundPosition(positions[position]);
+    } else {
+      const positions = {
+        top: 0,
+        middle: (section.height - element.frame.height) / 2,
+        bottom: section.height - element.frame.height
+      };
+      if (!(position in positions)) return;
+      target.frame.y = roundPosition(positions[position]);
+    }
+    commitState(next, `Position text ${position}`);
+  };
+
+  const lockPreviewScroll = () => {
+    if (canvasScrollLock) return;
+    const targets = [previewStage, document.scrollingElement].filter(Boolean);
+    const positions = targets.map((target) => ({
+      target,
+      left: target.scrollLeft,
+      top: target.scrollTop
+    }));
+    const keepStationary = () => {
+      positions.forEach(({ target, left, top }) => {
+        if (target.scrollLeft !== left) target.scrollLeft = left;
+        if (target.scrollTop !== top) target.scrollTop = top;
+      });
+    };
+    canvasScrollLock = { positions, keepStationary };
+    previewStage?.classList.add('is-manipulating');
+    positions.forEach(({ target }) => target.addEventListener('scroll', keepStationary, { passive: true }));
+  };
+
+  const unlockPreviewScroll = () => {
+    if (!canvasScrollLock) return;
+    canvasScrollLock.positions.forEach(({ target }) => {
+      target.removeEventListener('scroll', canvasScrollLock.keepStationary);
+    });
+    canvasScrollLock = null;
+    previewStage?.classList.remove('is-manipulating');
+  };
+
   model.fontCatalog.forEach((family) => {
     const option = document.createElement('option');
     option.value = family;
@@ -291,6 +357,18 @@
     commitSelectedStyle({ textAlign: button.dataset.align }, 'Change text alignment');
   });
 
+  horizontalPositionControls.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-position-x]');
+    if (!button) return;
+    positionSelectedElement('x', button.dataset.positionX);
+  });
+
+  verticalPositionControls.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-position-y]');
+    if (!button) return;
+    positionSelectedElement('y', button.dataset.positionY);
+  });
+
   undoButton.addEventListener('click', () => {
     finalizeActiveTransaction(false);
     const previous = history.past.pop();
@@ -337,6 +415,16 @@
     if (message.type === 'green-sage-visual:ready') {
       canvasReady = true;
       syncCanvas();
+      return;
+    }
+
+    if (message.type === 'green-sage-visual:manipulation-start') {
+      lockPreviewScroll();
+      return;
+    }
+
+    if (message.type === 'green-sage-visual:manipulation-end') {
+      unlockPreviewScroll();
       return;
     }
 

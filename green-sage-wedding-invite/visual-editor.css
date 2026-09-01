@@ -118,6 +118,25 @@
   background: var(--editor-sage);
 }
 
+.control-subheading {
+  margin: 0;
+  color: var(--editor-ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.visual-position-controls {
+  display: grid;
+  gap: 13px;
+  margin-top: 18px;
+  padding-top: 17px;
+  border-top: 1px solid #ebe8df;
+}
+
+.visual-position-controls .control-field {
+  margin: 0;
+}
+
 .visual-object-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;

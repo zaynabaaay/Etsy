@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;1,400&amp;family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&amp;family=Instrument+Sans:wght@400&amp;family=Instrument+Serif:ital@0;1&amp;family=Libre+Baskerville:wght@400;700&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="editor.css?v=20260804-editor-foundation">
-  <link rel="stylesheet" href="visual-editor.css?v=20260831-visual-proof-v1">
+  <link rel="stylesheet" href="visual-editor.css?v=20260831-object-position-v1">
 </head>
 <body>
   <main class="editor-app visual-editor-app">
@@ -75,11 +75,33 @@
           </div>
 
           <div class="control-field">
-            <span class="control-label">Alignment</span>
+            <span class="control-label">Text alignment</span>
             <div class="visual-alignment" id="alignmentControls" role="group" aria-label="Text alignment">
               <button type="button" data-align="left">Left</button>
               <button type="button" data-align="center">Center</button>
               <button type="button" data-align="right">Right</button>
+            </div>
+          </div>
+
+          <div class="visual-position-controls" aria-labelledby="positionHeading">
+            <h3 class="control-subheading" id="positionHeading">Position on page</h3>
+
+            <div class="control-field">
+              <span class="control-label">Horizontal</span>
+              <div class="visual-alignment" id="horizontalPositionControls" role="group" aria-label="Horizontal position on page">
+                <button type="button" data-position-x="left">Left</button>
+                <button type="button" data-position-x="center">Center</button>
+                <button type="button" data-position-x="right">Right</button>
+              </div>
+            </div>
+
+            <div class="control-field">
+              <span class="control-label">Vertical</span>
+              <div class="visual-alignment" id="verticalPositionControls" role="group" aria-label="Vertical position on page">
+                <button type="button" data-position-y="top">Top</button>
+                <button type="button" data-position-y="middle">Middle</button>
+                <button type="button" data-position-y="bottom">Bottom</button>
+              </div>
             </div>
           </div>
         </section>
@@ -101,6 +123,6 @@
   </main>
 
   <script src="visual-document.js?v=20260831-visual-proof-v1"></script>
-  <script src="visual-editor.js?v=20260831-visual-proof-v1"></script>
+  <script src="visual-editor.js?v=20260831-object-position-v1"></script>
 </body>
 </html>

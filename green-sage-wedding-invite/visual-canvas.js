@@ -15,6 +15,7 @@
   let currentScale = 1;
   let renderToken = 0;
   let endingEdit = false;
+  let activePointerGesture = null;
 
   const post = (message) => {
     window.parent.postMessage(message, messageOrigin);
@@ -161,8 +162,80 @@
     sendTransactionPatch({ frame: element.frame });
   };
 
+  const capturePointer = (target, pointerId) => {
+    try {
+      target.setPointerCapture?.(pointerId);
+    } catch {
+      // Pointer capture can fail if Safari has already cancelled the pointer.
+    }
+  };
+
+  const releasePointer = (target, pointerId) => {
+    try {
+      if (!target.hasPointerCapture || target.hasPointerCapture(pointerId)) {
+        target.releasePointerCapture?.(pointerId);
+      }
+    } catch {
+      // The pointer may already have been released by the browser.
+    }
+  };
+
+  const lockCanvasScroll = (pointerId, target) => {
+    const scrollPosition = { x: window.scrollX, y: window.scrollY };
+    const keepCanvasStationary = () => {
+      if (!activePointerGesture) return;
+      if (window.scrollX !== scrollPosition.x || window.scrollY !== scrollPosition.y) {
+        window.scrollTo(scrollPosition.x, scrollPosition.y);
+      }
+    };
+
+    activePointerGesture = { pointerId, target, keepCanvasStationary };
+    document.documentElement.classList.add('is-manipulating');
+    window.addEventListener('scroll', keepCanvasStationary, { passive: true });
+    capturePointer(target, pointerId);
+    post({ type: 'green-sage-visual:manipulation-start' });
+  };
+
+  const unlockCanvasScroll = (pointerId, target) => {
+    const gesture = activePointerGesture;
+    if (!gesture || gesture.pointerId !== pointerId) return;
+    activePointerGesture = null;
+    window.removeEventListener('scroll', gesture.keepCanvasStationary);
+    document.documentElement.classList.remove('is-manipulating');
+    releasePointer(target || gesture.target, pointerId);
+    post({ type: 'green-sage-visual:manipulation-end' });
+  };
+
+  const pointerCanManipulate = (event) => event.isPrimary
+    && (event.pointerType !== 'mouse' || event.button === 0);
+
+  const placeCaretAtPoint = (content, clientX, clientY) => {
+    content.focus({ preventScroll: true });
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    let range = null;
+    const position = document.caretPositionFromPoint?.(clientX, clientY);
+    if (position?.offsetNode && content.contains(position.offsetNode)) {
+      range = document.createRange();
+      range.setStart(position.offsetNode, position.offset);
+      range.collapse(true);
+    } else {
+      const legacyRange = document.caretRangeFromPoint?.(clientX, clientY);
+      if (legacyRange && content.contains(legacyRange.commonAncestorContainer)) range = legacyRange;
+    }
+
+    if (!range) {
+      range = document.createRange();
+      range.selectNodeContents(content);
+      range.collapse(false);
+    }
+    selection.removeAllRanges();
+    selection.addRange(range);
+  };
+
   const startMove = (event, element, frame, handle) => {
-    if (!element.permissions.movable || element.permissions.locked) return;
+    if (!pointerCanManipulate(event) || !element.permissions.movable || element.permissions.locked) return;
     event.preventDefault();
     event.stopPropagation();
     exitTextEdit('commit');
@@ -174,10 +247,11 @@
       frame: { ...element.frame }
     };
     const transaction = beginTransaction(element.id, 'Move text');
-    handle.setPointerCapture?.(event.pointerId);
+    lockCanvasScroll(event.pointerId, handle);
 
     const onMove = (moveEvent) => {
       if (!activeTransaction || activeTransaction.transactionId !== transaction.transactionId) return;
+      moveEvent.preventDefault();
       const x = start.frame.x + ((moveEvent.clientX - start.clientX) / currentScale);
       const y = start.frame.y + ((moveEvent.clientY - start.clientY) / currentScale);
       applyFrameLocally(element, frame, {
@@ -187,22 +261,22 @@
     };
 
     const onEnd = (endEvent) => {
-      handle.releasePointerCapture?.(endEvent.pointerId);
       handle.removeEventListener('pointermove', onMove);
       handle.removeEventListener('pointerup', onEnd);
       handle.removeEventListener('pointercancel', onCancel);
+      unlockCanvasScroll(endEvent.pointerId, handle);
       finishTransaction('commit');
     };
 
     const onCancel = (cancelEvent) => {
-      handle.releasePointerCapture?.(cancelEvent.pointerId);
       handle.removeEventListener('pointermove', onMove);
       handle.removeEventListener('pointerup', onEnd);
       handle.removeEventListener('pointercancel', onCancel);
+      unlockCanvasScroll(cancelEvent.pointerId, handle);
       finishTransaction('cancel');
     };
 
-    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointermove', onMove, { passive: false });
     handle.addEventListener('pointerup', onEnd);
     handle.addEventListener('pointercancel', onCancel);
   };
@@ -229,7 +303,7 @@
   };
 
   const startResize = (event, element, frame, handle) => {
-    if (!element.permissions.resizable || element.permissions.locked) return;
+    if (!pointerCanManipulate(event) || !element.permissions.resizable || element.permissions.locked) return;
     event.preventDefault();
     event.stopPropagation();
     exitTextEdit('commit');
@@ -242,34 +316,102 @@
       frame: { ...element.frame }
     };
     const transaction = beginTransaction(element.id, 'Resize text box');
-    handle.setPointerCapture?.(event.pointerId);
+    lockCanvasScroll(event.pointerId, handle);
 
     const onMove = (moveEvent) => {
       if (!activeTransaction || activeTransaction.transactionId !== transaction.transactionId) return;
+      moveEvent.preventDefault();
       const dx = (moveEvent.clientX - start.clientX) / currentScale;
       const dy = (moveEvent.clientY - start.clientY) / currentScale;
       applyFrameLocally(element, frame, resizedFrame(start.frame, direction, dx, dy));
     };
 
     const onEnd = (endEvent) => {
-      handle.releasePointerCapture?.(endEvent.pointerId);
       handle.removeEventListener('pointermove', onMove);
       handle.removeEventListener('pointerup', onEnd);
       handle.removeEventListener('pointercancel', onCancel);
+      unlockCanvasScroll(endEvent.pointerId, handle);
       finishTransaction('commit');
     };
 
     const onCancel = (cancelEvent) => {
-      handle.releasePointerCapture?.(cancelEvent.pointerId);
       handle.removeEventListener('pointermove', onMove);
       handle.removeEventListener('pointerup', onEnd);
       handle.removeEventListener('pointercancel', onCancel);
+      unlockCanvasScroll(cancelEvent.pointerId, handle);
       finishTransaction('cancel');
     };
 
-    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointermove', onMove, { passive: false });
     handle.addEventListener('pointerup', onEnd);
     handle.addEventListener('pointercancel', onCancel);
+  };
+
+  const startDirectMove = (event, element, frame, content) => {
+    if (!pointerCanManipulate(event)
+      || editingElementId === element.id
+      || selectedElementId !== element.id
+      || !element.permissions.movable
+      || element.permissions.locked) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    const pointerId = event.pointerId;
+    const start = {
+      clientX: event.clientX,
+      clientY: event.clientY,
+      frame: { ...element.frame }
+    };
+    let transaction = null;
+    let moved = false;
+    lockCanvasScroll(pointerId, content);
+
+    const onMove = (moveEvent) => {
+      if (moveEvent.pointerId !== pointerId) return;
+      moveEvent.preventDefault();
+      const rawDx = moveEvent.clientX - start.clientX;
+      const rawDy = moveEvent.clientY - start.clientY;
+      if (!moved && Math.hypot(rawDx, rawDy) < 5) return;
+
+      if (!moved) {
+        moved = true;
+        exitTextEdit('commit');
+        transaction = beginTransaction(element.id, 'Move text');
+      }
+      if (!activeTransaction || activeTransaction.transactionId !== transaction.transactionId) return;
+      applyFrameLocally(element, frame, {
+        x: Math.round((start.frame.x + (rawDx / currentScale)) * 10) / 10,
+        y: Math.round((start.frame.y + (rawDy / currentScale)) * 10) / 10
+      });
+    };
+
+    const cleanUp = (endEvent) => {
+      content.removeEventListener('pointermove', onMove);
+      content.removeEventListener('pointerup', onEnd);
+      content.removeEventListener('pointercancel', onCancel);
+      unlockCanvasScroll(endEvent.pointerId, content);
+    };
+
+    const onEnd = (endEvent) => {
+      if (endEvent.pointerId !== pointerId) return;
+      cleanUp(endEvent);
+      if (moved) {
+        finishTransaction('commit');
+        return;
+      }
+      enterTextEdit(element, frame, content);
+      placeCaretAtPoint(content, endEvent.clientX, endEvent.clientY);
+    };
+
+    const onCancel = (cancelEvent) => {
+      if (cancelEvent.pointerId !== pointerId) return;
+      cleanUp(cancelEvent);
+      if (moved) finishTransaction('cancel');
+    };
+
+    content.addEventListener('pointermove', onMove, { passive: false });
+    content.addEventListener('pointerup', onEnd);
+    content.addEventListener('pointercancel', onCancel);
   };
 
   const insertPlainText = (content, text) => {
@@ -323,8 +465,8 @@
 
     content.addEventListener('pointerdown', (event) => {
       event.stopPropagation();
-      if (selectedElementId === element.id) enterTextEdit(element, frame, content);
-    });
+      startDirectMove(event, element, frame, content);
+    }, { passive: false });
 
     content.addEventListener('click', (event) => {
       event.stopPropagation();
@@ -367,7 +509,7 @@
     moveHandle.type = 'button';
     moveHandle.textContent = '↕';
     moveHandle.setAttribute('aria-label', 'Move text box');
-    moveHandle.addEventListener('pointerdown', (event) => startMove(event, element, frame, moveHandle));
+    moveHandle.addEventListener('pointerdown', (event) => startMove(event, element, frame, moveHandle), { passive: false });
     frame.append(moveHandle);
 
     resizeDirections.forEach((direction) => {
@@ -376,7 +518,7 @@
       handle.type = 'button';
       handle.dataset.direction = direction;
       handle.setAttribute('aria-label', `Resize text box ${direction}`);
-      handle.addEventListener('pointerdown', (event) => startResize(event, element, frame, handle));
+      handle.addEventListener('pointerdown', (event) => startResize(event, element, frame, handle), { passive: false });
       frame.append(handle);
     });
 

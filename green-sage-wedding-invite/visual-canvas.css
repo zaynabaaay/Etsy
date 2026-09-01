@@ -156,6 +156,13 @@ button {
   -webkit-user-select: text;
 }
 
+.element-frame.is-selected:not(.is-editing) .element-content {
+  cursor: move;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
 .element-content[contenteditable="true"],
 .element-content[contenteditable="plaintext-only"] {
   caret-color: #474232;
@@ -165,6 +172,14 @@ button {
 .element-frame.is-editing {
   outline-width: 2px;
   box-shadow: 0 0 0 4px var(--selection-soft);
+}
+
+html.is-manipulating,
+html.is-manipulating body,
+html.is-manipulating .canvas-page,
+html.is-manipulating .section-canvas,
+html.is-manipulating .element-frame {
+  overscroll-behavior: none;
 }
 
 .element-move-handle,
