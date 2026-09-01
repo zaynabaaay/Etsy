@@ -4,161 +4,108 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#f4f1ea">
-  <title>Green Sage Visual Text Editor</title>
+  <title>Storiel Visual Invitation Editor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="editor.css?v=20260804-editor-foundation">
-  <link rel="stylesheet" href="visual-editor.css?v=20260901-typography-v3">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;1,400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="visual-editor.css?v=20260901-stabilized1">
 </head>
 <body>
-  <main class="editor-app visual-editor-app">
-    <header class="editor-header visual-editor-header">
-      <div class="editor-brand">
-        <span class="editor-mark">Aa</span>
-        <div>
-          <strong>Green Sage</strong>
-          <span>Direct text editing proof</span>
+  <main class="storiel-editor" id="storielEditor">
+    <header class="storiel-global-bar">
+      <div class="storiel-brand"><span class="storiel-mark">S</span><div><strong>Storiel</strong><span>Green Sage invitation</span></div></div>
+      <div class="storiel-history" aria-label="Editing history">
+        <button class="icon-button" id="undoButton" type="button" aria-label="Undo" disabled>↶</button>
+        <button class="icon-button" id="redoButton" type="button" aria-label="Redo" disabled>↷</button>
+      </div>
+      <div class="storiel-document-status"><span class="save-status" id="saveStatus" role="status">Saved</span></div>
+      <div class="storiel-global-actions">
+        <div class="toolbar-popover-anchor">
+          <button class="global-button" id="previewButton" type="button" aria-haspopup="menu" aria-expanded="false">Preview</button>
+          <div class="compact-popover preview-popover" id="previewPopover" role="menu" hidden>
+            <button type="button" data-device="mobile" role="menuitem">Mobile canvas</button>
+            <button type="button" data-device="tablet" role="menuitem">iPad preview</button>
+            <button type="button" data-device="desktop" role="menuitem">Desktop preview</button>
+          </div>
         </div>
+        <button class="global-button is-disabled" type="button" aria-disabled="true" title="Publishing will be added later">Publish later</button>
       </div>
-
-      <div class="editor-history" aria-label="Editing history">
-        <button class="toolbar-button" id="undoButton" type="button" disabled>Undo</button>
-        <button class="toolbar-button" id="redoButton" type="button" disabled>Redo</button>
-      </div>
-
-      <div class="device-switcher" aria-label="Preview size">
-        <button class="device-button" type="button" data-device="desktop">Desktop</button>
-        <button class="device-button" type="button" data-device="tablet">iPad</button>
-        <button class="device-button is-active" type="button" data-device="mobile">Mobile</button>
-      </div>
-
-      <a class="preview-link" href="editor.html">Invitation controls</a>
     </header>
 
-    <aside class="editor-sidebar visual-editor-sidebar">
-      <div class="save-status" id="saveStatus" role="status">Saved in this browser</div>
+    <nav class="storiel-nav" aria-label="Editor tools">
+      <button class="nav-tool is-active" type="button" data-panel="design" aria-pressed="true"><span aria-hidden="true">◐</span><span>Design</span></button>
+      <button class="nav-tool" type="button" data-panel="elements" aria-pressed="false"><span aria-hidden="true">◇</span><span>Elements</span></button>
+      <button class="nav-tool" type="button" data-panel="text" aria-pressed="false"><span aria-hidden="true">T</span><span>Text</span></button>
+      <button class="nav-tool" type="button" data-panel="uploads" aria-pressed="false"><span aria-hidden="true">↑</span><span>Uploads</span></button>
+      <button class="nav-tool" type="button" data-panel="sections" aria-pressed="false"><span aria-hidden="true">☷</span><span>Sections</span></button>
+    </nav>
 
-      <section class="visual-control-group visual-add-group">
-        <h1 class="control-heading">Text</h1>
-        <button class="visual-primary-button" id="addTextButton" type="button">Add Text</button>
+    <aside class="storiel-panel" aria-live="polite">
+      <section class="panel-view is-active" data-panel-view="design">
+        <div class="panel-heading"><div><p>Design</p><h1>Section appearance</h1></div><span class="panel-selection" id="designSectionName">Opening canvas</span></div>
+        <div class="panel-block"><h2>Template colors</h2><div class="palette-grid" id="sectionPalette"></div><label class="field-row">Custom color<input id="sectionBackgroundColor" type="color" value="#EAE2D7"></label></div>
+        <div class="panel-block"><h2>Background images</h2><div class="asset-grid background-grid" id="templateBackgrounds"></div><div id="uploadedBackgrounds" class="asset-grid background-grid"></div><button class="secondary-button" id="removeBackgroundButton" type="button">Remove image</button></div>
+        <div class="panel-block" id="backgroundPositionControls"><h2>Background crop</h2><label class="range-field">Horizontal focal point<input id="backgroundFocalX" type="range" min="0" max="100" step="1"></label><label class="range-field">Vertical focal point<input id="backgroundFocalY" type="range" min="0" max="100" step="1"></label><label class="range-field">Zoom<input id="backgroundZoom" type="range" min="1" max="4" step="0.05"></label></div>
       </section>
 
-      <section class="visual-empty-state" id="emptyState">
-        <p>Select a text box on the invitation to edit it.</p>
-        <p>Tap once to select. Tap selected text again to place the caret.</p>
+      <section class="panel-view" data-panel-view="elements" hidden>
+        <div class="panel-heading"><div><p>Elements</p><h1>Decorative assets</h1></div></div>
+        <p class="panel-help">Select an asset to add it to the current section.</p>
+        <div class="asset-grid" id="templateElements"></div>
       </section>
 
-      <div id="selectionControls" hidden>
-        <section class="visual-control-group">
-          <h2 class="control-heading">Selected text</h2>
+      <section class="panel-view" data-panel-view="text" hidden>
+        <div class="panel-heading"><div><p>Text</p><h1>Add a text box</h1></div></div>
+        <div class="text-add-list">
+          <button type="button" data-add-text="heading"><span>Add a heading</span><strong>Elegant title</strong></button>
+          <button type="button" data-add-text="subheading"><span>Add a subheading</span><strong>Supporting detail</strong></button>
+          <button type="button" data-add-text="body"><span>Add body text</span><strong>Practical information</strong></button>
+        </div>
+        <p class="panel-help">Select a text box, then use the toolbar above the canvas. Select it again to type directly.</p>
+      </section>
 
-          <div class="control-field visual-popover-field">
-            <span class="control-label" id="fontPickerLabel">Font family</span>
-            <button class="visual-font-trigger" id="fontPickerButton" type="button" aria-labelledby="fontPickerLabel fontPickerValue" aria-haspopup="listbox" aria-expanded="false">
-              <span id="fontPickerValue">Instrument Serif</span>
-              <span aria-hidden="true">⌄</span>
-            </button>
-            <div class="visual-font-popover" id="fontPickerPopover" hidden>
-              <div class="visual-font-filters" id="fontCategoryFilters" role="group" aria-label="Filter fonts by category">
-                <button class="is-active" type="button" data-font-category="all">All</button>
-                <button type="button" data-font-category="serif">Serif</button>
-                <button type="button" data-font-category="sans">Sans</button>
-                <button type="button" data-font-category="script">Script</button>
-              </div>
-              <div class="visual-font-list" id="fontList" role="listbox" aria-labelledby="fontPickerLabel"></div>
-            </div>
-          </div>
+      <section class="panel-view" data-panel-view="uploads" hidden>
+        <div class="panel-heading"><div><p>Uploads</p><h1>Your images</h1></div></div>
+        <label class="upload-button" for="uploadInput">Upload images</label>
+        <input id="uploadInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" multiple hidden>
+        <p class="upload-status" id="uploadStatus">JPG, PNG, WebP, GIF, or SVG up to 12 MB.</p>
+        <div class="upload-grid" id="uploadLibrary"></div>
+      </section>
 
-          <div class="control-field visual-popover-field">
-            <label class="control-label" for="fontSize">Font size</label>
-            <div class="visual-font-size-control">
-              <button id="fontSizeDecrease" type="button" aria-label="Decrease font size">−</button>
-              <input id="fontSize" type="number" min="8" max="180" step="1" inputmode="decimal" aria-haspopup="listbox" aria-expanded="false">
-              <button id="fontSizeIncrease" type="button" aria-label="Increase font size">+</button>
-            </div>
-            <div class="visual-size-presets" id="fontSizePresets" role="listbox" aria-label="Preset font sizes" hidden></div>
-          </div>
-
-          <div class="control-field">
-            <span class="control-label">Style</span>
-            <div class="visual-formatting" id="formattingControls" role="group" aria-label="Text style">
-              <button type="button" data-format="bold" aria-label="Bold"><strong>B</strong></button>
-              <button type="button" data-format="italic" aria-label="Italic"><em>I</em></button>
-            </div>
-          </div>
-
-          <div class="control-field">
-            <label class="control-label" for="textColor">Text color</label>
-            <div class="visual-color-row">
-              <input id="textColor" type="color">
-              <output id="textColorValue"></output>
-            </div>
-          </div>
-
-          <div class="control-field">
-            <span class="control-label">Text alignment</span>
-            <div class="visual-alignment" id="alignmentControls" role="group" aria-label="Text alignment">
-              <button type="button" data-align="left">Left</button>
-              <button type="button" data-align="center">Center</button>
-              <button type="button" data-align="right">Right</button>
-            </div>
-          </div>
-
-          <div class="visual-spacing-controls" aria-labelledby="spacingHeading">
-            <h3 class="control-subheading" id="spacingHeading">Spacing</h3>
-            <div class="visual-spacing-grid">
-              <label class="control-field" for="lineHeight">
-                <span class="control-label">Line height</span>
-                <input class="text-control" id="lineHeight" type="number" min="0.7" max="3" step="0.05" inputmode="decimal">
-              </label>
-              <label class="control-field" for="letterSpacing">
-                <span class="control-label">Letter spacing</span>
-                <input class="text-control" id="letterSpacing" type="number" min="-10" max="30" step="0.1" inputmode="decimal">
-              </label>
-            </div>
-          </div>
-
-          <div class="visual-position-controls" aria-labelledby="positionHeading">
-            <h3 class="control-subheading" id="positionHeading">Position on page</h3>
-
-            <div class="control-field">
-              <span class="control-label">Horizontal</span>
-              <div class="visual-alignment" id="horizontalPositionControls" role="group" aria-label="Horizontal position on page">
-                <button type="button" data-position-x="left">Left</button>
-                <button type="button" data-position-x="center">Center</button>
-                <button type="button" data-position-x="right">Right</button>
-              </div>
-            </div>
-
-            <div class="control-field">
-              <span class="control-label">Vertical</span>
-              <div class="visual-alignment" id="verticalPositionControls" role="group" aria-label="Vertical position on page">
-                <button type="button" data-position-y="top">Top</button>
-                <button type="button" data-position-y="middle">Middle</button>
-                <button type="button" data-position-y="bottom">Bottom</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="visual-control-group visual-object-actions" aria-label="Text object actions">
-          <button class="toolbar-button" id="duplicateButton" type="button">Duplicate</button>
-          <button class="toolbar-button visual-danger-button" id="deleteButton" type="button">Delete</button>
-        </section>
-      </div>
-
-      <p class="visual-proof-note"><span aria-hidden="true">◇</span> This isolated canvas does not alter the public invitation.</p>
+      <section class="panel-view" data-panel-view="sections" hidden>
+        <div class="panel-heading"><div><p>Sections</p><h1>Invitation flow</h1></div></div>
+        <button class="primary-button" id="addSectionButton" type="button">Add blank section</button>
+        <div class="section-list" id="sectionList"></div>
+        <div class="panel-block section-settings" id="sectionSettings"><h2>Selected section</h2><label class="field-row">Name<input id="sectionName" type="text" maxlength="60"></label><label class="field-row">Height preset<select id="sectionHeightPreset"><option value="strip">Strip</option><option value="standard">Standard</option><option value="full">Full</option><option value="custom">Custom</option></select></label><label class="field-row">Custom height<input id="sectionHeight" type="number" min="180" max="2200" step="1"></label><div class="button-row"><button class="secondary-button" id="duplicateSectionButton" type="button">Duplicate</button><button class="danger-button" id="deleteSectionButton" type="button">Delete</button></div></div>
+      </section>
     </aside>
 
-    <section class="preview-stage visual-preview-stage" aria-label="Direct-editing canvas">
-      <div class="preview-frame device-mobile" id="previewFrame">
-        <iframe id="visualCanvas" src="visual-canvas.html?editor=1" title="Editable text canvas"></iframe>
+    <section class="storiel-context-bar" aria-label="Contextual editing toolbar">
+      <div class="context-empty" id="contextEmpty">Select text, an image, or a section to edit it.</div>
+      <div class="context-tools" id="textContext" hidden>
+        <div class="toolbar-popover-anchor"><button class="context-button font-trigger" id="fontPickerButton" type="button" aria-haspopup="dialog" aria-expanded="false"><span id="fontPickerValue">Instrument Serif</span><span aria-hidden="true">⌄</span></button>
+          <div class="toolbar-popover font-popover" id="fontPickerPopover" hidden><label class="font-search"><span class="sr-only">Search fonts</span><input id="fontSearch" type="search" placeholder="Search fonts"></label><div class="font-filters" id="fontCategoryFilters"><button class="is-active" type="button" data-font-category="all">All</button><button type="button" data-font-category="serif">Serif</button><button type="button" data-font-category="sans">Sans</button><button type="button" data-font-category="script">Script</button><button type="button" data-font-category="display">Display</button></div><div class="font-list" id="fontList" role="listbox"></div></div>
+        </div>
+        <div class="toolbar-popover-anchor"><div class="font-size-control"><button id="fontSizeDecrease" type="button" aria-label="Decrease font size">−</button><input id="fontSize" aria-label="Font size" type="number" min="8" max="180" step="1" inputmode="decimal" aria-haspopup="listbox"><button id="fontSizeIncrease" type="button" aria-label="Increase font size">+</button></div><div class="toolbar-popover size-popover" id="fontSizePresets" role="listbox" hidden></div></div>
+        <label class="color-button" title="Text color"><span class="sr-only">Text color</span><input id="textColor" type="color"><span id="textColorSwatch"></span></label>
+        <button class="context-button square" id="boldButton" type="button" aria-label="Bold"><strong>B</strong></button><button class="context-button square" id="italicButton" type="button" aria-label="Italic"><em>I</em></button>
+        <div class="toolbar-popover-anchor"><button class="context-button" id="alignmentButton" type="button" aria-haspopup="menu">Alignment</button><div class="toolbar-popover compact-menu" id="alignmentPopover" hidden><button type="button" data-align="left">Left</button><button type="button" data-align="center">Center</button><button type="button" data-align="right">Right</button></div></div>
+        <div class="toolbar-popover-anchor"><button class="context-button" id="spacingButton" type="button">Spacing</button><div class="toolbar-popover control-popover" id="spacingPopover" hidden><label>Line height<input id="lineHeight" type="number" min="0.7" max="3" step="0.05"></label><label>Letter spacing<input id="letterSpacing" type="number" min="-10" max="30" step="0.1"></label></div></div>
+        <button class="context-button" data-open-position type="button">Position</button><button class="context-button" data-open-more type="button">More</button>
       </div>
+      <div class="context-tools" id="imageContext" hidden><button class="context-button" id="replaceImageButton" type="button">Replace</button><button class="context-button" id="imageFitButton" type="button">Fit / Fill</button><button class="context-button" data-open-position type="button">Position</button><button class="context-button" data-open-more type="button">More</button></div>
+      <div class="context-tools" id="sectionContext" hidden><strong id="sectionContextName">Section</strong><span>Drag the bottom edge to resize, or use Sections for presets.</span></div>
+      <div class="toolbar-popover position-popover" id="positionPopover" hidden><div class="position-grid"><button type="button" data-layer="forward">Bring forward</button><button type="button" data-layer="backward">Send backward</button><button type="button" data-layer="front">Bring to front</button><button type="button" data-layer="back">Send to back</button></div><hr><div class="position-grid"><button type="button" data-position-x="left">Align left</button><button type="button" data-position-x="center">Center horizontally</button><button type="button" data-position-x="right">Align right</button><button type="button" data-position-y="top">Align top</button><button type="button" data-position-y="middle">Center vertically</button><button type="button" data-position-y="bottom">Align bottom</button></div></div>
+      <div class="toolbar-popover more-popover" id="morePopover" hidden><label>Opacity<input id="elementOpacity" type="range" min="0.05" max="1" step="0.05"></label><label>Rotation<input id="elementRotation" type="number" min="-180" max="180" step="1"></label><div id="imageCropControls"><label>Horizontal focal point<input id="imageFocalX" type="range" min="0" max="100" step="1"></label><label>Vertical focal point<input id="imageFocalY" type="range" min="0" max="100" step="1"></label><label>Image zoom<input id="imageZoom" type="range" min="1" max="4" step="0.05"></label></div><div class="button-row"><button type="button" id="lockButton">Lock</button><button type="button" id="duplicateButton">Duplicate</button><button type="button" class="is-danger" id="deleteButton">Delete</button></div></div>
     </section>
-  </main>
 
-  <script src="visual-document.js?v=20260901-typography-v3"></script>
-  <script src="visual-editor.js?v=20260901-typography-v3"></script>
+    <section class="storiel-workspace" id="workspace" aria-label="Invitation editing workspace">
+      <div class="preview-frame device-mobile" id="previewFrame"><iframe id="visualCanvas" src="visual-canvas.html?editor=1&amp;v=20260901-stabilized1" title="Editable invitation canvas"></iframe></div>
+    </section>
+    <input id="replaceImageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden>
+  </main>
+  <script src="visual-document.js?v=20260901-stabilized1"></script>
+  <script src="visual-assets.js?v=20260901-stabilized1"></script>
+  <script src="visual-editor.js?v=20260901-stabilized1"></script>
 </body>
 </html>

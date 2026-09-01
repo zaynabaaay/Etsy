@@ -61,6 +61,28 @@ button {
   touch-action: pan-y;
 }
 
+.section-canvas.is-section-selected {
+  outline: 1px solid rgba(116, 121, 99, .72);
+  outline-offset: 4px;
+}
+
+.section-background {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.section-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center;
+  pointer-events: none;
+  user-select: none;
+}
+
 .section-canvas::after {
   position: absolute;
   z-index: 10000;
@@ -90,6 +112,7 @@ button {
   min-height: 32px;
   outline: 0 solid transparent;
   transform: translate3d(0, 0, 0);
+  transform-origin: center;
   touch-action: pan-y;
 }
 
@@ -123,10 +146,42 @@ button {
   box-shadow: inset 0 -2px 0 rgba(166, 107, 69, .62);
 }
 
+.text-overflow-warning {
+  position: absolute;
+  z-index: 11;
+  right: 0;
+  bottom: -22px;
+  padding: 3px 5px;
+  border-radius: 4px;
+  color: #fff;
+  background: var(--warning);
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 8px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .element-animation-layer,
 .element-content {
   width: 100%;
   height: 100%;
+}
+
+.image-content {
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.image-content img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .element-animation-layer {
@@ -159,10 +214,16 @@ button {
 }
 
 .element-frame.is-selected:not(.is-editing) .element-content {
-  cursor: move;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: manipulation;
+}
+
+.element-frame.is-selected:not(.is-editing) .image-content {
+  cursor: default;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: none;
 }
 
 .element-content[contenteditable="true"],
@@ -248,6 +309,61 @@ html.is-manipulating body {
 .resize-handle[data-direction="s"] { bottom: -16px; left: calc(50% - 16px); cursor: ns-resize; }
 .resize-handle[data-direction="sw"] { bottom: -16px; left: -16px; cursor: nesw-resize; }
 .resize-handle[data-direction="w"] { top: calc(50% - 16px); left: -16px; cursor: ew-resize; }
+
+.section-resize-handle {
+  position: absolute;
+  z-index: 10020;
+  right: 0;
+  bottom: -22px;
+  left: 0;
+  width: 88px;
+  height: 44px;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.section-resize-handle::before {
+  position: absolute;
+  top: 18px;
+  left: 14px;
+  width: 60px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--selection);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .86);
+  content: "";
+}
+
+.safe-margin-guides {
+  position: absolute;
+  z-index: 9990;
+  border: 1px dashed rgba(116, 121, 99, .32);
+  pointer-events: none;
+}
+
+.snap-guide {
+  position: absolute;
+  z-index: 9992;
+  display: block;
+  background: #a3538f;
+  pointer-events: none;
+}
+
+.snap-guide.is-x {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.snap-guide.is-y {
+  right: 0;
+  left: 0;
+  height: 1px;
+}
 
 .canvas-loading {
   display: grid;

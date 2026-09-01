@@ -1,607 +1,225 @@
 (() => {
   const model = globalThis.GreenSageVisualDocument;
   if (!model) return;
-
   const root = document.getElementById('canvasRoot');
-  const messageOrigin = window.location.origin === 'null' ? '*' : window.location.origin;
-  const isSameOrigin = (origin) => origin === window.location.origin
-    || (window.location.origin === 'null' && origin === 'null');
+  const ORIGIN = window.location.origin === 'null' ? '*' : window.location.origin;
+  const sameOrigin = (origin) => origin === window.location.origin || (origin === 'null' && window.location.origin === 'null');
   const resizeDirections = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
-
-  let currentState = null;
+  const post = (message) => window.parent.postMessage(message, ORIGIN);
+  let state = null;
+  let selectedSectionId = null;
   let selectedElementId = null;
   let editingElementId = null;
-  let activeTransaction = null;
-  let currentScale = 1;
+  let assetUrls = {};
+  let scale = 1;
   let renderToken = 0;
-  let endingEdit = false;
-  let activePointerGesture = null;
+  let transaction = null;
+  let gesture = null;
 
-  const post = (message) => {
-    window.parent.postMessage(message, messageOrigin);
+  const frameNode = (id) => root.querySelector(`[data-element-id="${CSS.escape(id)}"]`);
+  const sectionNode = (id) => root.querySelector(`[data-section-id="${CSS.escape(id)}"]`);
+  const getAssetUrl = (item) => item.assetKind === 'upload' ? assetUrls[item.assetId] : model.getTemplateAsset(item.assetId)?.url;
+  const calculateScale = () => state ? Math.min(window.innerWidth / state.document.canvas.baseWidth, state.document.canvas.maxRenderedWidth / state.document.canvas.baseWidth) : 1;
+  const canPointer = (event) => event.isPrimary && (event.pointerType !== 'mouse' || event.button === 0);
+
+  const sendStart = (targetType, targetId, label) => {
+    transaction = { id: model.createId('transaction'), targetType, targetId, label };
+    post({ type: 'green-sage-visual:transaction-start', transactionId: transaction.id, targetType, targetId, label });
   };
+  const sendPatch = (patch) => { if (transaction) post({ type: 'green-sage-visual:transaction-patch', transactionId: transaction.id, targetType: transaction.targetType, targetId: transaction.targetId, patch, label: transaction.label }); };
+  const sendCommit = () => { if (!transaction) return; const active = transaction; transaction = null; post({ type: 'green-sage-visual:transaction-commit', transactionId: active.id, targetType: active.targetType, targetId: active.targetId }); };
 
-  const ensureFontLoaded = async (element) => {
-    await model.loadFont(element.style.fontFamily, {
-      weight: element.style.fontWeight,
-      style: element.style.fontStyle,
-      size: element.style.fontSize,
-      sample: element.content || 'Text',
-      document
-    });
-  };
-
-  const waitForFonts = async (state) => {
-    const requests = [];
-    const seen = new Set();
-    Object.values(state.elements).forEach((element) => {
-      const key = `${element.style.fontSize}:${element.style.fontFamily}:${element.style.fontWeight}:${element.style.fontStyle}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      requests.push(ensureFontLoaded(element));
-    });
-    await Promise.allSettled(requests);
-  };
-
-  const calculateScale = () => {
-    if (!currentState) return 1;
-    const { baseWidth, maxRenderedWidth } = currentState.document.canvas;
-    return Math.min(window.innerWidth / baseWidth, maxRenderedWidth / baseWidth);
-  };
-
-  const frameElement = (elementId) => root.querySelector(`[data-element-id="${CSS.escape(elementId)}"]`);
-
-  const elementIsOutside = (element) => {
-    const section = currentState.sections[element.sectionId];
-    return element.frame.x < 0
-      || element.frame.y < 0
-      || element.frame.x + element.frame.width > currentState.document.canvas.baseWidth
-      || element.frame.y + element.frame.height > section.height;
-  };
-
-  const updateOverflowState = (elementId) => {
-    const element = currentState?.elements[elementId];
-    const frame = frameElement(elementId);
-    if (!element || !frame) return;
-    const content = frame.querySelector('.element-content');
-    const outside = elementIsOutside(element);
-    const textOverflow = content.scrollHeight > frame.clientHeight + 1
-      || content.scrollWidth > frame.clientWidth + 1;
-    frame.classList.toggle('is-outside', outside);
-    frame.classList.toggle('has-text-overflow', textOverflow);
-    const sectionCanvas = frame.closest('.section-canvas');
-    const sectionId = element.sectionId;
-    const sectionHasOverflow = currentState.sections[sectionId].elementOrder
-      .some((id) => elementIsOutside(currentState.elements[id]));
-    sectionCanvas?.classList.toggle('has-overflow', sectionHasOverflow);
-  };
-
-  const updateAllOverflowStates = () => {
-    if (!currentState) return;
-    Object.keys(currentState.elements).forEach(updateOverflowState);
-  };
-
-  const refreshSelectionChrome = () => {
-    root.querySelectorAll('.element-frame').forEach((frame) => {
-      const isSelected = frame.dataset.elementId === selectedElementId;
-      frame.classList.toggle('is-selected', isSelected);
-      frame.setAttribute('aria-selected', String(isSelected));
-      const content = frame.querySelector('.element-content');
-      if (!isSelected && content.isContentEditable) content.blur();
-    });
-  };
-
-  const beginTransaction = (elementId, kind) => {
-    const transactionId = model.createId('transaction');
-    activeTransaction = { transactionId, elementId, kind };
-    post({
-      type: 'green-sage-visual:transaction-start',
-      transactionId,
-      elementId,
-      kind
-    });
-    return activeTransaction;
-  };
-
-  const sendTransactionPatch = (patch) => {
-    if (!activeTransaction) return;
-    post({
-      type: 'green-sage-visual:transaction-patch',
-      transactionId: activeTransaction.transactionId,
-      elementId: activeTransaction.elementId,
-      patch
-    });
-  };
-
-  const finishTransaction = (outcome = 'commit') => {
-    if (!activeTransaction) return;
-    const transaction = activeTransaction;
-    activeTransaction = null;
-    post({
-      type: outcome === 'cancel'
-        ? 'green-sage-visual:transaction-cancel'
-        : 'green-sage-visual:transaction-commit',
-      transactionId: transaction.transactionId,
-      elementId: transaction.elementId
-    });
-  };
-
-  const exitTextEdit = (outcome = 'commit') => {
-    if (!editingElementId || endingEdit) return;
-    endingEdit = true;
-    const frame = frameElement(editingElementId);
-    const content = frame?.querySelector('.element-content');
-    const editingId = editingElementId;
-    editingElementId = null;
-    frame?.classList.remove('is-editing');
-    if (content) {
-      content.setAttribute('contenteditable', 'false');
-      if (document.activeElement === content) content.blur();
-    }
-    if (activeTransaction?.elementId === editingId) finishTransaction(outcome);
-    endingEdit = false;
-  };
-
-  const enterTextEdit = (element, frame, content) => {
-    if (editingElementId === element.id || !element.permissions.editable || element.permissions.locked) return;
-    exitTextEdit('commit');
-    editingElementId = element.id;
-    frame.classList.add('is-editing');
-    content.setAttribute('contenteditable', 'plaintext-only');
-    content.spellcheck = true;
-    beginTransaction(element.id, 'Edit text');
-  };
-
-  const applyFrameLocally = (element, frame, nextFrame) => {
-    element.frame = { ...element.frame, ...nextFrame };
-    frame.style.left = `${element.frame.x}px`;
-    frame.style.top = `${element.frame.y}px`;
-    frame.style.width = `${element.frame.width}px`;
-    frame.style.height = `${element.frame.height}px`;
-    updateOverflowState(element.id);
-    sendTransactionPatch({ frame: element.frame });
-  };
-
-  const capturePointer = (target, pointerId) => {
-    try {
-      target.setPointerCapture?.(pointerId);
-    } catch {
-      // Pointer capture can fail if Safari has already cancelled the pointer.
-    }
-  };
-
-  const releasePointer = (target, pointerId) => {
-    try {
-      if (!target.hasPointerCapture || target.hasPointerCapture(pointerId)) {
-        target.releasePointerCapture?.(pointerId);
-      }
-    } catch {
-      // The pointer may already have been released by the browser.
-    }
-  };
-
-  const lockCanvasScroll = (pointerId, target) => {
-    const scrollPosition = { x: window.scrollX, y: window.scrollY };
-    const keepCanvasStationary = () => {
-      if (!activePointerGesture) return;
-      if (window.scrollX !== scrollPosition.x || window.scrollY !== scrollPosition.y) {
-        window.scrollTo(scrollPosition.x, scrollPosition.y);
-      }
-    };
-
-    activePointerGesture = { pointerId, target, keepCanvasStationary };
+  const lockScroll = (event) => {
     document.documentElement.classList.add('is-manipulating');
-    window.addEventListener('scroll', keepCanvasStationary, { passive: true });
-    capturePointer(target, pointerId);
-    post({ type: 'green-sage-visual:manipulation-start' });
+    try { event.currentTarget.setPointerCapture(event.pointerId); } catch {}
+    gesture = { pointerId: event.pointerId, target: event.currentTarget };
+  };
+  const unlockScroll = (event) => {
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+    try { gesture.target.releasePointerCapture(event.pointerId); } catch {}
+    gesture = null; document.documentElement.classList.remove('is-manipulating'); clearGuides();
   };
 
-  const unlockCanvasScroll = (pointerId, target) => {
-    const gesture = activePointerGesture;
-    if (!gesture || gesture.pointerId !== pointerId) return;
-    activePointerGesture = null;
-    window.removeEventListener('scroll', gesture.keepCanvasStationary);
-    document.documentElement.classList.remove('is-manipulating');
-    releasePointer(target || gesture.target, pointerId);
-    post({ type: 'green-sage-visual:manipulation-end' });
+  const isOutside = (item) => {
+    const section = state.sections[item.sectionId];
+    return item.frame.x < 0 || item.frame.y < 0 || item.frame.x + item.frame.width > 390 || item.frame.y + item.frame.height > section.height;
   };
-
-  const pointerCanManipulate = (event) => event.isPrimary
-    && (event.pointerType !== 'mouse' || event.button === 0);
-
-  const placeCaretAtPoint = (content, clientX, clientY) => {
-    content.focus({ preventScroll: true });
-    const selection = window.getSelection();
-    if (!selection) return;
-
-    let range = null;
-    const position = document.caretPositionFromPoint?.(clientX, clientY);
-    if (position?.offsetNode && content.contains(position.offsetNode)) {
-      range = document.createRange();
-      range.setStart(position.offsetNode, position.offset);
-      range.collapse(true);
-    } else {
-      const legacyRange = document.caretRangeFromPoint?.(clientX, clientY);
-      if (legacyRange && content.contains(legacyRange.commonAncestorContainer)) range = legacyRange;
+  const textExceedsFrame = (frame, content) => {
+    if (!content?.textContent) return false;
+    const tolerance = 1;
+    const range = document.createRange();
+    range.selectNodeContents(content);
+    const lineRects = [...range.getClientRects()].filter((rect) => rect.width || rect.height);
+    const frameRect = frame.getBoundingClientRect();
+    const visualOverflow = lineRects.some((rect) => rect.left < frameRect.left - tolerance || rect.top < frameRect.top - tolerance || rect.right > frameRect.right + tolerance || rect.bottom > frameRect.bottom + tolerance);
+    const layoutOverflow = content.scrollWidth > content.clientWidth + tolerance || content.scrollHeight > content.clientHeight + tolerance;
+    return visualOverflow || layoutOverflow;
+  };
+  const updateOverflow = (item) => {
+    const frame = frameNode(item.id); if (!frame) return;
+    frame.classList.toggle('is-outside', isOutside(item));
+    if (item.type === 'text') {
+      const content = frame.querySelector('.element-content');
+      const overflow = textExceedsFrame(frame, content);
+      frame.classList.toggle('has-text-overflow', overflow);
+      let warning = frame.querySelector(':scope > .text-overflow-warning');
+      if (overflow && !warning) { warning = document.createElement('span'); warning.className = 'text-overflow-warning'; warning.textContent = 'Text exceeds frame'; frame.append(warning); }
+      if (warning) warning.hidden = !overflow;
     }
-
-    if (!range) {
-      range = document.createRange();
-      range.selectNodeContents(content);
-      range.collapse(false);
-    }
-    selection.removeAllRanges();
-    selection.addRange(range);
+    const canvas = frame.closest('.section-canvas'); canvas?.classList.toggle('has-overflow', state.sections[item.sectionId].elementOrder.some((id) => isOutside(state.elements[id])));
   };
 
-  const startMove = (event, element, frame, handle) => {
-    if (!pointerCanManipulate(event) || !element.permissions.movable || element.permissions.locked) return;
-    event.preventDefault();
-    event.stopPropagation();
-    exitTextEdit('commit');
-    selectedElementId = element.id;
-    refreshSelectionChrome();
-    const start = {
-      clientX: event.clientX,
-      clientY: event.clientY,
-      frame: { ...element.frame }
-    };
-    const transaction = beginTransaction(element.id, 'Move text');
-    lockCanvasScroll(event.pointerId, handle);
-
-    const onMove = (moveEvent) => {
-      if (!activeTransaction || activeTransaction.transactionId !== transaction.transactionId) return;
-      moveEvent.preventDefault();
-      const x = start.frame.x + ((moveEvent.clientX - start.clientX) / currentScale);
-      const y = start.frame.y + ((moveEvent.clientY - start.clientY) / currentScale);
-      applyFrameLocally(element, frame, {
-        x: Math.round(x * 10) / 10,
-        y: Math.round(y * 10) / 10
-      });
-    };
-
-    const onEnd = (endEvent) => {
-      handle.removeEventListener('pointermove', onMove);
-      handle.removeEventListener('pointerup', onEnd);
-      handle.removeEventListener('pointercancel', onCancel);
-      unlockCanvasScroll(endEvent.pointerId, handle);
-      finishTransaction('commit');
-    };
-
-    const onCancel = (cancelEvent) => {
-      handle.removeEventListener('pointermove', onMove);
-      handle.removeEventListener('pointerup', onEnd);
-      handle.removeEventListener('pointercancel', onCancel);
-      unlockCanvasScroll(cancelEvent.pointerId, handle);
-      finishTransaction('cancel');
-    };
-
-    handle.addEventListener('pointermove', onMove, { passive: false });
-    handle.addEventListener('pointerup', onEnd);
-    handle.addEventListener('pointercancel', onCancel);
+  const clearGuides = () => root.querySelectorAll('.snap-guide, .safe-margin-guides').forEach((node) => node.remove());
+  const drawGuides = (sectionId, guides) => {
+    clearGuides(); const canvas = sectionNode(sectionId); if (!canvas) return;
+    const safe = document.createElement('div'); safe.className = 'safe-margin-guides'; safe.style.inset = `${state.document.canvas.safeMargin}px`; canvas.append(safe);
+    guides.forEach((guide) => { const node = document.createElement('span'); node.className = `snap-guide is-${guide.axis}`; node.style[guide.axis === 'x' ? 'left' : 'top'] = `${guide.value}px`; canvas.append(node); });
   };
 
-  const resizedFrame = (startFrame, direction, dx, dy) => {
-    const minimumWidth = 48;
-    const minimumHeight = 32;
-    let { x, y, width, height } = startFrame;
-
-    if (direction.includes('e')) width = Math.max(minimumWidth, startFrame.width + dx);
-    if (direction.includes('s')) height = Math.max(minimumHeight, startFrame.height + dy);
-    if (direction.includes('w')) {
-      width = Math.max(minimumWidth, startFrame.width - dx);
-      x = startFrame.x + (startFrame.width - width);
-    }
-    if (direction.includes('n')) {
-      height = Math.max(minimumHeight, startFrame.height - dy);
-      y = startFrame.y + (startFrame.height - height);
-    }
-
-    return Object.fromEntries(
-      Object.entries({ x, y, width, height }).map(([key, value]) => [key, Math.round(value * 10) / 10])
-    );
+  const snapFrame = (item, nextFrame) => {
+    const threshold = 5; const section = state.sections[item.sectionId]; const margin = state.document.canvas.safeMargin;
+    const xCandidates = [margin, 195, 390 - margin]; const yCandidates = [margin, section.height / 2, section.height - margin];
+    section.elementOrder.filter((id) => id !== item.id).forEach((id) => {
+      const frame = state.elements[id].frame; xCandidates.push(frame.x, frame.x + frame.width / 2, frame.x + frame.width); yCandidates.push(frame.y, frame.y + frame.height / 2, frame.y + frame.height);
+    });
+    const xPoints = [{ key: 'left', value: nextFrame.x }, { key: 'center', value: nextFrame.x + nextFrame.width / 2 }, { key: 'right', value: nextFrame.x + nextFrame.width }];
+    const yPoints = [{ key: 'top', value: nextFrame.y }, { key: 'middle', value: nextFrame.y + nextFrame.height / 2 }, { key: 'bottom', value: nextFrame.y + nextFrame.height }];
+    const guides = []; let bestX = null; let bestY = null;
+    xPoints.forEach((point) => xCandidates.forEach((candidate) => { const distance = Math.abs(point.value - candidate); if (distance <= threshold && (!bestX || distance < bestX.distance)) bestX = { point, candidate, distance }; }));
+    yPoints.forEach((point) => yCandidates.forEach((candidate) => { const distance = Math.abs(point.value - candidate); if (distance <= threshold && (!bestY || distance < bestY.distance)) bestY = { point, candidate, distance }; }));
+    if (bestX) { nextFrame.x += bestX.candidate - bestX.point.value; guides.push({ axis: 'x', value: bestX.candidate }); }
+    if (bestY) { nextFrame.y += bestY.candidate - bestY.point.value; guides.push({ axis: 'y', value: bestY.candidate }); }
+    return { frame: nextFrame, guides };
   };
 
-  const startResize = (event, element, frame, handle) => {
-    if (!pointerCanManipulate(event) || !element.permissions.resizable || element.permissions.locked) return;
-    event.preventDefault();
-    event.stopPropagation();
-    exitTextEdit('commit');
-    selectedElementId = element.id;
-    refreshSelectionChrome();
-    const direction = handle.dataset.direction;
-    const start = {
-      clientX: event.clientX,
-      clientY: event.clientY,
-      frame: { ...element.frame }
-    };
-    const transaction = beginTransaction(element.id, 'Resize text box');
-    lockCanvasScroll(event.pointerId, handle);
-
-    const onMove = (moveEvent) => {
-      if (!activeTransaction || activeTransaction.transactionId !== transaction.transactionId) return;
-      moveEvent.preventDefault();
-      const dx = (moveEvent.clientX - start.clientX) / currentScale;
-      const dy = (moveEvent.clientY - start.clientY) / currentScale;
-      applyFrameLocally(element, frame, resizedFrame(start.frame, direction, dx, dy));
-    };
-
-    const onEnd = (endEvent) => {
-      handle.removeEventListener('pointermove', onMove);
-      handle.removeEventListener('pointerup', onEnd);
-      handle.removeEventListener('pointercancel', onCancel);
-      unlockCanvasScroll(endEvent.pointerId, handle);
-      finishTransaction('commit');
-    };
-
-    const onCancel = (cancelEvent) => {
-      handle.removeEventListener('pointermove', onMove);
-      handle.removeEventListener('pointerup', onEnd);
-      handle.removeEventListener('pointercancel', onCancel);
-      unlockCanvasScroll(cancelEvent.pointerId, handle);
-      finishTransaction('cancel');
-    };
-
-    handle.addEventListener('pointermove', onMove, { passive: false });
-    handle.addEventListener('pointerup', onEnd);
-    handle.addEventListener('pointercancel', onCancel);
+  const applyFrame = (item, frame, nextFrame, guides = []) => {
+    item.frame = { ...item.frame, ...nextFrame };
+    Object.assign(frame.style, { left: `${item.frame.x}px`, top: `${item.frame.y}px`, width: `${item.frame.width}px`, height: `${item.frame.height}px` });
+    updateOverflow(item); drawGuides(item.sectionId, guides); sendPatch({ frame: item.frame });
   };
 
-  const startDirectMove = (event, element, frame, content) => {
-    if (!pointerCanManipulate(event)
-      || editingElementId === element.id
-      || selectedElementId !== element.id
-      || !element.permissions.movable
-      || element.permissions.locked) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    const pointerId = event.pointerId;
-    const start = {
-      clientX: event.clientX,
-      clientY: event.clientY,
-      frame: { ...element.frame }
-    };
-    let transaction = null;
-    let moved = false;
-    lockCanvasScroll(pointerId, content);
-
-    const onMove = (moveEvent) => {
-      if (moveEvent.pointerId !== pointerId) return;
-      moveEvent.preventDefault();
-      const rawDx = moveEvent.clientX - start.clientX;
-      const rawDy = moveEvent.clientY - start.clientY;
-      if (!moved && Math.hypot(rawDx, rawDy) < 5) return;
-
-      if (!moved) {
-        moved = true;
-        exitTextEdit('commit');
-        transaction = beginTransaction(element.id, 'Move text');
-      }
-      if (!activeTransaction || activeTransaction.transactionId !== transaction.transactionId) return;
-      applyFrameLocally(element, frame, {
-        x: Math.round((start.frame.x + (rawDx / currentScale)) * 10) / 10,
-        y: Math.round((start.frame.y + (rawDy / currentScale)) * 10) / 10
-      });
-    };
-
-    const cleanUp = (endEvent) => {
-      content.removeEventListener('pointermove', onMove);
-      content.removeEventListener('pointerup', onEnd);
-      content.removeEventListener('pointercancel', onCancel);
-      unlockCanvasScroll(endEvent.pointerId, content);
-    };
-
-    const onEnd = (endEvent) => {
-      if (endEvent.pointerId !== pointerId) return;
-      cleanUp(endEvent);
-      if (moved) {
-        finishTransaction('commit');
-        return;
-      }
-      enterTextEdit(element, frame, content);
-      placeCaretAtPoint(content, endEvent.clientX, endEvent.clientY);
-    };
-
-    const onCancel = (cancelEvent) => {
-      if (cancelEvent.pointerId !== pointerId) return;
-      cleanUp(cancelEvent);
-      if (moved) finishTransaction('cancel');
-    };
-
-    content.addEventListener('pointermove', onMove, { passive: false });
-    content.addEventListener('pointerup', onEnd);
-    content.addEventListener('pointercancel', onCancel);
+  const startMove = (event, item, frame) => {
+    if (!canPointer(event) || item.permissions.locked || !item.permissions.movable) return;
+    event.preventDefault(); event.stopPropagation(); exitEdit(); lockScroll(event); sendStart('element', item.id, 'Move element');
+    const start = { x: event.clientX, y: event.clientY, frame: { ...item.frame } };
+    const move = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; const next = { ...start.frame, x: start.frame.x + (nextEvent.clientX - start.x) / scale, y: start.frame.y + (nextEvent.clientY - start.y) / scale }; const snapped = snapFrame(item, next); applyFrame(item, frame, snapped.frame, snapped.guides); };
+    const end = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; frame.removeEventListener('pointermove', move); frame.removeEventListener('pointerup', end); frame.removeEventListener('pointercancel', end); unlockScroll(nextEvent); sendCommit(); };
+    frame.addEventListener('pointermove', move); frame.addEventListener('pointerup', end); frame.addEventListener('pointercancel', end);
   };
 
-  const insertPlainText = (content, text) => {
-    const selection = window.getSelection();
-    if (!selection?.rangeCount) return;
-    const range = selection.getRangeAt(0);
-    if (!content.contains(range.commonAncestorContainer)) return;
-    range.deleteContents();
-    const textNode = document.createTextNode(text);
-    range.insertNode(textNode);
-    range.setStartAfter(textNode);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-    content.dispatchEvent(new InputEvent('input', {
-      bubbles: true,
-      inputType: 'insertFromPaste',
-      data: text
-    }));
+  const startResize = (event, item, frame, direction) => {
+    if (!canPointer(event) || item.permissions.locked || !item.permissions.resizable) return;
+    event.preventDefault(); event.stopPropagation(); exitEdit(); lockScroll(event); sendStart('element', item.id, 'Resize element');
+    const start = { x: event.clientX, y: event.clientY, frame: { ...item.frame } };
+    const move = (nextEvent) => {
+      if (nextEvent.pointerId !== event.pointerId) return;
+      const dx = (nextEvent.clientX - start.x) / scale; const dy = (nextEvent.clientY - start.y) / scale; const next = { ...start.frame };
+      if (direction.includes('e')) next.width = Math.max(40, start.frame.width + dx);
+      if (direction.includes('s')) next.height = Math.max(32, start.frame.height + dy);
+      if (direction.includes('w')) { next.width = Math.max(40, start.frame.width - dx); next.x = start.frame.x + start.frame.width - next.width; }
+      if (direction.includes('n')) { next.height = Math.max(32, start.frame.height - dy); next.y = start.frame.y + start.frame.height - next.height; }
+      applyFrame(item, frame, next);
+    };
+    const end = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; frame.removeEventListener('pointermove', move); frame.removeEventListener('pointerup', end); frame.removeEventListener('pointercancel', end); unlockScroll(nextEvent); sendCommit(); };
+    frame.addEventListener('pointermove', move); frame.addEventListener('pointerup', end); frame.addEventListener('pointercancel', end);
   };
 
-  const createElementFrame = (element, layerIndex) => {
-    const frame = document.createElement('div');
-    frame.className = 'element-frame';
-    frame.dataset.elementId = element.id;
-    frame.setAttribute('role', 'group');
-    frame.setAttribute('aria-label', `Text box: ${element.content.slice(0, 50)}`);
-    frame.style.left = `${element.frame.x}px`;
-    frame.style.top = `${element.frame.y}px`;
-    frame.style.width = `${element.frame.width}px`;
-    frame.style.height = `${element.frame.height}px`;
-    frame.style.zIndex = String(layerIndex + 1);
+  const startSectionResize = (event, section, canvas) => {
+    if (!canPointer(event)) return;
+    event.preventDefault(); event.stopPropagation(); lockScroll(event); sendStart('section', section.id, 'Resize section');
+    const start = { y: event.clientY, height: section.height };
+    const move = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; section.height = Math.max(180, Math.min(2200, start.height + (nextEvent.clientY - start.y) / scale)); canvas.style.height = `${section.height}px`; canvas.parentElement.style.height = `${section.height * scale}px`; sendPatch({ height: section.height }); };
+    const end = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; canvas.removeEventListener('pointermove', move); canvas.removeEventListener('pointerup', end); canvas.removeEventListener('pointercancel', end); unlockScroll(nextEvent); sendCommit(); };
+    canvas.addEventListener('pointermove', move); canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end);
+  };
 
-    const animationLayer = document.createElement('div');
-    animationLayer.className = 'element-animation-layer';
+  const placeCaret = (content, x, y) => {
+    content.focus({ preventScroll: true }); const selection = getSelection(); if (!selection) return; let range;
+    const position = document.caretPositionFromPoint?.(x, y);
+    if (position && content.contains(position.offsetNode)) { range = document.createRange(); range.setStart(position.offsetNode, position.offset); range.collapse(true); }
+    else { const legacy = document.caretRangeFromPoint?.(x, y); if (legacy && content.contains(legacy.commonAncestorContainer)) range = legacy; }
+    if (!range) { range = document.createRange(); range.selectNodeContents(content); range.collapse(false); }
+    selection.removeAllRanges(); selection.addRange(range);
+  };
 
-    const content = document.createElement('div');
-    content.className = 'element-content';
-    content.textContent = element.content;
-    content.setAttribute('role', 'textbox');
-    content.setAttribute('aria-label', 'Edit text');
-    content.setAttribute('aria-multiline', 'true');
-    content.setAttribute('contenteditable', 'false');
-    content.style.fontFamily = model.fontStack(element.style.fontFamily);
-    content.style.fontSize = `${element.style.fontSize}px`;
-    content.style.fontWeight = String(element.style.fontWeight);
-    content.style.fontStyle = element.style.fontStyle;
-    content.style.color = element.style.color;
-    content.style.textAlign = element.style.textAlign;
-    content.style.lineHeight = String(element.style.lineHeight);
-    content.style.letterSpacing = `${element.style.letterSpacing}px`;
+  const exitEdit = () => {
+    if (!editingElementId) return;
+    const frame = frameNode(editingElementId); const content = frame?.querySelector('.element-content'); editingElementId = null;
+    frame?.classList.remove('is-editing'); if (content) { content.setAttribute('contenteditable', 'false'); content.blur(); }
+    if (transaction?.label === 'Edit text') sendCommit();
+  };
+  const enterEdit = (item, frame, content, event) => {
+    if (item.permissions.locked || !item.permissions.editable) return;
+    exitEdit(); editingElementId = item.id; frame.classList.add('is-editing'); content.setAttribute('contenteditable', 'plaintext-only'); content.spellcheck = true;
+    sendStart('element', item.id, 'Edit text'); placeCaret(content, event.clientX, event.clientY);
+  };
 
+  const createTextContent = (item, frame) => {
+    const content = document.createElement('div'); content.className = 'element-content text-content'; content.textContent = item.content;
+    Object.assign(content.style, { fontFamily: model.fontStack(item.style.fontFamily), fontSize: `${item.style.fontSize}px`, fontWeight: item.style.fontWeight, fontStyle: item.style.fontStyle, color: item.style.color, textAlign: item.style.textAlign, lineHeight: item.style.lineHeight, letterSpacing: `${item.style.letterSpacing}px` });
     content.addEventListener('pointerdown', (event) => {
-      event.stopPropagation();
-      startDirectMove(event, element, frame, content);
-    }, { passive: false });
-
-    content.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (selectedElementId === element.id) return;
-      exitTextEdit('commit');
-      selectedElementId = element.id;
-      refreshSelectionChrome();
-      post({ type: 'green-sage-visual:select', elementId: element.id });
+      if (!canPointer(event)) return;
+      if (selectedElementId !== item.id) { event.preventDefault(); event.stopPropagation(); post({ type: 'green-sage-visual:select-element', elementId: item.id }); }
+      else if (editingElementId !== item.id) { event.stopPropagation(); enterEdit(item, frame, content, event); }
     });
+    content.addEventListener('input', () => { item.content = content.innerText.replace(/\r/g, ''); requestAnimationFrame(() => updateOverflow(item)); sendPatch({ content: item.content }); });
+    content.addEventListener('paste', (event) => { event.preventDefault(); const text = event.clipboardData?.getData('text/plain') || ''; document.execCommand('insertText', false, text); });
+    content.addEventListener('blur', () => { if (editingElementId === item.id) exitEdit(); });
+    return content;
+  };
 
-    content.addEventListener('input', () => {
-      if (editingElementId !== element.id || activeTransaction?.elementId !== element.id) return;
-      element.content = content.textContent || '';
-      frame.setAttribute('aria-label', `Text box: ${element.content.slice(0, 50)}`);
-      updateOverflowState(element.id);
-      sendTransactionPatch({ content: element.content });
-    });
+  const createImageContent = (item) => {
+    const content = document.createElement('div'); content.className = 'element-content image-content';
+    const image = document.createElement('img'); image.alt = item.alt || ''; image.draggable = false; image.src = getAssetUrl(item) || '';
+    Object.assign(image.style, { objectFit: item.crop.fit, objectPosition: `${item.crop.focalX}% ${item.crop.focalY}%`, transform: `scale(${item.crop.zoom})` }); content.append(image);
+    content.addEventListener('pointerdown', (event) => { if (!canPointer(event)) return; if (selectedElementId !== item.id) { event.preventDefault(); event.stopPropagation(); post({ type: 'green-sage-visual:select-element', elementId: item.id }); } });
+    return content;
+  };
 
-    content.addEventListener('paste', (event) => {
-      if (editingElementId !== element.id) return;
-      event.preventDefault();
-      insertPlainText(content, event.clipboardData?.getData('text/plain') || '');
-    });
-
-    content.addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape') return;
-      event.preventDefault();
-      exitTextEdit('cancel');
-    });
-
-    content.addEventListener('blur', () => {
-      if (!endingEdit && editingElementId === element.id) exitTextEdit('commit');
-    });
-
-    animationLayer.append(content);
-    frame.append(animationLayer);
-
-    const moveHandle = document.createElement('button');
-    moveHandle.className = 'element-move-handle';
-    moveHandle.type = 'button';
-    moveHandle.textContent = '↕';
-    moveHandle.setAttribute('aria-label', 'Move text box');
-    moveHandle.addEventListener('pointerdown', (event) => startMove(event, element, frame, moveHandle), { passive: false });
-    frame.append(moveHandle);
-
-    resizeDirections.forEach((direction) => {
-      const handle = document.createElement('button');
-      handle.className = 'resize-handle';
-      handle.type = 'button';
-      handle.dataset.direction = direction;
-      handle.setAttribute('aria-label', `Resize text box ${direction}`);
-      handle.addEventListener('pointerdown', (event) => startResize(event, element, frame, handle), { passive: false });
-      frame.append(handle);
-    });
-
+  const createElement = (item) => {
+    const frame = document.createElement('div'); frame.className = 'element-frame'; frame.dataset.elementId = item.id; frame.dataset.elementType = item.type;
+    frame.classList.toggle('is-selected', selectedElementId === item.id); frame.classList.toggle('is-locked', item.permissions.locked);
+    Object.assign(frame.style, { left: `${item.frame.x}px`, top: `${item.frame.y}px`, width: `${item.frame.width}px`, height: `${item.frame.height}px`, opacity: item.opacity, rotate: `${item.rotation}deg` });
+    const animation = document.createElement('div'); animation.className = 'element-animation-layer'; animation.append(item.type === 'text' ? createTextContent(item, frame) : createImageContent(item)); frame.append(animation);
+    if (selectedElementId === item.id && !item.permissions.locked) {
+      const move = document.createElement('button'); move.type = 'button'; move.className = 'element-move-handle'; move.setAttribute('aria-label', 'Move element'); move.textContent = '✥'; move.addEventListener('pointerdown', (event) => startMove(event, item, frame)); frame.append(move);
+      if (item.permissions.resizable) resizeDirections.forEach((direction) => { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'resize-handle'; handle.dataset.direction = direction; handle.setAttribute('aria-label', `Resize ${direction}`); handle.addEventListener('pointerdown', (event) => startResize(event, item, frame, direction)); frame.append(handle); });
+    }
     return frame;
   };
 
-  const render = async (value, selection) => {
-    const token = ++renderToken;
-    const normalized = model.normalize(value);
-    await waitForFonts(normalized);
-    if (token !== renderToken) return;
+  const createSection = (section) => {
+    const shell = document.createElement('div'); shell.className = 'section-shell'; shell.style.width = `${390 * scale}px`; shell.style.height = `${section.height * scale}px`;
+    const canvas = document.createElement('section'); canvas.className = 'section-canvas'; canvas.dataset.sectionId = section.id; canvas.classList.toggle('is-section-selected', section.id === selectedSectionId && !selectedElementId); canvas.style.height = `${section.height}px`; canvas.style.transform = `scale(${scale})`; canvas.style.background = section.background.color;
+    const background = document.createElement('div'); background.className = 'section-background';
+    if (section.background.kind === 'image') { const image = document.createElement('img'); image.alt = ''; image.src = section.background.assetKind === 'upload' ? assetUrls[section.background.assetId] || '' : model.getTemplateAsset(section.background.assetId)?.url || ''; Object.assign(image.style, { objectPosition: `${section.background.focalX}% ${section.background.focalY}%`, transform: `scale(${section.background.zoom})` }); background.append(image); }
+    canvas.append(background);
+    section.elementOrder.forEach((id, index) => { const item = state.elements[id]; if (!item) return; const node = createElement(item); node.style.zIndex = String(index + 1); canvas.append(node); });
+    canvas.addEventListener('pointerdown', (event) => { if (event.target !== canvas && event.target !== background) return; exitEdit(); post({ type: 'green-sage-visual:select-section', sectionId: section.id }); });
+    if (section.id === selectedSectionId && !selectedElementId) { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'section-resize-handle'; handle.setAttribute('aria-label', 'Resize section height'); handle.addEventListener('pointerdown', (event) => startSectionResize(event, section, canvas)); canvas.append(handle); }
+    shell.append(canvas); return shell;
+  };
 
-    exitTextEdit('commit');
-    currentState = normalized;
-    selectedElementId = currentState.elements[selection] ? selection : null;
-    currentScale = calculateScale();
-    document.documentElement.style.backgroundColor = currentState.document.canvas.viewportBackground;
-    document.body.style.backgroundColor = currentState.document.canvas.viewportBackground;
-    root.replaceChildren();
-
-    currentState.document.sectionOrder.forEach((sectionId) => {
-      const section = currentState.sections[sectionId];
-      const shell = document.createElement('div');
-      shell.className = 'section-shell';
-      shell.dataset.sectionId = sectionId;
-      shell.style.width = `${currentState.document.canvas.baseWidth * currentScale}px`;
-      shell.style.height = `${section.height * currentScale}px`;
-
-      const sectionCanvas = document.createElement('section');
-      sectionCanvas.className = 'section-canvas';
-      sectionCanvas.dataset.sectionId = sectionId;
-      sectionCanvas.setAttribute('aria-label', section.name);
-      sectionCanvas.style.height = `${section.height}px`;
-      sectionCanvas.style.backgroundColor = section.style.backgroundColor;
-      sectionCanvas.style.transform = `scale(${currentScale})`;
-
-      section.elementOrder.forEach((elementId, index) => {
-        const element = currentState.elements[elementId];
-        if (element) sectionCanvas.append(createElementFrame(element, index));
-      });
-
-      sectionCanvas.addEventListener('pointerdown', (event) => {
-        if (event.target !== sectionCanvas) return;
-        exitTextEdit('commit');
-        selectedElementId = null;
-        refreshSelectionChrome();
-        post({ type: 'green-sage-visual:select', elementId: null });
-      });
-
-      shell.append(sectionCanvas);
-      root.append(shell);
-    });
-
-    refreshSelectionChrome();
-    requestAnimationFrame(updateAllOverflowStates);
+  const render = async () => {
+    if (!state) return; const token = ++renderToken; const scrollY = window.scrollY; scale = calculateScale();
+    const fonts = Object.values(state.elements).filter((item) => item.type === 'text').map((item) => model.loadFont(item.style.fontFamily, { document, weight: item.style.fontWeight, style: item.style.fontStyle, size: item.style.fontSize, sample: item.content }));
+    await Promise.allSettled(fonts); await document.fonts?.ready; if (token !== renderToken) return;
+    root.replaceChildren(...state.document.sectionOrder.map((id) => createSection(state.sections[id])));
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (token !== renderToken) return; window.scrollTo(0, scrollY); Object.values(state.elements).forEach(updateOverflow); }));
   };
 
   window.addEventListener('message', (event) => {
-    if (event.source !== window.parent || !isSameOrigin(event.origin)) return;
-    if (event.data?.type === 'green-sage-visual:scroll-by') {
-      const deltaY = Number(event.data.deltaY);
-      if (Number.isFinite(deltaY)) window.scrollBy({ top: deltaY, left: 0, behavior: 'auto' });
-      return;
+    if (event.source !== window.parent || !sameOrigin(event.origin) || !event.data) return;
+    if (event.data.type === 'green-sage-visual:state') {
+      const wasEditing = editingElementId; state = model.normalize(event.data.state); selectedSectionId = state.sections[event.data.selectedSectionId] ? event.data.selectedSectionId : state.document.sectionOrder[0]; selectedElementId = state.elements[event.data.selectedElementId] ? event.data.selectedElementId : null; assetUrls = event.data.assetUrls || {};
+      if (wasEditing && wasEditing === selectedElementId && transaction?.label === 'Edit text') return;
+      editingElementId = null; transaction = null; render();
     }
-    if (event.data?.type === 'green-sage-visual:state') {
-      render(event.data.state, event.data.selectedElementId);
-    }
+    if (event.data.type === 'green-sage-visual:scroll-by') window.scrollBy({ top: Number(event.data.deltaY) || 0, behavior: 'auto' });
   });
-
-  window.addEventListener('resize', () => {
-    if (!currentState || activeTransaction || editingElementId) return;
-    render(currentState, selectedElementId);
-  });
-
-  root.addEventListener('pointerdown', (event) => {
-    if (event.target !== root) return;
-    exitTextEdit('commit');
-    selectedElementId = null;
-    refreshSelectionChrome();
-    post({ type: 'green-sage-visual:select', elementId: null });
-  });
-
-  root.innerHTML = '<div class="canvas-loading">Preparing text canvas…</div>';
+  window.addEventListener('resize', render);
+  document.addEventListener('pointerdown', () => post({ type: 'green-sage-visual:canvas-interaction' }), true);
+  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.element-frame')) exitEdit(); });
+  root.innerHTML = '<div class="canvas-loading">Preparing your invitation canvas…</div>';
   post({ type: 'green-sage-visual:ready' });
 })();
