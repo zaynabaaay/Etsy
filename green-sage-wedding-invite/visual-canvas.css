@@ -85,6 +85,41 @@ button {
   user-select: none;
 }
 
+.section-background.is-editing {
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+}
+
+.section-background.is-editing:active {
+  cursor: grabbing;
+}
+
+.section-canvas.is-background-editing {
+  outline: 1.5px solid var(--selection);
+  outline-offset: 4px;
+}
+
+.section-canvas.is-background-editing > .element-frame {
+  pointer-events: none;
+}
+
+.background-edit-indicator {
+  position: absolute;
+  z-index: 10010;
+  top: 12px;
+  left: 50%;
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(71, 66, 50, .82);
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 9px;
+  letter-spacing: .02em;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
 .section-canvas::after {
   position: absolute;
   z-index: 10000;
@@ -311,34 +346,6 @@ html.is-manipulating body {
 .resize-handle[data-direction="s"] { bottom: -16px; left: calc(50% - 16px); cursor: ns-resize; }
 .resize-handle[data-direction="sw"] { bottom: -16px; left: -16px; cursor: nesw-resize; }
 .resize-handle[data-direction="w"] { top: calc(50% - 16px); left: -16px; cursor: ew-resize; }
-
-.section-resize-handle {
-  position: absolute;
-  z-index: 10020;
-  right: 0;
-  bottom: -22px;
-  left: 0;
-  width: 88px;
-  height: 44px;
-  margin: auto;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: ns-resize;
-  touch-action: none;
-}
-
-.section-resize-handle::before {
-  position: absolute;
-  top: 18px;
-  left: 14px;
-  width: 60px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--selection);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, .86);
-  content: "";
-}
 
 .safe-margin-guides {
   position: absolute;

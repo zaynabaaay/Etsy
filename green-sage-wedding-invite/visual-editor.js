@@ -17,15 +17,15 @@
   const ui = {
     canvas: $('visualCanvas'), previewFrame: $('previewFrame'), workspace: $('workspace'), saveStatus: $('saveStatus'),
     undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'),
-    contextEmpty: $('contextEmpty'), textContext: $('textContext'), imageContext: $('imageContext'), sectionContext: $('sectionContext'), sectionContextName: $('sectionContextName'),
+    contextEmpty: $('contextEmpty'), textContext: $('textContext'), imageContext: $('imageContext'), sectionContext: $('sectionContext'), sectionContextName: $('sectionContextName'), backgroundEditContext: $('backgroundEditContext'), doneBackgroundToolbar: $('doneBackgroundToolbarButton'),
     fontButton: $('fontPickerButton'), fontValue: $('fontPickerValue'), fontPopover: $('fontPickerPopover'), fontSearch: $('fontSearch'), fontFilters: $('fontCategoryFilters'), fontList: $('fontList'),
     fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColor: $('textColor'), textColorSwatch: $('textColorSwatch'),
     bold: $('boldButton'), italic: $('italicButton'), alignButton: $('alignmentButton'), alignPopover: $('alignmentPopover'), spacingButton: $('spacingButton'), spacingPopover: $('spacingPopover'), lineHeight: $('lineHeight'), letterSpacing: $('letterSpacing'),
     positionPopover: $('positionPopover'), morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), cropControls: $('imageCropControls'), imageFocalX: $('imageFocalX'), imageFocalY: $('imageFocalY'), imageZoom: $('imageZoom'),
     lock: $('lockButton'), duplicate: $('duplicateButton'), remove: $('deleteButton'), replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'),
-    designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), templateBackgrounds: $('templateBackgrounds'), uploadedBackgrounds: $('uploadedBackgrounds'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
+    designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), templateBackgrounds: $('templateBackgrounds'), uploadedBackgrounds: $('uploadedBackgrounds'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
     templateElements: $('templateElements'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'),
-    addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionPreset: $('sectionHeightPreset'), sectionHeight: $('sectionHeight'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton')
+    addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton')
   };
 
   const ORIGIN = window.location.origin === 'null' ? '*' : window.location.origin;
@@ -39,6 +39,7 @@
   let canvasReady = false;
   let activePanel = 'design';
   let activeFontCategory = 'all';
+  let backgroundEditSectionId = null;
   let fontObserver = null;
   let transaction = null;
   let saveTimer = 0;
@@ -71,7 +72,7 @@
 
   const syncCanvas = () => {
     saveRevision += 1;
-    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:state', state, selectedSectionId, selectedElementId, assetUrls, revision: saveRevision }, ORIGIN);
+    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:state', state, selectedSectionId, selectedElementId, backgroundEditSectionId, assetUrls, revision: saveRevision }, ORIGIN);
   };
 
   const finishTransaction = (sync = true) => {
@@ -109,6 +110,7 @@
     if (!source.length) return;
     destination.push(snapshot(direction));
     const entry = source.pop(); state = model.normalize(entry.state);
+    backgroundEditSectionId = null;
     selectedSectionId = state.sections[entry.selectedSectionId] ? entry.selectedSectionId : state.document.sectionOrder[0];
     selectedElementId = state.elements[entry.selectedElementId] ? entry.selectedElementId : null;
     updateHistory(); scheduleSave(); renderAll(); syncCanvas();
@@ -127,8 +129,8 @@
     $$('.nav-tool').forEach((button) => { const active = button.dataset.panel === name; button.classList.toggle('is-active', active); button.setAttribute('aria-pressed', String(active)); });
     $$('.panel-view').forEach((view) => { const active = view.dataset.panelView === name; view.hidden = !active; view.classList.toggle('is-active', active); });
   };
-  const selectSection = (id, sync = true) => { if (!state.sections[id]) return; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
-  const selectElement = (id, sync = true) => { if (!state.elements[id]) return; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
+  const selectSection = (id, sync = true) => { if (!state.sections[id]) return; backgroundEditSectionId = null; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
+  const selectElement = (id, sync = true) => { if (!state.elements[id]) return; backgroundEditSectionId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
 
   const ensureSelectedFont = async (nextFont, style = null) => {
     const current = element(); if (!current || current.type !== 'text') return;
@@ -155,8 +157,9 @@
 
   const renderContext = () => {
     const selected = element();
-    ui.contextEmpty.hidden = Boolean(selected || section()); ui.textContext.hidden = selected?.type !== 'text';
-    ui.imageContext.hidden = !selected || !['image', 'decorative'].includes(selected.type); ui.sectionContext.hidden = Boolean(selected) || !section();
+    const editingBackground = Boolean(backgroundEditSectionId && backgroundEditSectionId === selectedSectionId && section()?.background.kind === 'image');
+    ui.contextEmpty.hidden = Boolean(selected || section()); ui.textContext.hidden = selected?.type !== 'text' || editingBackground;
+    ui.imageContext.hidden = editingBackground || !selected || !['image', 'decorative'].includes(selected.type); ui.sectionContext.hidden = editingBackground || Boolean(selected) || !section(); ui.backgroundEditContext.hidden = !editingBackground;
     if (!selected) { ui.sectionContextName.textContent = section()?.name || 'Section'; return; }
     const locked = selected.permissions.locked;
     ui.opacity.value = selected.opacity; ui.rotation.value = selected.rotation; ui.lock.textContent = locked ? 'Unlock' : 'Lock';
@@ -175,23 +178,25 @@
   const assetUrl = (assetId, kind) => kind === 'upload' ? assetUrls[assetId] : model.getTemplateAsset(assetId)?.url;
   const assetCard = (asset, options = {}) => {
     const card = document.createElement('button'); card.type = 'button'; card.className = options.className || 'asset-card'; card.dataset.assetId = asset.id;
-    const url = options.url || asset.url; card.innerHTML = `<span class="asset-thumb" style="background-image:url('${url}')"></span><span>${asset.name}</span>`; if (options.selected) card.classList.add('is-selected'); return card;
+    const url = options.url || asset.url; card.innerHTML = `<span class="asset-thumb" style="background-image:url('${url}')"></span><span>${asset.name}</span>${options.actionLabel ? `<span class="asset-action-label">${options.actionLabel}</span>` : ''}`; if (options.selected) card.classList.add('is-selected'); return card;
   };
 
   const renderDesign = () => {
     const current = section(); if (!current) return;
+    const editingBackground = backgroundEditSectionId === current.id && current.background.kind === 'image';
+    if (backgroundEditSectionId && !editingBackground) backgroundEditSectionId = null;
     ui.designName.textContent = current.name; ui.sectionColor.value = current.background.color; ui.palette.replaceChildren();
     model.templatePalette.forEach((color) => { const button = document.createElement('button'); button.type = 'button'; button.className = 'palette-swatch'; button.dataset.color = color.value; button.style.background = color.value; button.title = `${color.name} ${color.value}`; button.setAttribute('aria-label', color.name); button.classList.toggle('is-selected', current.background.kind === 'color' && current.background.color.toUpperCase() === color.value); ui.palette.append(button); });
-    ui.templateBackgrounds.replaceChildren(); model.templateAssets.filter((asset) => asset.kind === 'background').forEach((asset) => ui.templateBackgrounds.append(assetCard(asset, { selected: current.background.kind === 'image' && current.background.assetKind === 'template' && current.background.assetId === asset.id })));
-    ui.uploadedBackgrounds.replaceChildren(); assetRecords.forEach((asset) => ui.uploadedBackgrounds.append(assetCard(asset, { url: assetUrls[asset.id], selected: current.background.kind === 'image' && current.background.assetKind === 'upload' && current.background.assetId === asset.id })));
-    ui.removeBackground.hidden = current.background.kind !== 'image'; ui.backgroundPosition.hidden = current.background.kind !== 'image'; ui.backgroundFocalX.value = current.background.focalX; ui.backgroundFocalY.value = current.background.focalY; ui.backgroundZoom.value = current.background.zoom;
+    ui.templateBackgrounds.replaceChildren(); model.templateAssets.filter((asset) => asset.kind === 'background').forEach((asset) => ui.templateBackgrounds.append(assetCard(asset, { actionLabel: 'Set as background', selected: current.background.kind === 'image' && current.background.assetKind === 'template' && current.background.assetId === asset.id })));
+    ui.uploadedBackgrounds.replaceChildren(); assetRecords.forEach((asset) => ui.uploadedBackgrounds.append(assetCard(asset, { actionLabel: 'Set as background', url: assetUrls[asset.id], selected: current.background.kind === 'image' && current.background.assetKind === 'upload' && current.background.assetId === asset.id })));
+    ui.editBackground.hidden = current.background.kind !== 'image' || editingBackground; ui.doneBackground.hidden = !editingBackground; ui.removeBackground.hidden = current.background.kind !== 'image'; ui.backgroundPosition.hidden = !editingBackground; ui.backgroundFocalX.value = current.background.focalX; ui.backgroundFocalY.value = current.background.focalY; ui.backgroundZoom.value = current.background.zoom;
   };
 
   const renderTemplateElements = () => { ui.templateElements.replaceChildren(); model.templateAssets.filter((asset) => asset.kind === 'decorative').forEach((asset) => ui.templateElements.append(assetCard(asset))); };
   const renderUploads = () => {
     ui.uploadLibrary.replaceChildren();
     if (!assetRecords.length) { const empty = document.createElement('p'); empty.className = 'panel-help'; empty.textContent = 'Uploaded images will appear here.'; ui.uploadLibrary.append(empty); return; }
-    assetRecords.forEach((asset) => { const card = document.createElement('article'); card.className = 'upload-card'; card.dataset.assetId = asset.id; card.innerHTML = `<img src="${assetUrls[asset.id]}" alt=""><span>${asset.name}</span><div><button type="button" data-upload-action="insert">Insert</button><button type="button" data-upload-action="background">Background</button></div>`; ui.uploadLibrary.append(card); });
+    assetRecords.forEach((asset) => { const card = document.createElement('article'); card.className = 'upload-card'; card.dataset.assetId = asset.id; card.innerHTML = `<img src="${assetUrls[asset.id]}" alt=""><span>${asset.name}</span><div><button type="button" data-upload-action="insert">Insert</button><button type="button" data-upload-action="background">Set as background</button></div>`; ui.uploadLibrary.append(card); });
   };
 
   const renderSections = () => {
@@ -201,7 +206,7 @@
       const bg = item.background.kind === 'image' ? assetUrl(item.background.assetId, item.background.assetKind) : '';
       card.innerHTML = `<button class="section-select" type="button"><span class="section-thumb" style="background-color:${item.background.color};${bg ? `background-image:url('${bg}')` : ''}"></span><span><strong>${item.name}</strong><small>${Math.round(item.height)} units</small></span></button><div class="section-order"><button type="button" data-section-move="up" aria-label="Move section up" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-section-move="down" aria-label="Move section down" ${index === state.document.sectionOrder.length - 1 ? 'disabled' : ''}>↓</button></div>`; ui.sectionList.append(card);
     });
-    if (!current) return; ui.sectionName.value = current.name; ui.sectionPreset.value = current.heightPreset; ui.sectionHeight.value = Math.round(current.height); ui.deleteSection.disabled = state.document.sectionOrder.length === 1;
+    if (!current) return; ui.sectionName.value = current.name; ui.sectionHeight.value = Math.round(current.height); $$('[data-section-height-preset]', ui.sectionHeightPresets).forEach((button) => button.classList.toggle('is-selected', button.dataset.sectionHeightPreset === current.heightPreset)); ui.deleteSection.disabled = state.document.sectionOrder.length === 1;
   };
 
   const renderAll = () => { renderContext(); renderDesign(); renderUploads(); renderSections(); };
@@ -277,7 +282,26 @@
   const moveSection = (id, direction) => {
     mutate('Reorder sections', (next) => { const order = next.document.sectionOrder; const from = order.indexOf(id); const to = from + (direction === 'up' ? -1 : 1); if (to < 0 || to >= order.length) return; [order[from], order[to]] = [order[to], order[from]]; });
   };
-  const applyBackgroundAsset = (assetId, assetKind) => mutate('Change section background', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'image', assetId, assetKind, focalX: 50, focalY: 50, zoom: 1 }); });
+  const setBackgroundEditMode = (enabled) => {
+    const current = section();
+    backgroundEditSectionId = enabled && current?.background.kind === 'image' ? current.id : null;
+    if (backgroundEditSectionId) selectedElementId = null;
+    renderAll(); syncCanvas();
+  };
+  const applyBackgroundAsset = (assetId, assetKind) => {
+    backgroundEditSectionId = null;
+    mutate('Change section background', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'image', assetId, assetKind, focalX: 50, focalY: 50, zoom: 1 }); });
+  };
+  const setSectionHeightPreset = (preset) => {
+    const current = section(); if (!current) return;
+    if (preset === 'custom') { mutate('Use custom section height', (next) => { next.sections[current.id].heightPreset = 'custom'; }); requestAnimationFrame(() => ui.sectionHeight.focus()); return; }
+    const value = model.sectionHeightPresets[preset]; if (!value) return;
+    mutate('Change section height', (next) => { next.sections[current.id].heightPreset = preset; next.sections[current.id].height = value; });
+  };
+  const stepSectionHeight = (delta) => {
+    const current = section(); if (!current) return;
+    mutate('Resize section', (next) => { next.sections[current.id].height = Math.max(180, Math.min(2200, Math.round(current.height + delta))); next.sections[current.id].heightPreset = 'custom'; });
+  };
 
   const uploadFiles = async (fileList) => {
     if (!fileList?.length) return [];
@@ -340,7 +364,10 @@
   const backgroundClick = (event, kind) => { const card = event.target.closest('[data-asset-id]'); if (card) applyBackgroundAsset(card.dataset.assetId, kind); };
   ui.templateBackgrounds.addEventListener('click', (event) => backgroundClick(event, 'template'));
   ui.uploadedBackgrounds.addEventListener('click', (event) => backgroundClick(event, 'upload'));
-  ui.removeBackground.addEventListener('click', () => mutate('Remove background image', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', assetId: '' }); }));
+  ui.editBackground.addEventListener('click', () => setBackgroundEditMode(true));
+  ui.doneBackground.addEventListener('click', () => setBackgroundEditMode(false));
+  ui.doneBackgroundToolbar.addEventListener('click', () => setBackgroundEditMode(false));
+  ui.removeBackground.addEventListener('click', () => { backgroundEditSectionId = null; mutate('Remove background image', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', assetId: '' }); }); });
   bindTransactionalInput(ui.backgroundFocalX, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.focalX = Number(value); });
   bindTransactionalInput(ui.backgroundFocalY, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.focalY = Number(value); });
   bindTransactionalInput(ui.backgroundZoom, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.zoom = Number(value); });
@@ -351,8 +378,17 @@
   ui.addSection.addEventListener('click', addSection); ui.duplicateSection.addEventListener('click', duplicateSection); ui.deleteSection.addEventListener('click', deleteSection);
   ui.sectionList.addEventListener('click', (event) => { const card = event.target.closest('[data-section-id]'); if (!card) return; const move = event.target.closest('[data-section-move]'); if (move) moveSection(card.dataset.sectionId, move.dataset.sectionMove); else selectSection(card.dataset.sectionId); });
   bindTransactionalInput(ui.sectionName, 'Rename section', (next, value) => { next.sections[selectedSectionId].name = value; });
-  ui.sectionPreset.addEventListener('change', () => { if (ui.sectionPreset.value === 'custom') return; const value = model.sectionHeightPresets[ui.sectionPreset.value]; mutate('Change section height', (next) => { next.sections[selectedSectionId].heightPreset = ui.sectionPreset.value; next.sections[selectedSectionId].height = value; }); });
-  bindTransactionalInput(ui.sectionHeight, 'Resize section', (next, value) => { next.sections[selectedSectionId].height = Number(value); next.sections[selectedSectionId].heightPreset = 'custom'; });
+  ui.sectionHeightPresets.addEventListener('click', (event) => { const button = event.target.closest('[data-section-height-preset]'); if (button) setSectionHeightPreset(button.dataset.sectionHeightPreset); });
+  ui.sectionHeightMinus.addEventListener('click', () => stepSectionHeight(-10)); ui.sectionHeightPlus.addEventListener('click', () => stepSectionHeight(10));
+  ui.sectionHeight.addEventListener('focus', () => beginControlTransaction('Resize section'));
+  ui.sectionHeight.addEventListener('input', () => {
+    beginControlTransaction('Resize section');
+    if (ui.sectionHeight.value === '' || !Number.isFinite(Number(ui.sectionHeight.value))) return;
+    const next = clone(state); next.sections[selectedSectionId].height = Number(ui.sectionHeight.value); next.sections[selectedSectionId].heightPreset = 'custom'; state = model.normalize(next); syncCanvas();
+  });
+  const finishSectionHeight = () => { if (!finishTransaction()) renderSections(); };
+  ui.sectionHeight.addEventListener('change', finishSectionHeight); ui.sectionHeight.addEventListener('blur', finishSectionHeight);
+  ui.sectionHeight.addEventListener('keydown', (event) => { if (event.key === 'Enter') { event.preventDefault(); ui.sectionHeight.blur(); } });
 
   window.addEventListener('message', (event) => {
     if (event.source !== ui.canvas.contentWindow || !sameOrigin(event.origin) || !event.data) return;
@@ -365,7 +401,7 @@
     if (message.type === 'green-sage-visual:transaction-patch') {
       if (!transaction) transaction = { before: snapshot(message.label || 'Edit canvas'), source: 'canvas' };
       const next = clone(state);
-      if (message.targetType === 'section' && next.sections[message.targetId] && message.patch?.height != null) { next.sections[message.targetId].height = message.patch.height; next.sections[message.targetId].heightPreset = 'custom'; }
+      if (message.targetType === 'section' && next.sections[message.targetId] && message.patch?.background) Object.assign(next.sections[message.targetId].background, message.patch.background);
       if (message.targetType !== 'section' && next.elements[message.targetId]) {
         const target = next.elements[message.targetId];
         if (message.patch?.frame) Object.assign(target.frame, message.patch.frame);

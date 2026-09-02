@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;1,400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="visual-editor.css?v=20260901-stabilized1">
+  <link rel="stylesheet" href="visual-editor.css?v=20260902-section1">
 </head>
 <body>
   <main class="storiel-editor" id="storielEditor">
@@ -43,9 +43,9 @@
     <aside class="storiel-panel" aria-live="polite">
       <section class="panel-view is-active" data-panel-view="design">
         <div class="panel-heading"><div><p>Design</p><h1>Section appearance</h1></div><span class="panel-selection" id="designSectionName">Opening canvas</span></div>
-        <div class="panel-block"><h2>Template colors</h2><div class="palette-grid" id="sectionPalette"></div><label class="field-row">Custom color<input id="sectionBackgroundColor" type="color" value="#EAE2D7"></label></div>
-        <div class="panel-block"><h2>Background images</h2><div class="asset-grid background-grid" id="templateBackgrounds"></div><div id="uploadedBackgrounds" class="asset-grid background-grid"></div><button class="secondary-button" id="removeBackgroundButton" type="button">Remove image</button></div>
-        <div class="panel-block" id="backgroundPositionControls"><h2>Background crop</h2><label class="range-field">Horizontal focal point<input id="backgroundFocalX" type="range" min="0" max="100" step="1"></label><label class="range-field">Vertical focal point<input id="backgroundFocalY" type="range" min="0" max="100" step="1"></label><label class="range-field">Zoom<input id="backgroundZoom" type="range" min="1" max="4" step="0.05"></label></div>
+        <div class="panel-block"><h2>Background color</h2><div class="palette-grid" id="sectionPalette"></div><label class="field-row">Custom color<input id="sectionBackgroundColor" type="color" value="#EAE2D7"></label></div>
+        <div class="panel-block" id="backgroundImageControls"><h2>Choose or replace background</h2><div class="asset-grid background-grid" id="templateBackgrounds"></div><div id="uploadedBackgrounds" class="asset-grid background-grid"></div><p class="panel-help" id="uploadedBackgroundHelp">Uploads can be inserted as elements or set as this section’s background.</p><div class="background-action-row"><button class="primary-button" id="editBackgroundButton" type="button">Edit background</button><button class="primary-button" id="doneBackgroundButton" type="button" hidden>Done</button><button class="secondary-button" id="removeBackgroundButton" type="button">Remove image</button></div></div>
+        <div class="panel-block" id="backgroundPositionControls"><h2>Reframe background</h2><p class="panel-help">Drag the image directly on the canvas, then use these controls for precise adjustment.</p><label class="range-field">Horizontal focal point<input id="backgroundFocalX" type="range" min="0" max="100" step="1"></label><label class="range-field">Vertical focal point<input id="backgroundFocalY" type="range" min="0" max="100" step="1"></label><label class="range-field">Zoom<input id="backgroundZoom" type="range" min="1" max="4" step="0.05"></label></div>
       </section>
 
       <section class="panel-view" data-panel-view="elements" hidden>
@@ -76,7 +76,7 @@
         <div class="panel-heading"><div><p>Sections</p><h1>Invitation flow</h1></div></div>
         <button class="primary-button" id="addSectionButton" type="button">Add blank section</button>
         <div class="section-list" id="sectionList"></div>
-        <div class="panel-block section-settings" id="sectionSettings"><h2>Selected section</h2><label class="field-row">Name<input id="sectionName" type="text" maxlength="60"></label><label class="field-row">Height preset<select id="sectionHeightPreset"><option value="strip">Strip</option><option value="standard">Standard</option><option value="full">Full</option><option value="custom">Custom</option></select></label><label class="field-row">Custom height<input id="sectionHeight" type="number" min="180" max="2200" step="1"></label><div class="button-row"><button class="secondary-button" id="duplicateSectionButton" type="button">Duplicate</button><button class="danger-button" id="deleteSectionButton" type="button">Delete</button></div></div>
+        <div class="panel-block section-settings" id="sectionSettings"><h2>Selected section</h2><label class="field-row">Name<input id="sectionName" type="text" maxlength="60"></label><div class="field-row"><span>Section height</span><div class="height-presets" id="sectionHeightPresets"><button type="button" data-section-height-preset="strip">Strip</button><button type="button" data-section-height-preset="standard">Standard</button><button type="button" data-section-height-preset="full">Full</button><button type="button" data-section-height-preset="custom">Custom</button></div></div><label class="field-row">Custom height<div class="section-height-control"><button id="sectionHeightDecrease" type="button" aria-label="Decrease section height">−</button><input id="sectionHeight" type="number" min="180" max="2200" step="1" inputmode="numeric"><button id="sectionHeightIncrease" type="button" aria-label="Increase section height">+</button></div></label><div class="button-row"><button class="secondary-button" id="duplicateSectionButton" type="button">Duplicate</button><button class="danger-button" id="deleteSectionButton" type="button">Delete</button></div></div>
       </section>
     </aside>
 
@@ -94,18 +94,19 @@
         <button class="context-button" data-open-position type="button">Position</button><button class="context-button" data-open-more type="button">More</button>
       </div>
       <div class="context-tools" id="imageContext" hidden><button class="context-button" id="replaceImageButton" type="button">Replace</button><button class="context-button" id="imageFitButton" type="button">Fit / Fill</button><button class="context-button" data-open-position type="button">Position</button><button class="context-button" data-open-more type="button">More</button></div>
-      <div class="context-tools" id="sectionContext" hidden><strong id="sectionContextName">Section</strong><span>Drag the bottom edge to resize, or use Sections for presets.</span></div>
+      <div class="context-tools" id="sectionContext" hidden><strong id="sectionContextName">Section</strong><span>Use Sections for height presets or a custom value.</span></div>
+      <div class="context-tools background-edit-context" id="backgroundEditContext" hidden><strong>Reframe background</strong><span>Drag the image to reposition its crop.</span><button class="context-button is-active" id="doneBackgroundToolbarButton" type="button">Done</button></div>
       <div class="toolbar-popover position-popover" id="positionPopover" hidden><div class="position-grid"><button type="button" data-layer="forward">Bring forward</button><button type="button" data-layer="backward">Send backward</button><button type="button" data-layer="front">Bring to front</button><button type="button" data-layer="back">Send to back</button></div><hr><div class="position-grid"><button type="button" data-position-x="left">Align left</button><button type="button" data-position-x="center">Center horizontally</button><button type="button" data-position-x="right">Align right</button><button type="button" data-position-y="top">Align top</button><button type="button" data-position-y="middle">Center vertically</button><button type="button" data-position-y="bottom">Align bottom</button></div></div>
       <div class="toolbar-popover more-popover" id="morePopover" hidden><label>Opacity<input id="elementOpacity" type="range" min="0.05" max="1" step="0.05"></label><label>Rotation<input id="elementRotation" type="number" min="-180" max="180" step="1"></label><div id="imageCropControls"><label>Horizontal focal point<input id="imageFocalX" type="range" min="0" max="100" step="1"></label><label>Vertical focal point<input id="imageFocalY" type="range" min="0" max="100" step="1"></label><label>Image zoom<input id="imageZoom" type="range" min="1" max="4" step="0.05"></label></div><div class="button-row"><button type="button" id="lockButton">Lock</button><button type="button" id="duplicateButton">Duplicate</button><button type="button" class="is-danger" id="deleteButton">Delete</button></div></div>
     </section>
 
     <section class="storiel-workspace" id="workspace" aria-label="Invitation editing workspace">
-      <div class="preview-frame device-mobile" id="previewFrame"><iframe id="visualCanvas" src="visual-canvas.html?editor=1&amp;v=20260901-overscroll1" title="Editable invitation canvas"></iframe></div>
+      <div class="preview-frame device-mobile" id="previewFrame"><iframe id="visualCanvas" src="visual-canvas.html?editor=1&amp;v=20260902-section1" title="Editable invitation canvas"></iframe></div>
     </section>
     <input id="replaceImageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden>
   </main>
-  <script src="visual-document.js?v=20260901-stabilized1"></script>
-  <script src="visual-assets.js?v=20260901-stabilized1"></script>
-  <script src="visual-editor.js?v=20260901-stabilized1"></script>
+  <script src="visual-document.js?v=20260902-section1"></script>
+  <script src="visual-assets.js?v=20260902-section1"></script>
+  <script src="visual-editor.js?v=20260902-section1"></script>
 </body>
 </html>

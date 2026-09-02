@@ -9,6 +9,7 @@
   let state = null;
   let selectedSectionId = null;
   let selectedElementId = null;
+  let backgroundEditSectionId = null;
   let editingElementId = null;
   let assetUrls = {};
   let scale = 1;
@@ -124,13 +125,20 @@
     frame.addEventListener('pointermove', move); frame.addEventListener('pointerup', end); frame.addEventListener('pointercancel', end);
   };
 
-  const startSectionResize = (event, section, canvas) => {
+  const startBackgroundReframe = (event, section, background, image) => {
     if (!canPointer(event)) return;
-    event.preventDefault(); event.stopPropagation(); lockScroll(event); sendStart('section', section.id, 'Resize section');
-    const start = { y: event.clientY, height: section.height };
-    const move = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; section.height = Math.max(180, Math.min(2200, start.height + (nextEvent.clientY - start.y) / scale)); canvas.style.height = `${section.height}px`; canvas.parentElement.style.height = `${section.height * scale}px`; sendPatch({ height: section.height }); };
-    const end = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; canvas.removeEventListener('pointermove', move); canvas.removeEventListener('pointerup', end); canvas.removeEventListener('pointercancel', end); unlockScroll(nextEvent); sendCommit(); };
-    canvas.addEventListener('pointermove', move); canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end);
+    event.preventDefault(); event.stopPropagation(); exitEdit(); lockScroll(event); sendStart('section', section.id, 'Reframe background');
+    const bounds = background.getBoundingClientRect();
+    const start = { x: event.clientX, y: event.clientY, focalX: section.background.focalX, focalY: section.background.focalY };
+    const move = (nextEvent) => {
+      if (nextEvent.pointerId !== event.pointerId) return;
+      const focalX = Math.max(0, Math.min(100, start.focalX - ((nextEvent.clientX - start.x) / Math.max(bounds.width * .55, 1)) * 100));
+      const focalY = Math.max(0, Math.min(100, start.focalY - ((nextEvent.clientY - start.y) / Math.max(bounds.height * .55, 1)) * 100));
+      section.background.focalX = focalX; section.background.focalY = focalY; image.style.objectPosition = `${focalX}% ${focalY}%`;
+      sendPatch({ background: { focalX, focalY } });
+    };
+    const end = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; background.removeEventListener('pointermove', move); background.removeEventListener('pointerup', end); background.removeEventListener('pointercancel', end); unlockScroll(nextEvent); sendCommit(); };
+    background.addEventListener('pointermove', move); background.addEventListener('pointerup', end); background.addEventListener('pointercancel', end);
   };
 
   const placeCaret = (content, x, y) => {
@@ -189,14 +197,15 @@
   };
 
   const createSection = (section) => {
+    const editingBackground = backgroundEditSectionId === section.id && section.background.kind === 'image';
     const shell = document.createElement('div'); shell.className = 'section-shell'; shell.style.width = `${390 * scale}px`; shell.style.height = `${section.height * scale}px`;
-    const canvas = document.createElement('section'); canvas.className = 'section-canvas'; canvas.dataset.sectionId = section.id; canvas.classList.toggle('is-section-selected', section.id === selectedSectionId && !selectedElementId); canvas.style.height = `${section.height}px`; canvas.style.transform = `scale(${scale})`; canvas.style.background = section.background.color;
-    const background = document.createElement('div'); background.className = 'section-background';
-    if (section.background.kind === 'image') { const image = document.createElement('img'); image.alt = ''; image.src = section.background.assetKind === 'upload' ? assetUrls[section.background.assetId] || '' : model.getTemplateAsset(section.background.assetId)?.url || ''; Object.assign(image.style, { objectPosition: `${section.background.focalX}% ${section.background.focalY}%`, transform: `scale(${section.background.zoom})` }); background.append(image); }
+    const canvas = document.createElement('section'); canvas.className = 'section-canvas'; canvas.dataset.sectionId = section.id; canvas.classList.toggle('is-section-selected', section.id === selectedSectionId && !selectedElementId); canvas.classList.toggle('is-background-editing', editingBackground); canvas.style.height = `${section.height}px`; canvas.style.transform = `scale(${scale})`; canvas.style.background = section.background.color;
+    const background = document.createElement('div'); background.className = 'section-background'; background.classList.toggle('is-editing', editingBackground);
+    if (section.background.kind === 'image') { const image = document.createElement('img'); image.alt = ''; image.src = section.background.assetKind === 'upload' ? assetUrls[section.background.assetId] || '' : model.getTemplateAsset(section.background.assetId)?.url || ''; Object.assign(image.style, { objectPosition: `${section.background.focalX}% ${section.background.focalY}%`, transform: `scale(${section.background.zoom})` }); background.append(image); if (editingBackground) background.addEventListener('pointerdown', (event) => startBackgroundReframe(event, section, background, image)); }
     canvas.append(background);
     section.elementOrder.forEach((id, index) => { const item = state.elements[id]; if (!item) return; const node = createElement(item); node.style.zIndex = String(index + 1); canvas.append(node); });
     canvas.addEventListener('pointerdown', (event) => { if (event.target !== canvas && event.target !== background) return; exitEdit(); post({ type: 'green-sage-visual:select-section', sectionId: section.id }); });
-    if (section.id === selectedSectionId && !selectedElementId) { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'section-resize-handle'; handle.setAttribute('aria-label', 'Resize section height'); handle.addEventListener('pointerdown', (event) => startSectionResize(event, section, canvas)); canvas.append(handle); }
+    if (editingBackground) { const indicator = document.createElement('span'); indicator.className = 'background-edit-indicator'; indicator.textContent = 'Drag to reposition'; canvas.append(indicator); }
     shell.append(canvas); return shell;
   };
 
@@ -211,7 +220,7 @@
   window.addEventListener('message', (event) => {
     if (event.source !== window.parent || !sameOrigin(event.origin) || !event.data) return;
     if (event.data.type === 'green-sage-visual:state') {
-      const wasEditing = editingElementId; state = model.normalize(event.data.state); selectedSectionId = state.sections[event.data.selectedSectionId] ? event.data.selectedSectionId : state.document.sectionOrder[0]; selectedElementId = state.elements[event.data.selectedElementId] ? event.data.selectedElementId : null; assetUrls = event.data.assetUrls || {};
+      const wasEditing = editingElementId; state = model.normalize(event.data.state); selectedSectionId = state.sections[event.data.selectedSectionId] ? event.data.selectedSectionId : state.document.sectionOrder[0]; selectedElementId = state.elements[event.data.selectedElementId] ? event.data.selectedElementId : null; backgroundEditSectionId = state.sections[event.data.backgroundEditSectionId]?.background.kind === 'image' ? event.data.backgroundEditSectionId : null; assetUrls = event.data.assetUrls || {};
       if (wasEditing && wasEditing === selectedElementId && transaction?.label === 'Edit text') return;
       editingElementId = null; transaction = null; render();
     }
