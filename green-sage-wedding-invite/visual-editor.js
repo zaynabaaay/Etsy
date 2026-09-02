@@ -19,11 +19,11 @@
     undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'),
     contextEmpty: $('contextEmpty'), textContext: $('textContext'), imageContext: $('imageContext'), sectionContext: $('sectionContext'), sectionContextName: $('sectionContextName'), backgroundEditContext: $('backgroundEditContext'), doneBackgroundToolbar: $('doneBackgroundToolbarButton'),
     fontButton: $('fontPickerButton'), fontValue: $('fontPickerValue'), fontPopover: $('fontPickerPopover'), fontSearch: $('fontSearch'), fontFilters: $('fontCategoryFilters'), fontList: $('fontList'),
-    fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColor: $('textColor'), textColorSwatch: $('textColorSwatch'),
+    fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'),
     bold: $('boldButton'), italic: $('italicButton'), alignButton: $('alignmentButton'), alignPopover: $('alignmentPopover'), spacingButton: $('spacingButton'), spacingPopover: $('spacingPopover'), lineHeight: $('lineHeight'), letterSpacing: $('letterSpacing'),
-    positionPopover: $('positionPopover'), morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), cropControls: $('imageCropControls'), imageFocalX: $('imageFocalX'), imageFocalY: $('imageFocalY'), imageZoom: $('imageZoom'),
+    positionPopover: $('positionPopover'), morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), textCaseControls: $('textCaseControls'), cropControls: $('imageCropControls'), imageFocalX: $('imageFocalX'), imageFocalY: $('imageFocalY'), imageZoom: $('imageZoom'),
     lock: $('lockButton'), duplicate: $('duplicateButton'), remove: $('deleteButton'), replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'),
-    designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), templateBackgrounds: $('templateBackgrounds'), uploadedBackgrounds: $('uploadedBackgrounds'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
+    designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'), templateBackgrounds: $('templateBackgrounds'), uploadedBackgrounds: $('uploadedBackgrounds'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
     templateElements: $('templateElements'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'),
     addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton')
   };
@@ -117,7 +117,7 @@
   };
 
   const closePopovers = (except = null) => {
-    [ui.fontPopover, ui.sizePresets, ui.alignPopover, ui.spacingPopover, ui.positionPopover, ui.morePopover, ui.previewPopover].forEach((popover) => { if (popover !== except) popover.hidden = true; });
+    [ui.fontPopover, ui.sizePresets, ui.textColorPopover, ui.alignPopover, ui.spacingPopover, ui.positionPopover, ui.morePopover, ui.previewPopover].forEach((popover) => { if (popover !== except) popover.hidden = true; });
     ui.fontButton.setAttribute('aria-expanded', String(!ui.fontPopover.hidden));
     ui.previewButton.setAttribute('aria-expanded', String(!ui.previewPopover.hidden));
     if (except !== ui.fontPopover) fontObserver?.disconnect();
@@ -163,16 +163,28 @@
     if (!selected) { ui.sectionContextName.textContent = section()?.name || 'Section'; return; }
     const locked = selected.permissions.locked;
     ui.opacity.value = selected.opacity; ui.rotation.value = selected.rotation; ui.lock.textContent = locked ? 'Unlock' : 'Lock';
-    ui.duplicate.disabled = locked; ui.remove.disabled = locked || !selected.permissions.deletable; ui.cropControls.hidden = !['image', 'decorative'].includes(selected.type);
+    ui.duplicate.disabled = locked; ui.remove.disabled = locked || !selected.permissions.deletable; ui.textCaseControls.hidden = selected.type !== 'text'; ui.cropControls.hidden = !['image', 'decorative'].includes(selected.type);
     if (selected.crop) { ui.imageFocalX.value = selected.crop.focalX; ui.imageFocalY.value = selected.crop.focalY; ui.imageZoom.value = selected.crop.zoom; ui.imageFit.textContent = selected.crop.fit === 'cover' ? 'Fit image' : 'Fill frame'; }
     if (selected.type !== 'text') return;
     const font = model.getFont(selected.style.fontFamily); const editable = selected.permissions.editable && !locked;
     ui.fontValue.textContent = font.displayName; ui.fontValue.style.fontFamily = model.fontStack(font.name); ui.fontSize.value = selected.style.fontSize;
-    ui.textColor.value = selected.style.color; ui.textColorSwatch.style.background = selected.style.color; ui.lineHeight.value = selected.style.lineHeight; ui.letterSpacing.value = selected.style.letterSpacing;
+    ui.textColor.value = selected.style.color; ui.textColorHex.value = selected.style.color.toUpperCase(); ui.textColorSwatch.style.background = selected.style.color; ui.lineHeight.value = selected.style.lineHeight; ui.letterSpacing.value = selected.style.letterSpacing; renderColorSwatches(ui.textColorPalette, selected.style.color);
     const bold = selected.style.fontWeight === 700; const italic = selected.style.fontStyle === 'italic';
     ui.bold.classList.toggle('is-active', bold); ui.italic.classList.toggle('is-active', italic); ui.bold.setAttribute('aria-pressed', String(bold)); ui.italic.setAttribute('aria-pressed', String(italic));
     ui.bold.disabled = !editable || !font.weights.includes(700); ui.italic.disabled = !editable || !font.styles.includes('italic');
-    [ui.fontButton, ui.fontSize, ui.sizeMinus, ui.sizePlus, ui.textColor, ui.lineHeight, ui.letterSpacing].forEach((control) => { control.disabled = !editable; });
+    $$('[data-text-case]', ui.textCaseControls).forEach((button) => { button.disabled = !editable; });
+    [ui.fontButton, ui.fontSize, ui.sizeMinus, ui.sizePlus, ui.textColorButton, ui.textColor, ui.textColorHex, ui.lineHeight, ui.letterSpacing].forEach((control) => { control.disabled = !editable; });
+  };
+
+  const renderColorSwatches = (root, selectedColor) => {
+    root.replaceChildren(); const selected = model.normalizeColor(selectedColor);
+    state.document.colors.forEach((color) => {
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'palette-swatch'; button.dataset.color = color; button.style.background = color; button.title = color; button.setAttribute('aria-label', color); button.classList.toggle('is-selected', selected === color); root.append(button);
+    });
+  };
+  const rememberColor = (next, value) => {
+    const color = model.normalizeColor(value); if (!color) return null;
+    next.document.colors = [...new Set([...(next.document.colors || []).map(model.normalizeColor).filter(Boolean), color])]; return color;
   };
 
   const assetUrl = (assetId, kind) => kind === 'upload' ? assetUrls[assetId] : model.getTemplateAsset(assetId)?.url;
@@ -185,8 +197,7 @@
     const current = section(); if (!current) return;
     const editingBackground = backgroundEditSectionId === current.id && current.background.kind === 'image';
     if (backgroundEditSectionId && !editingBackground) backgroundEditSectionId = null;
-    ui.designName.textContent = current.name; ui.sectionColor.value = current.background.color; ui.palette.replaceChildren();
-    model.templatePalette.forEach((color) => { const button = document.createElement('button'); button.type = 'button'; button.className = 'palette-swatch'; button.dataset.color = color.value; button.style.background = color.value; button.title = `${color.name} ${color.value}`; button.setAttribute('aria-label', color.name); button.classList.toggle('is-selected', current.background.kind === 'color' && current.background.color.toUpperCase() === color.value); ui.palette.append(button); });
+    ui.designName.textContent = current.name; ui.sectionColor.value = current.background.color; ui.sectionColorHex.value = current.background.color.toUpperCase(); renderColorSwatches(ui.palette, current.background.kind === 'color' ? current.background.color : null);
     ui.templateBackgrounds.replaceChildren(); model.templateAssets.filter((asset) => asset.kind === 'background').forEach((asset) => ui.templateBackgrounds.append(assetCard(asset, { actionLabel: 'Set as background', selected: current.background.kind === 'image' && current.background.assetKind === 'template' && current.background.assetId === asset.id })));
     ui.uploadedBackgrounds.replaceChildren(); assetRecords.forEach((asset) => ui.uploadedBackgrounds.append(assetCard(asset, { actionLabel: 'Set as background', url: assetUrls[asset.id], selected: current.background.kind === 'image' && current.background.assetKind === 'upload' && current.background.assetId === asset.id })));
     ui.editBackground.hidden = current.background.kind !== 'image' || editingBackground; ui.doneBackground.hidden = !editingBackground; ui.removeBackground.hidden = current.background.kind !== 'image'; ui.backgroundPosition.hidden = !editingBackground; ui.backgroundFocalX.value = current.background.focalX; ui.backgroundFocalY.value = current.background.focalY; ui.backgroundZoom.value = current.background.zoom;
@@ -241,6 +252,11 @@
   const deleteElement = () => {
     const source = element(); if (!source || source.permissions.locked || !source.permissions.deletable) return;
     mutate('Delete element', (next) => { delete next.elements[source.id]; next.sections[source.sectionId].elementOrder = next.sections[source.sectionId].elementOrder.filter((id) => id !== source.id); }, { sectionId: source.sectionId, elementId: null });
+  };
+  const changeTextCase = (mode) => {
+    const source = element(); if (source?.type !== 'text' || source.permissions.locked || !source.permissions.editable) return;
+    const transform = mode === 'upper' ? (value) => value.toLocaleUpperCase() : mode === 'lower' ? (value) => value.toLocaleLowerCase() : (value) => value.toLocaleLowerCase().replace(/(^|[\s\u2013\u2014-])([\p{L}\p{N}])/gu, (_, prefix, character) => prefix + character.toLocaleUpperCase());
+    mutate('Change text case', (next) => { next.elements[source.id].content = transform(source.content); });
   };
   const layerElement = (action) => {
     const source = element(); if (!source || source.permissions.locked) return;
@@ -315,6 +331,16 @@
     control.addEventListener(eventName, () => { beginControlTransaction(label); previewMutation((next) => apply(next, control.value)); });
     control.addEventListener('change', () => finishTransaction()); control.addEventListener('blur', () => finishTransaction());
   };
+  const bindHexColor = (control, label, currentValue, apply) => {
+    control.addEventListener('focus', () => beginControlTransaction(label));
+    control.addEventListener('input', () => {
+      const color = model.normalizeColor(control.value); if (!color) return;
+      beginControlTransaction(label); previewMutation((next) => apply(next, color));
+    });
+    const finish = () => { if (!model.normalizeColor(control.value)) control.value = currentValue(); finishTransaction(); };
+    control.addEventListener('change', finish); control.addEventListener('blur', finish);
+    control.addEventListener('keydown', (event) => { if (event.key === 'Enter') { event.preventDefault(); control.blur(); } });
+  };
 
   $$('.nav-tool').forEach((button) => button.addEventListener('click', () => setPanel(button.dataset.panel)));
   $$('[data-add-text]').forEach((button) => button.addEventListener('click', () => addText(button.dataset.addText)));
@@ -337,7 +363,11 @@
   const stepFontSize = (delta) => { const source = element(); if (!source) return; mutate('Change font size', (next) => { next.elements[source.id].style.fontSize = Math.max(8, Math.min(180, source.style.fontSize + delta)); }); };
   ui.sizeMinus.addEventListener('click', () => stepFontSize(-1)); ui.sizePlus.addEventListener('click', () => stepFontSize(1));
   bindTransactionalInput(ui.fontSize, 'Change font size', (next, value) => { const source = element(); if (source) next.elements[source.id].style.fontSize = Number(value); });
-  bindTransactionalInput(ui.textColor, 'Change text color', (next, value) => { const source = element(); if (source) next.elements[source.id].style.color = value; });
+  ui.textColorButton.addEventListener('click', () => { renderColorSwatches(ui.textColorPalette, element()?.style?.color); togglePopover(ui.textColorPopover, ui.textColorButton); });
+  ui.textColorPalette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); const source = element(); if (!swatch || source?.type !== 'text' || source.permissions.locked || !source.permissions.editable) return; mutate('Change text color', (next) => { next.elements[source.id].style.color = rememberColor(next, swatch.dataset.color); }); closePopovers(); });
+  bindTransactionalInput(ui.textColor, 'Change text color', (next, value) => { const source = element(); const color = rememberColor(next, value); if (source && color) next.elements[source.id].style.color = color; });
+  ui.textColor.addEventListener('input', () => { ui.textColorHex.value = ui.textColor.value.toUpperCase(); });
+  bindHexColor(ui.textColorHex, 'Change text color', () => element()?.style.color || '#474232', (next, color) => { const source = element(); if (source && !source.permissions.locked && source.permissions.editable) next.elements[source.id].style.color = rememberColor(next, color); });
   bindTransactionalInput(ui.lineHeight, 'Change line height', (next, value) => { const source = element(); if (source) next.elements[source.id].style.lineHeight = Number(value); });
   bindTransactionalInput(ui.letterSpacing, 'Change letter spacing', (next, value) => { const source = element(); if (source) next.elements[source.id].style.letterSpacing = Number(value); });
   ui.bold.addEventListener('click', () => { const source = element(); if (source) mutate('Toggle bold', (next) => { next.elements[source.id].style.fontWeight = source.style.fontWeight === 700 ? 400 : 700; }); });
@@ -353,14 +383,17 @@
   bindTransactionalInput(ui.imageFocalX, 'Crop image', (next, value) => { const source = element(); if (source?.crop) next.elements[source.id].crop.focalX = Number(value); });
   bindTransactionalInput(ui.imageFocalY, 'Crop image', (next, value) => { const source = element(); if (source?.crop) next.elements[source.id].crop.focalY = Number(value); });
   bindTransactionalInput(ui.imageZoom, 'Crop image', (next, value) => { const source = element(); if (source?.crop) next.elements[source.id].crop.zoom = Number(value); });
-  ui.lock.addEventListener('click', () => { const source = element(); if (source) mutate(source.permissions.locked ? 'Unlock element' : 'Lock element', (next) => { next.elements[source.id].permissions.locked = !source.permissions.locked; }); });
-  ui.duplicate.addEventListener('click', duplicateElement); ui.remove.addEventListener('click', deleteElement);
+  ui.lock.addEventListener('click', () => { const source = element(); if (source) mutate(source.permissions.locked ? 'Unlock element' : 'Lock element', (next) => { next.elements[source.id].permissions.locked = !source.permissions.locked; }); closePopovers(); });
+  ui.duplicate.addEventListener('click', () => { duplicateElement(); closePopovers(); }); ui.remove.addEventListener('click', () => { deleteElement(); closePopovers(); });
+  ui.textCaseControls.addEventListener('click', (event) => { const button = event.target.closest('[data-text-case]'); if (button) { changeTextCase(button.dataset.textCase); closePopovers(); } });
   ui.imageFit.addEventListener('click', () => { const source = element(); if (source) mutate('Change image fit', (next) => { next.elements[source.id].crop.fit = source.crop.fit === 'cover' ? 'contain' : 'cover'; }); });
   ui.replace.addEventListener('click', () => ui.replaceInput.click());
   ui.replaceInput.addEventListener('change', async () => { const source = element(); const [added] = await uploadFiles(ui.replaceInput.files); if (source && added) mutate('Replace image', (next) => { next.elements[source.id].assetId = added.id; next.elements[source.id].assetKind = 'upload'; }); ui.replaceInput.value = ''; });
 
-  ui.palette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); if (!swatch) return; mutate('Change section color', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color: swatch.dataset.color, assetId: '' }); }); });
-  bindTransactionalInput(ui.sectionColor, 'Change section color', (next, value) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color: value, assetId: '' }); });
+  ui.palette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); if (!swatch) return; mutate('Change section color', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color: rememberColor(next, swatch.dataset.color), assetId: '' }); }); });
+  bindTransactionalInput(ui.sectionColor, 'Change section color', (next, value) => { const color = rememberColor(next, value); if (color) Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color, assetId: '' }); });
+  ui.sectionColor.addEventListener('input', () => { ui.sectionColorHex.value = ui.sectionColor.value.toUpperCase(); });
+  bindHexColor(ui.sectionColorHex, 'Change section color', () => section()?.background.color || '#EAE2D7', (next, color) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color: rememberColor(next, color), assetId: '' }); });
   const backgroundClick = (event, kind) => { const card = event.target.closest('[data-asset-id]'); if (card) applyBackgroundAsset(card.dataset.assetId, kind); };
   ui.templateBackgrounds.addEventListener('click', (event) => backgroundClick(event, 'template'));
   ui.uploadedBackgrounds.addEventListener('click', (event) => backgroundClick(event, 'upload'));
@@ -397,6 +430,7 @@
     if (message.type === 'green-sage-visual:canvas-interaction') { closePopovers(); return; }
     if (message.type === 'green-sage-visual:select-element') { selectElement(message.elementId, true); return; }
     if (message.type === 'green-sage-visual:select-section') { selectSection(message.sectionId, true); return; }
+    if (message.type === 'green-sage-visual:delete-selected') { deleteElement(); return; }
     if (message.type === 'green-sage-visual:transaction-start') { finishTransaction(false); transaction = { before: snapshot(message.label || 'Edit canvas'), label: message.label || 'Edit canvas', source: 'canvas' }; return; }
     if (message.type === 'green-sage-visual:transaction-patch') {
       if (!transaction) transaction = { before: snapshot(message.label || 'Edit canvas'), source: 'canvas' };

@@ -156,7 +156,10 @@ button {
 .element-frame.is-selected {
   outline: 1.5px solid var(--selection);
   outline-offset: 0;
+  touch-action: none;
 }
+
+.element-frame.is-editing { touch-action: pan-y; }
 
 .element-frame.is-outside {
   outline-color: var(--warning);
@@ -251,14 +254,14 @@ button {
 }
 
 .element-frame.is-selected:not(.is-editing) .element-content {
-  cursor: text;
-  user-select: text;
-  -webkit-user-select: text;
-  touch-action: manipulation;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
 
 .element-frame.is-selected:not(.is-editing) .image-content {
-  cursor: default;
+  cursor: grab;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -286,7 +289,6 @@ html.is-manipulating body {
   overflow: hidden;
 }
 
-.element-move-handle,
 .resize-handle {
   position: absolute;
   z-index: 12;
@@ -301,27 +303,8 @@ html.is-manipulating body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.element-frame.is-selected .element-move-handle,
 .element-frame.is-selected .resize-handle {
   display: block;
-}
-
-.element-move-handle {
-  top: -34px;
-  left: 50%;
-  border: 1px solid var(--selection);
-  border-radius: 16px;
-  color: #fff;
-  background: var(--selection);
-  cursor: grab;
-  font-family: "Instrument Sans", sans-serif;
-  font-size: 15px;
-  line-height: 30px;
-  transform: translateX(-50%);
-}
-
-.element-move-handle:active {
-  cursor: grabbing;
 }
 
 .resize-handle::after {
@@ -384,16 +367,9 @@ html.is-manipulating body {
 }
 
 @media (pointer: coarse) {
-  .element-move-handle,
   .resize-handle {
     width: 40px;
     height: 40px;
-  }
-
-  .element-move-handle {
-    top: -42px;
-    border-radius: 20px;
-    line-height: 38px;
   }
 
   .resize-handle[data-direction="nw"] { top: -20px; left: -20px; }

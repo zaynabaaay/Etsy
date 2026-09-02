@@ -1,5 +1,5 @@
 (() => {
-  const SCHEMA_VERSION = 2;
+  const SCHEMA_VERSION = 3;
   const STORAGE_KEY = 'green-sage-visual-proof-v1';
   const FONT_CATALOG = Object.freeze([
     { name: 'Prata', displayName: 'Prata', cssFamily: 'Prata', category: 'serif', display: true, weights: [400], styles: ['normal'], fallback: 'Georgia, serif' },
@@ -50,6 +50,8 @@
   const finite = (value, fallback) => Number.isFinite(Number(value)) ? Number(value) : fallback;
   const clamp = (value, min, max) => Math.min(max, Math.max(min, finite(value, min)));
   const isHexColor = (value) => /^#[0-9a-f]{6}$/i.test(String(value || ''));
+  const normalizeColor = (value) => isHexColor(value) ? String(value).toUpperCase() : null;
+  const uniqueColors = (values) => [...new Set(values.map(normalizeColor).filter(Boolean))];
   const createId = (prefix = 'element') => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
   const getFont = (name) => FONT_BY_NAME[name] || FONT_BY_NAME['Instrument Serif'];
   const getTemplateAsset = (id) => TEMPLATE_ASSET_BY_ID[id] || null;
@@ -115,7 +117,7 @@
   });
   const defaults = {
     schemaVersion: SCHEMA_VERSION,
-    document: { id: 'green-sage-visual-editor', templateId: 'green-sage', title: 'Green Sage invitation', canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 }, sectionOrder: ['proof-section'], media: { audio: null } },
+    document: { id: 'green-sage-visual-editor', templateId: 'green-sage', title: 'Green Sage invitation', colors: TEMPLATE_PALETTE.map((color) => color.value), canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 }, sectionOrder: ['proof-section'], media: { audio: null } },
     sections: { 'proof-section': createSection({ id: 'proof-section', name: 'Opening canvas', height: 844, heightPreset: 'full', background: { kind: 'color', color: '#EAE2D7' }, elementOrder: ['proof-heading', 'proof-copy'] }) },
     elements: {
       'proof-heading': createTextElement({ id: 'proof-heading', content: 'A BEAUTIFUL BEGINNING', frame: { x: 35, y: 184, width: 320, height: 92 }, style: { fontFamily: 'Instrument Serif', fontSize: 46, color: '#474232', textAlign: 'center', lineHeight: 1.04, letterSpacing: 0 } }),
@@ -148,13 +150,15 @@
       sections[sectionId] = section;
       section.elementOrder.forEach((elementId) => { const raw = rawElements[elementId]; elements[elementId] = raw.type === 'text' ? normalizeTextElement(raw, elementId, sectionId) : normalizeImageElement(raw, elementId, sectionId); });
     });
-    return { ...supplied, schemaVersion: SCHEMA_VERSION, document: { ...defaults.document, ...documentValue, canvas: { ...defaults.document.canvas, ...(documentValue.canvas || {}), baseWidth: 390, maxRenderedWidth: clamp(documentValue.canvas?.maxRenderedWidth ?? 560, 390, 720), viewportBackground: isHexColor(documentValue.canvas?.viewportBackground) ? documentValue.canvas.viewportBackground : '#F4EFE7', safeMargin: clamp(documentValue.canvas?.safeMargin ?? 20, 0, 60) }, sectionOrder, media: { ...defaults.document.media, ...(documentValue.media || {}), audio: null } }, sections, elements };
+    const usedColors = [...Object.values(sections).map((section) => section.background.color), ...Object.values(elements).filter((item) => item.type === 'text').map((item) => item.style.color)];
+    const colors = uniqueColors([...(Array.isArray(documentValue.colors) ? documentValue.colors : TEMPLATE_PALETTE.map((color) => color.value)), ...usedColors]);
+    return { ...supplied, schemaVersion: SCHEMA_VERSION, document: { ...defaults.document, ...documentValue, colors, canvas: { ...defaults.document.canvas, ...(documentValue.canvas || {}), baseWidth: 390, maxRenderedWidth: clamp(documentValue.canvas?.maxRenderedWidth ?? 560, 390, 720), viewportBackground: isHexColor(documentValue.canvas?.viewportBackground) ? documentValue.canvas.viewportBackground : '#F4EFE7', safeMargin: clamp(documentValue.canvas?.safeMargin ?? 20, 0, 60) }, sectionOrder, media: { ...defaults.document.media, ...(documentValue.media || {}), audio: null } }, sections, elements };
   };
   const load = (storage = globalThis.localStorage) => { try { const saved = storage?.getItem(STORAGE_KEY); return normalize(saved ? JSON.parse(saved) : defaults); } catch { return clone(defaults); } };
   globalThis.GreenSageVisualDocument = Object.freeze({
     schemaVersion: SCHEMA_VERSION, storageKey: STORAGE_KEY, fontCatalog: FONT_CATALOG,
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
     templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS,
-    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, normalize, load
+    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, normalize, load
   });
 })();

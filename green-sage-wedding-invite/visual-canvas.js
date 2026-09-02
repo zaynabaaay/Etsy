@@ -16,6 +16,7 @@
   let renderToken = 0;
   let transaction = null;
   let gesture = null;
+  let lastTextTap = null;
 
   const frameNode = (id) => root.querySelector(`[data-element-id="${CSS.escape(id)}"]`);
   const sectionNode = (id) => root.querySelector(`[data-section-id="${CSS.escape(id)}"]`);
@@ -101,10 +102,26 @@
 
   const startMove = (event, item, frame) => {
     if (!canPointer(event) || item.permissions.locked || !item.permissions.movable) return;
-    event.preventDefault(); event.stopPropagation(); exitEdit(); lockScroll(event); sendStart('element', item.id, 'Move element');
-    const start = { x: event.clientX, y: event.clientY, frame: { ...item.frame } };
-    const move = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; const next = { ...start.frame, x: start.frame.x + (nextEvent.clientX - start.x) / scale, y: start.frame.y + (nextEvent.clientY - start.y) / scale }; const snapped = snapFrame(item, next); applyFrame(item, frame, snapped.frame, snapped.guides); };
-    const end = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; frame.removeEventListener('pointermove', move); frame.removeEventListener('pointerup', end); frame.removeEventListener('pointercancel', end); unlockScroll(nextEvent); sendCommit(); };
+    event.preventDefault(); event.stopPropagation(); exitEdit(); lockScroll(event);
+    const start = { x: event.clientX, y: event.clientY, frame: { ...item.frame }, moved: false };
+    const move = (nextEvent) => {
+      if (nextEvent.pointerId !== event.pointerId) return;
+      const dx = nextEvent.clientX - start.x; const dy = nextEvent.clientY - start.y;
+      if (!start.moved && Math.hypot(dx, dy) < 4) return;
+      if (!start.moved) { start.moved = true; lastTextTap = null; sendStart('element', item.id, 'Move element'); }
+      const next = { ...start.frame, x: start.frame.x + dx / scale, y: start.frame.y + dy / scale }; const snapped = snapFrame(item, next); applyFrame(item, frame, snapped.frame, snapped.guides);
+    };
+    const end = (nextEvent) => {
+      if (nextEvent.pointerId !== event.pointerId) return;
+      frame.removeEventListener('pointermove', move); frame.removeEventListener('pointerup', end); frame.removeEventListener('pointercancel', end); unlockScroll(nextEvent);
+      if (start.moved) sendCommit();
+      else if (item.type === 'text') {
+        const now = performance.now(); const previous = lastTextTap;
+        if (previous?.id === item.id && now - previous.time < 420 && Math.hypot(nextEvent.clientX - previous.x, nextEvent.clientY - previous.y) < 28) {
+          lastTextTap = null; const content = frame.querySelector('.text-content'); if (content) enterEdit(item, frame, content, nextEvent);
+        } else lastTextTap = { id: item.id, time: now, x: nextEvent.clientX, y: nextEvent.clientY };
+      }
+    };
     frame.addEventListener('pointermove', move); frame.addEventListener('pointerup', end); frame.addEventListener('pointercancel', end);
   };
 
@@ -166,9 +183,8 @@
     const content = document.createElement('div'); content.className = 'element-content text-content'; content.textContent = item.content;
     Object.assign(content.style, { fontFamily: model.fontStack(item.style.fontFamily), fontSize: `${item.style.fontSize}px`, fontWeight: item.style.fontWeight, fontStyle: item.style.fontStyle, color: item.style.color, textAlign: item.style.textAlign, lineHeight: item.style.lineHeight, letterSpacing: `${item.style.letterSpacing}px` });
     content.addEventListener('pointerdown', (event) => {
-      if (!canPointer(event)) return;
-      if (selectedElementId !== item.id) { event.preventDefault(); event.stopPropagation(); post({ type: 'green-sage-visual:select-element', elementId: item.id }); }
-      else if (editingElementId !== item.id) { event.stopPropagation(); enterEdit(item, frame, content, event); }
+      if (!canPointer(event) || editingElementId === item.id) return;
+      if (selectedElementId !== item.id) { event.preventDefault(); event.stopPropagation(); lastTextTap = { id: item.id, time: performance.now(), x: event.clientX, y: event.clientY }; post({ type: 'green-sage-visual:select-element', elementId: item.id }); }
     });
     content.addEventListener('input', () => { item.content = content.innerText.replace(/\r/g, ''); requestAnimationFrame(() => updateOverflow(item)); sendPatch({ content: item.content }); });
     content.addEventListener('paste', (event) => { event.preventDefault(); const text = event.clipboardData?.getData('text/plain') || ''; document.execCommand('insertText', false, text); });
@@ -189,8 +205,11 @@
     frame.classList.toggle('is-selected', selectedElementId === item.id); frame.classList.toggle('is-locked', item.permissions.locked);
     Object.assign(frame.style, { left: `${item.frame.x}px`, top: `${item.frame.y}px`, width: `${item.frame.width}px`, height: `${item.frame.height}px`, opacity: item.opacity, rotate: `${item.rotation}deg` });
     const animation = document.createElement('div'); animation.className = 'element-animation-layer'; animation.append(item.type === 'text' ? createTextContent(item, frame) : createImageContent(item)); frame.append(animation);
+    frame.addEventListener('pointerdown', (event) => {
+      if (!canPointer(event) || event.target.closest('.resize-handle') || editingElementId === item.id) return;
+      if (selectedElementId === item.id) startMove(event, item, frame);
+    });
     if (selectedElementId === item.id && !item.permissions.locked) {
-      const move = document.createElement('button'); move.type = 'button'; move.className = 'element-move-handle'; move.setAttribute('aria-label', 'Move element'); move.textContent = '✥'; move.addEventListener('pointerdown', (event) => startMove(event, item, frame)); frame.append(move);
       if (item.permissions.resizable) resizeDirections.forEach((direction) => { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'resize-handle'; handle.dataset.direction = direction; handle.setAttribute('aria-label', `Resize ${direction}`); handle.addEventListener('pointerdown', (event) => startResize(event, item, frame, direction)); frame.append(handle); });
     }
     return frame;
@@ -228,7 +247,12 @@
   });
   window.addEventListener('resize', render);
   document.addEventListener('pointerdown', () => post({ type: 'green-sage-visual:canvas-interaction' }), true);
-  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.element-frame')) exitEdit(); });
+  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.element-frame')) { lastTextTap = null; exitEdit(); } });
+  document.addEventListener('keydown', (event) => {
+    if (!['Delete', 'Backspace'].includes(event.key) || editingElementId || event.target.closest('input, textarea, [contenteditable="true"], [contenteditable="plaintext-only"]')) return;
+    const selected = state?.elements[selectedElementId]; if (!selected || selected.permissions.locked || !selected.permissions.deletable) return;
+    event.preventDefault(); post({ type: 'green-sage-visual:delete-selected' });
+  });
   root.innerHTML = '<div class="canvas-loading">Preparing your invitation canvas…</div>';
   post({ type: 'green-sage-visual:ready' });
 })();
