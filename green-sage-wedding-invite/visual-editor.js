@@ -190,7 +190,11 @@
   const assetUrl = (assetId, kind) => kind === 'upload' ? assetUrls[assetId] : model.getTemplateAsset(assetId)?.url;
   const assetCard = (asset, options = {}) => {
     const card = document.createElement('button'); card.type = 'button'; card.className = options.className || 'asset-card'; card.dataset.assetId = asset.id;
-    const url = options.url || asset.url; card.innerHTML = `<span class="asset-thumb" style="background-image:url('${url}')"></span><span>${asset.name}</span>${options.actionLabel ? `<span class="asset-action-label">${options.actionLabel}</span>` : ''}`; if (options.selected) card.classList.add('is-selected'); return card;
+    const thumb = document.createElement('span'); thumb.className = 'asset-thumb'; thumb.style.backgroundImage = `url("${options.url || asset.url}")`;
+    const name = document.createElement('span'); name.textContent = asset.name;
+    card.append(thumb, name);
+    if (options.actionLabel) { const action = document.createElement('span'); action.className = 'asset-action-label'; action.textContent = options.actionLabel; card.append(action); }
+    if (options.selected) card.classList.add('is-selected'); return card;
   };
 
   const renderDesign = () => {
@@ -207,7 +211,15 @@
   const renderUploads = () => {
     ui.uploadLibrary.replaceChildren();
     if (!assetRecords.length) { const empty = document.createElement('p'); empty.className = 'panel-help'; empty.textContent = 'Uploaded images will appear here.'; ui.uploadLibrary.append(empty); return; }
-    assetRecords.forEach((asset) => { const card = document.createElement('article'); card.className = 'upload-card'; card.dataset.assetId = asset.id; card.innerHTML = `<img src="${assetUrls[asset.id]}" alt=""><span>${asset.name}</span><div><button type="button" data-upload-action="insert">Insert</button><button type="button" data-upload-action="background">Set as background</button></div>`; ui.uploadLibrary.append(card); });
+    assetRecords.forEach((asset) => {
+      const card = document.createElement('article'); card.className = 'upload-card'; card.dataset.assetId = asset.id;
+      const image = document.createElement('img'); image.src = assetUrls[asset.id]; image.alt = '';
+      const name = document.createElement('span'); name.textContent = asset.name;
+      const actions = document.createElement('div');
+      const insert = document.createElement('button'); insert.type = 'button'; insert.dataset.uploadAction = 'insert'; insert.textContent = 'Insert';
+      const background = document.createElement('button'); background.type = 'button'; background.dataset.uploadAction = 'background'; background.textContent = 'Set as background';
+      actions.append(insert, background); card.append(image, name, actions); ui.uploadLibrary.append(card);
+    });
   };
 
   const renderSections = () => {
@@ -215,7 +227,16 @@
     state.document.sectionOrder.forEach((id, index) => {
       const item = state.sections[id]; const card = document.createElement('article'); card.className = 'section-card'; card.classList.toggle('is-selected', id === selectedSectionId); card.dataset.sectionId = id;
       const bg = item.background.kind === 'image' ? assetUrl(item.background.assetId, item.background.assetKind) : '';
-      card.innerHTML = `<button class="section-select" type="button"><span class="section-thumb" style="background-color:${item.background.color};${bg ? `background-image:url('${bg}')` : ''}"></span><span><strong>${item.name}</strong><small>${Math.round(item.height)} units</small></span></button><div class="section-order"><button type="button" data-section-move="up" aria-label="Move section up" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-section-move="down" aria-label="Move section down" ${index === state.document.sectionOrder.length - 1 ? 'disabled' : ''}>↓</button></div>`; ui.sectionList.append(card);
+      const select = document.createElement('button'); select.className = 'section-select'; select.type = 'button';
+      const thumb = document.createElement('span'); thumb.className = 'section-thumb'; thumb.style.backgroundColor = item.background.color; if (bg) thumb.style.backgroundImage = `url("${bg}")`;
+      const copy = document.createElement('span');
+      const name = document.createElement('strong'); name.textContent = item.name;
+      const height = document.createElement('small'); height.textContent = `${Math.round(item.height)} units`;
+      copy.append(name, height); select.append(thumb, copy);
+      const order = document.createElement('div'); order.className = 'section-order';
+      const up = document.createElement('button'); up.type = 'button'; up.dataset.sectionMove = 'up'; up.setAttribute('aria-label', 'Move section up'); up.disabled = index === 0; up.textContent = '↑';
+      const down = document.createElement('button'); down.type = 'button'; down.dataset.sectionMove = 'down'; down.setAttribute('aria-label', 'Move section down'); down.disabled = index === state.document.sectionOrder.length - 1; down.textContent = '↓';
+      order.append(up, down); card.append(select, order); ui.sectionList.append(card);
     });
     if (!current) return; ui.sectionName.value = current.name; ui.sectionHeight.value = Math.round(current.height); $$('[data-section-height-preset]', ui.sectionHeightPresets).forEach((button) => button.classList.toggle('is-selected', button.dataset.sectionHeightPreset === current.heightPreset)); ui.deleteSection.disabled = state.document.sectionOrder.length === 1;
   };
