@@ -70,13 +70,19 @@
     updateHistory();
   };
 
+  const flushPendingSave = () => {
+    if (!saveTimer) return;
+    clearTimeout(saveTimer);
+    saveTimer = 0;
+    // Live transaction patches are previews; only persist committed authored state.
+    const committedState = transaction ? transaction.before.state : state;
+    try { localStorage.setItem(model.storageKey, JSON.stringify(committedState)); ui.saveStatus.textContent = 'Saved'; }
+    catch { ui.saveStatus.textContent = 'Draft not saved'; }
+  };
   const scheduleSave = () => {
     clearTimeout(saveTimer);
     ui.saveStatus.textContent = 'Saving…';
-    saveTimer = setTimeout(() => {
-      try { localStorage.setItem(model.storageKey, JSON.stringify(state)); ui.saveStatus.textContent = 'Saved'; }
-      catch { ui.saveStatus.textContent = 'Draft not saved'; }
-    }, 220);
+    saveTimer = setTimeout(flushPendingSave, 220);
   };
 
   const syncCanvas = () => {
@@ -567,7 +573,16 @@
   });
   const endWorkspacePan = (event) => { if (!workspacePan || workspacePan.id !== event.pointerId) return; workspacePan = null; try { ui.workspace.releasePointerCapture(event.pointerId); } catch {} };
   ui.workspace.addEventListener('pointerup', endWorkspacePan); ui.workspace.addEventListener('pointercancel', endWorkspacePan);
-  window.addEventListener('beforeunload', () => assetObjectUrls.forEach((url) => URL.revokeObjectURL(url)));
+  window.addEventListener('pagehide', (event) => {
+    try { flushPendingSave(); }
+    finally {
+      // A cached page still owns its URLs and needs them when restored.
+      if (!event.persisted) {
+        const urls = assetObjectUrls; assetObjectUrls = [];
+        urls.forEach((url) => URL.revokeObjectURL(url));
+      }
+    }
+  });
 
   renderTemplateElements(); setPanel(activePanel); renderAll(); updateHistory();
   refreshAssets().catch(() => { ui.uploadStatus.textContent = 'Local upload storage is unavailable in this browser.'; });
