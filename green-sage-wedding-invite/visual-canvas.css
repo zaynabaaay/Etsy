@@ -42,7 +42,9 @@ button {
 .canvas-page {
   width: 100%;
   min-height: 100%;
-  padding: 28px 0 42px;
+  padding: 28px 0;
+  /* Out-of-section objects must not enlarge the invitation scroll bounds. */
+  overflow: clip;
   touch-action: pan-y;
 }
 
@@ -50,6 +52,11 @@ button {
   position: relative;
   margin: 0 auto 28px;
   overflow: visible;
+}
+
+/* Section gaps belong between sections, not beyond the invitation. */
+.section-shell:last-child {
+  margin-bottom: 0;
 }
 
 .section-canvas {
