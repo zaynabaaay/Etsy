@@ -31,15 +31,44 @@
   const sendPatch = (patch) => { if (transaction) post({ type: 'green-sage-visual:transaction-patch', transactionId: transaction.id, targetType: transaction.targetType, targetId: transaction.targetId, patch, label: transaction.label }); };
   const sendCommit = () => { if (!transaction) return; const active = transaction; transaction = null; post({ type: 'green-sage-visual:transaction-commit', transactionId: active.id, targetType: active.targetType, targetId: active.targetId }); };
 
-  const lockScroll = (event) => {
-    document.documentElement.classList.add('is-manipulating');
-    try { event.currentTarget.setPointerCapture(event.pointerId); } catch {}
-    gesture = { pointerId: event.pointerId, target: event.currentTarget };
+  const finishGesture = (active, event) => {
+    if (gesture !== active || (event?.pointerId != null && event.pointerId !== active.pointerId)) return;
+    // Clear ownership before releasing capture, which can itself signal termination.
+    gesture = null;
+    active.removeListeners.forEach((remove) => remove());
+    document.documentElement.classList.remove('is-manipulating'); clearGuides();
+    try { if (active.target.hasPointerCapture(active.pointerId)) active.target.releasePointerCapture(active.pointerId); } catch {}
+    sendCommit();
+    if (event?.type === 'pointerup') active.onPointerUp?.(event);
+    else lastTextTap = null;
   };
-  const unlockScroll = (event) => {
-    if (!gesture || gesture.pointerId !== event.pointerId) return;
-    try { gesture.target.releasePointerCapture(event.pointerId); } catch {}
-    gesture = null; document.documentElement.classList.remove('is-manipulating'); clearGuides();
+
+  const trackGesture = (event, moveTarget, move, onPointerUp = null) => {
+    const active = { pointerId: event.pointerId, target: event.currentTarget, onPointerUp, removeListeners: [] };
+    gesture = active; document.documentElement.classList.add('is-manipulating');
+    const listen = (target, type, handler, capture = false) => {
+      target.addEventListener(type, handler, capture);
+      active.removeListeners.push(() => target.removeEventListener(type, handler, capture));
+    };
+    const end = (nextEvent) => finishGesture(active, nextEvent);
+    listen(moveTarget, 'pointermove', (nextEvent) => { if (gesture === active && nextEvent.pointerId === active.pointerId) move(nextEvent); });
+    listen(moveTarget, 'pointerup', end);
+    listen(moveTarget, 'pointercancel', end);
+    listen(document, 'lostpointercapture', (nextEvent) => {
+      if (nextEvent.target === active.target || (!active.target.isConnected && nextEvent.target === document)) end(nextEvent);
+    }, true);
+    listen(window, 'blur', end);
+    listen(window, 'pagehide', end);
+    listen(document, 'visibilitychange', (nextEvent) => { if (document.hidden) end(nextEvent); });
+
+    let captured = false;
+    try { active.target.setPointerCapture(active.pointerId); captured = active.target.hasPointerCapture(active.pointerId); } catch { /* Use scoped termination listeners below. */ }
+    if (!captured && gesture === active) {
+      listen(document, 'pointerup', end, true);
+      listen(document, 'pointercancel', end, true);
+      // Without capture, release outside the iframe may never reach this document.
+      listen(document, 'pointerout', (nextEvent) => { if (!nextEvent.relatedTarget) end(nextEvent); });
+    }
   };
 
   const isOutside = (item) => {
@@ -101,8 +130,8 @@
   };
 
   const startMove = (event, item, frame) => {
-    if (!canPointer(event) || item.permissions.locked || !item.permissions.movable) return;
-    event.preventDefault(); event.stopPropagation(); exitEdit(); lockScroll(event);
+    if (!canPointer(event) || gesture || item.permissions.locked || !item.permissions.movable) return;
+    event.preventDefault(); event.stopPropagation(); exitEdit();
     const start = { x: event.clientX, y: event.clientY, frame: { ...item.frame }, moved: false };
     const move = (nextEvent) => {
       if (nextEvent.pointerId !== event.pointerId) return;
@@ -111,23 +140,19 @@
       if (!start.moved) { start.moved = true; lastTextTap = null; sendStart('element', item.id, 'Move element'); }
       const next = { ...start.frame, x: start.frame.x + dx / scale, y: start.frame.y + dy / scale }; const snapped = snapFrame(item, next); applyFrame(item, frame, snapped.frame, snapped.guides);
     };
-    const end = (nextEvent) => {
-      if (nextEvent.pointerId !== event.pointerId) return;
-      frame.removeEventListener('pointermove', move); frame.removeEventListener('pointerup', end); frame.removeEventListener('pointercancel', end); unlockScroll(nextEvent);
-      if (start.moved) sendCommit();
-      else if (item.type === 'text') {
+    trackGesture(event, frame, move, (nextEvent) => {
+      if (!start.moved && item.type === 'text') {
         const now = performance.now(); const previous = lastTextTap;
         if (previous?.id === item.id && now - previous.time < 420 && Math.hypot(nextEvent.clientX - previous.x, nextEvent.clientY - previous.y) < 28) {
           lastTextTap = null; const content = frame.querySelector('.text-content'); if (content) enterEdit(item, frame, content, nextEvent);
         } else lastTextTap = { id: item.id, time: now, x: nextEvent.clientX, y: nextEvent.clientY };
       }
-    };
-    frame.addEventListener('pointermove', move); frame.addEventListener('pointerup', end); frame.addEventListener('pointercancel', end);
+    });
   };
 
   const startResize = (event, item, frame, direction) => {
-    if (!canPointer(event) || item.permissions.locked || !item.permissions.resizable) return;
-    event.preventDefault(); event.stopPropagation(); exitEdit(); lockScroll(event); sendStart('element', item.id, 'Resize element');
+    if (!canPointer(event) || gesture || item.permissions.locked || !item.permissions.resizable) return;
+    event.preventDefault(); event.stopPropagation(); exitEdit(); sendStart('element', item.id, 'Resize element');
     const start = { x: event.clientX, y: event.clientY, frame: { ...item.frame } };
     const move = (nextEvent) => {
       if (nextEvent.pointerId !== event.pointerId) return;
@@ -138,13 +163,12 @@
       if (direction.includes('n')) { next.height = Math.max(32, start.frame.height - dy); next.y = start.frame.y + start.frame.height - next.height; }
       applyFrame(item, frame, next);
     };
-    const end = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; frame.removeEventListener('pointermove', move); frame.removeEventListener('pointerup', end); frame.removeEventListener('pointercancel', end); unlockScroll(nextEvent); sendCommit(); };
-    frame.addEventListener('pointermove', move); frame.addEventListener('pointerup', end); frame.addEventListener('pointercancel', end);
+    trackGesture(event, frame, move);
   };
 
   const startBackgroundReframe = (event, section, background, image) => {
-    if (!canPointer(event)) return;
-    event.preventDefault(); event.stopPropagation(); exitEdit(); lockScroll(event); sendStart('section', section.id, 'Reframe background');
+    if (!canPointer(event) || gesture) return;
+    event.preventDefault(); event.stopPropagation(); exitEdit(); sendStart('section', section.id, 'Reframe background');
     const bounds = background.getBoundingClientRect();
     const start = { x: event.clientX, y: event.clientY, focalX: section.background.focalX, focalY: section.background.focalY };
     const move = (nextEvent) => {
@@ -154,8 +178,7 @@
       section.background.focalX = focalX; section.background.focalY = focalY; image.style.objectPosition = `${focalX}% ${focalY}%`;
       sendPatch({ background: { focalX, focalY } });
     };
-    const end = (nextEvent) => { if (nextEvent.pointerId !== event.pointerId) return; background.removeEventListener('pointermove', move); background.removeEventListener('pointerup', end); background.removeEventListener('pointercancel', end); unlockScroll(nextEvent); sendCommit(); };
-    background.addEventListener('pointermove', move); background.addEventListener('pointerup', end); background.addEventListener('pointercancel', end);
+    trackGesture(event, background, move);
   };
 
   const placeCaret = (content, x, y) => {
