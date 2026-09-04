@@ -57,6 +57,9 @@
   let assetUrls = {};
   let assetObjectUrls = [];
   let replaceTargetElementId = null;
+  let uploadMenuId = null;
+  let uploadDeleteId = null;
+  let deletingUploadId = null;
 
   const section = () => state.sections[selectedSectionId] || null;
   const element = () => state.elements[selectedElementId] || null;
@@ -259,18 +262,57 @@
   };
 
   const renderTemplateElements = () => { ui.templateElements.replaceChildren(); model.templateAssets.filter((asset) => asset.kind === 'decorative').forEach((asset) => ui.templateElements.append(assetCard(asset))); };
+  const uploadUsage = () => {
+    const counts = new Map();
+    const count = (item) => { if (item.assetKind === 'upload' && item.assetId) counts.set(item.assetId, (counts.get(item.assetId) || 0) + 1); };
+    Object.values(state.elements).filter(item => item.type === 'image' || item.type === 'decorative').forEach(count);
+    Object.values(state.sections).filter(item => item.background.kind === 'image').forEach(item => count(item.background));
+    return counts;
+  };
   const renderUploads = () => {
+    const focusedId = document.activeElement.closest('.upload-card')?.dataset.assetId;
+    const focusedAction = document.activeElement.dataset.uploadAction;
     ui.uploadLibrary.replaceChildren();
-    if (!assetRecords.length) { const empty = document.createElement('p'); empty.className = 'panel-help'; empty.textContent = 'Uploaded images will appear here.'; ui.uploadLibrary.append(empty); return; }
-    assetRecords.forEach((asset) => {
+    const usage = uploadUsage(); const library = new Map(assetRecords.map(asset => [asset.id, asset]));
+    // Authored references remain visible and Used even when their binary is absent.
+    usage.forEach((count, id) => { if (!library.has(id)) library.set(id, { id, name: 'Image unavailable', missing: true }); });
+    if (!library.size) { const empty = document.createElement('p'); empty.className = 'panel-help'; empty.textContent = 'Uploaded images will appear here.'; ui.uploadLibrary.append(empty); return; }
+    library.forEach((asset) => {
+      const count = usage.get(asset.id) || 0; const busy = deletingUploadId === asset.id;
       const card = document.createElement('article'); card.className = 'upload-card'; card.dataset.assetId = asset.id;
-      const image = document.createElement('img'); image.src = assetUrls[asset.id]; image.alt = '';
-      const name = document.createElement('span'); name.textContent = asset.name;
+      if (asset.missing) { const placeholder = document.createElement('p'); placeholder.className = 'upload-unavailable'; placeholder.textContent = 'Image unavailable'; card.append(placeholder); }
+      else { const image = document.createElement('img'); image.src = assetUrls[asset.id]; image.alt = ''; card.append(image); }
+      const name = document.createElement('span'); name.textContent = asset.name; card.append(name);
+      if (count) { const used = document.createElement('small'); used.className = 'upload-usage'; used.textContent = count === 1 ? 'Used' : `Used ${count} times`; card.append(used); }
+      const button = (action, label) => { const node = document.createElement('button'); node.type = 'button'; node.dataset.uploadAction = action; node.textContent = label; node.disabled = busy; return node; };
       const actions = document.createElement('div');
-      const insert = document.createElement('button'); insert.type = 'button'; insert.dataset.uploadAction = 'insert'; insert.textContent = 'Insert';
-      const background = document.createElement('button'); background.type = 'button'; background.dataset.uploadAction = 'background'; background.textContent = 'Set as background';
-      actions.append(insert, background); card.append(image, name, actions); ui.uploadLibrary.append(card);
+      const insert = button('insert', 'Insert'); const background = button('background', 'Set as background');
+      insert.disabled = background.disabled = busy || Boolean(asset.missing); actions.append(insert, background); card.append(actions);
+      if (!asset.missing) { const manage = button('manage', '…'); manage.className = 'upload-manage'; manage.setAttribute('aria-label', `Manage ${asset.name}`); manage.setAttribute('aria-expanded', String(uploadMenuId === asset.id || uploadDeleteId === asset.id)); card.append(manage); }
+      if (uploadDeleteId === asset.id) {
+        const confirmation = document.createElement('section'); confirmation.className = 'upload-delete-confirmation'; confirmation.setAttribute('role', 'group'); confirmation.setAttribute('aria-label', 'Delete upload confirmation');
+        const message = document.createElement('p'); message.textContent = count ? `This image is used in ${count} ${count === 1 ? 'place' : 'places'}. Deleting it will make those images unavailable.` : 'Delete this upload?';
+        confirmation.append(message, button('cancel-delete', 'Cancel'), button('confirm-delete', busy ? 'Deleting…' : 'Delete anyway')); card.append(confirmation);
+      } else if (uploadMenuId === asset.id) { const menu = document.createElement('section'); menu.className = 'upload-management'; menu.append(button('delete', busy ? 'Deleting…' : 'Delete upload')); card.append(menu); }
+      ui.uploadLibrary.append(card);
+      if (asset.id === focusedId) {
+        const focusTarget = card.querySelector(`[data-upload-action="${CSS.escape(focusedAction || '')}"]:not(:disabled)`) || card.querySelector('[data-upload-action="cancel-delete"]:not(:disabled), [data-upload-action="manage"]:not(:disabled)');
+        focusTarget?.focus({ preventScroll: true });
+      }
     });
+  };
+  const deleteUpload = async (assetId, confirmed = false) => {
+    if (deletingUploadId) return;
+    if (!confirmed && (uploadUsage().get(assetId) || 0) > 0) { uploadDeleteId = assetId; uploadMenuId = null; renderUploads(); return; }
+    deletingUploadId = assetId; renderUploads();
+    try {
+      await assets.remove(assetId); // Missing records are a safe no-op; authored references stay intact.
+      await refreshAssets();
+      ui.uploadStatus.textContent = 'Upload deleted.';
+      if (uploadDeleteId === assetId) uploadDeleteId = null;
+      if (uploadMenuId === assetId) uploadMenuId = null;
+    } catch { ui.uploadStatus.textContent = 'Could not finish deleting the upload. Please try again.'; }
+    finally { deletingUploadId = null; renderUploads(); }
   };
 
   const renderSections = () => {
@@ -518,6 +560,10 @@
     switch (action.dataset.uploadAction) {
       case 'insert': addImage(card.dataset.assetId); break;
       case 'background': applyBackgroundAsset(card.dataset.assetId, 'upload'); break;
+      case 'manage': uploadMenuId = uploadMenuId === card.dataset.assetId ? null : card.dataset.assetId; uploadDeleteId = null; renderUploads(); break;
+      case 'delete': void deleteUpload(card.dataset.assetId); break;
+      case 'cancel-delete': uploadDeleteId = null; uploadMenuId = null; renderUploads(); break;
+      case 'confirm-delete': if (uploadDeleteId === card.dataset.assetId) void deleteUpload(uploadDeleteId, true); break;
       default: break;
     }
   });
