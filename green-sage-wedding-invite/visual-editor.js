@@ -21,15 +21,16 @@
     fontButton: $('fontPickerButton'), fontValue: $('fontPickerValue'), fontPopover: $('fontPickerPopover'), fontSearch: $('fontSearch'), fontFilters: $('fontCategoryFilters'), fontList: $('fontList'),
     fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'),
     bold: $('boldButton'), italic: $('italicButton'), alignButton: $('alignmentButton'), alignPopover: $('alignmentPopover'), spacingButton: $('spacingButton'), spacingPopover: $('spacingPopover'), lineHeight: $('lineHeight'), letterSpacing: $('letterSpacing'),
-    positionPopover: $('positionPopover'), morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
+    morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
     replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
     designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'), templateBackgrounds: $('templateBackgrounds'), uploadedBackgrounds: $('uploadedBackgrounds'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
     templateElements: $('templateElements'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'),
-    addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton')
+    addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton'),
+    closePosition: $('closePositionPanel'), positionTabs: $$('[data-position-tab]'), arrangePanel: $('positionArrangePanel'), layersPanel: $('positionLayersPanel'), layersList: $('layersList'), positionHelp: $('positionSelectionHelp')
   };
 
   // Keep existing popover nodes and handlers outside the toolbar scroll containers.
-  const popovers = [ui.fontPopover, ui.sizePresets, ui.textColorPopover, ui.alignPopover, ui.spacingPopover, ui.positionPopover, ui.morePopover, ui.previewPopover];
+  const popovers = [ui.fontPopover, ui.sizePresets, ui.textColorPopover, ui.alignPopover, ui.spacingPopover, ui.morePopover, ui.previewPopover];
   const popoverLayer = document.createElement('div'); popoverLayer.className = 'popover-layer';
   popoverLayer.append(...popovers); document.body.append(popoverLayer);
   let openPopover = null;
@@ -44,6 +45,8 @@
   let selectedElementId = null;
   let canvasReady = false;
   let activePanel = 'design';
+  let positionReturnPanel = 'design';
+  let activePositionTab = 'arrange';
   let activeFontCategory = 'all';
   let backgroundEditSectionId = null;
   let imageEditElementId = null;
@@ -60,6 +63,7 @@
   let uploadMenuId = null;
   let uploadDeleteId = null;
   let deletingUploadId = null;
+  let layerDrag = null;
 
   const section = () => state.sections[selectedSectionId] || null;
   const element = () => state.elements[selectedElementId] || null;
@@ -175,6 +179,16 @@
     $$('.nav-tool').forEach((button) => { const active = button.dataset.panel === name; button.classList.toggle('is-active', active); button.setAttribute('aria-pressed', String(active)); });
     $$('.panel-view').forEach((view) => { const active = view.dataset.panelView === name; view.hidden = !active; view.classList.toggle('is-active', active); });
   };
+  const setPositionTab = (name) => {
+    activePositionTab = name === 'layers' ? 'layers' : 'arrange';
+    ui.positionTabs.forEach((button) => { const active = button.dataset.positionTab === activePositionTab; button.classList.toggle('is-active', active); button.setAttribute('aria-selected', String(active)); });
+    ui.arrangePanel.hidden = activePositionTab !== 'arrange'; ui.layersPanel.hidden = activePositionTab !== 'layers';
+  };
+  const openPositionPanel = () => {
+    if (activePanel !== 'position') positionReturnPanel = activePanel;
+    closePopovers(); setPanel('position'); setPositionTab(activePositionTab); renderLayers();
+  };
+  const closePositionPanel = () => setPanel(positionReturnPanel === 'position' ? 'design' : positionReturnPanel);
   const selectSection = (id, sync = true) => { if (!state.sections[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
   const selectElement = (id, sync = true) => { if (!state.elements[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
 
@@ -335,7 +349,32 @@
     if (!current) return; ui.sectionName.value = current.name; ui.sectionHeight.value = Math.round(current.height); $$('[data-section-height-preset]', ui.sectionHeightPresets).forEach((button) => button.classList.toggle('is-selected', button.dataset.sectionHeightPreset === current.heightPreset)); ui.deleteSection.disabled = state.document.sectionOrder.length === 1;
   };
 
-  const renderAll = () => { renderContext(); renderDesign(); renderUploads(); renderSections(); };
+  const layerLabel = (item) => {
+    if (item.type === 'text') return item.content.replace(/\s+/g, ' ').trim().slice(0, 42) || 'Text';
+    if (item.type === 'image') return 'Image';
+    if (item.type === 'decorative') return model.getTemplateAsset(item.assetId)?.name || 'Asset';
+    return `${item.type.charAt(0).toUpperCase()}${item.type.slice(1)}`;
+  };
+  const renderLayers = () => {
+    const current = section(); ui.layersList.replaceChildren();
+    if (!current?.elementOrder.length) { const empty = document.createElement('p'); empty.className = 'layers-empty'; empty.textContent = 'No objects in this section.'; ui.layersList.append(empty); }
+    else [...current.elementOrder].reverse().forEach((id) => {
+      const item = state.elements[id]; if (!item) return;
+      const row = document.createElement('article'); row.className = 'layer-row'; row.dataset.elementId = id; row.classList.toggle('is-selected', id === selectedElementId);
+      const select = document.createElement('button'); select.type = 'button'; select.className = 'layer-select'; select.dataset.layerSelect = id;
+      const type = document.createElement('small'); type.textContent = item.type === 'decorative' ? 'Asset' : item.type === 'image' ? 'Image' : 'Text';
+      const label = document.createElement('span'); label.textContent = layerLabel(item); select.append(type, label);
+      const drag = document.createElement('button'); drag.type = 'button'; drag.className = 'layer-drag-handle'; drag.dataset.layerDrag = id; drag.textContent = 'Drag'; drag.setAttribute('aria-label', `Reorder ${layerLabel(item)}`);
+      row.append(select, drag); ui.layersList.append(row);
+    });
+    const selected = element(); const locked = !selected || selected.permissions.locked;
+    const order = current?.elementOrder || []; const index = selected ? order.indexOf(selected.id) : -1;
+    $$('[data-layer]', ui.arrangePanel).forEach((button) => { const action = button.dataset.layer; button.disabled = locked || index < 0 || (['forward', 'front'].includes(action) && index === order.length - 1) || (['backward', 'back'].includes(action) && index === 0); });
+    $$('[data-position-x], [data-position-y]', ui.arrangePanel).forEach((button) => { button.disabled = !selected || selected.permissions.locked || !selected.permissions.movable; });
+    ui.positionHelp.hidden = Boolean(selected);
+  };
+
+  const renderAll = () => { renderContext(); renderDesign(); renderUploads(); renderSections(); renderLayers(); };
   const refreshAssets = async () => {
     const nextRecords = await assets.list(); const nextUrls = {}; const nextObjectUrls = [];
     try {
@@ -404,6 +443,39 @@
     });
   };
 
+  const startLayerDrag = (event, handle) => {
+    if (layerDrag || !event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    const row = handle.closest('.layer-row'); const current = section();
+    if (!row || !current || !current.elementOrder.includes(row.dataset.elementId)) return;
+    event.preventDefault(); event.stopPropagation();
+    const active = { pointerId: event.pointerId, handle, row, captureTarget: ui.layersList, sectionId: current.id, original: [...current.elementOrder], removers: [] };
+    layerDrag = active; row.classList.add('is-dragging');
+    const listen = (target, type, handler, options) => { target.addEventListener(type, handler, options); active.removers.push(() => target.removeEventListener(type, handler, options)); };
+    const finish = (nextEvent, commitOrder) => {
+      if (layerDrag !== active || (nextEvent.pointerId != null && nextEvent.pointerId !== active.pointerId)) return;
+      layerDrag = null; active.removers.forEach((remove) => remove()); row.classList.remove('is-dragging');
+      try { if (active.captureTarget.hasPointerCapture(active.pointerId)) active.captureTarget.releasePointerCapture(active.pointerId); } catch {}
+      if (!commitOrder || !state.sections[active.sectionId]) { renderLayers(); return; }
+      const frontToBack = $$('.layer-row', ui.layersList).map((item) => item.dataset.elementId);
+      if (selectedSectionId !== active.sectionId || frontToBack.length !== active.original.length || !frontToBack.every((id) => active.original.includes(id))) { renderLayers(); return; }
+      const nextOrder = frontToBack.reverse();
+      if (equal(active.original, nextOrder)) { renderLayers(); return; }
+      mutate('Reorder layer', (next) => { next.sections[active.sectionId].elementOrder = nextOrder; });
+    };
+    listen(document, 'pointermove', (nextEvent) => {
+      if (layerDrag !== active || nextEvent.pointerId !== active.pointerId) return;
+      nextEvent.preventDefault();
+      const siblings = $$('.layer-row', ui.layersList).filter((item) => item !== row);
+      const before = siblings.find((item) => nextEvent.clientY < item.getBoundingClientRect().top + item.getBoundingClientRect().height / 2);
+      ui.layersList.insertBefore(row, before || null);
+    }, { capture: true, passive: false });
+    listen(document, 'pointerup', (nextEvent) => finish(nextEvent, true), true);
+    listen(document, 'pointercancel', (nextEvent) => finish(nextEvent, false), true);
+    listen(document, 'lostpointercapture', (nextEvent) => { if (nextEvent.target === active.captureTarget) finish(nextEvent, false); }, true);
+    listen(window, 'blur', (nextEvent) => finish(nextEvent, false));
+    try { active.captureTarget.setPointerCapture(active.pointerId); } catch {}
+  };
+
   const addSection = () => {
     const created = model.createSection({ name: `Section ${state.document.sectionOrder.length + 1}`, heightPreset: 'standard', height: model.sectionHeightPresets.standard, background: { kind: 'color', color: '#F4EFE7' } });
     mutate('Add section', (next) => { next.sections[created.id] = created; next.document.sectionOrder.push(created.id); }, { sectionId: created.id, elementId: null });
@@ -470,6 +542,10 @@
   };
 
   $$('.nav-tool').forEach((button) => button.addEventListener('click', () => setPanel(button.dataset.panel)));
+  ui.closePosition.addEventListener('click', closePositionPanel);
+  ui.positionTabs.forEach((button) => button.addEventListener('click', () => setPositionTab(button.dataset.positionTab)));
+  ui.layersList.addEventListener('click', (event) => { const button = event.target.closest('[data-layer-select]'); if (button) selectElement(button.dataset.layerSelect); });
+  ui.layersList.addEventListener('pointerdown', (event) => { const handle = event.target.closest('[data-layer-drag]'); if (handle) startLayerDrag(event, handle); });
   $$('[data-add-text]').forEach((button) => button.addEventListener('click', () => addText(button.dataset.addText)));
   ui.undo.addEventListener('click', () => applyHistory('undo')); ui.redo.addEventListener('click', () => applyHistory('redo'));
   ui.previewButton.addEventListener('click', () => togglePopover(ui.previewPopover, ui.previewButton));
@@ -503,9 +579,9 @@
   ui.alignButton.addEventListener('click', () => togglePopover(ui.alignPopover, ui.alignButton));
   ui.alignPopover.addEventListener('click', (event) => { const button = event.target.closest('[data-align]'); const source = element(); if (!button || !source) return; mutate('Change text alignment', (next) => { next.elements[source.id].style.textAlign = button.dataset.align; }); closePopovers(); });
   ui.spacingButton.addEventListener('click', () => togglePopover(ui.spacingPopover, ui.spacingButton));
-  $$('[data-open-position]').forEach((button) => button.addEventListener('click', () => togglePopover(ui.positionPopover, button)));
+  $$('[data-open-position]').forEach((button) => button.addEventListener('click', openPositionPanel));
   $$('[data-open-more]').forEach((button) => button.addEventListener('click', () => togglePopover(ui.morePopover, button)));
-  ui.positionPopover.addEventListener('click', (event) => { const layer = event.target.closest('[data-layer]'); const x = event.target.closest('[data-position-x]'); const y = event.target.closest('[data-position-y]'); if (layer) layerElement(layer.dataset.layer); if (x) alignElement('x', x.dataset.positionX); if (y) alignElement('y', y.dataset.positionY); closePopovers(); });
+  ui.arrangePanel.addEventListener('click', (event) => { const layer = event.target.closest('[data-layer]'); const x = event.target.closest('[data-position-x]'); const y = event.target.closest('[data-position-y]'); if (layer) layerElement(layer.dataset.layer); if (x) alignElement('x', x.dataset.positionX); if (y) alignElement('y', y.dataset.positionY); });
   bindTransactionalInput(ui.opacity, 'Change opacity', (next, value) => { const source = element(); if (source) next.elements[source.id].opacity = Number(value); });
   bindTransactionalInput(ui.rotation, 'Rotate element', (next, value) => { const source = element(); if (source) next.elements[source.id].rotation = Number(value); });
   bindTransactionalInput(ui.imageZoom, 'Crop image', (next, value) => { const source = element(); if (source?.crop) next.elements[source.id].crop.zoom = Number(value); });
