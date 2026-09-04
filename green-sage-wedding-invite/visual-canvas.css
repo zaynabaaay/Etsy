@@ -22,14 +22,14 @@ html {
   overflow-y: auto;
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
-  background: #f4efe7;
+  background: transparent;
 }
 
 body {
   overflow: visible;
   overscroll-behavior: none;
   color: #474232;
-  background: #f4efe7;
+  background: transparent;
   font-family: "Instrument Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -50,13 +50,8 @@ button {
 
 .section-shell {
   position: relative;
-  margin: 0 auto 28px;
+  margin: 0 auto;
   overflow: visible;
-}
-
-/* Section gaps belong between sections, not beyond the invitation. */
-.section-shell:last-child {
-  margin-bottom: 0;
 }
 
 .section-canvas {
@@ -66,13 +61,12 @@ button {
   width: 390px;
   overflow: visible;
   transform-origin: top left;
-  box-shadow: 0 18px 52px rgba(67, 60, 48, .15);
   touch-action: pan-y;
 }
 
 .section-canvas.is-section-selected {
   outline: 1px solid rgba(116, 121, 99, .72);
-  outline-offset: 4px;
+  outline-offset: -1px;
 }
 
 .section-background {
@@ -104,7 +98,7 @@ button {
 
 .section-canvas.is-background-editing {
   outline: 1.5px solid var(--selection);
-  outline-offset: 4px;
+  outline-offset: -1px;
 }
 
 .section-canvas.is-background-editing > .element-frame {
