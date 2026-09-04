@@ -305,7 +305,8 @@ html.is-manipulating .element-frame {
   overscroll-behavior: none;
 }
 
-html.is-manipulating body {
+/* Lock the root scroller without clipping the viewport-height body and collapsing its scroll extent. */
+html.is-manipulating {
   overflow: hidden;
 }
 
