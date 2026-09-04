@@ -21,8 +21,8 @@
     fontButton: $('fontPickerButton'), fontValue: $('fontPickerValue'), fontPopover: $('fontPickerPopover'), fontSearch: $('fontSearch'), fontFilters: $('fontCategoryFilters'), fontList: $('fontList'),
     fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'),
     bold: $('boldButton'), italic: $('italicButton'), alignButton: $('alignmentButton'), alignPopover: $('alignmentPopover'), spacingButton: $('spacingButton'), spacingPopover: $('spacingPopover'), lineHeight: $('lineHeight'), letterSpacing: $('letterSpacing'),
-    positionPopover: $('positionPopover'), morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), textCaseControls: $('textCaseControls'), cropControls: $('imageCropControls'), imageFocalX: $('imageFocalX'), imageFocalY: $('imageFocalY'), imageZoom: $('imageZoom'),
-    lock: $('lockButton'), duplicate: $('duplicateButton'), remove: $('deleteButton'), replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
+    positionPopover: $('positionPopover'), morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
+    replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
     designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'), templateBackgrounds: $('templateBackgrounds'), uploadedBackgrounds: $('uploadedBackgrounds'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
     templateElements: $('templateElements'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'),
     addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton')
@@ -206,6 +206,7 @@
     if (selected?.id !== imageEditElementId || selected?.type !== 'image' || selected.permissions.locked || !selected.permissions.editable) imageEditElementId = null;
     ui.editImage.hidden = selected?.type !== 'image' || Boolean(imageEditElementId);
     ui.doneImage.hidden = !imageEditElementId;
+    ui.imageZoomControl.hidden = !imageEditElementId;
     $$('[data-open-position]', ui.imageContext).forEach(button => { button.disabled = Boolean(imageEditElementId); });
     ui.editImage.disabled = !selected?.permissions.editable || selected?.permissions.locked;
     ui.editImage.setAttribute('aria-pressed', String(Boolean(imageEditElementId)));
@@ -216,9 +217,9 @@
     ui.imageContext.hidden = editingBackground || !selected || !['image', 'decorative'].includes(selected.type); ui.sectionContext.hidden = editingBackground || Boolean(selected) || !section(); ui.backgroundEditContext.hidden = !editingBackground;
     if (!selected) { ui.sectionContextName.textContent = section()?.name || 'Section'; return; }
     const locked = selected.permissions.locked;
-    ui.opacity.value = selected.opacity; ui.rotation.value = selected.rotation; ui.lock.textContent = locked ? 'Unlock' : 'Lock';
-    ui.duplicate.disabled = locked; ui.remove.disabled = locked || !selected.permissions.deletable; ui.textCaseControls.hidden = selected.type !== 'text'; ui.cropControls.hidden = !['image', 'decorative'].includes(selected.type);
-    if (selected.crop) { [ui.imageFit, ui.replace, ui.imageFocalX, ui.imageFocalY, ui.imageZoom].forEach(control => control.disabled = locked || !selected.permissions.editable); ui.imageFocalX.value = selected.crop.focalX; ui.imageFocalY.value = selected.crop.focalY; ui.imageZoom.value = selected.crop.zoom; ui.imageFit.textContent = selected.crop.fit === 'cover' ? 'Fit / Contain' : 'Fill / Cover'; }
+    ui.opacity.value = selected.opacity; ui.rotation.value = selected.rotation;
+    ui.textCaseControls.hidden = selected.type !== 'text';
+    if (selected.crop) { [ui.imageFit, ui.replace, ui.imageZoom].forEach(control => control.disabled = locked || !selected.permissions.editable); ui.imageZoom.value = selected.crop.zoom; ui.imageFit.textContent = selected.crop.fit === 'cover' ? 'Fit / Contain' : 'Fill / Cover'; }
     if (selected.type !== 'text') return;
     const font = model.getFont(selected.style.fontFamily); const editable = selected.permissions.editable && !locked;
     ui.fontValue.textContent = font.displayName; ui.fontValue.style.fontFamily = model.fontStack(font.name); ui.fontSize.value = selected.style.fontSize;
@@ -507,11 +508,8 @@
   ui.positionPopover.addEventListener('click', (event) => { const layer = event.target.closest('[data-layer]'); const x = event.target.closest('[data-position-x]'); const y = event.target.closest('[data-position-y]'); if (layer) layerElement(layer.dataset.layer); if (x) alignElement('x', x.dataset.positionX); if (y) alignElement('y', y.dataset.positionY); closePopovers(); });
   bindTransactionalInput(ui.opacity, 'Change opacity', (next, value) => { const source = element(); if (source) next.elements[source.id].opacity = Number(value); });
   bindTransactionalInput(ui.rotation, 'Rotate element', (next, value) => { const source = element(); if (source) next.elements[source.id].rotation = Number(value); });
-  bindTransactionalInput(ui.imageFocalX, 'Crop image', (next, value) => { const source = element(); if (source?.crop) next.elements[source.id].crop.focalX = Number(value); });
-  bindTransactionalInput(ui.imageFocalY, 'Crop image', (next, value) => { const source = element(); if (source?.crop) next.elements[source.id].crop.focalY = Number(value); });
   bindTransactionalInput(ui.imageZoom, 'Crop image', (next, value) => { const source = element(); if (source?.crop) next.elements[source.id].crop.zoom = Number(value); });
-  ui.lock.addEventListener('click', () => { const source = element(); if (source) mutate(source.permissions.locked ? 'Unlock element' : 'Lock element', (next) => { next.elements[source.id].permissions.locked = !source.permissions.locked; }); closePopovers(); });
-  ui.duplicate.addEventListener('click', () => { duplicateElement(); closePopovers(); }); ui.remove.addEventListener('click', () => { deleteElement(); closePopovers(); });
+  const toggleElementLock = () => { const source = element(); if (source) mutate(source.permissions.locked ? 'Unlock element' : 'Lock element', (next) => { next.elements[source.id].permissions.locked = !source.permissions.locked; }); closePopovers(); };
   ui.textCaseControls.addEventListener('click', (event) => { const button = event.target.closest('[data-text-case]'); if (button) { changeTextCase(button.dataset.textCase); closePopovers(); } });
   ui.editImage.addEventListener('click', () => {
     const source = element(); if (source?.type !== 'image' || source.permissions.locked || !source.permissions.editable) return;
@@ -593,9 +591,9 @@
     if (message.type === 'green-sage-visual:delete-selected') { deleteElement(); return; }
     if (message.type === 'green-sage-visual:object-action') {
       if (message.elementId !== selectedElementId || !state.elements[message.elementId]) return;
-      if (message.action === 'lock') { ui.lock.click(); return; }
-      if (message.action === 'duplicate') { ui.duplicate.click(); return; }
-      if (message.action === 'delete') { ui.remove.click(); return; }
+      if (message.action === 'lock') { toggleElementLock(); return; }
+      if (message.action === 'duplicate') { duplicateElement(); closePopovers(); return; }
+      if (message.action === 'delete') { deleteElement(); closePopovers(); return; }
       if (message.action === 'more' && message.anchor) {
         const frame = ui.canvas.getBoundingClientRect(); const anchor = message.anchor;
         const values = ['left', 'right', 'top', 'bottom', 'width', 'height'].map((key) => Number(anchor[key]));

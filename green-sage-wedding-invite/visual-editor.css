@@ -110,6 +110,9 @@ input[type="range"] { width:100%; accent-color:var(--sage); }
 .context-button,.color-button { display:flex; min-height:42px; align-items:center; justify-content:center; padding:7px 10px; border:1px solid var(--line); border-radius:8px; background:#fff; font-size:10px; white-space:nowrap; }
 .context-button.square { width:42px; padding:0; font-size:14px; }
 .context-button.is-active { color:#fff; border-color:var(--sage); background:var(--sage); }
+.image-reframe-zoom { display:flex; min-width:150px; align-items:center; gap:8px; padding:0 9px; color:var(--muted); font-size:9px; white-space:nowrap; }
+.image-reframe-zoom[hidden] { display:none; }
+.image-reframe-zoom input { min-width:100px; }
 .font-trigger { width:150px; justify-content:space-between; overflow:hidden; }
 .font-trigger span:first-child { overflow:hidden; font-size:14px; text-overflow:ellipsis; }
 .font-size-control { display:grid; grid-template-columns:36px 52px 36px; overflow:hidden; border:1px solid var(--line); border-radius:8px; background:#fff; }
