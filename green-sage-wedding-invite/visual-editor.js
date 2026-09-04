@@ -47,6 +47,7 @@
   let assetRecords = [];
   let assetUrls = {};
   let assetObjectUrls = [];
+  let replaceTargetElementId = null;
 
   const section = () => state.sections[selectedSectionId] || null;
   const element = () => state.elements[selectedElementId] || null;
@@ -132,10 +133,10 @@
   const selectSection = (id, sync = true) => { if (!state.sections[id]) return; backgroundEditSectionId = null; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
   const selectElement = (id, sync = true) => { if (!state.elements[id]) return; backgroundEditSectionId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
 
-  const ensureSelectedFont = async (nextFont, style = null) => {
-    const current = element(); if (!current || current.type !== 'text') return;
-    const target = style || current.style;
-    await model.loadFont(nextFont, { document, weight: target.fontWeight, style: target.fontStyle, size: target.fontSize, sample: current.content });
+  const ensureElementFont = async (elementId, nextFont) => {
+    const current = state.elements[elementId]; if (!current || current.type !== 'text') return false;
+    await model.loadFont(nextFont, { document, weight: current.style.fontWeight, style: current.style.fontStyle, size: current.style.fontSize, sample: current.content });
+    return state.elements[elementId]?.type === 'text';
   };
 
   const renderFontList = () => {
@@ -374,8 +375,9 @@
   ui.fontFilters.addEventListener('click', (event) => { const button = event.target.closest('[data-font-category]'); if (!button) return; activeFontCategory = button.dataset.fontCategory; $$('[data-font-category]', ui.fontFilters).forEach((item) => item.classList.toggle('is-active', item === button)); renderFontList(); });
   ui.fontList.addEventListener('click', async (event) => {
     const option = event.target.closest('[data-font-name]'); const source = element(); if (!option || source?.type !== 'text') return;
-    await ensureSelectedFont(option.dataset.fontName);
-    mutate('Change font', (next) => { const target = next.elements[source.id]; const variant = model.resolveFontVariant(option.dataset.fontName, target.style.fontWeight, target.style.fontStyle); target.style.fontFamily = variant.font.name; target.style.fontWeight = variant.weight; target.style.fontStyle = variant.style; }); closePopovers();
+    const targetId = source.id; const fontName = option.dataset.fontName;
+    if (!await ensureElementFont(targetId, fontName)) { closePopovers(); return; }
+    mutate('Change font', (next) => { const target = next.elements[targetId]; const variant = model.resolveFontVariant(fontName, target.style.fontWeight, target.style.fontStyle); target.style.fontFamily = variant.font.name; target.style.fontWeight = variant.weight; target.style.fontStyle = variant.style; }); closePopovers();
   });
 
   SIZE_PRESETS.forEach((size) => { const button = document.createElement('button'); button.type = 'button'; button.dataset.fontSize = size; button.textContent = size; ui.sizePresets.append(button); });
@@ -408,8 +410,18 @@
   ui.duplicate.addEventListener('click', () => { duplicateElement(); closePopovers(); }); ui.remove.addEventListener('click', () => { deleteElement(); closePopovers(); });
   ui.textCaseControls.addEventListener('click', (event) => { const button = event.target.closest('[data-text-case]'); if (button) { changeTextCase(button.dataset.textCase); closePopovers(); } });
   ui.imageFit.addEventListener('click', () => { const source = element(); if (source) mutate('Change image fit', (next) => { next.elements[source.id].crop.fit = source.crop.fit === 'cover' ? 'contain' : 'cover'; }); });
-  ui.replace.addEventListener('click', () => ui.replaceInput.click());
-  ui.replaceInput.addEventListener('change', async () => { const source = element(); const [added] = await uploadFiles(ui.replaceInput.files); if (source && added) mutate('Replace image', (next) => { next.elements[source.id].assetId = added.id; next.elements[source.id].assetKind = 'upload'; }); ui.replaceInput.value = ''; });
+  ui.replace.addEventListener('click', () => {
+    const source = element();
+    replaceTargetElementId = source && ['image', 'decorative'].includes(source.type) ? source.id : null;
+    if (replaceTargetElementId) ui.replaceInput.click();
+  });
+  ui.replaceInput.addEventListener('change', async () => {
+    const targetId = replaceTargetElementId; const files = [...ui.replaceInput.files]; replaceTargetElementId = null; ui.replaceInput.value = '';
+    if (!targetId || !files.length) return;
+    const [added] = await uploadFiles(files); const target = state.elements[targetId];
+    if (!added || !target || !['image', 'decorative'].includes(target.type)) return;
+    mutate('Replace image', (next) => { next.elements[targetId].assetId = added.id; next.elements[targetId].assetKind = 'upload'; });
+  });
 
   ui.palette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); if (!swatch) return; mutate('Change section color', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color: rememberColor(next, swatch.dataset.color), assetId: '' }); }); });
   bindTransactionalInput(ui.sectionColor, 'Change section color', (next, value) => { const color = rememberColor(next, value); if (color) Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color, assetId: '' }); });
@@ -427,7 +439,15 @@
   bindTransactionalInput(ui.backgroundZoom, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.zoom = Number(value); });
   ui.templateElements.addEventListener('click', (event) => { const card = event.target.closest('[data-asset-id]'); if (card) addImage(card.dataset.assetId, 'template', 'decorative'); });
   ui.uploadInput.addEventListener('change', async () => { await uploadFiles(ui.uploadInput.files); ui.uploadInput.value = ''; });
-  ui.uploadLibrary.addEventListener('click', (event) => { const card = event.target.closest('[data-asset-id]'); const action = event.target.closest('[data-upload-action]'); if (!card || !action) return; if (action.dataset.uploadAction === 'insert') addImage(card.dataset.assetId); else applyBackgroundAsset(card.dataset.assetId, 'upload'); });
+  ui.uploadLibrary.addEventListener('click', (event) => {
+    const card = event.target.closest('[data-asset-id]'); const action = event.target.closest('[data-upload-action]');
+    if (!card || !action) return;
+    switch (action.dataset.uploadAction) {
+      case 'insert': addImage(card.dataset.assetId); break;
+      case 'background': applyBackgroundAsset(card.dataset.assetId, 'upload'); break;
+      default: break;
+    }
+  });
 
   ui.addSection.addEventListener('click', addSection); ui.duplicateSection.addEventListener('click', duplicateSection); ui.deleteSection.addEventListener('click', deleteSection);
   ui.sectionList.addEventListener('click', (event) => { const card = event.target.closest('[data-section-id]'); if (!card) return; const move = event.target.closest('[data-section-move]'); if (move) moveSection(card.dataset.sectionId, move.dataset.sectionMove); else selectSection(card.dataset.sectionId); });
