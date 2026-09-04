@@ -221,6 +221,7 @@
     ui.editImage.hidden = selected?.type !== 'image' || Boolean(imageEditElementId);
     ui.doneImage.hidden = !imageEditElementId;
     ui.imageZoomControl.hidden = !imageEditElementId;
+    ui.replace.hidden = selected?.type !== 'image'; ui.imageFit.hidden = selected?.type !== 'image';
     $$('[data-open-position]', ui.imageContext).forEach(button => { button.disabled = Boolean(imageEditElementId); });
     ui.editImage.disabled = !selected?.permissions.editable || selected?.permissions.locked;
     ui.editImage.setAttribute('aria-pressed', String(Boolean(imageEditElementId)));
@@ -405,7 +406,13 @@
   const addImage = (assetId, assetKind = 'upload', type = 'image') => {
     const current = section(); if (!current) return;
     const count = current.elementOrder.length;
-    const created = model.createImageElement({ sectionId: current.id, assetId, assetKind, type, frame: { x: 65 + (count % 3) * 8, y: 410 + (count % 4) * 12, width: 260, height: 220 }, crop: { fit: type === 'decorative' ? 'contain' : 'cover' } });
+    let frame = { x: 65 + (count % 3) * 8, y: 410 + (count % 4) * 12, width: 260, height: 220 };
+    if (type === 'decorative') {
+      const asset = model.getTemplateAsset(assetId); const ratio = asset?.width && asset?.height ? asset.width / asset.height : 1;
+      const maxHeight = Math.max(32, current.height - 40); const width = Math.min(260, maxHeight * ratio); const height = width / ratio; const offset = (count % 3) * 8;
+      frame = { x: Math.max(20, Math.min(390 - width - 20, (390 - width) / 2 + offset)), y: Math.max(20, Math.min(current.height - height - 20, (current.height - height) / 2 + offset)), width, height };
+    }
+    const created = model.createImageElement({ sectionId: current.id, assetId, assetKind, type, frame, crop: { fit: type === 'decorative' ? 'contain' : 'cover' } });
     mutate('Add image', (next) => { next.elements[created.id] = created; next.sections[current.id].elementOrder.push(created.id); }, { sectionId: current.id, elementId: created.id });
   };
 
@@ -600,14 +607,14 @@
   ui.imageFit.addEventListener('click', () => { const source = element(); if (source) mutate('Change image fit', (next) => { next.elements[source.id].crop.fit = source.crop.fit === 'cover' ? 'contain' : 'cover'; }); });
   ui.replace.addEventListener('click', () => {
     const source = element();
-    replaceTargetElementId = source && ['image', 'decorative'].includes(source.type) ? source.id : null;
+    replaceTargetElementId = source?.type === 'image' ? source.id : null;
     if (replaceTargetElementId) ui.replaceInput.click();
   });
   ui.replaceInput.addEventListener('change', async () => {
     const targetId = replaceTargetElementId; const files = [...ui.replaceInput.files]; replaceTargetElementId = null; ui.replaceInput.value = '';
     if (!targetId || !files.length) return;
     const [added] = await uploadFiles(files); const target = state.elements[targetId];
-    if (!added || !target || !['image', 'decorative'].includes(target.type)) return;
+    if (!added || target?.type !== 'image') return;
     // Preserve fit, focal position, zoom and flips alongside the existing frame/layout.
     mutate('Replace image', (next) => { next.elements[targetId].assetId = added.id; next.elements[targetId].assetKind = 'upload'; });
   });

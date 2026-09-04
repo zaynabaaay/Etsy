@@ -214,6 +214,15 @@
     const move = (nextEvent) => {
       if (nextEvent.pointerId !== event.pointerId) return;
       const dx = (nextEvent.clientX - start.x) / scale; const dy = (nextEvent.clientY - start.y) / scale; const next = { ...start.frame };
+      if (item.type === 'decorative') {
+        const xSign = direction.includes('w') ? -1 : 1; const ySign = direction.includes('n') ? -1 : 1;
+        const projected = ((dx * xSign * start.frame.width) + (dy * ySign * start.frame.height)) / ((start.frame.width ** 2) + (start.frame.height ** 2));
+        const factor = Math.max(40 / start.frame.width, 32 / start.frame.height, 1 + projected);
+        next.width = start.frame.width * factor; next.height = start.frame.height * factor;
+        if (direction.includes('w')) next.x = start.frame.x + start.frame.width - next.width;
+        if (direction.includes('n')) next.y = start.frame.y + start.frame.height - next.height;
+        applyFrame(item, frame, next); return;
+      }
       if (direction.includes('e')) next.width = Math.max(40, start.frame.width + dx);
       if (direction.includes('s')) next.height = Math.max(32, start.frame.height + dy);
       if (direction.includes('w')) { next.width = Math.max(40, start.frame.width - dx); next.x = start.frame.x + start.frame.width - next.width; }
@@ -335,13 +344,15 @@
   const imageSize = (item, image) => {
     const { width, height } = item.frame;
     const ratio = image.naturalWidth && image.naturalHeight ? image.naturalWidth / image.naturalHeight : width / height;
-    const fitWidth = item.crop.fit === 'cover' ? Math.max(width, height * ratio) : Math.min(width, height * ratio);
-    return { width: fitWidth * item.crop.zoom, height: fitWidth / ratio * item.crop.zoom };
+    const cover = item.type !== 'decorative' && item.crop.fit === 'cover'; const zoom = item.type === 'decorative' ? 1 : item.crop.zoom;
+    const fitWidth = cover ? Math.max(width, height * ratio) : Math.min(width, height * ratio);
+    return { width: fitWidth * zoom, height: fitWidth / ratio * zoom };
   };
   const layoutImage = (item, image) => {
     if (!image) return;
     const size = imageSize(item, image);
-    Object.assign(image.style, { position: 'absolute', maxWidth: 'none', width: `${size.width}px`, height: `${size.height}px`, left: `${(item.frame.width - size.width) * item.crop.focalX / 100}px`, top: `${(item.frame.height - size.height) * item.crop.focalY / 100}px`, objectFit: 'fill', transform: `scale(${item.crop.flipX ? -1 : 1}, ${item.crop.flipY ? -1 : 1})` });
+    const focalX = item.type === 'decorative' ? 50 : item.crop.focalX; const focalY = item.type === 'decorative' ? 50 : item.crop.focalY;
+    Object.assign(image.style, { position: 'absolute', maxWidth: 'none', width: `${size.width}px`, height: `${size.height}px`, left: `${(item.frame.width - size.width) * focalX / 100}px`, top: `${(item.frame.height - size.height) * focalY / 100}px`, objectFit: 'fill', transform: `scale(${item.crop.flipX ? -1 : 1}, ${item.crop.flipY ? -1 : 1})` });
   };
   const startImageReframe = (event, item, content, image) => {
     if (!canPointer(event) || gesture || item.permissions.locked || !item.permissions.editable) return;
@@ -383,7 +394,7 @@
       if (selectedElementId === item.id) startMove(event, item, frame);
     });
     if (selectedElementId === item.id && imageEditElementId !== item.id && !item.permissions.locked) {
-      if (item.permissions.resizable) resizeDirections.forEach((direction) => { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'resize-handle'; handle.dataset.direction = direction; handle.setAttribute('aria-label', `Resize ${direction}`); handle.addEventListener('pointerdown', (event) => startResize(event, item, frame, direction)); frame.append(handle); });
+      if (item.permissions.resizable) (item.type === 'decorative' ? ['nw', 'ne', 'se', 'sw'] : resizeDirections).forEach((direction) => { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'resize-handle'; handle.dataset.direction = direction; handle.setAttribute('aria-label', `Resize ${direction}`); handle.addEventListener('pointerdown', (event) => startResize(event, item, frame, direction)); frame.append(handle); });
     }
     return frame;
   };

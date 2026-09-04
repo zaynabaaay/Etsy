@@ -38,10 +38,10 @@
     Object.freeze({ id: 'background-ivory-silk', name: 'Ivory Silk', kind: 'background', url: 'invitation-assets/opening-background-ivory-silk-4k.png' }),
     Object.freeze({ id: 'background-sage-flatlay', name: 'Sage Flatlay', kind: 'background', url: 'invitation-assets/opening-background-sage-flatlay.png' }),
     Object.freeze({ id: 'background-botanical', name: 'Botanical Paper', kind: 'background', url: 'invitation-assets/invitation-background-optimized.jpg' }),
-    Object.freeze({ id: 'asset-botanical-left', name: 'Botanical Left', kind: 'decorative', url: 'invitation-assets/botanical-left.png' }),
-    Object.freeze({ id: 'asset-botanical-right', name: 'Botanical Right', kind: 'decorative', url: 'invitation-assets/botanical-right.png' }),
-    Object.freeze({ id: 'asset-botanical-accent', name: 'Botanical Accent', kind: 'decorative', url: 'invitation-assets/botanical-accent-v2.png' }),
-    Object.freeze({ id: 'asset-deckled-frame', name: 'Deckled Frame', kind: 'decorative', url: 'invitation-assets/deckled-edge.png' })
+    Object.freeze({ id: 'asset-botanical-left', name: 'Botanical Left', kind: 'decorative', url: 'invitation-assets/botanical-left.png', width: 1024, height: 1536 }),
+    Object.freeze({ id: 'asset-botanical-right', name: 'Botanical Right', kind: 'decorative', url: 'invitation-assets/botanical-right.png', width: 1024, height: 1536 }),
+    Object.freeze({ id: 'asset-botanical-accent', name: 'Botanical Accent', kind: 'decorative', url: 'invitation-assets/botanical-accent-v2.png', width: 1254, height: 1254 }),
+    Object.freeze({ id: 'asset-deckled-frame', name: 'Deckled Frame', kind: 'decorative', url: 'invitation-assets/deckled-edge.png', width: 1672, height: 941 })
   ]);
   const TEMPLATE_ASSET_BY_ID = Object.freeze(Object.fromEntries(TEMPLATE_ASSETS.map((asset) => [asset.id, asset])));
   const SECTION_HEIGHT_PRESETS = Object.freeze({ strip: 280, standard: 620, full: 844 });
