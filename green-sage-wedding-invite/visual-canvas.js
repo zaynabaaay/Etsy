@@ -7,13 +7,28 @@
   quickActions.hidden = true;
   quickActions.setAttribute('role', 'toolbar');
   quickActions.setAttribute('aria-label', 'Selected object actions');
-  const quickActionButton = (action, icon, label) => {
-    const button = document.createElement('button'); button.type = 'button'; button.dataset.objectAction = action; button.textContent = icon; button.title = label; button.setAttribute('aria-label', label); quickActions.append(button); return button;
+  // Standard editor actions use Lucide icons; ambiguous actions should keep text labels.
+  const lucideIcons = {
+    lock: [['rect', { width: 18, height: 11, x: 3, y: 11, rx: 2, ry: 2 }], ['path', { d: 'M7 11V7a5 5 0 0 1 10 0v4' }]],
+    unlock: [['rect', { width: 18, height: 11, x: 3, y: 11, rx: 2, ry: 2 }], ['path', { d: 'M7 11V7a5 5 0 0 1 9.9-1' }]],
+    copy: [['rect', { width: 12, height: 12, x: 8, y: 8, rx: 2, ry: 2 }], ['path', { d: 'M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2' }]],
+    trash2: [['path', { d: 'M3 6h18' }], ['path', { d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6' }], ['path', { d: 'M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2' }], ['line', { x1: 10, x2: 10, y1: 11, y2: 17 }], ['line', { x1: 14, x2: 14, y1: 11, y2: 17 }]],
+    ellipsis: [['circle', { cx: 12, cy: 12, r: 1 }], ['circle', { cx: 19, cy: 12, r: 1 }], ['circle', { cx: 5, cy: 12, r: 1 }]],
   };
-  const quickLock = quickActionButton('lock', '🔒', 'Lock');
-  const quickDuplicate = quickActionButton('duplicate', '⧉', 'Duplicate');
-  const quickDelete = quickActionButton('delete', '🗑', 'Delete');
-  const quickMore = quickActionButton('more', '•••', 'More');
+  const setQuickActionIcon = (button, name) => {
+    if (button.firstElementChild?.dataset.lucide === name) return;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.dataset.lucide = name; svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '2'); svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round'); svg.setAttribute('aria-hidden', 'true');
+    lucideIcons[name].forEach(([tag, attributes]) => { const node = document.createElementNS(svg.namespaceURI, tag); Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, value)); svg.append(node); });
+    button.replaceChildren(svg);
+  };
+  const quickActionButton = (action, icon, label) => {
+    const button = document.createElement('button'); button.type = 'button'; button.dataset.objectAction = action; button.title = label; button.setAttribute('aria-label', label); setQuickActionIcon(button, icon); quickActions.append(button); return button;
+  };
+  const quickLock = quickActionButton('lock', 'lock', 'Lock');
+  const quickDuplicate = quickActionButton('duplicate', 'copy', 'Duplicate');
+  const quickDelete = quickActionButton('delete', 'trash2', 'Delete');
+  const quickMore = quickActionButton('more', 'ellipsis', 'More');
   document.body.append(quickActions);
   const ORIGIN = window.location.origin === 'null' ? '*' : window.location.origin;
   const sameOrigin = (origin) => origin === window.location.origin || (origin === 'null' && window.location.origin === 'null');
@@ -51,7 +66,7 @@
     const top = above >= topEdge ? above : Math.min(below, bottomEdge - bar.height);
     quickActions.style.transform = `translate(${Math.round(left)}px, ${Math.round(Math.max(topEdge, top))}px)`;
     const locked = Boolean(item.permissions.locked);
-    quickLock.textContent = locked ? '🔓' : '🔒'; quickLock.title = locked ? 'Unlock' : 'Lock'; quickLock.setAttribute('aria-label', quickLock.title);
+    setQuickActionIcon(quickLock, locked ? 'unlock' : 'lock'); quickLock.title = locked ? 'Unlock' : 'Lock'; quickLock.setAttribute('aria-label', quickLock.title);
     quickDuplicate.disabled = locked; quickDelete.disabled = locked || !item.permissions.deletable;
   };
 
