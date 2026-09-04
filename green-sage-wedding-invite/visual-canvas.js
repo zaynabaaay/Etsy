@@ -10,6 +10,7 @@
   let selectedSectionId = null;
   let selectedElementId = null;
   let backgroundEditSectionId = null;
+  let imageEditElementId = null;
   let editingElementId = null;
   let assetUrls = {};
   let scale = 1;
@@ -126,6 +127,7 @@
   const applyFrame = (item, frame, nextFrame, guides = []) => {
     item.frame = { ...item.frame, ...nextFrame };
     Object.assign(frame.style, { left: `${item.frame.x}px`, top: `${item.frame.y}px`, width: `${item.frame.width}px`, height: `${item.frame.height}px` });
+    if (item.crop) layoutImage(item, frame.querySelector('.image-content img'));
     updateOverflow(item); drawGuides(item.sectionId, guides); sendPatch({ frame: item.frame });
   };
 
@@ -272,24 +274,58 @@
     });
   };
 
+  // Resolve the actual fitted image size; focal positions span only its available travel.
+  const imageSize = (item, image) => {
+    const { width, height } = item.frame;
+    const ratio = image.naturalWidth && image.naturalHeight ? image.naturalWidth / image.naturalHeight : width / height;
+    const fitWidth = item.crop.fit === 'cover' ? Math.max(width, height * ratio) : Math.min(width, height * ratio);
+    return { width: fitWidth * item.crop.zoom, height: fitWidth / ratio * item.crop.zoom };
+  };
+  const layoutImage = (item, image) => {
+    if (!image) return;
+    const size = imageSize(item, image);
+    Object.assign(image.style, { position: 'absolute', maxWidth: 'none', width: `${size.width}px`, height: `${size.height}px`, left: `${(item.frame.width - size.width) * item.crop.focalX / 100}px`, top: `${(item.frame.height - size.height) * item.crop.focalY / 100}px`, objectFit: 'fill', transform: `scale(${item.crop.flipX ? -1 : 1}, ${item.crop.flipY ? -1 : 1})` });
+  };
+  const startImageReframe = (event, item, content, image) => {
+    if (!canPointer(event) || gesture || item.permissions.locked || !item.permissions.editable) return;
+    event.preventDefault(); event.stopPropagation(); exitEdit();
+    const start = { x: event.clientX, y: event.clientY, crop: { ...item.crop } }; const size = imageSize(item, image);
+    const angle = item.rotation * Math.PI / 180;
+    sendStart('element', item.id, 'Reframe image');
+    trackGesture(event, content, (nextEvent) => {
+      const current = state.elements[item.id]; if (!current || imageEditElementId !== item.id) { finishGesture(gesture); return; }
+      const dx = (nextEvent.clientX - start.x) / scale, dy = (nextEvent.clientY - start.y) / scale;
+      const x = dx * Math.cos(angle) + dy * Math.sin(angle), y = -dx * Math.sin(angle) + dy * Math.cos(angle);
+      const focal = (initial, delta, travel) => Math.abs(travel) < .01 ? initial : Math.max(0, Math.min(100, initial + delta / travel * 100));
+      current.crop.focalX = focal(start.crop.focalX, x, item.frame.width - size.width);
+      current.crop.focalY = focal(start.crop.focalY, y, item.frame.height - size.height);
+      layoutImage(current, image); sendPatch({ crop: { focalX: current.crop.focalX, focalY: current.crop.focalY } });
+    });
+  };
   const createImageContent = (item) => {
     const content = document.createElement('div'); content.className = 'element-content image-content';
     const image = document.createElement('img'); image.alt = item.alt || ''; image.draggable = false;
-    Object.assign(image.style, { objectFit: item.crop.fit, objectPosition: `${item.crop.focalX}% ${item.crop.focalY}%`, transform: `scale(${item.crop.zoom})` }); content.append(image); setImageSource(content, image, item);
-    content.addEventListener('pointerdown', (event) => { if (!canPointer(event)) return; if (selectedElementId !== item.id) { event.preventDefault(); event.stopPropagation(); post({ type: 'green-sage-visual:select-element', elementId: item.id }); } });
+    image.addEventListener('load', () => { const current = state.elements[item.id]; if (current?.crop) layoutImage(current, image); });
+    layoutImage(item, image); content.append(image); setImageSource(content, image, item);
+    content.addEventListener('pointerdown', (event) => {
+      if (!canPointer(event)) return;
+      if (imageEditElementId === item.id) { startImageReframe(event, item, content, image); return; }
+      if (selectedElementId !== item.id) { event.preventDefault(); event.stopPropagation(); post({ type: 'green-sage-visual:select-element', elementId: item.id }); }
+    });
     return content;
   };
 
   const createElement = (item) => {
     const frame = document.createElement('div'); frame.className = 'element-frame'; frame.dataset.elementId = item.id; frame.dataset.elementType = item.type;
+    frame.classList.toggle('is-image-editing', imageEditElementId === item.id);
     frame.classList.toggle('is-selected', selectedElementId === item.id); frame.classList.toggle('is-locked', item.permissions.locked);
     Object.assign(frame.style, { left: `${item.frame.x}px`, top: `${item.frame.y}px`, width: `${item.frame.width}px`, height: `${item.frame.height}px`, opacity: item.opacity, rotate: `${item.rotation}deg` });
     const animation = document.createElement('div'); animation.className = 'element-animation-layer'; animation.append(item.type === 'text' ? createTextContent(item, frame) : createImageContent(item)); frame.append(animation);
     frame.addEventListener('pointerdown', (event) => {
-      if (!canPointer(event) || event.target.closest('.resize-handle') || editingElementId === item.id) return;
+      if (!canPointer(event) || event.target.closest('.resize-handle') || editingElementId === item.id || imageEditElementId === item.id) return;
       if (selectedElementId === item.id) startMove(event, item, frame);
     });
-    if (selectedElementId === item.id && !item.permissions.locked) {
+    if (selectedElementId === item.id && imageEditElementId !== item.id && !item.permissions.locked) {
       if (item.permissions.resizable) resizeDirections.forEach((direction) => { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'resize-handle'; handle.dataset.direction = direction; handle.setAttribute('aria-label', `Resize ${direction}`); handle.addEventListener('pointerdown', (event) => startResize(event, item, frame, direction)); frame.append(handle); });
     }
     return frame;
@@ -319,7 +355,10 @@
   window.addEventListener('message', (event) => {
     if (event.source !== window.parent || !sameOrigin(event.origin) || !event.data) return;
     if (event.data.type === 'green-sage-visual:state') {
+      if (gesture && imageEditElementId) finishGesture(gesture);
       const wasEditing = editingElementId; state = model.normalize(event.data.state); selectedSectionId = state.sections[event.data.selectedSectionId] ? event.data.selectedSectionId : state.document.sectionOrder[0]; selectedElementId = state.elements[event.data.selectedElementId] ? event.data.selectedElementId : null; backgroundEditSectionId = state.sections[event.data.backgroundEditSectionId]?.background.kind === 'image' ? event.data.backgroundEditSectionId : null; assetUrls = event.data.assetUrls || {};
+      const imageTarget = state.elements[event.data.imageEditElementId];
+      imageEditElementId = imageTarget?.type === 'image' && imageTarget.id === selectedElementId && !imageTarget.permissions.locked && imageTarget.permissions.editable ? imageTarget.id : null;
       if (wasEditing && state.elements[wasEditing]?.type === 'text' && transaction?.label === 'Edit text') {
         syncUploadSources(); syncEditableContent(state.elements[wasEditing]);
         return;

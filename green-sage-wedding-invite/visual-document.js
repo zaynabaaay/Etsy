@@ -107,7 +107,7 @@
   const createImageElement = (overrides = {}) => ({
     ...baseElement({ frame: { x: 65, y: 430, width: 260, height: 220 }, ...overrides }, overrides.type === 'decorative' ? 'decorative' : 'image'),
     assetId: String(overrides.assetId || ''), assetKind: overrides.assetKind === 'template' ? 'template' : 'upload', alt: String(overrides.alt || 'Invitation image'),
-    crop: { fit: overrides.crop?.fit === 'contain' ? 'contain' : 'cover', focalX: clamp(overrides.crop?.focalX ?? 50, 0, 100), focalY: clamp(overrides.crop?.focalY ?? 50, 0, 100), zoom: clamp(overrides.crop?.zoom ?? 1, 1, 4) }
+    crop: { flipX: overrides.crop?.flipX === true, flipY: overrides.crop?.flipY === true, fit: overrides.crop?.fit === 'contain' ? 'contain' : 'cover', focalX: clamp(overrides.crop?.focalX ?? 50, 0, 100), focalY: clamp(overrides.crop?.focalY ?? 50, 0, 100), zoom: clamp(overrides.crop?.zoom ?? 1, 1, 4) }
   });
   const createSection = (overrides = {}) => ({
     id: overrides.id || createId('section'), name: String(overrides.name || 'Untitled section'), height: clamp(overrides.height ?? SECTION_HEIGHT_PRESETS.standard, 180, 2200),
@@ -133,7 +133,7 @@
   };
   const normalizeImageElement = (value, id, sectionId) => {
     const supplied = value && typeof value === 'object' ? value : {}; const fallback = createImageElement({ id, sectionId, type: supplied.type });
-    return { ...fallback, ...supplied, id, sectionId, type: supplied.type === 'decorative' ? 'decorative' : 'image', frame: normalizeFrame(supplied.frame, fallback.frame), assetId: String(supplied.assetId || ''), assetKind: supplied.assetKind === 'template' ? 'template' : 'upload', alt: String(supplied.alt || fallback.alt), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), crop: { fit: supplied.crop?.fit === 'contain' ? 'contain' : fallback.crop.fit, focalX: clamp(supplied.crop?.focalX ?? 50, 0, 100), focalY: clamp(supplied.crop?.focalY ?? 50, 0, 100), zoom: clamp(supplied.crop?.zoom ?? 1, 1, 4) }, responsive: { ...fallback.responsive, ...(supplied.responsive || {}), strategy: 'scale' }, permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
+    return { ...fallback, ...supplied, id, sectionId, type: supplied.type === 'decorative' ? 'decorative' : 'image', frame: normalizeFrame(supplied.frame, fallback.frame), assetId: String(supplied.assetId || ''), assetKind: supplied.assetKind === 'template' ? 'template' : 'upload', alt: String(supplied.alt || fallback.alt), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), crop: { flipX: supplied.crop?.flipX === true, flipY: supplied.crop?.flipY === true, fit: supplied.crop?.fit === 'contain' ? 'contain' : fallback.crop.fit, focalX: clamp(supplied.crop?.focalX ?? 50, 0, 100), focalY: clamp(supplied.crop?.focalY ?? 50, 0, 100), zoom: clamp(supplied.crop?.zoom ?? 1, 1, 4) }, responsive: { ...fallback.responsive, ...(supplied.responsive || {}), strategy: 'scale' }, permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
   };
   const normalize = (value) => {
     const supplied = value && typeof value === 'object' ? clone(value) : clone(defaults); const documentValue = supplied.document && typeof supplied.document === 'object' ? supplied.document : {};

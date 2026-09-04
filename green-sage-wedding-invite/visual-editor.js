@@ -22,7 +22,7 @@
     fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'),
     bold: $('boldButton'), italic: $('italicButton'), alignButton: $('alignmentButton'), alignPopover: $('alignmentPopover'), spacingButton: $('spacingButton'), spacingPopover: $('spacingPopover'), lineHeight: $('lineHeight'), letterSpacing: $('letterSpacing'),
     positionPopover: $('positionPopover'), morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), textCaseControls: $('textCaseControls'), cropControls: $('imageCropControls'), imageFocalX: $('imageFocalX'), imageFocalY: $('imageFocalY'), imageZoom: $('imageZoom'),
-    lock: $('lockButton'), duplicate: $('duplicateButton'), remove: $('deleteButton'), replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'),
+    lock: $('lockButton'), duplicate: $('duplicateButton'), remove: $('deleteButton'), replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
     designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'), templateBackgrounds: $('templateBackgrounds'), uploadedBackgrounds: $('uploadedBackgrounds'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
     templateElements: $('templateElements'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'),
     addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton')
@@ -46,6 +46,7 @@
   let activePanel = 'design';
   let activeFontCategory = 'all';
   let backgroundEditSectionId = null;
+  let imageEditElementId = null;
   let fontObserver = null;
   let transaction = null;
   // Keep completed and rejected starts from reopening a transaction on replay.
@@ -87,7 +88,7 @@
 
   const syncCanvas = () => {
     saveRevision += 1;
-    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:state', state, selectedSectionId, selectedElementId, backgroundEditSectionId, assetUrls, revision: saveRevision }, ORIGIN);
+    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:state', state, selectedSectionId, selectedElementId, backgroundEditSectionId, imageEditElementId, assetUrls, revision: saveRevision }, ORIGIN);
   };
 
   const finishTransaction = (sync = true) => {
@@ -125,7 +126,7 @@
     if (!source.length) return;
     destination.push(snapshot(direction));
     const entry = source.pop(); state = model.normalize(entry.state);
-    backgroundEditSectionId = null;
+    backgroundEditSectionId = null; imageEditElementId = null;
     selectedSectionId = state.sections[entry.selectedSectionId] ? entry.selectedSectionId : state.document.sectionOrder[0];
     selectedElementId = state.elements[entry.selectedElementId] ? entry.selectedElementId : null;
     updateHistory(); scheduleSave(); renderAll(); syncCanvas();
@@ -171,8 +172,8 @@
     $$('.nav-tool').forEach((button) => { const active = button.dataset.panel === name; button.classList.toggle('is-active', active); button.setAttribute('aria-pressed', String(active)); });
     $$('.panel-view').forEach((view) => { const active = view.dataset.panelView === name; view.hidden = !active; view.classList.toggle('is-active', active); });
   };
-  const selectSection = (id, sync = true) => { if (!state.sections[id]) return; backgroundEditSectionId = null; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
-  const selectElement = (id, sync = true) => { if (!state.elements[id]) return; backgroundEditSectionId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
+  const selectSection = (id, sync = true) => { if (!state.sections[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
+  const selectElement = (id, sync = true) => { if (!state.elements[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
 
   const ensureElementFont = async (elementId, nextFont) => {
     const current = state.elements[elementId]; if (!current || current.type !== 'text') return false;
@@ -199,6 +200,14 @@
 
   const renderContext = () => {
     const selected = element();
+    if (selected?.id !== imageEditElementId || selected?.type !== 'image' || selected.permissions.locked || !selected.permissions.editable) imageEditElementId = null;
+    ui.editImage.hidden = selected?.type !== 'image' || Boolean(imageEditElementId);
+    ui.doneImage.hidden = !imageEditElementId;
+    $$('[data-open-position]', ui.imageContext).forEach(button => { button.disabled = Boolean(imageEditElementId); });
+    ui.editImage.disabled = !selected?.permissions.editable || selected?.permissions.locked;
+    ui.editImage.setAttribute('aria-pressed', String(Boolean(imageEditElementId)));
+    ui.imageFlips.hidden = !selected?.crop;
+    $$('[data-image-flip]', ui.imageFlips).forEach(button => { button.disabled = !selected?.permissions.editable || selected?.permissions.locked; button.setAttribute('aria-pressed', String(Boolean(selected?.crop?.[button.dataset.imageFlip]))); });
     const editingBackground = Boolean(backgroundEditSectionId && backgroundEditSectionId === selectedSectionId && section()?.background.kind === 'image');
     ui.contextEmpty.hidden = Boolean(selected || section()); ui.textContext.hidden = selected?.type !== 'text' || editingBackground;
     ui.imageContext.hidden = editingBackground || !selected || !['image', 'decorative'].includes(selected.type); ui.sectionContext.hidden = editingBackground || Boolean(selected) || !section(); ui.backgroundEditContext.hidden = !editingBackground;
@@ -206,7 +215,7 @@
     const locked = selected.permissions.locked;
     ui.opacity.value = selected.opacity; ui.rotation.value = selected.rotation; ui.lock.textContent = locked ? 'Unlock' : 'Lock';
     ui.duplicate.disabled = locked; ui.remove.disabled = locked || !selected.permissions.deletable; ui.textCaseControls.hidden = selected.type !== 'text'; ui.cropControls.hidden = !['image', 'decorative'].includes(selected.type);
-    if (selected.crop) { ui.imageFocalX.value = selected.crop.focalX; ui.imageFocalY.value = selected.crop.focalY; ui.imageZoom.value = selected.crop.zoom; ui.imageFit.textContent = selected.crop.fit === 'cover' ? 'Fit image' : 'Fill frame'; }
+    if (selected.crop) { [ui.imageFit, ui.replace, ui.imageFocalX, ui.imageFocalY, ui.imageZoom].forEach(control => control.disabled = locked || !selected.permissions.editable); ui.imageFocalX.value = selected.crop.focalX; ui.imageFocalY.value = selected.crop.focalY; ui.imageZoom.value = selected.crop.zoom; ui.imageFit.textContent = selected.crop.fit === 'cover' ? 'Fit / Contain' : 'Fill / Cover'; }
     if (selected.type !== 'text') return;
     const font = model.getFont(selected.style.fontFamily); const editable = selected.permissions.editable && !locked;
     ui.fontValue.textContent = font.displayName; ui.fontValue.style.fontFamily = model.fontStack(font.name); ui.fontSize.value = selected.style.fontSize;
@@ -374,12 +383,13 @@
   };
   const setBackgroundEditMode = (enabled) => {
     const current = section();
+    imageEditElementId = null;
     backgroundEditSectionId = enabled && current?.background.kind === 'image' ? current.id : null;
     if (backgroundEditSectionId) selectedElementId = null;
     renderAll(); syncCanvas();
   };
   const applyBackgroundAsset = (assetId, assetKind) => {
-    backgroundEditSectionId = null;
+    backgroundEditSectionId = null; imageEditElementId = null;
     mutate('Change section background', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'image', assetId, assetKind, focalX: 50, focalY: 50, zoom: 1 }); });
   };
   const setSectionHeightPreset = (preset) => {
@@ -461,6 +471,16 @@
   ui.lock.addEventListener('click', () => { const source = element(); if (source) mutate(source.permissions.locked ? 'Unlock element' : 'Lock element', (next) => { next.elements[source.id].permissions.locked = !source.permissions.locked; }); closePopovers(); });
   ui.duplicate.addEventListener('click', () => { duplicateElement(); closePopovers(); }); ui.remove.addEventListener('click', () => { deleteElement(); closePopovers(); });
   ui.textCaseControls.addEventListener('click', (event) => { const button = event.target.closest('[data-text-case]'); if (button) { changeTextCase(button.dataset.textCase); closePopovers(); } });
+  ui.editImage.addEventListener('click', () => {
+    const source = element(); if (source?.type !== 'image' || source.permissions.locked || !source.permissions.editable) return;
+    finishTransaction(false); backgroundEditSectionId = null; imageEditElementId = source.id; closePopovers(); renderAll(); syncCanvas();
+  });
+  ui.doneImage.addEventListener('click', () => { finishTransaction(false); imageEditElementId = null; closePopovers(); renderAll(); syncCanvas(); });
+  ui.imageFlips.addEventListener('click', (event) => {
+    const axis = event.target.closest('[data-image-flip]')?.dataset.imageFlip; const source = element();
+    if (!['flipX', 'flipY'].includes(axis) || !source?.crop || source.permissions.locked || !source.permissions.editable) return;
+    mutate('Flip image', (next) => { next.elements[source.id].crop[axis] = !source.crop[axis]; });
+  });
   ui.imageFit.addEventListener('click', () => { const source = element(); if (source) mutate('Change image fit', (next) => { next.elements[source.id].crop.fit = source.crop.fit === 'cover' ? 'contain' : 'cover'; }); });
   ui.replace.addEventListener('click', () => {
     const source = element();
@@ -472,6 +492,7 @@
     if (!targetId || !files.length) return;
     const [added] = await uploadFiles(files); const target = state.elements[targetId];
     if (!added || !target || !['image', 'decorative'].includes(target.type)) return;
+    // Preserve fit, focal position, zoom and flips alongside the existing frame/layout.
     mutate('Replace image', (next) => { next.elements[targetId].assetId = added.id; next.elements[targetId].assetKind = 'upload'; });
   });
 
@@ -485,7 +506,7 @@
   ui.editBackground.addEventListener('click', () => setBackgroundEditMode(true));
   ui.doneBackground.addEventListener('click', () => setBackgroundEditMode(false));
   ui.doneBackgroundToolbar.addEventListener('click', () => setBackgroundEditMode(false));
-  ui.removeBackground.addEventListener('click', () => { backgroundEditSectionId = null; mutate('Remove background image', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', assetId: '' }); }); });
+  ui.removeBackground.addEventListener('click', () => { backgroundEditSectionId = null; imageEditElementId = null; mutate('Remove background image', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', assetId: '' }); }); });
   bindTransactionalInput(ui.backgroundFocalX, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.focalX = Number(value); });
   bindTransactionalInput(ui.backgroundFocalY, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.focalY = Number(value); });
   bindTransactionalInput(ui.backgroundZoom, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.zoom = Number(value); });
@@ -539,6 +560,7 @@
       if (message.targetType !== 'section' && next.elements[message.targetId]) {
         const target = next.elements[message.targetId];
         if (message.patch?.frame) Object.assign(target.frame, message.patch.frame);
+        if (message.patch?.crop && target.type === 'image') Object.assign(target.crop, { focalX: message.patch.crop.focalX ?? target.crop.focalX, focalY: message.patch.crop.focalY ?? target.crop.focalY });
         if (message.patch?.content != null) target.content = String(message.patch.content);
       }
       state = model.normalize(next); renderAll(); return;

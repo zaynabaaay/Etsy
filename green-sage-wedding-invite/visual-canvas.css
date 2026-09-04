@@ -208,7 +208,8 @@ button {
   height: 100%;
 }
 
-.image-content {
+.element-content.image-content {
+  position: relative;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
@@ -408,3 +409,6 @@ html.is-manipulating body {
     scroll-behavior: auto !important;
   }
 }
+
+.element-frame.is-image-editing .image-content { cursor: grab; touch-action: none; }
+.element-frame.is-image-editing::after { content: 'Drag image to reframe'; position: absolute; left: 0; bottom: -24px; padding: 3px 6px; background: #fff; color: #333; font: 11px sans-serif; pointer-events: none; white-space: nowrap; }
