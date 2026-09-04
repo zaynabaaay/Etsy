@@ -42,6 +42,8 @@
   let backgroundEditSectionId = null;
   let fontObserver = null;
   let transaction = null;
+  // Keep completed and rejected starts from reopening a transaction on replay.
+  const seenCanvasTransactionIds = new Set();
   let saveTimer = 0;
   let saveRevision = 0;
   let assetRecords = [];
@@ -472,9 +474,16 @@
     if (message.type === 'green-sage-visual:select-element') { selectElement(message.elementId, true); return; }
     if (message.type === 'green-sage-visual:select-section') { selectSection(message.sectionId, true); return; }
     if (message.type === 'green-sage-visual:delete-selected') { deleteElement(); return; }
-    if (message.type === 'green-sage-visual:transaction-start') { finishTransaction(false); transaction = { before: snapshot(message.label || 'Edit canvas'), label: message.label || 'Edit canvas', source: 'canvas' }; return; }
+    if (message.type === 'green-sage-visual:transaction-start') {
+      const id = message.transactionId;
+      if (typeof id !== 'string' || !id.trim() || seenCanvasTransactionIds.has(id)) return;
+      seenCanvasTransactionIds.add(id);
+      if (transaction) return;
+      transaction = { id, before: snapshot(message.label || 'Edit canvas'), label: message.label || 'Edit canvas', source: 'canvas' };
+      return;
+    }
     if (message.type === 'green-sage-visual:transaction-patch') {
-      if (!transaction) transaction = { before: snapshot(message.label || 'Edit canvas'), source: 'canvas' };
+      if (transaction?.source !== 'canvas' || message.transactionId !== transaction.id) return;
       const next = clone(state);
       if (message.targetType === 'section' && next.sections[message.targetId] && message.patch?.background) Object.assign(next.sections[message.targetId].background, message.patch.background);
       if (message.targetType !== 'section' && next.elements[message.targetId]) {
@@ -484,7 +493,10 @@
       }
       state = model.normalize(next); renderAll(); return;
     }
-    if (message.type === 'green-sage-visual:transaction-commit') { finishTransaction(false); renderAll(); syncCanvas(); }
+    if (message.type === 'green-sage-visual:transaction-commit') {
+      if (transaction?.source !== 'canvas' || message.transactionId !== transaction.id) return;
+      finishTransaction(false); renderAll(); syncCanvas();
+    }
   });
 
   document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.toolbar-popover, .toolbar-popover-anchor, [data-open-position], [data-open-more]')) closePopovers(); });

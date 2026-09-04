@@ -175,20 +175,46 @@
   };
   const enterEdit = (item, frame, content, event) => {
     if (item.permissions.locked || !item.permissions.editable) return;
-    exitEdit(); editingElementId = item.id; frame.classList.add('is-editing'); content.setAttribute('contenteditable', 'plaintext-only'); content.spellcheck = true;
+    exitEdit(); renderToken += 1; editingElementId = item.id; frame.classList.add('is-editing'); content.setAttribute('contenteditable', 'plaintext-only'); content.spellcheck = true;
     sendStart('element', item.id, 'Edit text'); placeCaret(content, event.clientX, event.clientY);
   };
 
+  const syncEditableContent = (item) => {
+    const content = frameNode(item.id)?.querySelector('.text-content');
+    if (!content) { exitEdit(); render(); return; }
+    if (content.innerText.replace(/\r/g, '') === item.content) return;
+    const selection = getSelection();
+    const offset = (node, position) => {
+      const range = document.createRange(); range.selectNodeContents(content); range.setEnd(node, position); return range.toString().length;
+    };
+    const inside = selection && content.contains(selection.anchorNode) && content.contains(selection.focusNode);
+    const anchor = inside ? offset(selection.anchorNode, selection.anchorOffset) : 0;
+    const focus = inside ? offset(selection.focusNode, selection.focusOffset) : 0;
+    content.textContent = item.content;
+    if (inside) {
+      const node = content.firstChild || content;
+      selection.setBaseAndExtent(node, Math.min(anchor, item.content.length), node, Math.min(focus, item.content.length));
+    }
+  };
+
   const createTextContent = (item, frame) => {
+    const elementId = item.id;
     const content = document.createElement('div'); content.className = 'element-content text-content'; content.textContent = item.content;
     Object.assign(content.style, { fontFamily: model.fontStack(item.style.fontFamily), fontSize: `${item.style.fontSize}px`, fontWeight: item.style.fontWeight, fontStyle: item.style.fontStyle, color: item.style.color, textAlign: item.style.textAlign, lineHeight: item.style.lineHeight, letterSpacing: `${item.style.letterSpacing}px` });
     content.addEventListener('pointerdown', (event) => {
-      if (!canPointer(event) || editingElementId === item.id) return;
-      if (selectedElementId !== item.id) { event.preventDefault(); event.stopPropagation(); lastTextTap = { id: item.id, time: performance.now(), x: event.clientX, y: event.clientY }; post({ type: 'green-sage-visual:select-element', elementId: item.id }); }
+      if (!canPointer(event) || editingElementId === elementId) return;
+      if (selectedElementId !== elementId) { event.preventDefault(); event.stopPropagation(); lastTextTap = { id: elementId, time: performance.now(), x: event.clientX, y: event.clientY }; post({ type: 'green-sage-visual:select-element', elementId }); }
     });
-    content.addEventListener('input', () => { item.content = content.innerText.replace(/\r/g, ''); requestAnimationFrame(() => updateOverflow(item)); sendPatch({ content: item.content }); });
+    content.addEventListener('input', () => {
+      if (editingElementId !== elementId) return;
+      const current = state.elements[elementId];
+      if (current?.type !== 'text') { exitEdit(); return; }
+      current.content = content.innerText.replace(/\r/g, '');
+      requestAnimationFrame(() => { const latest = state.elements[elementId]; if (editingElementId === elementId && latest?.type === 'text') updateOverflow(latest); });
+      sendPatch({ content: current.content });
+    });
     content.addEventListener('paste', (event) => { event.preventDefault(); const text = event.clipboardData?.getData('text/plain') || ''; document.execCommand('insertText', false, text); });
-    content.addEventListener('blur', () => { if (editingElementId === item.id) exitEdit(); });
+    content.addEventListener('blur', () => { if (editingElementId === elementId) exitEdit(); });
     return content;
   };
 
@@ -229,7 +255,7 @@
   };
 
   const render = async () => {
-    if (!state) return; const token = ++renderToken; const scrollY = window.scrollY; scale = calculateScale();
+    if (!state || editingElementId) return; const token = ++renderToken; const scrollY = window.scrollY; scale = calculateScale();
     const fonts = Object.values(state.elements).filter((item) => item.type === 'text').map((item) => model.loadFont(item.style.fontFamily, { document, weight: item.style.fontWeight, style: item.style.fontStyle, size: item.style.fontSize, sample: item.content }));
     await Promise.allSettled(fonts); await document.fonts?.ready; if (token !== renderToken) return;
     root.replaceChildren(...state.document.sectionOrder.map((id) => createSection(state.sections[id])));
@@ -240,8 +266,11 @@
     if (event.source !== window.parent || !sameOrigin(event.origin) || !event.data) return;
     if (event.data.type === 'green-sage-visual:state') {
       const wasEditing = editingElementId; state = model.normalize(event.data.state); selectedSectionId = state.sections[event.data.selectedSectionId] ? event.data.selectedSectionId : state.document.sectionOrder[0]; selectedElementId = state.elements[event.data.selectedElementId] ? event.data.selectedElementId : null; backgroundEditSectionId = state.sections[event.data.backgroundEditSectionId]?.background.kind === 'image' ? event.data.backgroundEditSectionId : null; assetUrls = event.data.assetUrls || {};
-      if (wasEditing && wasEditing === selectedElementId && transaction?.label === 'Edit text') return;
-      editingElementId = null; transaction = null; render();
+      if (wasEditing && state.elements[wasEditing]?.type === 'text' && transaction?.label === 'Edit text') {
+        syncEditableContent(state.elements[wasEditing]);
+        return;
+      }
+      exitEdit(); transaction = null; render();
     }
     if (event.data.type === 'green-sage-visual:scroll-by') window.scrollBy({ top: Number(event.data.deltaY) || 0, behavior: 'auto' });
   });
