@@ -28,6 +28,12 @@
     addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton')
   };
 
+  // Keep existing popover nodes and handlers outside the toolbar scroll containers.
+  const popovers = [ui.fontPopover, ui.sizePresets, ui.textColorPopover, ui.alignPopover, ui.spacingPopover, ui.positionPopover, ui.morePopover, ui.previewPopover];
+  const popoverLayer = document.createElement('div'); popoverLayer.className = 'popover-layer';
+  popoverLayer.append(...popovers); document.body.append(popoverLayer);
+  let openPopover = null;
+
   const ORIGIN = window.location.origin === 'null' ? '*' : window.location.origin;
   const sameOrigin = (origin) => origin === window.location.origin || (origin === 'null' && window.location.origin === 'null');
   const SIZE_PRESETS = [8, 10, 12, 14, 16, 18, 21, 24, 28, 32, 36, 42, 48, 56, 64, 72, 84, 96, 120];
@@ -120,12 +126,39 @@
   };
 
   const closePopovers = (except = null) => {
-    [ui.fontPopover, ui.sizePresets, ui.textColorPopover, ui.alignPopover, ui.spacingPopover, ui.positionPopover, ui.morePopover, ui.previewPopover].forEach((popover) => { if (popover !== except) popover.hidden = true; });
+    popovers.forEach((popover) => { if (popover !== except) popover.hidden = true; });
+    if (openPopover && openPopover.popover !== except) { openPopover.trigger.setAttribute('aria-expanded', 'false'); openPopover = null; }
     ui.fontButton.setAttribute('aria-expanded', String(!ui.fontPopover.hidden));
     ui.previewButton.setAttribute('aria-expanded', String(!ui.previewPopover.hidden));
     if (except !== ui.fontPopover) fontObserver?.disconnect();
   };
-  const togglePopover = (popover, trigger) => { const opening = popover.hidden; closePopovers(opening ? popover : null); popover.hidden = !opening; trigger?.setAttribute('aria-expanded', String(opening)); return opening; };
+  const positionOpenPopover = () => {
+    if (!openPopover) return;
+    const { popover, trigger } = openPopover; const viewport = window.visualViewport;
+    const editor = $('storielEditor').getBoundingClientRect(); const anchor = trigger.getBoundingClientRect(); const margin = 8;
+    const left = Math.max(editor.left, viewport?.offsetLeft || 0) + margin;
+    const top = Math.max(editor.top, viewport?.offsetTop || 0) + margin;
+    const right = Math.min(editor.right, (viewport?.offsetLeft || 0) + (viewport?.width || window.innerWidth)) - margin;
+    const bottom = Math.min(editor.bottom, (viewport?.offsetTop || 0) + (viewport?.height || window.innerHeight)) - margin;
+    const below = Math.max(top, Math.min(bottom, anchor.bottom + margin));
+    const above = Math.max(top, Math.min(bottom, anchor.top - margin));
+    const placeBelow = bottom - below >= above - top;
+    popover.style.setProperty('--popover-max-width', `${Math.max(1, right - left)}px`);
+    popover.style.setProperty('--popover-max-height', `${Math.max(0, placeBelow ? bottom - below : above - top)}px`);
+    const bounds = popover.getBoundingClientRect();
+    popover.style.left = `${Math.max(left, Math.min(anchor.left, right - bounds.width))}px`;
+    popover.style.top = `${placeBelow ? below : above - bounds.height}px`;
+  };
+  const togglePopover = (popover, trigger) => {
+    const opening = popover.hidden; closePopovers(opening ? popover : null); popover.hidden = !opening;
+    trigger.setAttribute('aria-controls', popover.id); trigger.setAttribute('aria-expanded', String(opening));
+    if (opening) { openPopover = { popover, trigger }; positionOpenPopover(); }
+    return opening;
+  };
+  $$('.context-tools').forEach((toolbar) => toolbar.addEventListener('scroll', positionOpenPopover, { passive: true }));
+  window.addEventListener('resize', positionOpenPopover);
+  window.visualViewport?.addEventListener('resize', positionOpenPopover);
+  window.visualViewport?.addEventListener('scroll', positionOpenPopover);
 
   const setPanel = (name) => {
     activePanel = name;
@@ -383,7 +416,7 @@
   });
 
   SIZE_PRESETS.forEach((size) => { const button = document.createElement('button'); button.type = 'button'; button.dataset.fontSize = size; button.textContent = size; ui.sizePresets.append(button); });
-  ui.fontSize.addEventListener('click', () => togglePopover(ui.sizePresets));
+  ui.fontSize.addEventListener('click', () => togglePopover(ui.sizePresets, ui.fontSize));
   ui.sizePresets.addEventListener('click', (event) => { const button = event.target.closest('[data-font-size]'); const source = element(); if (!button || !source) return; mutate('Change font size', (next) => { next.elements[source.id].style.fontSize = Number(button.dataset.fontSize); }); closePopovers(); });
   const stepFontSize = (delta) => { const source = element(); if (!source) return; mutate('Change font size', (next) => { next.elements[source.id].style.fontSize = Math.max(8, Math.min(180, source.style.fontSize + delta)); }); };
   ui.sizeMinus.addEventListener('click', () => stepFontSize(-1)); ui.sizePlus.addEventListener('click', () => stepFontSize(1));
@@ -397,11 +430,11 @@
   bindTransactionalInput(ui.letterSpacing, 'Change letter spacing', (next, value) => { const source = element(); if (source) next.elements[source.id].style.letterSpacing = Number(value); });
   ui.bold.addEventListener('click', () => { const source = element(); if (source) mutate('Toggle bold', (next) => { next.elements[source.id].style.fontWeight = source.style.fontWeight === 700 ? 400 : 700; }); });
   ui.italic.addEventListener('click', () => { const source = element(); if (source) mutate('Toggle italic', (next) => { next.elements[source.id].style.fontStyle = source.style.fontStyle === 'italic' ? 'normal' : 'italic'; }); });
-  ui.alignButton.addEventListener('click', () => togglePopover(ui.alignPopover));
+  ui.alignButton.addEventListener('click', () => togglePopover(ui.alignPopover, ui.alignButton));
   ui.alignPopover.addEventListener('click', (event) => { const button = event.target.closest('[data-align]'); const source = element(); if (!button || !source) return; mutate('Change text alignment', (next) => { next.elements[source.id].style.textAlign = button.dataset.align; }); closePopovers(); });
-  ui.spacingButton.addEventListener('click', () => togglePopover(ui.spacingPopover));
-  $$('[data-open-position]').forEach((button) => button.addEventListener('click', () => togglePopover(ui.positionPopover)));
-  $$('[data-open-more]').forEach((button) => button.addEventListener('click', () => togglePopover(ui.morePopover)));
+  ui.spacingButton.addEventListener('click', () => togglePopover(ui.spacingPopover, ui.spacingButton));
+  $$('[data-open-position]').forEach((button) => button.addEventListener('click', () => togglePopover(ui.positionPopover, button)));
+  $$('[data-open-more]').forEach((button) => button.addEventListener('click', () => togglePopover(ui.morePopover, button)));
   ui.positionPopover.addEventListener('click', (event) => { const layer = event.target.closest('[data-layer]'); const x = event.target.closest('[data-position-x]'); const y = event.target.closest('[data-position-y]'); if (layer) layerElement(layer.dataset.layer); if (x) alignElement('x', x.dataset.positionX); if (y) alignElement('y', y.dataset.positionY); closePopovers(); });
   bindTransactionalInput(ui.opacity, 'Change opacity', (next, value) => { const source = element(); if (source) next.elements[source.id].opacity = Number(value); });
   bindTransactionalInput(ui.rotation, 'Rotate element', (next, value) => { const source = element(); if (source) next.elements[source.id].rotation = Number(value); });
@@ -499,7 +532,7 @@
     }
   });
 
-  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.toolbar-popover, .toolbar-popover-anchor, [data-open-position], [data-open-more]')) closePopovers(); });
+  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.toolbar-popover, .compact-popover, .toolbar-popover-anchor, [data-open-position], [data-open-more]')) closePopovers(); });
   document.addEventListener('keydown', (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') { event.preventDefault(); applyHistory(event.shiftKey ? 'redo' : 'undo'); }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'y') { event.preventDefault(); applyHistory('redo'); }
