@@ -2,6 +2,19 @@
   const model = globalThis.GreenSageVisualDocument;
   if (!model) return;
   const root = document.getElementById('canvasRoot');
+  const quickActions = document.createElement('div');
+  quickActions.className = 'object-quick-actions';
+  quickActions.hidden = true;
+  quickActions.setAttribute('role', 'toolbar');
+  quickActions.setAttribute('aria-label', 'Selected object actions');
+  const quickActionButton = (action, icon, label) => {
+    const button = document.createElement('button'); button.type = 'button'; button.dataset.objectAction = action; button.textContent = icon; button.title = label; button.setAttribute('aria-label', label); quickActions.append(button); return button;
+  };
+  const quickLock = quickActionButton('lock', '🔒', 'Lock');
+  const quickDuplicate = quickActionButton('duplicate', '⧉', 'Duplicate');
+  const quickDelete = quickActionButton('delete', '🗑', 'Delete');
+  const quickMore = quickActionButton('more', '•••', 'More');
+  document.body.append(quickActions);
   const ORIGIN = window.location.origin === 'null' ? '*' : window.location.origin;
   const sameOrigin = (origin) => origin === window.location.origin || (origin === 'null' && window.location.origin === 'null');
   const resizeDirections = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
@@ -25,6 +38,32 @@
   const calculateScale = () => state ? Math.min(window.innerWidth / state.document.canvas.baseWidth, state.document.canvas.maxRenderedWidth / state.document.canvas.baseWidth) : 1;
   const canPointer = (event) => event.isPrimary && (event.pointerType !== 'mouse' || event.button === 0);
 
+  const positionQuickActions = () => {
+    const item = state?.elements[selectedElementId]; const frame = item && frameNode(item.id);
+    const unavailable = !item || !frame || gesture || editingElementId || imageEditElementId || backgroundEditSectionId;
+    quickActions.hidden = Boolean(unavailable);
+    if (unavailable) return;
+    const bounds = frame.getBoundingClientRect(); const bar = quickActions.getBoundingClientRect(); const viewport = window.visualViewport;
+    const leftEdge = (viewport?.offsetLeft || 0) + 8; const topEdge = (viewport?.offsetTop || 0) + 8;
+    const rightEdge = (viewport?.offsetLeft || 0) + (viewport?.width || innerWidth) - 8; const bottomEdge = (viewport?.offsetTop || 0) + (viewport?.height || innerHeight) - 8;
+    const left = Math.max(leftEdge, Math.min(bounds.left + (bounds.width - bar.width) / 2, rightEdge - bar.width));
+    const above = bounds.top - bar.height - 8; const below = bounds.bottom + 8;
+    const top = above >= topEdge ? above : Math.min(below, bottomEdge - bar.height);
+    quickActions.style.transform = `translate(${Math.round(left)}px, ${Math.round(Math.max(topEdge, top))}px)`;
+    const locked = Boolean(item.permissions.locked);
+    quickLock.textContent = locked ? '🔓' : '🔒'; quickLock.title = locked ? 'Unlock' : 'Lock'; quickLock.setAttribute('aria-label', quickLock.title);
+    quickDuplicate.disabled = locked; quickDelete.disabled = locked || !item.permissions.deletable;
+  };
+
+  quickActions.addEventListener('pointerdown', (event) => { event.preventDefault(); event.stopPropagation(); });
+  quickActions.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-object-action]'); const item = state?.elements[selectedElementId];
+    if (!button || !item || button.disabled) return;
+    const message = { type: 'green-sage-visual:object-action', action: button.dataset.objectAction, elementId: item.id };
+    if (message.action === 'more') message.anchor = quickActions.getBoundingClientRect().toJSON();
+    post(message);
+  });
+
   const sendStart = (targetType, targetId, label) => {
     transaction = { id: model.createId('transaction'), targetType, targetId, label };
     post({ type: 'green-sage-visual:transaction-start', transactionId: transaction.id, targetType, targetId, label });
@@ -40,6 +79,7 @@
     document.documentElement.classList.remove('is-manipulating'); clearGuides();
     try { if (active.target.hasPointerCapture(active.pointerId)) active.target.releasePointerCapture(active.pointerId); } catch {}
     sendCommit();
+    requestAnimationFrame(positionQuickActions);
     if (event?.type === 'pointerup') active.onPointerUp?.(event);
     else lastTextTap = null;
   };
@@ -128,7 +168,7 @@
     item.frame = { ...item.frame, ...nextFrame };
     Object.assign(frame.style, { left: `${item.frame.x}px`, top: `${item.frame.y}px`, width: `${item.frame.width}px`, height: `${item.frame.height}px` });
     if (item.crop) layoutImage(item, frame.querySelector('.image-content img'));
-    updateOverflow(item); drawGuides(item.sectionId, guides); sendPatch({ frame: item.frame });
+    updateOverflow(item); drawGuides(item.sectionId, guides); positionQuickActions(); sendPatch({ frame: item.frame });
   };
 
   const startMove = (event, item, frame) => {
@@ -197,10 +237,12 @@
     const frame = frameNode(editingElementId); const content = frame?.querySelector('.element-content'); editingElementId = null;
     frame?.classList.remove('is-editing'); if (content) { content.setAttribute('contenteditable', 'false'); content.blur(); }
     if (transaction?.label === 'Edit text') sendCommit();
+    requestAnimationFrame(positionQuickActions);
   };
   const enterEdit = (item, frame, content, event) => {
     if (item.permissions.locked || !item.permissions.editable) return;
     exitEdit(); renderToken += 1; editingElementId = item.id; frame.classList.add('is-editing'); content.setAttribute('contenteditable', 'plaintext-only'); content.spellcheck = true;
+    positionQuickActions();
     sendStart('element', item.id, 'Edit text'); placeCaret(content, event.clientX, event.clientY);
   };
 
@@ -349,7 +391,7 @@
     const fonts = Object.values(state.elements).filter((item) => item.type === 'text').map((item) => model.loadFont(item.style.fontFamily, { document, weight: item.style.fontWeight, style: item.style.fontStyle, size: item.style.fontSize, sample: item.content }));
     await Promise.allSettled(fonts); await document.fonts?.ready; if (token !== renderToken) return;
     root.replaceChildren(...state.document.sectionOrder.map((id) => createSection(state.sections[id])));
-    requestAnimationFrame(() => requestAnimationFrame(() => { if (token !== renderToken) return; window.scrollTo(0, scrollY); Object.values(state.elements).forEach(updateOverflow); }));
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (token !== renderToken) return; window.scrollTo(0, scrollY); Object.values(state.elements).forEach(updateOverflow); positionQuickActions(); }));
   };
 
   window.addEventListener('message', (event) => {
@@ -368,7 +410,10 @@
     if (event.data.type === 'green-sage-visual:scroll-by') window.scrollBy({ top: Number(event.data.deltaY) || 0, behavior: 'auto' });
   });
   window.addEventListener('resize', render);
-  document.addEventListener('pointerdown', () => post({ type: 'green-sage-visual:canvas-interaction' }), true);
+  window.addEventListener('scroll', positionQuickActions, { passive: true });
+  window.visualViewport?.addEventListener('resize', positionQuickActions);
+  window.visualViewport?.addEventListener('scroll', positionQuickActions);
+  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.object-quick-actions')) post({ type: 'green-sage-visual:canvas-interaction' }); }, true);
   document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.element-frame')) { lastTextTap = null; exitEdit(); } });
   document.addEventListener('keydown', (event) => {
     if (!['Delete', 'Backspace'].includes(event.key) || editingElementId || event.target.closest('input, textarea, [contenteditable="true"], [contenteditable="plaintext-only"]')) return;

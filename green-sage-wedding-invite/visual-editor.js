@@ -591,6 +591,21 @@
     if (message.type === 'green-sage-visual:select-element') { selectElement(message.elementId, true); return; }
     if (message.type === 'green-sage-visual:select-section') { selectSection(message.sectionId, true); return; }
     if (message.type === 'green-sage-visual:delete-selected') { deleteElement(); return; }
+    if (message.type === 'green-sage-visual:object-action') {
+      if (message.elementId !== selectedElementId || !state.elements[message.elementId]) return;
+      if (message.action === 'lock') { ui.lock.click(); return; }
+      if (message.action === 'duplicate') { ui.duplicate.click(); return; }
+      if (message.action === 'delete') { ui.remove.click(); return; }
+      if (message.action === 'more' && message.anchor) {
+        const frame = ui.canvas.getBoundingClientRect(); const anchor = message.anchor;
+        const values = ['left', 'right', 'top', 'bottom', 'width', 'height'].map((key) => Number(anchor[key]));
+        if (!values.every(Number.isFinite)) return;
+        const [left, right, top, bottom, width, height] = values;
+        const rect = { left: frame.left + left, right: frame.left + right, top: frame.top + top, bottom: frame.top + bottom, width, height, x: frame.left + left, y: frame.top + top, toJSON() { return this; } };
+        togglePopover(ui.morePopover, { getBoundingClientRect: () => rect, setAttribute() {} });
+      }
+      return;
+    }
     if (message.type === 'green-sage-visual:transaction-start') {
       const id = message.transactionId;
       if (typeof id !== 'string' || !id.trim() || seenCanvasTransactionIds.has(id)) return;
