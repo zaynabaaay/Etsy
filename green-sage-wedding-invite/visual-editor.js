@@ -279,8 +279,19 @@
 
   const renderAll = () => { renderContext(); renderDesign(); renderUploads(); renderSections(); };
   const refreshAssets = async () => {
-    assetObjectUrls.forEach((url) => URL.revokeObjectURL(url)); assetObjectUrls = []; assetUrls = {}; assetRecords = await assets.list();
-    assetRecords.forEach((record) => { const url = URL.createObjectURL(record.blob); assetUrls[record.id] = url; assetObjectUrls.push(url); }); renderUploads(); renderDesign(); renderSections(); syncCanvas();
+    const nextRecords = await assets.list(); const nextUrls = {}; const nextObjectUrls = [];
+    try {
+      nextRecords.forEach((record) => {
+        const url = URL.createObjectURL(record.blob); nextObjectUrls.push(url); nextUrls[record.id] = url;
+      });
+    } catch (error) {
+      nextObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+      throw error;
+    }
+    const previousUrls = assetObjectUrls;
+    assetRecords = nextRecords; assetUrls = nextUrls; assetObjectUrls = nextObjectUrls;
+    try { renderUploads(); renderDesign(); renderSections(); syncCanvas(); }
+    finally { previousUrls.forEach((url) => URL.revokeObjectURL(url)); }
   };
 
   const addText = (kind) => {

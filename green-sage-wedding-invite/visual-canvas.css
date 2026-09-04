@@ -224,6 +224,25 @@ button {
   -webkit-user-drag: none;
 }
 
+.image-content.asset-unavailable { position: relative; }
+.image-content.asset-unavailable,
+.section-background.asset-unavailable { background: #eae2d7; }
+.asset-unavailable > img { visibility: hidden; }
+.missing-asset-message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 6px;
+  color: #474232;
+  font: 12px/1.3 "Instrument Sans", sans-serif;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+}
+.section-background > .missing-asset-message { align-items: start; padding-top: 12px; }
+
 .element-animation-layer {
   position: relative;
   transform: none;

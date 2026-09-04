@@ -241,10 +241,41 @@
     return content;
   };
 
+  const setImageSource = (container, image, asset) => {
+    const url = getAssetUrl(asset) || '';
+    if (image.getAttribute('src') === url) return;
+    if (asset.assetKind === 'upload') {
+      const showUnavailable = (missing) => {
+        container.classList.toggle('asset-unavailable', missing);
+        let message = container.querySelector(':scope > .missing-asset-message');
+        if (missing && !message) { message = document.createElement('span'); message.className = 'missing-asset-message'; message.textContent = 'Image unavailable'; container.append(message); }
+        if (!missing) message?.remove();
+      };
+      image.onload = () => { if (url && image.getAttribute('src') === url) showUnavailable(false); };
+      image.onerror = () => { if (image.getAttribute('src') === url && image.complete && !image.naturalWidth) showUnavailable(true); };
+      showUnavailable(!url);
+    }
+    if (url) image.src = url; else image.removeAttribute('src');
+  };
+
+  const syncUploadSources = () => {
+    // Asset recovery must not rerender an active contenteditable node.
+    Object.values(state.elements).forEach((item) => {
+      if (item.assetKind !== 'upload') return;
+      const content = frameNode(item.id)?.querySelector('.image-content'); const image = content?.querySelector('img');
+      if (image) setImageSource(content, image, item);
+    });
+    Object.values(state.sections).forEach((section) => {
+      if (section.background.kind !== 'image' || section.background.assetKind !== 'upload') return;
+      const background = sectionNode(section.id)?.querySelector(':scope > .section-background'); const image = background?.querySelector('img');
+      if (image) setImageSource(background, image, section.background);
+    });
+  };
+
   const createImageContent = (item) => {
     const content = document.createElement('div'); content.className = 'element-content image-content';
-    const image = document.createElement('img'); image.alt = item.alt || ''; image.draggable = false; image.src = getAssetUrl(item) || '';
-    Object.assign(image.style, { objectFit: item.crop.fit, objectPosition: `${item.crop.focalX}% ${item.crop.focalY}%`, transform: `scale(${item.crop.zoom})` }); content.append(image);
+    const image = document.createElement('img'); image.alt = item.alt || ''; image.draggable = false;
+    Object.assign(image.style, { objectFit: item.crop.fit, objectPosition: `${item.crop.focalX}% ${item.crop.focalY}%`, transform: `scale(${item.crop.zoom})` }); content.append(image); setImageSource(content, image, item);
     content.addEventListener('pointerdown', (event) => { if (!canPointer(event)) return; if (selectedElementId !== item.id) { event.preventDefault(); event.stopPropagation(); post({ type: 'green-sage-visual:select-element', elementId: item.id }); } });
     return content;
   };
@@ -269,7 +300,7 @@
     const shell = document.createElement('div'); shell.className = 'section-shell'; shell.style.width = `${390 * scale}px`; shell.style.height = `${section.height * scale}px`;
     const canvas = document.createElement('section'); canvas.className = 'section-canvas'; canvas.dataset.sectionId = section.id; canvas.classList.toggle('is-section-selected', section.id === selectedSectionId && !selectedElementId); canvas.classList.toggle('is-background-editing', editingBackground); canvas.style.height = `${section.height}px`; canvas.style.transform = `scale(${scale})`; canvas.style.background = section.background.color;
     const background = document.createElement('div'); background.className = 'section-background'; background.classList.toggle('is-editing', editingBackground);
-    if (section.background.kind === 'image') { const image = document.createElement('img'); image.alt = ''; image.src = section.background.assetKind === 'upload' ? assetUrls[section.background.assetId] || '' : model.getTemplateAsset(section.background.assetId)?.url || ''; Object.assign(image.style, { objectPosition: `${section.background.focalX}% ${section.background.focalY}%`, transform: `scale(${section.background.zoom})` }); background.append(image); if (editingBackground) background.addEventListener('pointerdown', (event) => startBackgroundReframe(event, section, background, image)); }
+    if (section.background.kind === 'image') { const image = document.createElement('img'); image.alt = ''; Object.assign(image.style, { objectPosition: `${section.background.focalX}% ${section.background.focalY}%`, transform: `scale(${section.background.zoom})` }); background.append(image); setImageSource(background, image, section.background); if (editingBackground) background.addEventListener('pointerdown', (event) => startBackgroundReframe(event, section, background, image)); }
     canvas.append(background);
     section.elementOrder.forEach((id, index) => { const item = state.elements[id]; if (!item) return; const node = createElement(item); node.style.zIndex = String(index + 1); canvas.append(node); });
     canvas.addEventListener('pointerdown', (event) => { if (event.target !== canvas && event.target !== background) return; exitEdit(); post({ type: 'green-sage-visual:select-section', sectionId: section.id }); });
@@ -290,7 +321,7 @@
     if (event.data.type === 'green-sage-visual:state') {
       const wasEditing = editingElementId; state = model.normalize(event.data.state); selectedSectionId = state.sections[event.data.selectedSectionId] ? event.data.selectedSectionId : state.document.sectionOrder[0]; selectedElementId = state.elements[event.data.selectedElementId] ? event.data.selectedElementId : null; backgroundEditSectionId = state.sections[event.data.backgroundEditSectionId]?.background.kind === 'image' ? event.data.backgroundEditSectionId : null; assetUrls = event.data.assetUrls || {};
       if (wasEditing && state.elements[wasEditing]?.type === 'text' && transaction?.label === 'Edit text') {
-        syncEditableContent(state.elements[wasEditing]);
+        syncUploadSources(); syncEditableContent(state.elements[wasEditing]);
         return;
       }
       exitEdit(); transaction = null; render();
