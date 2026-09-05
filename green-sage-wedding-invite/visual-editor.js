@@ -97,7 +97,8 @@
 
   const syncCanvas = () => {
     saveRevision += 1;
-    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:state', state, selectedSectionId, selectedElementId, backgroundEditSectionId, imageEditElementId, activeResponsiveView, assetUrls, revision: saveRevision }, ORIGIN);
+    const resolvedState = model.resolveDocument(state, activeResponsiveView);
+    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:state', state: resolvedState, selectedSectionId, selectedElementId, backgroundEditSectionId, imageEditElementId, activeResponsiveView, assetUrls, revision: saveRevision }, ORIGIN);
   };
 
   const finishTransaction = (sync = true) => {

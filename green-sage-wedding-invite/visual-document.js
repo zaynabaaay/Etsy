@@ -1,5 +1,5 @@
 (() => {
-  const SCHEMA_VERSION = 3;
+  const SCHEMA_VERSION = 4;
   const STORAGE_KEY = 'green-sage-visual-proof-v1';
   const CANVAS_VIEWS = Object.freeze({
     mobile: Object.freeze({ logicalWidth: 390 }),
@@ -61,12 +61,91 @@
   const clone = (value) => JSON.parse(JSON.stringify(value));
   const finite = (value, fallback) => Number.isFinite(Number(value)) ? Number(value) : fallback;
   const clamp = (value, min, max) => Math.min(max, Math.max(min, finite(value, min)));
+  const isObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+  const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
+  const copyFinite = (target, source, key, min, max) => {
+    if (!hasOwn(source, key) || !Number.isFinite(Number(source[key]))) return;
+    const value = Number(source[key]);
+    target[key] = Number.isFinite(min) && Number.isFinite(max) ? Math.min(max, Math.max(min, value)) : value;
+  };
   const isHexColor = (value) => /^#[0-9a-f]{6}$/i.test(String(value || ''));
   const normalizeColor = (value) => isHexColor(value) ? String(value).toUpperCase() : null;
   const uniqueColors = (values) => [...new Set(values.map(normalizeColor).filter(Boolean))];
   const createId = (prefix = 'element') => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
   const getFont = (name) => FONT_BY_NAME[name] || FONT_BY_NAME['Instrument Serif'];
   const getTemplateAsset = (id) => TEMPLATE_ASSET_BY_ID[id] || null;
+  const normalizeSectionOverride = (value) => {
+    if (!isObject(value)) return {};
+    const result = {};
+    copyFinite(result, value, 'height', 180, 2200);
+    if (hasOwn(value, 'heightPreset') && (Object.hasOwn(SECTION_HEIGHT_PRESETS, value.heightPreset) || value.heightPreset === 'custom')) result.heightPreset = value.heightPreset;
+    if (isObject(value.background)) {
+      const background = {};
+      copyFinite(background, value.background, 'focalX', 0, 100);
+      copyFinite(background, value.background, 'focalY', 0, 100);
+      copyFinite(background, value.background, 'zoom', 1, 4);
+      if (Object.keys(background).length) result.background = background;
+    }
+    return result;
+  };
+  const normalizeElementOverride = (value, type) => {
+    if (!isObject(value)) return {};
+    const result = {};
+    if (isObject(value.frame)) {
+      const frame = {};
+      copyFinite(frame, value.frame, 'x');
+      copyFinite(frame, value.frame, 'y');
+      copyFinite(frame, value.frame, 'width', 40, MAX_FRAME_WIDTH);
+      copyFinite(frame, value.frame, 'height', 32, 1600);
+      if (Object.keys(frame).length) result.frame = frame;
+    }
+    if (type === 'text' && isObject(value.style)) {
+      const style = {};
+      copyFinite(style, value.style, 'fontSize', 8, 180);
+      if (hasOwn(value.style, 'textAlign') && ALIGNMENTS.includes(value.style.textAlign)) style.textAlign = value.style.textAlign;
+      copyFinite(style, value.style, 'lineHeight', 0.7, 3);
+      copyFinite(style, value.style, 'letterSpacing', -10, 30);
+      if (Object.keys(style).length) result.style = style;
+    }
+    if (type === 'image' && isObject(value.crop)) {
+      const crop = {};
+      if (hasOwn(value.crop, 'fit') && ['cover', 'contain'].includes(value.crop.fit)) crop.fit = value.crop.fit;
+      copyFinite(crop, value.crop, 'focalX', 0, 100);
+      copyFinite(crop, value.crop, 'focalY', 0, 100);
+      copyFinite(crop, value.crop, 'zoom', 1, 4);
+      if (Object.keys(crop).length) result.crop = crop;
+    }
+    return result;
+  };
+  const normalizeResponsiveOverrides = (value, normalizeKnownOverride) => {
+    if (!isObject(value)) return null;
+    const result = {};
+    Object.entries(value).forEach(([breakpoint, override]) => {
+      if (breakpoint === 'ipad' || breakpoint === 'desktop') {
+        const normalized = normalizeKnownOverride(override);
+        if (Object.keys(normalized).length) result[breakpoint] = normalized;
+        return;
+      }
+      // Preserve unknown breakpoint payloads for forward-compatible round trips, but never interpret them here.
+      if (override !== undefined) result[breakpoint] = clone(override);
+    });
+    return Object.keys(result).length ? result : null;
+  };
+  const normalizeElementResponsive = (value, fallback, type) => {
+    const source = isObject(value) ? value : {};
+    const result = {
+      strategy: typeof source.strategy === 'string' ? source.strategy : fallback.strategy,
+      anchorX: typeof source.anchorX === 'string' ? source.anchorX : fallback.anchorX
+    };
+    const overrides = normalizeResponsiveOverrides(source.overrides, (override) => normalizeElementOverride(override, type));
+    if (overrides) result.overrides = overrides;
+    return result;
+  };
+  const normalizeSectionResponsive = (value) => {
+    const source = isObject(value) ? value : {};
+    const overrides = normalizeResponsiveOverrides(source.overrides, normalizeSectionOverride);
+    return overrides ? { overrides } : {};
+  };
   const resolveFontVariant = (name, weight = 400, style = 'normal') => {
     const font = getFont(name);
     const resolvedStyle = font.styles.includes(style) ? style : 'normal';
@@ -125,7 +204,8 @@
     id: overrides.id || createId('section'), name: String(overrides.name || 'Untitled section'), height: clamp(overrides.height ?? SECTION_HEIGHT_PRESETS.standard, 180, 2200),
     heightPreset: Object.hasOwn(SECTION_HEIGHT_PRESETS, overrides.heightPreset) || overrides.heightPreset === 'custom' ? overrides.heightPreset : 'standard',
     background: { kind: overrides.background?.kind === 'image' ? 'image' : 'color', color: isHexColor(overrides.background?.color) ? overrides.background.color : '#EAE2D7', assetId: String(overrides.background?.assetId || ''), assetKind: overrides.background?.assetKind === 'upload' ? 'upload' : 'template', focalX: clamp(overrides.background?.focalX ?? 50, 0, 100), focalY: clamp(overrides.background?.focalY ?? 50, 0, 100), zoom: clamp(overrides.background?.zoom ?? 1, 1, 4) },
-    elementOrder: Array.isArray(overrides.elementOrder) ? [...overrides.elementOrder] : []
+    elementOrder: Array.isArray(overrides.elementOrder) ? [...overrides.elementOrder] : [],
+    responsive: normalizeSectionResponsive(overrides.responsive)
   });
   const defaults = {
     schemaVersion: SCHEMA_VERSION,
@@ -141,14 +221,21 @@
     const supplied = value && typeof value === 'object' ? value : {}; const fallback = createTextElement({ id, sectionId });
     const fontFamily = FONT_BY_NAME[supplied.style?.fontFamily] ? supplied.style.fontFamily : fallback.style.fontFamily;
     const variant = resolveFontVariant(fontFamily, Math.round(finite(supplied.style?.fontWeight, 400)), supplied.style?.fontStyle);
-    return { ...fallback, ...supplied, id, sectionId, type: 'text', content: String(supplied.content ?? fallback.content), frame: normalizeFrame(supplied.frame, fallback.frame), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), style: { ...fallback.style, ...(supplied.style || {}), fontFamily, fontSize: clamp(supplied.style?.fontSize ?? fallback.style.fontSize, 8, 180), fontWeight: variant.weight, fontStyle: variant.style, color: isHexColor(supplied.style?.color) ? supplied.style.color : fallback.style.color, textAlign: ALIGNMENTS.includes(supplied.style?.textAlign) ? supplied.style.textAlign : fallback.style.textAlign, lineHeight: clamp(supplied.style?.lineHeight ?? fallback.style.lineHeight, 0.7, 3), letterSpacing: clamp(supplied.style?.letterSpacing ?? fallback.style.letterSpacing, -10, 30) }, responsive: { ...fallback.responsive, ...(supplied.responsive || {}), strategy: 'scale' }, permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
+    return { ...fallback, ...supplied, id, sectionId, type: 'text', content: String(supplied.content ?? fallback.content), frame: normalizeFrame(supplied.frame, fallback.frame), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), style: { ...fallback.style, ...(supplied.style || {}), fontFamily, fontSize: clamp(supplied.style?.fontSize ?? fallback.style.fontSize, 8, 180), fontWeight: variant.weight, fontStyle: variant.style, color: isHexColor(supplied.style?.color) ? supplied.style.color : fallback.style.color, textAlign: ALIGNMENTS.includes(supplied.style?.textAlign) ? supplied.style.textAlign : fallback.style.textAlign, lineHeight: clamp(supplied.style?.lineHeight ?? fallback.style.lineHeight, 0.7, 3), letterSpacing: clamp(supplied.style?.letterSpacing ?? fallback.style.letterSpacing, -10, 30) }, responsive: normalizeElementResponsive(supplied.responsive, fallback.responsive, 'text'), permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
   };
   const normalizeImageElement = (value, id, sectionId) => {
     const supplied = value && typeof value === 'object' ? value : {}; const fallback = createImageElement({ id, sectionId, type: supplied.type });
-    return { ...fallback, ...supplied, id, sectionId, type: supplied.type === 'decorative' ? 'decorative' : 'image', frame: normalizeFrame(supplied.frame, fallback.frame), assetId: String(supplied.assetId || ''), assetKind: supplied.assetKind === 'template' ? 'template' : 'upload', alt: String(supplied.alt || fallback.alt), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), crop: { flipX: supplied.crop?.flipX === true, flipY: supplied.crop?.flipY === true, fit: supplied.crop?.fit === 'contain' ? 'contain' : fallback.crop.fit, focalX: clamp(supplied.crop?.focalX ?? 50, 0, 100), focalY: clamp(supplied.crop?.focalY ?? 50, 0, 100), zoom: clamp(supplied.crop?.zoom ?? 1, 1, 4) }, responsive: { ...fallback.responsive, ...(supplied.responsive || {}), strategy: 'scale' }, permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
+    const type = supplied.type === 'decorative' ? 'decorative' : 'image';
+    return { ...fallback, ...supplied, id, sectionId, type, frame: normalizeFrame(supplied.frame, fallback.frame), assetId: String(supplied.assetId || ''), assetKind: supplied.assetKind === 'template' ? 'template' : 'upload', alt: String(supplied.alt || fallback.alt), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), crop: { flipX: supplied.crop?.flipX === true, flipY: supplied.crop?.flipY === true, fit: supplied.crop?.fit === 'contain' ? 'contain' : fallback.crop.fit, focalX: clamp(supplied.crop?.focalX ?? 50, 0, 100), focalY: clamp(supplied.crop?.focalY ?? 50, 0, 100), zoom: clamp(supplied.crop?.zoom ?? 1, 1, 4) }, responsive: normalizeElementResponsive(supplied.responsive, fallback.responsive, type), permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
+  };
+  const migrate = (value) => {
+    const migrated = isObject(value) ? clone(value) : clone(defaults);
+    const sourceVersion = Math.max(1, Math.floor(finite(migrated.schemaVersion, 1)));
+    if (sourceVersion <= 3) migrated.schemaVersion = 4;
+    return migrated;
   };
   const normalize = (value) => {
-    const supplied = value && typeof value === 'object' ? clone(value) : clone(defaults); const documentValue = supplied.document && typeof supplied.document === 'object' ? supplied.document : {};
+    const supplied = migrate(value); const documentValue = supplied.document && typeof supplied.document === 'object' ? supplied.document : {};
     const rawSections = supplied.sections && typeof supplied.sections === 'object' ? supplied.sections : {}; const rawElements = supplied.elements && typeof supplied.elements === 'object' ? supplied.elements : {};
     const requestedOrder = Array.isArray(documentValue.sectionOrder) ? documentValue.sectionOrder : [];
     const sectionOrder = [...new Set([...requestedOrder, ...Object.keys(rawSections)])].filter((id) => rawSections[id] && typeof rawSections[id] === 'object');
@@ -166,12 +253,37 @@
     const colors = uniqueColors([...(Array.isArray(documentValue.colors) ? documentValue.colors : TEMPLATE_PALETTE.map((color) => color.value)), ...usedColors]);
     return { ...supplied, schemaVersion: SCHEMA_VERSION, document: { ...defaults.document, ...documentValue, colors, canvas: { ...defaults.document.canvas, ...(documentValue.canvas || {}), baseWidth: 390, maxRenderedWidth: clamp(documentValue.canvas?.maxRenderedWidth ?? 560, 390, 720), viewportBackground: isHexColor(documentValue.canvas?.viewportBackground) ? documentValue.canvas.viewportBackground : '#F4EFE7', safeMargin: clamp(documentValue.canvas?.safeMargin ?? 20, 0, 60) }, sectionOrder, media: { ...defaults.document.media, ...(documentValue.media || {}), audio: null } }, sections, elements };
   };
+  const applySectionOverride = (resolved, authored, view) => {
+    if (view === 'mobile') return resolved;
+    const override = normalizeSectionOverride(authored?.responsive?.overrides?.[view]);
+    if (hasOwn(override, 'height')) resolved.height = override.height;
+    if (hasOwn(override, 'heightPreset')) resolved.heightPreset = override.heightPreset;
+    if (override.background) Object.assign(resolved.background, override.background);
+    return resolved;
+  };
+  const applyElementOverride = (resolved, authored, view) => {
+    if (view === 'mobile') return resolved;
+    const override = normalizeElementOverride(authored?.responsive?.overrides?.[view], authored?.type);
+    if (override.frame) Object.assign(resolved.frame, override.frame);
+    if (override.style && resolved.style) Object.assign(resolved.style, override.style);
+    if (override.crop && resolved.crop) Object.assign(resolved.crop, override.crop);
+    return resolved;
+  };
+  const resolveSection = (section, view = 'mobile') => applySectionOverride(clone(section), section, CANVAS_VIEWS[view] ? view : 'mobile');
+  const resolveElement = (element, view = 'mobile') => applyElementOverride(clone(element), element, CANVAS_VIEWS[view] ? view : 'mobile');
+  const resolveDocument = (authoredState, view = 'mobile') => {
+    const activeView = CANVAS_VIEWS[view] ? view : 'mobile';
+    const resolved = clone(authoredState);
+    Object.entries(authoredState?.sections || {}).forEach(([id, section]) => { resolved.sections[id] = applySectionOverride(resolved.sections[id], section, activeView); });
+    Object.entries(authoredState?.elements || {}).forEach(([id, element]) => { resolved.elements[id] = applyElementOverride(resolved.elements[id], element, activeView); });
+    return resolved;
+  };
   const load = (storage = globalThis.localStorage) => { try { const saved = storage?.getItem(STORAGE_KEY); return normalize(saved ? JSON.parse(saved) : defaults); } catch { return clone(defaults); } };
   globalThis.GreenSageVisualDocument = Object.freeze({
     schemaVersion: SCHEMA_VERSION, storageKey: STORAGE_KEY, fontCatalog: FONT_CATALOG,
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
     templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
     getCanvasMetrics,
-    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, normalize, load
+    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, load
   });
 })();
