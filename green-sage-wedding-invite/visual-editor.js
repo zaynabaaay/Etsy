@@ -69,6 +69,9 @@
 
   const section = () => state.sections[selectedSectionId] || null;
   const element = () => state.elements[selectedElementId] || null;
+  const effectiveSection = (id = selectedSectionId, view = activeResponsiveView) => state.sections[id] ? model.resolveSection(state.sections[id], view) : null;
+  const effectiveElement = (id = selectedElementId, view = activeResponsiveView) => state.elements[id] ? model.resolveElement(state.elements[id], view) : null;
+  const writeAuthoredProperty = (next, options) => model.writeAuthoredProperty(next, { responsiveView: transaction?.responsiveView || activeResponsiveView, ...options });
   const snapshot = (label = '') => ({ state: clone(state), selectedElementId, selectedSectionId, label });
   const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   const updateHistory = () => { ui.undo.disabled = !history.past.length; ui.redo.disabled = !history.future.length; };
@@ -126,8 +129,16 @@
   };
 
   const mutate = (label, callback, selection) => { const next = clone(state); callback(next); commit(next, label, selection); };
-  const beginControlTransaction = (label) => { if (!transaction) transaction = { before: snapshot(label), label, source: 'control' }; };
+  const beginControlTransaction = (label) => { if (!transaction) transaction = { before: snapshot(label), label, source: 'control', responsiveView: activeResponsiveView }; };
   const previewMutation = (callback) => { const next = clone(state); callback(next); state = model.normalize(next); renderAll(); syncCanvas(); };
+  const transactionValue = (target, path) => String(path).split('.').reduce((value, key) => value?.[key], target);
+  const routeTransactionProperty = (next, path, value) => {
+    if (!transaction?.resolvedTarget) return;
+    const changed = !equal(transactionValue(transaction.resolvedTarget, path), value);
+    if (!changed && !transaction.changedPaths.has(path)) return;
+    writeAuthoredProperty(next, { targetType: transaction.targetType, targetId: transaction.targetId, path, value, scope: 'responsive', responsiveView: transaction.responsiveView });
+    if (changed) transaction.changedPaths.add(path); else transaction.changedPaths.delete(path);
+  };
 
   const applyHistory = (direction) => {
     finishTransaction(false);
@@ -205,6 +216,7 @@
   };
   const setResponsiveView = (view) => {
     if (!model.canvasViews[view] || view === activeResponsiveView) { closePopovers(); return; }
+    finishTransaction(false);
     activeResponsiveView = view;
     backgroundEditSectionId = null; imageEditElementId = null;
     renderResponsiveView(); closePopovers(); renderAll(); syncCanvas();
@@ -213,7 +225,7 @@
   const selectElement = (id, sync = true) => { if (!state.elements[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
 
   const ensureElementFont = async (elementId, nextFont) => {
-    const current = state.elements[elementId]; if (!current || current.type !== 'text') return false;
+    const current = effectiveElement(elementId); if (!current || current.type !== 'text') return false;
     await model.loadFont(nextFont, { document, weight: current.style.fontWeight, style: current.style.fontStyle, size: current.style.fontSize, sample: current.content });
     return state.elements[elementId]?.type === 'text';
   };
@@ -236,7 +248,7 @@
   };
 
   const renderContext = () => {
-    const selected = element();
+    const selected = effectiveElement();
     if (selected?.id !== imageEditElementId || selected?.type !== 'image' || selected.permissions.locked || !selected.permissions.editable) imageEditElementId = null;
     ui.editImage.hidden = selected?.type !== 'image' || Boolean(imageEditElementId);
     ui.doneImage.hidden = !imageEditElementId;
@@ -247,10 +259,10 @@
     ui.editImage.setAttribute('aria-pressed', String(Boolean(imageEditElementId)));
     ui.imageFlips.hidden = !selected?.crop;
     $$('[data-image-flip]', ui.imageFlips).forEach(button => { button.disabled = !selected?.permissions.editable || selected?.permissions.locked; button.setAttribute('aria-pressed', String(Boolean(selected?.crop?.[button.dataset.imageFlip]))); });
-    const editingBackground = Boolean(backgroundEditSectionId && backgroundEditSectionId === selectedSectionId && section()?.background.kind === 'image');
-    ui.contextEmpty.hidden = Boolean(selected || section()); ui.textContext.hidden = selected?.type !== 'text' || editingBackground;
-    ui.imageContext.hidden = editingBackground || !selected || !['image', 'decorative'].includes(selected.type); ui.sectionContext.hidden = editingBackground || Boolean(selected) || !section(); ui.backgroundEditContext.hidden = !editingBackground;
-    if (!selected) { ui.sectionContextName.textContent = section()?.name || 'Section'; return; }
+    const editingBackground = Boolean(backgroundEditSectionId && backgroundEditSectionId === selectedSectionId && effectiveSection()?.background.kind === 'image');
+    ui.contextEmpty.hidden = Boolean(selected || effectiveSection()); ui.textContext.hidden = selected?.type !== 'text' || editingBackground;
+    ui.imageContext.hidden = editingBackground || !selected || !['image', 'decorative'].includes(selected.type); ui.sectionContext.hidden = editingBackground || Boolean(selected) || !effectiveSection(); ui.backgroundEditContext.hidden = !editingBackground;
+    if (!selected) { ui.sectionContextName.textContent = effectiveSection()?.name || 'Section'; return; }
     const locked = selected.permissions.locked;
     ui.opacity.value = selected.opacity; ui.rotation.value = selected.rotation;
     ui.textCaseControls.hidden = selected.type !== 'text';
@@ -288,7 +300,7 @@
   };
 
   const renderDesign = () => {
-    const current = section(); if (!current) return;
+    const current = effectiveSection(); if (!current) return;
     const editingBackground = backgroundEditSectionId === current.id && current.background.kind === 'image';
     if (backgroundEditSectionId && !editingBackground) backgroundEditSectionId = null;
     ui.designName.textContent = current.name; ui.sectionColor.value = current.background.color; ui.sectionColorHex.value = current.background.color.toUpperCase(); renderColorSwatches(ui.palette, current.background.kind === 'color' ? current.background.color : null);
@@ -352,9 +364,9 @@
   };
 
   const renderSections = () => {
-    const current = section(); ui.sectionList.replaceChildren();
+    const current = effectiveSection(); ui.sectionList.replaceChildren();
     state.document.sectionOrder.forEach((id, index) => {
-      const item = state.sections[id]; const card = document.createElement('article'); card.className = 'section-card'; card.classList.toggle('is-selected', id === selectedSectionId); card.dataset.sectionId = id;
+      const item = effectiveSection(id); const card = document.createElement('article'); card.className = 'section-card'; card.classList.toggle('is-selected', id === selectedSectionId); card.dataset.sectionId = id;
       const bg = item.background.kind === 'image' ? assetUrl(item.background.assetId, item.background.assetKind) : '';
       const select = document.createElement('button'); select.className = 'section-select'; select.type = 'button';
       const thumb = document.createElement('span'); thumb.className = 'section-thumb'; thumb.style.backgroundColor = item.background.color; if (bg) thumb.style.backgroundImage = `url("${bg}")`;
@@ -463,11 +475,11 @@
     });
   };
   const alignElement = (axis, value) => {
-    const source = element(); const current = section(); if (!source || !current || source.permissions.locked || !source.permissions.movable) return;
+    const source = effectiveElement(); const current = effectiveSection(); if (!source || !current || source.permissions.locked || !source.permissions.movable) return;
     mutate('Align element', (next) => {
-      const frame = next.elements[source.id].frame; const canvas = getCanvasMetrics(); const margin = canvas.safeMargin;
-      if (axis === 'x') frame.x = value === 'left' ? margin : value === 'center' ? canvas.centerX - frame.width / 2 : canvas.right - margin - frame.width;
-      if (axis === 'y') frame.y = value === 'top' ? margin : value === 'middle' ? (current.height - frame.height) / 2 : current.height - margin - frame.height;
+      const canvas = getCanvasMetrics(); const margin = canvas.safeMargin;
+      if (axis === 'x') writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'frame.x', value: value === 'left' ? margin : value === 'center' ? canvas.centerX - source.frame.width / 2 : canvas.right - margin - source.frame.width, scope: 'responsive' });
+      if (axis === 'y') writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'frame.y', value: value === 'top' ? margin : value === 'middle' ? (current.height - source.frame.height) / 2 : current.height - margin - source.frame.height, scope: 'responsive' });
     });
   };
 
@@ -536,14 +548,20 @@
     mutate('Change section background', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'image', assetId, assetKind, focalX: 50, focalY: 50, zoom: 1 }); });
   };
   const setSectionHeightPreset = (preset) => {
-    const current = section(); if (!current) return;
-    if (preset === 'custom') { mutate('Use custom section height', (next) => { next.sections[current.id].heightPreset = 'custom'; }); requestAnimationFrame(() => ui.sectionHeight.focus()); return; }
+    const current = effectiveSection(); if (!current) return;
+    if (preset === 'custom') { mutate('Use custom section height', (next) => { writeAuthoredProperty(next, { targetType: 'section', targetId: current.id, path: 'heightPreset', value: 'custom', scope: 'responsive' }); }); requestAnimationFrame(() => ui.sectionHeight.focus()); return; }
     const value = model.sectionHeightPresets[preset]; if (!value) return;
-    mutate('Change section height', (next) => { next.sections[current.id].heightPreset = preset; next.sections[current.id].height = value; });
+    mutate('Change section height', (next) => {
+      writeAuthoredProperty(next, { targetType: 'section', targetId: current.id, path: 'heightPreset', value: preset, scope: 'responsive' });
+      writeAuthoredProperty(next, { targetType: 'section', targetId: current.id, path: 'height', value, scope: 'responsive' });
+    });
   };
   const stepSectionHeight = (delta) => {
-    const current = section(); if (!current) return;
-    mutate('Resize section', (next) => { next.sections[current.id].height = Math.max(180, Math.min(2200, Math.round(current.height + delta))); next.sections[current.id].heightPreset = 'custom'; });
+    const current = effectiveSection(); if (!current) return;
+    mutate('Resize section', (next) => {
+      writeAuthoredProperty(next, { targetType: 'section', targetId: current.id, path: 'height', value: Math.max(180, Math.min(2200, Math.round(current.height + delta))), scope: 'responsive' });
+      writeAuthoredProperty(next, { targetType: 'section', targetId: current.id, path: 'heightPreset', value: 'custom', scope: 'responsive' });
+    });
   };
 
   const uploadFiles = async (fileList) => {
@@ -591,28 +609,28 @@
 
   SIZE_PRESETS.forEach((size) => { const button = document.createElement('button'); button.type = 'button'; button.dataset.fontSize = size; button.textContent = size; ui.sizePresets.append(button); });
   ui.fontSize.addEventListener('click', () => togglePopover(ui.sizePresets, ui.fontSize));
-  ui.sizePresets.addEventListener('click', (event) => { const button = event.target.closest('[data-font-size]'); const source = element(); if (!button || !source) return; mutate('Change font size', (next) => { next.elements[source.id].style.fontSize = Number(button.dataset.fontSize); }); closePopovers(); });
-  const stepFontSize = (delta) => { const source = element(); if (!source) return; mutate('Change font size', (next) => { next.elements[source.id].style.fontSize = Math.max(8, Math.min(180, source.style.fontSize + delta)); }); };
+  ui.sizePresets.addEventListener('click', (event) => { const button = event.target.closest('[data-font-size]'); const source = effectiveElement(); if (!button || !source) return; mutate('Change font size', (next) => { writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.fontSize', value: Number(button.dataset.fontSize), scope: 'responsive' }); }); closePopovers(); });
+  const stepFontSize = (delta) => { const source = effectiveElement(); if (!source) return; mutate('Change font size', (next) => { writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.fontSize', value: Math.max(8, Math.min(180, source.style.fontSize + delta)), scope: 'responsive' }); }); };
   ui.sizeMinus.addEventListener('click', () => stepFontSize(-1)); ui.sizePlus.addEventListener('click', () => stepFontSize(1));
-  bindTransactionalInput(ui.fontSize, 'Change font size', (next, value) => { const source = element(); if (source) next.elements[source.id].style.fontSize = Number(value); });
+  bindTransactionalInput(ui.fontSize, 'Change font size', (next, value) => { const source = effectiveElement(); if (source) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.fontSize', value: Number(value), scope: 'responsive' }); });
   ui.textColorButton.addEventListener('click', () => { renderColorSwatches(ui.textColorPalette, element()?.style?.color); togglePopover(ui.textColorPopover, ui.textColorButton); });
   ui.textColorPalette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); const source = element(); if (!swatch || source?.type !== 'text' || source.permissions.locked || !source.permissions.editable) return; mutate('Change text color', (next) => { next.elements[source.id].style.color = rememberColor(next, swatch.dataset.color); }); closePopovers(); });
   bindTransactionalInput(ui.textColor, 'Change text color', (next, value) => { const source = element(); const color = rememberColor(next, value); if (source && color) next.elements[source.id].style.color = color; });
   ui.textColor.addEventListener('input', () => { ui.textColorHex.value = ui.textColor.value.toUpperCase(); });
   bindHexColor(ui.textColorHex, 'Change text color', () => element()?.style.color || '#474232', (next, color) => { const source = element(); if (source && !source.permissions.locked && source.permissions.editable) next.elements[source.id].style.color = rememberColor(next, color); });
-  bindTransactionalInput(ui.lineHeight, 'Change line height', (next, value) => { const source = element(); if (source) next.elements[source.id].style.lineHeight = Number(value); });
-  bindTransactionalInput(ui.letterSpacing, 'Change letter spacing', (next, value) => { const source = element(); if (source) next.elements[source.id].style.letterSpacing = Number(value); });
+  bindTransactionalInput(ui.lineHeight, 'Change line height', (next, value) => { const source = effectiveElement(); if (source) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.lineHeight', value: Number(value), scope: 'responsive' }); });
+  bindTransactionalInput(ui.letterSpacing, 'Change letter spacing', (next, value) => { const source = effectiveElement(); if (source) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.letterSpacing', value: Number(value), scope: 'responsive' }); });
   ui.bold.addEventListener('click', () => { const source = element(); if (source) mutate('Toggle bold', (next) => { next.elements[source.id].style.fontWeight = source.style.fontWeight === 700 ? 400 : 700; }); });
   ui.italic.addEventListener('click', () => { const source = element(); if (source) mutate('Toggle italic', (next) => { next.elements[source.id].style.fontStyle = source.style.fontStyle === 'italic' ? 'normal' : 'italic'; }); });
   ui.alignButton.addEventListener('click', () => togglePopover(ui.alignPopover, ui.alignButton));
-  ui.alignPopover.addEventListener('click', (event) => { const button = event.target.closest('[data-align]'); const source = element(); if (!button || !source) return; mutate('Change text alignment', (next) => { next.elements[source.id].style.textAlign = button.dataset.align; }); closePopovers(); });
+  ui.alignPopover.addEventListener('click', (event) => { const button = event.target.closest('[data-align]'); const source = effectiveElement(); if (!button || !source) return; mutate('Change text alignment', (next) => { writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.textAlign', value: button.dataset.align, scope: 'responsive' }); }); closePopovers(); });
   ui.spacingButton.addEventListener('click', () => togglePopover(ui.spacingPopover, ui.spacingButton));
   $$('[data-open-position]').forEach((button) => button.addEventListener('click', openPositionPanel));
   $$('[data-open-more]').forEach((button) => button.addEventListener('click', () => togglePopover(ui.morePopover, button)));
   ui.arrangePanel.addEventListener('click', (event) => { const layer = event.target.closest('[data-layer]'); const x = event.target.closest('[data-position-x]'); const y = event.target.closest('[data-position-y]'); if (layer) layerElement(layer.dataset.layer); if (x) alignElement('x', x.dataset.positionX); if (y) alignElement('y', y.dataset.positionY); });
   bindTransactionalInput(ui.opacity, 'Change opacity', (next, value) => { const source = element(); if (source) next.elements[source.id].opacity = Number(value); });
   bindTransactionalInput(ui.rotation, 'Rotate element', (next, value) => { const source = element(); if (source) next.elements[source.id].rotation = Number(value); });
-  bindTransactionalInput(ui.imageZoom, 'Crop image', (next, value) => { const source = element(); if (source?.crop) next.elements[source.id].crop.zoom = Number(value); });
+  bindTransactionalInput(ui.imageZoom, 'Crop image', (next, value) => { const source = effectiveElement(); if (source?.crop) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'crop.zoom', value: Number(value), scope: 'responsive' }); });
   const toggleElementLock = () => { const source = element(); if (source) mutate(source.permissions.locked ? 'Unlock element' : 'Lock element', (next) => { next.elements[source.id].permissions.locked = !source.permissions.locked; }); closePopovers(); };
   ui.textCaseControls.addEventListener('click', (event) => { const button = event.target.closest('[data-text-case]'); if (button) { changeTextCase(button.dataset.textCase); closePopovers(); } });
   ui.editImage.addEventListener('click', () => {
@@ -625,7 +643,7 @@
     if (!['flipX', 'flipY'].includes(axis) || !source?.crop || source.permissions.locked || !source.permissions.editable) return;
     mutate('Flip image', (next) => { next.elements[source.id].crop[axis] = !source.crop[axis]; });
   });
-  ui.imageFit.addEventListener('click', () => { const source = element(); if (source) mutate('Change image fit', (next) => { next.elements[source.id].crop.fit = source.crop.fit === 'cover' ? 'contain' : 'cover'; }); });
+  ui.imageFit.addEventListener('click', () => { const source = effectiveElement(); if (source) mutate('Change image fit', (next) => { writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'crop.fit', value: source.crop.fit === 'cover' ? 'contain' : 'cover', scope: 'responsive' }); }); });
   ui.replace.addEventListener('click', () => {
     const source = element();
     replaceTargetElementId = source?.type === 'image' ? source.id : null;
@@ -651,9 +669,9 @@
   ui.doneBackground.addEventListener('click', () => setBackgroundEditMode(false));
   ui.doneBackgroundToolbar.addEventListener('click', () => setBackgroundEditMode(false));
   ui.removeBackground.addEventListener('click', () => { backgroundEditSectionId = null; imageEditElementId = null; mutate('Remove background image', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', assetId: '' }); }); });
-  bindTransactionalInput(ui.backgroundFocalX, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.focalX = Number(value); });
-  bindTransactionalInput(ui.backgroundFocalY, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.focalY = Number(value); });
-  bindTransactionalInput(ui.backgroundZoom, 'Adjust background crop', (next, value) => { next.sections[selectedSectionId].background.zoom = Number(value); });
+  bindTransactionalInput(ui.backgroundFocalX, 'Adjust background crop', (next, value) => { writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'background.focalX', value: Number(value), scope: 'responsive' }); });
+  bindTransactionalInput(ui.backgroundFocalY, 'Adjust background crop', (next, value) => { writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'background.focalY', value: Number(value), scope: 'responsive' }); });
+  bindTransactionalInput(ui.backgroundZoom, 'Adjust background crop', (next, value) => { writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'background.zoom', value: Number(value), scope: 'responsive' }); });
   ui.templateElements.addEventListener('click', (event) => { const card = event.target.closest('[data-asset-id]'); if (card) addImage(card.dataset.assetId, 'template', 'decorative'); });
   ui.uploadInput.addEventListener('change', async () => { await uploadFiles(ui.uploadInput.files); ui.uploadInput.value = ''; });
   ui.uploadLibrary.addEventListener('click', (event) => {
@@ -679,7 +697,10 @@
   ui.sectionHeight.addEventListener('input', () => {
     beginControlTransaction('Resize section');
     if (ui.sectionHeight.value === '' || !Number.isFinite(Number(ui.sectionHeight.value))) return;
-    const next = clone(state); next.sections[selectedSectionId].height = Number(ui.sectionHeight.value); next.sections[selectedSectionId].heightPreset = 'custom'; state = model.normalize(next); syncCanvas();
+    const next = clone(state);
+    writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'height', value: Number(ui.sectionHeight.value), scope: 'responsive' });
+    writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'heightPreset', value: 'custom', scope: 'responsive' });
+    state = model.normalize(next); syncCanvas();
   });
   const finishSectionHeight = () => { if (!finishTransaction()) renderSections(); };
   ui.sectionHeight.addEventListener('change', finishSectionHeight); ui.sectionHeight.addEventListener('blur', finishSectionHeight);
@@ -713,23 +734,27 @@
       if (typeof id !== 'string' || !id.trim() || seenCanvasTransactionIds.has(id)) return;
       seenCanvasTransactionIds.add(id);
       if (transaction) return;
-      transaction = { id, before: snapshot(message.label || 'Edit canvas'), label: message.label || 'Edit canvas', source: 'canvas' };
+      const targetType = message.targetType === 'section' ? 'section' : message.targetType === 'element' ? 'element' : null;
+      const target = targetType === 'section' ? effectiveSection(message.targetId) : targetType === 'element' ? effectiveElement(message.targetId) : null;
+      if (!targetType || !target) return;
+      transaction = { id, before: snapshot(message.label || 'Edit canvas'), label: message.label || 'Edit canvas', source: 'canvas', targetType, targetId: message.targetId, responsiveView: activeResponsiveView, resolvedTarget: target, changedPaths: new Set() };
       return;
     }
     if (message.type === 'green-sage-visual:transaction-patch') {
-      if (transaction?.source !== 'canvas' || message.transactionId !== transaction.id) return;
+      if (transaction?.source !== 'canvas' || message.transactionId !== transaction.id || message.targetType !== transaction.targetType || message.targetId !== transaction.targetId) return;
       const next = clone(state);
-      if (message.targetType === 'section' && next.sections[message.targetId] && message.patch?.background) Object.assign(next.sections[message.targetId].background, message.patch.background);
-      if (message.targetType !== 'section' && next.elements[message.targetId]) {
-        const target = next.elements[message.targetId];
-        if (message.patch?.frame) Object.assign(target.frame, message.patch.frame);
-        if (message.patch?.crop && target.type === 'image') Object.assign(target.crop, { focalX: message.patch.crop.focalX ?? target.crop.focalX, focalY: message.patch.crop.focalY ?? target.crop.focalY });
-        if (message.patch?.content != null) target.content = String(message.patch.content);
+      if (message.targetType === 'section' && message.patch?.background) {
+        ['focalX', 'focalY', 'zoom'].forEach((key) => { if (Object.hasOwn(message.patch.background, key)) routeTransactionProperty(next, `background.${key}`, message.patch.background[key]); });
+      }
+      if (message.targetType === 'element') {
+        if (message.patch?.frame) ['x', 'y', 'width', 'height'].forEach((key) => { if (Object.hasOwn(message.patch.frame, key)) routeTransactionProperty(next, `frame.${key}`, message.patch.frame[key]); });
+        if (message.patch?.crop && transaction.resolvedTarget.type === 'image') ['focalX', 'focalY', 'zoom'].forEach((key) => { if (Object.hasOwn(message.patch.crop, key)) routeTransactionProperty(next, `crop.${key}`, message.patch.crop[key]); });
+        if (message.patch?.content != null && transaction.resolvedTarget.type === 'text') writeAuthoredProperty(next, { targetType: 'element', targetId: message.targetId, path: 'content', value: String(message.patch.content), scope: 'global' });
       }
       state = model.normalize(next); renderAll(); return;
     }
     if (message.type === 'green-sage-visual:transaction-commit') {
-      if (transaction?.source !== 'canvas' || message.transactionId !== transaction.id) return;
+      if (transaction?.source !== 'canvas' || message.transactionId !== transaction.id || message.targetType !== transaction.targetType || message.targetId !== transaction.targetId) return;
       finishTransaction(false); renderAll(); syncCanvas();
     }
   });

@@ -278,12 +278,63 @@
     Object.entries(authoredState?.elements || {}).forEach(([id, element]) => { resolved.elements[id] = applyElementOverride(resolved.elements[id], element, activeView); });
     return resolved;
   };
+  const pathParts = (path) => Array.isArray(path) ? path : String(path || '').split('.').filter(Boolean);
+  const readPath = (root, path) => pathParts(path).reduce((value, key) => value?.[key], root);
+  const hasPath = (root, path) => {
+    const parts = pathParts(path); let current = root;
+    return parts.length > 0 && parts.every((key) => {
+      if (!isObject(current) || !hasOwn(current, key)) return false;
+      current = current[key]; return true;
+    });
+  };
+  const setPath = (root, path, value) => {
+    const parts = pathParts(path); if (!parts.length) return false;
+    let current = root;
+    parts.slice(0, -1).forEach((key) => { if (!isObject(current[key])) current[key] = {}; current = current[key]; });
+    current[parts[parts.length - 1]] = value; return true;
+  };
+  const deletePath = (root, path) => {
+    const parts = pathParts(path); const parents = []; let current = root;
+    for (const key of parts.slice(0, -1)) { if (!isObject(current?.[key])) return; parents.push([current, key]); current = current[key]; }
+    if (!isObject(current)) return;
+    delete current[parts[parts.length - 1]];
+    parents.reverse().forEach(([parent, key]) => { if (isObject(parent[key]) && !Object.keys(parent[key]).length) delete parent[key]; });
+  };
+  const normalizeResponsiveWrite = (targetType, target, path, value) => {
+    const candidate = {}; setPath(candidate, path, value);
+    const normalized = targetType === 'section' ? normalizeSectionOverride(candidate) : normalizeElementOverride(candidate, target.type);
+    return hasPath(normalized, path) ? { valid: true, value: readPath(normalized, path) } : { valid: false };
+  };
+  const writeAuthoredProperty = (authoredState, options = {}) => {
+    const targetType = options.targetType === 'section' ? 'section' : options.targetType === 'element' ? 'element' : null;
+    const target = targetType === 'section' ? authoredState?.sections?.[options.targetId] : targetType === 'element' ? authoredState?.elements?.[options.targetId] : null;
+    const path = pathParts(options.path);
+    if (!target || !path.length) return false;
+    if (options.scope === 'global') return setPath(target, path, options.value);
+    if (options.scope !== 'responsive') return false;
+    const normalized = normalizeResponsiveWrite(targetType, target, path, options.value);
+    if (!normalized.valid) return false;
+    const view = CANVAS_VIEWS[options.responsiveView] ? options.responsiveView : 'mobile';
+    if (view === 'mobile') return setPath(target, path, normalized.value);
+
+    if (!isObject(target.responsive)) target.responsive = targetType === 'element' ? { strategy: 'scale', anchorX: 'center' } : {};
+    if (!isObject(target.responsive.overrides)) target.responsive.overrides = {};
+    const baseValue = readPath(target, path);
+    if (JSON.stringify(normalized.value) === JSON.stringify(baseValue)) {
+      deletePath(target.responsive.overrides[view], path);
+      if (isObject(target.responsive.overrides[view]) && !Object.keys(target.responsive.overrides[view]).length) delete target.responsive.overrides[view];
+      if (!Object.keys(target.responsive.overrides).length) delete target.responsive.overrides;
+      return true;
+    }
+    if (!isObject(target.responsive.overrides[view])) target.responsive.overrides[view] = {};
+    return setPath(target.responsive.overrides[view], path, normalized.value);
+  };
   const load = (storage = globalThis.localStorage) => { try { const saved = storage?.getItem(STORAGE_KEY); return normalize(saved ? JSON.parse(saved) : defaults); } catch { return clone(defaults); } };
   globalThis.GreenSageVisualDocument = Object.freeze({
     schemaVersion: SCHEMA_VERSION, storageKey: STORAGE_KEY, fontCatalog: FONT_CATALOG,
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
     templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
     getCanvasMetrics,
-    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, load
+    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, load
   });
 })();

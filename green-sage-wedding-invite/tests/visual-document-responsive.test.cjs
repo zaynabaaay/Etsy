@@ -122,3 +122,83 @@ test('global fields cannot be overridden and resolved projections are isolated',
   assert.equal(JSON.stringify(normalized), authoredBefore);
   assert.equal(JSON.stringify(model.normalize(JSON.parse(authoredBefore))), authoredBefore);
 });
+
+const write = (state, options) => {
+  const next = model.clone(state);
+  assert.equal(model.writeAuthoredProperty(next, options), true);
+  return model.normalize(next);
+};
+
+test('responsive writes create independent sparse frame overrides', () => {
+  let state = model.cloneDefaults();
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'frame.x', value: 100, scope: 'responsive', responsiveView: 'ipad' });
+  assert.equal(state.elements['proof-heading'].frame.x, 35);
+  assert.deepEqual(plain(state.elements['proof-heading'].responsive.overrides.ipad), { frame: { x: 100 } });
+
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'frame.x', value: 220, scope: 'responsive', responsiveView: 'desktop' });
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'frame.y', value: 140, scope: 'responsive', responsiveView: 'desktop' });
+  assert.deepEqual(plain(state.elements['proof-heading'].responsive.overrides.ipad), { frame: { x: 100 } });
+  assert.deepEqual(plain(state.elements['proof-heading'].responsive.overrides.desktop), { frame: { x: 220, y: 140 } });
+  assert.equal(state.elements['proof-heading'].responsive.overrides.desktop.frame.width, undefined);
+  assert.equal(state.elements['proof-heading'].responsive.overrides.desktop.frame.height, undefined);
+});
+
+test('redundant breakpoint writes prune only the edited override path', () => {
+  let state = model.cloneDefaults();
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'style.fontSize', value: 64, scope: 'responsive', responsiveView: 'desktop' });
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'frame.x', value: 200, scope: 'responsive', responsiveView: 'desktop' });
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'style.fontSize', value: 46, scope: 'responsive', responsiveView: 'desktop' });
+  assert.deepEqual(plain(state.elements['proof-heading'].responsive.overrides.desktop), { frame: { x: 200 } });
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'frame.x', value: 35, scope: 'responsive', responsiveView: 'desktop' });
+  assert.equal(state.elements['proof-heading'].responsive.overrides, undefined);
+});
+
+test('Mobile base writes preserve explicit overrides and update inherited views', () => {
+  let state = model.cloneDefaults();
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'style.fontSize', value: 64, scope: 'responsive', responsiveView: 'desktop' });
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'style.fontSize', value: 50, scope: 'responsive', responsiveView: 'mobile' });
+  assert.equal(state.elements['proof-heading'].style.fontSize, 50);
+  assert.equal(model.resolveElement(state.elements['proof-heading'], 'mobile').style.fontSize, 50);
+  assert.equal(model.resolveElement(state.elements['proof-heading'], 'ipad').style.fontSize, 50);
+  assert.equal(model.resolveElement(state.elements['proof-heading'], 'desktop').style.fontSize, 64);
+  assert.equal(state.elements['proof-heading'].responsive.overrides.desktop.style.fontSize, 64);
+});
+
+test('global writes stay shared in every view and never create overrides', () => {
+  let state = model.cloneDefaults();
+  const rejected = model.clone(state);
+  assert.equal(model.writeAuthoredProperty(rejected, { targetType: 'element', targetId: 'proof-heading', path: 'opacity', value: 0.5, scope: 'responsive', responsiveView: 'desktop' }), false);
+  assert.equal(rejected.elements['proof-heading'].responsive.overrides, undefined);
+  state = write(state, { targetType: 'element', targetId: 'proof-heading', path: 'content', value: 'Shared responsive invitation', scope: 'global', responsiveView: 'desktop' });
+  assert.equal(state.elements['proof-heading'].responsive.overrides, undefined);
+  ['mobile', 'ipad', 'desktop'].forEach((view) => assert.equal(model.resolveElement(state.elements['proof-heading'], view).content, 'Shared responsive invitation'));
+});
+
+test('crop and section writes resolve independently without materializing inherited values', () => {
+  let state = model.cloneDefaults();
+  const image = model.createImageElement({ id: 'image-one', sectionId: 'proof-section', assetId: 'asset-one', crop: { focalX: 50, focalY: 50, zoom: 1 } });
+  state.elements['image-one'] = image; state.sections['proof-section'].elementOrder.push('image-one'); state = model.normalize(state);
+  state = write(state, { targetType: 'element', targetId: 'image-one', path: 'crop.focalX', value: 42, scope: 'responsive', responsiveView: 'ipad' });
+  state = write(state, { targetType: 'element', targetId: 'image-one', path: 'crop.zoom', value: 1.4, scope: 'responsive', responsiveView: 'desktop' });
+  state = write(state, { targetType: 'section', targetId: 'proof-section', path: 'height', value: 700, scope: 'responsive', responsiveView: 'ipad' });
+
+  assert.deepEqual(plain(state.elements['image-one'].responsive.overrides.ipad), { crop: { focalX: 42 } });
+  assert.deepEqual(plain(state.elements['image-one'].responsive.overrides.desktop), { crop: { zoom: 1.4 } });
+  assert.equal(model.resolveElement(state.elements['image-one'], 'mobile').crop.focalX, 50);
+  assert.equal(model.resolveElement(state.elements['image-one'], 'ipad').crop.focalX, 42);
+  assert.equal(model.resolveElement(state.elements['image-one'], 'desktop').crop.zoom, 1.4);
+  assert.deepEqual(plain(state.sections['proof-section'].responsive.overrides.ipad), { height: 700 });
+  assert.equal(model.resolveSection(state.sections['proof-section'], 'mobile').height, 844);
+  assert.equal(model.resolveSection(state.sections['proof-section'], 'ipad').height, 700);
+  assert.equal(model.resolveSection(state.sections['proof-section'], 'desktop').height, 844);
+});
+
+test('canonical snapshots undo and redo first-override creation exactly', () => {
+  const before = model.cloneDefaults();
+  const after = write(before, { targetType: 'element', targetId: 'proof-heading', path: 'frame.x', value: 100, scope: 'responsive', responsiveView: 'ipad' });
+  let current = model.clone(before);
+  assert.equal(current.elements['proof-heading'].responsive.overrides, undefined);
+  current = model.clone(after);
+  assert.deepEqual(plain(current.elements['proof-heading'].responsive.overrides.ipad), { frame: { x: 100 } });
+  assert.deepEqual(plain(before), plain(model.cloneDefaults()));
+});
