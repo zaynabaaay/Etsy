@@ -2,7 +2,7 @@
   const model = globalThis.GreenSageVisualDocument;
   if (!model) return;
   const root = document.getElementById('canvasRoot');
-  const getCanvasMetrics = () => model.getCanvasMetrics('mobile', { safeMargin: state.document.canvas.safeMargin });
+  const getCanvasMetrics = () => model.getCanvasMetrics(activeResponsiveView, { safeMargin: state.document.canvas.safeMargin });
   const quickActions = document.createElement('div');
   quickActions.className = 'object-quick-actions';
   quickActions.hidden = true;
@@ -36,6 +36,7 @@
   const resizeDirections = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
   const post = (message) => window.parent.postMessage(message, ORIGIN);
   let state = null;
+  let activeResponsiveView = 'mobile';
   let selectedSectionId = null;
   let selectedElementId = null;
   let backgroundEditSectionId = null;
@@ -169,7 +170,7 @@
   };
 
   const snapFrame = (item, nextFrame) => {
-    const threshold = 5; const section = state.sections[item.sectionId]; const canvas = getCanvasMetrics(); const margin = canvas.safeMargin;
+    const threshold = 5 / Math.max(scale, 0.01); const section = state.sections[item.sectionId]; const canvas = getCanvasMetrics(); const margin = canvas.safeMargin;
     const xCandidates = [margin, canvas.centerX, canvas.right - margin]; const yCandidates = [margin, section.height / 2, section.height - margin];
     section.elementOrder.filter((id) => id !== item.id).forEach((id) => {
       const frame = state.elements[id].frame; xCandidates.push(frame.x, frame.x + frame.width / 2, frame.x + frame.width); yCandidates.push(frame.y, frame.y + frame.height / 2, frame.y + frame.height);
@@ -421,6 +422,7 @@
   const render = async () => {
     if (!state || editingElementId) return; const token = ++renderToken; const scrollY = window.scrollY; scale = calculateScale();
     root.style.setProperty('--canvas-logical-width', `${getCanvasMetrics().logicalWidth}px`);
+    root.style.setProperty('--inverse-canvas-scale', String(1 / Math.max(scale, 0.01)));
     const fonts = Object.values(state.elements).filter((item) => item.type === 'text').map((item) => model.loadFont(item.style.fontFamily, { document, weight: item.style.fontWeight, style: item.style.fontStyle, size: item.style.fontSize, sample: item.content }));
     await Promise.allSettled(fonts); await document.fonts?.ready; if (token !== renderToken) return;
     root.replaceChildren(...state.document.sectionOrder.map((id) => createSection(state.sections[id])));
@@ -430,8 +432,12 @@
   window.addEventListener('message', (event) => {
     if (event.source !== window.parent || !sameOrigin(event.origin) || !event.data) return;
     if (event.data.type === 'green-sage-visual:state') {
-      if (gesture && imageEditElementId) finishGesture(gesture);
-      const wasEditing = editingElementId; state = model.normalize(event.data.state); selectedSectionId = state.sections[event.data.selectedSectionId] ? event.data.selectedSectionId : state.document.sectionOrder[0]; selectedElementId = state.elements[event.data.selectedElementId] ? event.data.selectedElementId : null; backgroundEditSectionId = state.sections[event.data.backgroundEditSectionId]?.background.kind === 'image' ? event.data.backgroundEditSectionId : null; assetUrls = event.data.assetUrls || {};
+      const nextResponsiveView = model.canvasViews[event.data.activeResponsiveView] ? event.data.activeResponsiveView : 'mobile';
+      const viewChanged = nextResponsiveView !== activeResponsiveView;
+      if (viewChanged && gesture) finishGesture(gesture);
+      else if (gesture && imageEditElementId) finishGesture(gesture);
+      if (viewChanged) exitEdit();
+      const wasEditing = editingElementId; activeResponsiveView = nextResponsiveView; state = model.normalize(event.data.state); selectedSectionId = state.sections[event.data.selectedSectionId] ? event.data.selectedSectionId : state.document.sectionOrder[0]; selectedElementId = state.elements[event.data.selectedElementId] ? event.data.selectedElementId : null; backgroundEditSectionId = state.sections[event.data.backgroundEditSectionId]?.background.kind === 'image' ? event.data.backgroundEditSectionId : null; assetUrls = event.data.assetUrls || {};
       const imageTarget = state.elements[event.data.imageEditElementId];
       imageEditElementId = imageTarget?.type === 'image' && imageTarget.id === selectedElementId && !imageTarget.permissions.locked && imageTarget.permissions.editable ? imageTarget.id : null;
       if (wasEditing && state.elements[wasEditing]?.type === 'text' && transaction?.label === 'Edit text') {

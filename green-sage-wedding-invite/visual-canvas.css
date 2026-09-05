@@ -111,7 +111,7 @@ html.is-manipulating .object-quick-actions {
 }
 
 .section-canvas.is-section-selected {
-  outline: 1px solid rgba(116, 121, 99, .72);
+  outline: calc(1px * var(--inverse-canvas-scale, 1)) solid rgba(116, 121, 99, .72);
   outline-offset: -1px;
 }
 
@@ -143,7 +143,7 @@ html.is-manipulating .object-quick-actions {
 }
 
 .section-canvas.is-background-editing {
-  outline: 1.5px solid var(--selection);
+  outline: calc(1.5px * var(--inverse-canvas-scale, 1)) solid var(--selection);
   outline-offset: -1px;
 }
 
@@ -164,7 +164,8 @@ html.is-manipulating .object-quick-actions {
   font-size: 9px;
   letter-spacing: .02em;
   pointer-events: none;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scale(var(--inverse-canvas-scale, 1));
+  transform-origin: top center;
 }
 
 .section-canvas::after {
@@ -183,6 +184,8 @@ html.is-manipulating .object-quick-actions {
   font-size: 9px;
   letter-spacing: .04em;
   pointer-events: none;
+  transform: scale(var(--inverse-canvas-scale, 1));
+  transform-origin: top right;
 }
 
 .section-canvas.has-overflow::after {
@@ -201,7 +204,7 @@ html.is-manipulating .object-quick-actions {
 }
 
 .element-frame.is-selected {
-  outline: 1.5px solid var(--selection);
+  outline: calc(1.5px * var(--inverse-canvas-scale, 1)) solid var(--selection);
   outline-offset: 0;
   touch-action: none;
 }
@@ -227,6 +230,8 @@ html.is-manipulating .object-quick-actions {
   line-height: 1;
   white-space: nowrap;
   pointer-events: none;
+  transform: scale(var(--inverse-canvas-scale, 1));
+  transform-origin: top right;
 }
 
 .element-frame.has-text-overflow.is-selected {
@@ -247,6 +252,8 @@ html.is-manipulating .object-quick-actions {
   line-height: 1;
   white-space: nowrap;
   pointer-events: none;
+  transform: scale(var(--inverse-canvas-scale, 1));
+  transform-origin: top right;
 }
 
 .element-animation-layer,
@@ -340,7 +347,7 @@ html.is-manipulating .object-quick-actions {
 }
 
 .element-frame.is-editing {
-  outline-width: 2px;
+  outline-width: calc(2px * var(--inverse-canvas-scale, 1));
   box-shadow: 0 0 0 4px var(--selection-soft);
 }
 
@@ -369,6 +376,8 @@ html.is-manipulating {
   background: transparent;
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
+  transform: scale(var(--inverse-canvas-scale, 1));
+  transform-origin: center;
 }
 
 .element-frame.is-selected .resize-handle {
@@ -389,19 +398,19 @@ html.is-manipulating {
   transform: translate(-50%, -50%);
 }
 
-.resize-handle[data-direction="nw"] { top: -16px; left: -16px; cursor: nwse-resize; }
-.resize-handle[data-direction="n"] { top: -16px; left: calc(50% - 16px); cursor: ns-resize; }
-.resize-handle[data-direction="ne"] { top: -16px; right: -16px; cursor: nesw-resize; }
-.resize-handle[data-direction="e"] { top: calc(50% - 16px); right: -16px; cursor: ew-resize; }
-.resize-handle[data-direction="se"] { right: -16px; bottom: -16px; cursor: nwse-resize; }
-.resize-handle[data-direction="s"] { bottom: -16px; left: calc(50% - 16px); cursor: ns-resize; }
-.resize-handle[data-direction="sw"] { bottom: -16px; left: -16px; cursor: nesw-resize; }
-.resize-handle[data-direction="w"] { top: calc(50% - 16px); left: -16px; cursor: ew-resize; }
+.resize-handle[data-direction="nw"] { top: calc(-16px * var(--inverse-canvas-scale, 1)); left: calc(-16px * var(--inverse-canvas-scale, 1)); cursor: nwse-resize; }
+.resize-handle[data-direction="n"] { top: calc(-16px * var(--inverse-canvas-scale, 1)); left: calc(50% - 16px); cursor: ns-resize; }
+.resize-handle[data-direction="ne"] { top: calc(-16px * var(--inverse-canvas-scale, 1)); right: calc(-16px * var(--inverse-canvas-scale, 1)); cursor: nesw-resize; }
+.resize-handle[data-direction="e"] { top: calc(50% - 16px); right: calc(-16px * var(--inverse-canvas-scale, 1)); cursor: ew-resize; }
+.resize-handle[data-direction="se"] { right: calc(-16px * var(--inverse-canvas-scale, 1)); bottom: calc(-16px * var(--inverse-canvas-scale, 1)); cursor: nwse-resize; }
+.resize-handle[data-direction="s"] { bottom: calc(-16px * var(--inverse-canvas-scale, 1)); left: calc(50% - 16px); cursor: ns-resize; }
+.resize-handle[data-direction="sw"] { bottom: calc(-16px * var(--inverse-canvas-scale, 1)); left: calc(-16px * var(--inverse-canvas-scale, 1)); cursor: nesw-resize; }
+.resize-handle[data-direction="w"] { top: calc(50% - 16px); left: calc(-16px * var(--inverse-canvas-scale, 1)); cursor: ew-resize; }
 
 .safe-margin-guides {
   position: absolute;
   z-index: 9990;
-  border: 1px dashed rgba(116, 121, 99, .32);
+  border: calc(1px * var(--inverse-canvas-scale, 1)) dashed rgba(116, 121, 99, .32);
   pointer-events: none;
 }
 
@@ -416,13 +425,13 @@ html.is-manipulating {
 .snap-guide.is-x {
   top: 0;
   bottom: 0;
-  width: 1px;
+  width: calc(1px * var(--inverse-canvas-scale, 1));
 }
 
 .snap-guide.is-y {
   right: 0;
   left: 0;
-  height: 1px;
+  height: calc(1px * var(--inverse-canvas-scale, 1));
 }
 
 .canvas-loading {
@@ -440,14 +449,14 @@ html.is-manipulating {
     height: 40px;
   }
 
-  .resize-handle[data-direction="nw"] { top: -20px; left: -20px; }
-  .resize-handle[data-direction="n"] { top: -20px; left: calc(50% - 20px); }
-  .resize-handle[data-direction="ne"] { top: -20px; right: -20px; }
-  .resize-handle[data-direction="e"] { top: calc(50% - 20px); right: -20px; }
-  .resize-handle[data-direction="se"] { right: -20px; bottom: -20px; }
-  .resize-handle[data-direction="s"] { bottom: -20px; left: calc(50% - 20px); }
-  .resize-handle[data-direction="sw"] { bottom: -20px; left: -20px; }
-  .resize-handle[data-direction="w"] { top: calc(50% - 20px); left: -20px; }
+  .resize-handle[data-direction="nw"] { top: calc(-20px * var(--inverse-canvas-scale, 1)); left: calc(-20px * var(--inverse-canvas-scale, 1)); }
+  .resize-handle[data-direction="n"] { top: calc(-20px * var(--inverse-canvas-scale, 1)); left: calc(50% - 20px); }
+  .resize-handle[data-direction="ne"] { top: calc(-20px * var(--inverse-canvas-scale, 1)); right: calc(-20px * var(--inverse-canvas-scale, 1)); }
+  .resize-handle[data-direction="e"] { top: calc(50% - 20px); right: calc(-20px * var(--inverse-canvas-scale, 1)); }
+  .resize-handle[data-direction="se"] { right: calc(-20px * var(--inverse-canvas-scale, 1)); bottom: calc(-20px * var(--inverse-canvas-scale, 1)); }
+  .resize-handle[data-direction="s"] { bottom: calc(-20px * var(--inverse-canvas-scale, 1)); left: calc(50% - 20px); }
+  .resize-handle[data-direction="sw"] { bottom: calc(-20px * var(--inverse-canvas-scale, 1)); left: calc(-20px * var(--inverse-canvas-scale, 1)); }
+  .resize-handle[data-direction="w"] { top: calc(50% - 20px); left: calc(-20px * var(--inverse-canvas-scale, 1)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

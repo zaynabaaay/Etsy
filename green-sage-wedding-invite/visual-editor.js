@@ -14,7 +14,7 @@
 
   const $ = (id) => document.getElementById(id);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const getCanvasMetrics = () => model.getCanvasMetrics('mobile', { safeMargin: state.document.canvas.safeMargin });
+  const getCanvasMetrics = () => model.getCanvasMetrics(activeResponsiveView, { safeMargin: state.document.canvas.safeMargin });
   const ui = {
     canvas: $('visualCanvas'), previewFrame: $('previewFrame'), workspace: $('workspace'), saveStatus: $('saveStatus'),
     undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'),
@@ -42,6 +42,7 @@
   const history = { past: [], future: [] };
   const clone = model.clone;
   let state = model.load();
+  let activeResponsiveView = 'mobile';
   let selectedSectionId = state.document.sectionOrder[0];
   let selectedElementId = null;
   let canvasReady = false;
@@ -96,7 +97,7 @@
 
   const syncCanvas = () => {
     saveRevision += 1;
-    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:state', state, selectedSectionId, selectedElementId, backgroundEditSectionId, imageEditElementId, assetUrls, revision: saveRevision }, ORIGIN);
+    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:state', state, selectedSectionId, selectedElementId, backgroundEditSectionId, imageEditElementId, activeResponsiveView, assetUrls, revision: saveRevision }, ORIGIN);
   };
 
   const finishTransaction = (sync = true) => {
@@ -190,6 +191,23 @@
     closePopovers(); setPanel('position'); setPositionTab(activePositionTab); renderLayers();
   };
   const closePositionPanel = () => setPanel(positionReturnPanel === 'position' ? 'design' : positionReturnPanel);
+  const renderResponsiveView = () => {
+    const metrics = getCanvasMetrics();
+    const displayWidth = Math.min(metrics.logicalWidth, state.document.canvas.maxRenderedWidth);
+    ui.previewFrame.className = `preview-frame canvas-view-${activeResponsiveView}`;
+    ui.previewFrame.style.setProperty('--canvas-display-width', `${displayWidth}px`);
+    ui.previewButton.textContent = activeResponsiveView === 'ipad' ? 'iPad' : activeResponsiveView[0].toUpperCase() + activeResponsiveView.slice(1);
+    $$('[data-responsive-view]', ui.previewPopover).forEach((button) => {
+      const active = button.dataset.responsiveView === activeResponsiveView;
+      button.classList.toggle('is-active', active); button.setAttribute('aria-checked', String(active));
+    });
+  };
+  const setResponsiveView = (view) => {
+    if (!model.canvasViews[view] || view === activeResponsiveView) { closePopovers(); return; }
+    activeResponsiveView = view;
+    backgroundEditSectionId = null; imageEditElementId = null;
+    renderResponsiveView(); closePopovers(); renderAll(); syncCanvas();
+  };
   const selectSection = (id, sync = true) => { if (!state.sections[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
   const selectElement = (id, sync = true) => { if (!state.elements[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
 
@@ -558,7 +576,7 @@
   $$('[data-add-text]').forEach((button) => button.addEventListener('click', () => addText(button.dataset.addText)));
   ui.undo.addEventListener('click', () => applyHistory('undo')); ui.redo.addEventListener('click', () => applyHistory('redo'));
   ui.previewButton.addEventListener('click', () => togglePopover(ui.previewPopover, ui.previewButton));
-  ui.previewPopover.addEventListener('click', (event) => { const button = event.target.closest('[data-device]'); if (!button) return; ui.previewFrame.className = `preview-frame device-${button.dataset.device}`; closePopovers(); });
+  ui.previewPopover.addEventListener('click', (event) => { const button = event.target.closest('[data-responsive-view]'); if (button) setResponsiveView(button.dataset.responsiveView); });
 
   ui.fontButton.addEventListener('click', () => { if (togglePopover(ui.fontPopover, ui.fontButton)) { ui.fontSearch.focus(); renderFontList(); } });
   ui.fontSearch.addEventListener('input', renderFontList);
@@ -750,6 +768,6 @@
     }
   });
 
-  renderTemplateElements(); setPanel(activePanel); renderAll(); updateHistory();
+  renderTemplateElements(); setPanel(activePanel); renderResponsiveView(); renderAll(); updateHistory();
   refreshAssets().catch(() => { ui.uploadStatus.textContent = 'Local upload storage is unavailable in this browser.'; });
 })();

@@ -6,6 +6,8 @@
     ipad: Object.freeze({ logicalWidth: 768 }),
     desktop: Object.freeze({ logicalWidth: 1200 })
   });
+  // Allow a full Desktop-width element plus intentional overflow while still bounding corrupt data.
+  const MAX_FRAME_WIDTH = CANVAS_VIEWS.desktop.logicalWidth * 2;
   const getCanvasMetrics = (view = 'mobile', options = {}) => {
     const definition = CANVAS_VIEWS[view] || CANVAS_VIEWS.mobile;
     const safeMargin = Math.max(0, Number.isFinite(Number(options.safeMargin)) ? Number(options.safeMargin) : 20);
@@ -134,7 +136,7 @@
       'proof-copy': createTextElement({ id: 'proof-copy', content: 'Tap once to select. Tap again to place the caret and type.', frame: { x: 58, y: 324, width: 274, height: 78 }, style: { fontFamily: 'Instrument Sans', fontSize: 15, color: '#6B6A54', textAlign: 'center', lineHeight: 1.5, letterSpacing: 0.35 } })
     }
   };
-  const normalizeFrame = (frame, fallback) => ({ x: finite(frame?.x, fallback.x), y: finite(frame?.y, fallback.y), width: clamp(frame?.width ?? fallback.width, 40, 780), height: clamp(frame?.height ?? fallback.height, 32, 1600) });
+  const normalizeFrame = (frame, fallback) => ({ x: finite(frame?.x, fallback.x), y: finite(frame?.y, fallback.y), width: clamp(frame?.width ?? fallback.width, 40, MAX_FRAME_WIDTH), height: clamp(frame?.height ?? fallback.height, 32, 1600) });
   const normalizeTextElement = (value, id, sectionId) => {
     const supplied = value && typeof value === 'object' ? value : {}; const fallback = createTextElement({ id, sectionId });
     const fontFamily = FONT_BY_NAME[supplied.style?.fontFamily] ? supplied.style.fontFamily : fallback.style.fontFamily;

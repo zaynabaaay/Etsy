@@ -21,11 +21,11 @@
       <div class="storiel-document-status"><span class="save-status" id="saveStatus" role="status">Saved</span></div>
       <div class="storiel-global-actions">
         <div class="toolbar-popover-anchor">
-          <button class="global-button" id="previewButton" type="button" aria-haspopup="menu" aria-expanded="false">Preview</button>
+          <button class="global-button" id="previewButton" type="button" aria-haspopup="menu" aria-expanded="false">Mobile</button>
           <div class="compact-popover preview-popover" id="previewPopover" role="menu" hidden>
-            <button type="button" data-device="mobile" role="menuitem">Mobile canvas</button>
-            <button type="button" data-device="tablet" role="menuitem">iPad preview</button>
-            <button type="button" data-device="desktop" role="menuitem">Desktop preview</button>
+            <button class="is-active" type="button" data-responsive-view="mobile" role="menuitemradio" aria-checked="true">Mobile</button>
+            <button type="button" data-responsive-view="ipad" role="menuitemradio" aria-checked="false">iPad</button>
+            <button type="button" data-responsive-view="desktop" role="menuitemradio" aria-checked="false">Desktop</button>
           </div>
         </div>
         <button class="global-button is-disabled" type="button" aria-disabled="true" title="Publishing will be added later">Publish later</button>
@@ -111,7 +111,7 @@
     </section>
 
     <section class="storiel-workspace" id="workspace" aria-label="Invitation editing workspace">
-      <div class="preview-frame device-mobile" id="previewFrame"><iframe id="visualCanvas" src="visual-canvas.html?editor=1&amp;v=20260902-section2" title="Editable invitation canvas"></iframe></div>
+      <div class="preview-frame canvas-view-mobile" id="previewFrame"><iframe id="visualCanvas" src="visual-canvas.html?editor=1&amp;v=20260902-section2" title="Editable invitation canvas"></iframe></div>
     </section>
     <input id="replaceImageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden>
   </main>
