@@ -2,6 +2,7 @@
   const model = globalThis.GreenSageVisualDocument;
   if (!model) return;
   const root = document.getElementById('canvasRoot');
+  const getCanvasMetrics = () => model.getCanvasMetrics('mobile', { safeMargin: state.document.canvas.safeMargin });
   const quickActions = document.createElement('div');
   quickActions.className = 'object-quick-actions';
   quickActions.hidden = true;
@@ -50,7 +51,11 @@
   const frameNode = (id) => root.querySelector(`[data-element-id="${CSS.escape(id)}"]`);
   const sectionNode = (id) => root.querySelector(`[data-section-id="${CSS.escape(id)}"]`);
   const getAssetUrl = (item) => item.assetKind === 'upload' ? assetUrls[item.assetId] : model.getTemplateAsset(item.assetId)?.url;
-  const calculateScale = () => state ? Math.min(window.innerWidth / state.document.canvas.baseWidth, state.document.canvas.maxRenderedWidth / state.document.canvas.baseWidth) : 1;
+  const calculateScale = () => {
+    if (!state) return 1;
+    const canvas = getCanvasMetrics();
+    return Math.min(window.innerWidth / canvas.logicalWidth, state.document.canvas.maxRenderedWidth / canvas.logicalWidth);
+  };
   const canPointer = (event) => event.isPrimary && (event.pointerType !== 'mouse' || event.button === 0);
 
   const positionQuickActions = () => {
@@ -128,8 +133,8 @@
   };
 
   const isOutside = (item) => {
-    const section = state.sections[item.sectionId];
-    return item.frame.x < 0 || item.frame.y < 0 || item.frame.x + item.frame.width > 390 || item.frame.y + item.frame.height > section.height;
+    const section = state.sections[item.sectionId]; const canvas = getCanvasMetrics();
+    return item.frame.x < canvas.left || item.frame.y < 0 || item.frame.x + item.frame.width > canvas.right || item.frame.y + item.frame.height > section.height;
   };
   const textExceedsFrame = (frame, content) => {
     if (!content?.textContent) return false;
@@ -164,8 +169,8 @@
   };
 
   const snapFrame = (item, nextFrame) => {
-    const threshold = 5; const section = state.sections[item.sectionId]; const margin = state.document.canvas.safeMargin;
-    const xCandidates = [margin, 195, 390 - margin]; const yCandidates = [margin, section.height / 2, section.height - margin];
+    const threshold = 5; const section = state.sections[item.sectionId]; const canvas = getCanvasMetrics(); const margin = canvas.safeMargin;
+    const xCandidates = [margin, canvas.centerX, canvas.right - margin]; const yCandidates = [margin, section.height / 2, section.height - margin];
     section.elementOrder.filter((id) => id !== item.id).forEach((id) => {
       const frame = state.elements[id].frame; xCandidates.push(frame.x, frame.x + frame.width / 2, frame.x + frame.width); yCandidates.push(frame.y, frame.y + frame.height / 2, frame.y + frame.height);
     });
@@ -401,7 +406,8 @@
 
   const createSection = (section) => {
     const editingBackground = backgroundEditSectionId === section.id && section.background.kind === 'image';
-    const shell = document.createElement('div'); shell.className = 'section-shell'; shell.style.width = `${390 * scale}px`; shell.style.height = `${section.height * scale}px`;
+    const canvasMetrics = getCanvasMetrics();
+    const shell = document.createElement('div'); shell.className = 'section-shell'; shell.style.width = `${canvasMetrics.logicalWidth * scale}px`; shell.style.height = `${section.height * scale}px`;
     const canvas = document.createElement('section'); canvas.className = 'section-canvas'; canvas.dataset.sectionId = section.id; canvas.classList.toggle('is-section-selected', section.id === selectedSectionId && !selectedElementId); canvas.classList.toggle('is-background-editing', editingBackground); canvas.style.height = `${section.height}px`; canvas.style.transform = `scale(${scale})`; canvas.style.background = section.background.color;
     const background = document.createElement('div'); background.className = 'section-background'; background.classList.toggle('is-editing', editingBackground);
     if (section.background.kind === 'image') { const image = document.createElement('img'); image.alt = ''; Object.assign(image.style, { objectPosition: `${section.background.focalX}% ${section.background.focalY}%`, transform: `scale(${section.background.zoom})` }); background.append(image); setImageSource(background, image, section.background); if (editingBackground) background.addEventListener('pointerdown', (event) => startBackgroundReframe(event, section, background, image)); }
@@ -414,6 +420,7 @@
 
   const render = async () => {
     if (!state || editingElementId) return; const token = ++renderToken; const scrollY = window.scrollY; scale = calculateScale();
+    root.style.setProperty('--canvas-logical-width', `${getCanvasMetrics().logicalWidth}px`);
     const fonts = Object.values(state.elements).filter((item) => item.type === 'text').map((item) => model.loadFont(item.style.fontFamily, { document, weight: item.style.fontWeight, style: item.style.fontStyle, size: item.style.fontSize, sample: item.content }));
     await Promise.allSettled(fonts); await document.fonts?.ready; if (token !== renderToken) return;
     root.replaceChildren(...state.document.sectionOrder.map((id) => createSection(state.sections[id])));

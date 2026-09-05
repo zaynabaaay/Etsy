@@ -14,6 +14,7 @@
 
   const $ = (id) => document.getElementById(id);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const getCanvasMetrics = () => model.getCanvasMetrics('mobile', { safeMargin: state.document.canvas.safeMargin });
   const ui = {
     canvas: $('visualCanvas'), previewFrame: $('previewFrame'), workspace: $('workspace'), saveStatus: $('saveStatus'),
     undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'),
@@ -408,9 +409,10 @@
     const count = current.elementOrder.length;
     let frame = { x: 65 + (count % 3) * 8, y: 410 + (count % 4) * 12, width: 260, height: 220 };
     if (type === 'decorative') {
+      const canvas = getCanvasMetrics();
       const asset = model.getTemplateAsset(assetId); const ratio = asset?.width && asset?.height ? asset.width / asset.height : 1;
       const maxHeight = Math.max(32, current.height - 40); const width = Math.min(260, maxHeight * ratio); const height = width / ratio; const offset = (count % 3) * 8;
-      frame = { x: Math.max(20, Math.min(390 - width - 20, (390 - width) / 2 + offset)), y: Math.max(20, Math.min(current.height - height - 20, (current.height - height) / 2 + offset)), width, height };
+      frame = { x: Math.max(canvas.safeMargin, Math.min(canvas.right - width - canvas.safeMargin, canvas.centerX - width / 2 + offset)), y: Math.max(20, Math.min(current.height - height - 20, (current.height - height) / 2 + offset)), width, height };
     }
     const created = model.createImageElement({ sectionId: current.id, assetId, assetKind, type, frame, crop: { fit: type === 'decorative' ? 'contain' : 'cover' } });
     mutate('Add image', (next) => { next.elements[created.id] = created; next.sections[current.id].elementOrder.push(created.id); }, { sectionId: current.id, elementId: created.id });
@@ -444,8 +446,8 @@
   const alignElement = (axis, value) => {
     const source = element(); const current = section(); if (!source || !current || source.permissions.locked || !source.permissions.movable) return;
     mutate('Align element', (next) => {
-      const frame = next.elements[source.id].frame; const margin = state.document.canvas.safeMargin;
-      if (axis === 'x') frame.x = value === 'left' ? margin : value === 'center' ? (390 - frame.width) / 2 : 390 - margin - frame.width;
+      const frame = next.elements[source.id].frame; const canvas = getCanvasMetrics(); const margin = canvas.safeMargin;
+      if (axis === 'x') frame.x = value === 'left' ? margin : value === 'center' ? canvas.centerX - frame.width / 2 : canvas.right - margin - frame.width;
       if (axis === 'y') frame.y = value === 'top' ? margin : value === 'middle' ? (current.height - frame.height) / 2 : current.height - margin - frame.height;
     });
   };

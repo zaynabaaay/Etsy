@@ -1,6 +1,16 @@
 (() => {
   const SCHEMA_VERSION = 3;
   const STORAGE_KEY = 'green-sage-visual-proof-v1';
+  const CANVAS_VIEWS = Object.freeze({
+    mobile: Object.freeze({ logicalWidth: 390 }),
+    ipad: Object.freeze({ logicalWidth: 768 }),
+    desktop: Object.freeze({ logicalWidth: 1200 })
+  });
+  const getCanvasMetrics = (view = 'mobile', options = {}) => {
+    const definition = CANVAS_VIEWS[view] || CANVAS_VIEWS.mobile;
+    const safeMargin = Math.max(0, Number.isFinite(Number(options.safeMargin)) ? Number(options.safeMargin) : 20);
+    return Object.freeze({ logicalWidth: definition.logicalWidth, left: 0, right: definition.logicalWidth, centerX: definition.logicalWidth / 2, safeMargin });
+  };
   const FONT_CATALOG = Object.freeze([
     { name: 'Prata', displayName: 'Prata', cssFamily: 'Prata', category: 'serif', display: true, weights: [400], styles: ['normal'], fallback: 'Georgia, serif' },
     { name: 'Instrument Serif', displayName: 'Instrument Serif', cssFamily: 'Instrument Serif', category: 'serif', weights: [400], styles: ['normal', 'italic'], fallback: 'Georgia, serif' },
@@ -158,7 +168,8 @@
   globalThis.GreenSageVisualDocument = Object.freeze({
     schemaVersion: SCHEMA_VERSION, storageKey: STORAGE_KEY, fontCatalog: FONT_CATALOG,
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
-    templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS,
+    templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
+    getCanvasMetrics,
     getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, normalize, load
   });
 })();

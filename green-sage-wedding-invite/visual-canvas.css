@@ -104,7 +104,7 @@ html.is-manipulating .object-quick-actions {
   position: absolute;
   top: 0;
   left: 0;
-  width: 390px;
+  width: var(--canvas-logical-width);
   overflow: visible;
   transform-origin: top left;
   touch-action: pan-y;
