@@ -202,3 +202,88 @@ test('canonical snapshots undo and redo first-override creation exactly', () => 
   assert.deepEqual(plain(current.elements['proof-heading'].responsive.overrides.ipad), { frame: { x: 100 } });
   assert.deepEqual(plain(before), plain(model.cloneDefaults()));
 });
+
+const insertFixtureElement = ({ view, type = 'text', baseFrame, assetId = '', assetMetadata = null, index = 0 }) => {
+  const before = model.cloneDefaults();
+  const next = model.clone(before);
+  const section = next.sections['proof-section'];
+  const id = `inserted-${view}-${type}`;
+  const mobileFrame = model.getDefaultElementPlacement({ type, view: 'mobile', section, baseFrame, assetMetadata, index, safeMargin: next.document.canvas.safeMargin });
+  const activeFrame = model.getDefaultElementPlacement({ type, view, section: model.resolveSection(section, view), baseFrame, assetMetadata, index, safeMargin: next.document.canvas.safeMargin });
+  const element = type === 'text'
+    ? model.createTextElement({ id, sectionId: section.id, content: 'Inserted once', frame: mobileFrame })
+    : model.createImageElement({ id, sectionId: section.id, type, assetId, assetKind: type === 'decorative' ? 'template' : 'upload', frame: mobileFrame, crop: { fit: type === 'decorative' ? 'contain' : 'cover' } });
+  next.elements[id] = element;
+  section.elementOrder.push(id);
+  if (view !== 'mobile') {
+    ['x', 'y', 'width', 'height'].forEach((key) => assert.equal(model.writeAuthoredProperty(next, {
+      targetType: 'element', targetId: id, path: `frame.${key}`, value: activeFrame[key], scope: 'responsive', responsiveView: view
+    }), true));
+  }
+  return { before, state: model.normalize(next), id, mobileFrame, activeFrame };
+};
+
+test('Mobile insertion preserves the existing preset and creates no breakpoint overrides', () => {
+  const result = insertFixtureElement({ view: 'mobile', baseFrame: { x: 35, y: 120, width: 320, height: 80 } });
+  assert.deepEqual(plain(result.state.elements[result.id].frame), { x: 35, y: 120, width: 320, height: 80 });
+  assert.equal(result.state.elements[result.id].responsive.overrides, undefined);
+  assert.equal(result.state.sections['proof-section'].elementOrder.filter((id) => id === result.id).length, 1);
+});
+
+test('iPad and Desktop insertion keep one shared element and sparse active-view placement', () => {
+  const baseFrame = { x: 35, y: 120, width: 320, height: 80 };
+  const ipad = insertFixtureElement({ view: 'ipad', baseFrame });
+  assert.deepEqual(plain(ipad.state.elements[ipad.id].frame), baseFrame);
+  assert.deepEqual(plain(ipad.state.elements[ipad.id].responsive.overrides), { ipad: { frame: { x: 224 } } });
+  assert.equal(ipad.state.elements[ipad.id].responsive.overrides.desktop, undefined);
+  assert.equal(ipad.state.sections['proof-section'].elementOrder.filter((id) => id === ipad.id).length, 1);
+
+  const desktop = insertFixtureElement({ view: 'desktop', baseFrame });
+  assert.deepEqual(plain(desktop.state.elements[desktop.id].frame), baseFrame);
+  assert.deepEqual(plain(desktop.state.elements[desktop.id].responsive.overrides), { desktop: { frame: { x: 440 } } });
+  assert.equal(desktop.state.elements[desktop.id].responsive.overrides.ipad, undefined);
+  assert.deepEqual(plain(model.resolveElement(desktop.state.elements[desktop.id], 'desktop').frame), { x: 440, y: 120, width: 320, height: 80 });
+  assert.deepEqual(plain(model.resolveElement(desktop.state.elements[desktop.id], 'ipad').frame), baseFrame);
+  assert.deepEqual(plain(model.resolveElement(desktop.state.elements[desktop.id], 'mobile').frame), baseFrame);
+});
+
+test('wide-view image insertion remains conservatively sized with shared source data', () => {
+  const result = insertFixtureElement({ view: 'desktop', type: 'image', assetId: 'upload-one', baseFrame: { x: 65, y: 410, width: 260, height: 220 } });
+  const element = result.state.elements[result.id];
+  assert.deepEqual(plain(element.frame), { x: 65, y: 410, width: 260, height: 220 });
+  assert.deepEqual(plain(element.responsive.overrides), { desktop: { frame: { x: 470 } } });
+  assert.equal(element.assetId, 'upload-one');
+  assert.equal(element.responsive.overrides.desktop.assetId, undefined);
+  assert.equal(model.resolveElement(element, 'desktop').frame.width, 260);
+  assert.equal(model.resolveElement(element, 'desktop').frame.height, 220);
+});
+
+test('decorative insertion preserves natural ratio in Mobile and Desktop', () => {
+  const asset = model.getTemplateAsset('asset-botanical-left');
+  const result = insertFixtureElement({ view: 'desktop', type: 'decorative', assetId: asset.id, assetMetadata: asset, baseFrame: { x: 65, y: 410, width: 260, height: 220 } });
+  const element = result.state.elements[result.id];
+  const desktopFrame = model.resolveElement(element, 'desktop').frame;
+  const ratio = asset.width / asset.height;
+  assert.ok(Math.abs(element.frame.width / element.frame.height - ratio) < 1e-9);
+  assert.ok(Math.abs(desktopFrame.width / desktopFrame.height - ratio) < 1e-9);
+  assert.deepEqual(plain(element.responsive.overrides), { desktop: { frame: { x: 470 } } });
+  assert.equal(element.assetId, asset.id);
+  assert.equal(element.crop.fit, 'contain');
+});
+
+test('one insertion snapshot undoes and redoes element, override, and layer entry together', () => {
+  const result = insertFixtureElement({ view: 'ipad', baseFrame: { x: 35, y: 120, width: 320, height: 80 } });
+  let current = model.clone(result.state);
+  assert.ok(current.elements[result.id]);
+  assert.deepEqual(plain(current.elements[result.id].responsive.overrides), { ipad: { frame: { x: 224 } } });
+  assert.ok(current.sections['proof-section'].elementOrder.includes(result.id));
+
+  current = model.clone(result.before);
+  assert.equal(current.elements[result.id], undefined);
+  assert.equal(current.sections['proof-section'].elementOrder.includes(result.id), false);
+
+  current = model.clone(result.state);
+  assert.ok(current.elements[result.id]);
+  assert.deepEqual(plain(current.elements[result.id].responsive.overrides), { ipad: { frame: { x: 224 } } });
+  assert.equal(current.sections['proof-section'].elementOrder.filter((id) => id === result.id).length, 1);
+});

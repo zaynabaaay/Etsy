@@ -424,6 +424,17 @@
     finally { previousUrls.forEach((url) => URL.revokeObjectURL(url)); }
   };
 
+  const insertElement = (created, activeFrame, label) => {
+    const insertionView = activeResponsiveView;
+    mutate(label, (next) => {
+      next.elements[created.id] = created;
+      next.sections[created.sectionId].elementOrder.push(created.id);
+      if (insertionView !== 'mobile') {
+        ['x', 'y', 'width', 'height'].forEach((key) => writeAuthoredProperty(next, { targetType: 'element', targetId: created.id, path: `frame.${key}`, value: activeFrame[key], scope: 'responsive', responsiveView: insertionView }));
+      }
+    }, { sectionId: created.sectionId, elementId: created.id });
+  };
+
   const addText = (kind) => {
     const current = section(); if (!current) return;
     const presets = {
@@ -431,22 +442,22 @@
       subheading: { content: 'Add a subheading', frame: { x: 55, y: 210, width: 280, height: 58 }, style: { fontFamily: 'Instrument Serif', fontSize: 24, color: '#474232', textAlign: 'center', lineHeight: 1.1 } },
       body: { content: 'Add body text', frame: { x: 65, y: 300, width: 260, height: 64 }, style: { fontFamily: 'Instrument Sans', fontSize: 15, color: '#6B6A54', textAlign: 'center', lineHeight: 1.45 } }
     };
-    const created = model.createTextElement({ sectionId: current.id, ...presets[kind] });
-    mutate('Add text', (next) => { next.elements[created.id] = created; next.sections[current.id].elementOrder.push(created.id); }, { sectionId: current.id, elementId: created.id });
+    const preset = presets[kind]; if (!preset) return;
+    const baseFrame = model.getDefaultElementPlacement({ type: 'text', view: 'mobile', section: current, baseFrame: preset.frame, safeMargin: state.document.canvas.safeMargin });
+    const activeFrame = model.getDefaultElementPlacement({ type: 'text', view: activeResponsiveView, section: effectiveSection(current.id), baseFrame: preset.frame, safeMargin: state.document.canvas.safeMargin });
+    const created = model.createTextElement({ sectionId: current.id, ...preset, frame: baseFrame });
+    insertElement(created, activeFrame, 'Add text');
   };
 
   const addImage = (assetId, assetKind = 'upload', type = 'image') => {
     const current = section(); if (!current) return;
     const count = current.elementOrder.length;
-    let frame = { x: 65 + (count % 3) * 8, y: 410 + (count % 4) * 12, width: 260, height: 220 };
-    if (type === 'decorative') {
-      const canvas = getCanvasMetrics();
-      const asset = model.getTemplateAsset(assetId); const ratio = asset?.width && asset?.height ? asset.width / asset.height : 1;
-      const maxHeight = Math.max(32, current.height - 40); const width = Math.min(260, maxHeight * ratio); const height = width / ratio; const offset = (count % 3) * 8;
-      frame = { x: Math.max(canvas.safeMargin, Math.min(canvas.right - width - canvas.safeMargin, canvas.centerX - width / 2 + offset)), y: Math.max(20, Math.min(current.height - height - 20, (current.height - height) / 2 + offset)), width, height };
-    }
-    const created = model.createImageElement({ sectionId: current.id, assetId, assetKind, type, frame, crop: { fit: type === 'decorative' ? 'contain' : 'cover' } });
-    mutate('Add image', (next) => { next.elements[created.id] = created; next.sections[current.id].elementOrder.push(created.id); }, { sectionId: current.id, elementId: created.id });
+    const assetMetadata = type === 'decorative' ? model.getTemplateAsset(assetId) : null;
+    const presetFrame = { x: 65 + (count % 3) * 8, y: 410 + (count % 4) * 12, width: 260, height: 220 };
+    const baseFrame = model.getDefaultElementPlacement({ type, view: 'mobile', section: current, assetMetadata, baseFrame: presetFrame, index: count, safeMargin: state.document.canvas.safeMargin });
+    const activeFrame = model.getDefaultElementPlacement({ type, view: activeResponsiveView, section: effectiveSection(current.id), assetMetadata, baseFrame: presetFrame, index: count, safeMargin: state.document.canvas.safeMargin });
+    const created = model.createImageElement({ sectionId: current.id, assetId, assetKind, type, frame: baseFrame, crop: { fit: type === 'decorative' ? 'contain' : 'cover' } });
+    insertElement(created, activeFrame, 'Add image');
   };
 
   const duplicateElement = () => {

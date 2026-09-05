@@ -71,6 +71,29 @@
   const isHexColor = (value) => /^#[0-9a-f]{6}$/i.test(String(value || ''));
   const normalizeColor = (value) => isHexColor(value) ? String(value).toUpperCase() : null;
   const uniqueColors = (values) => [...new Set(values.map(normalizeColor).filter(Boolean))];
+  const getDefaultElementPlacement = (options = {}) => {
+    const view = CANVAS_VIEWS[options.view] ? options.view : 'mobile';
+    const metrics = getCanvasMetrics(view, { safeMargin: options.safeMargin });
+    const mobileMetrics = getCanvasMetrics('mobile', { safeMargin: options.safeMargin });
+    const base = {
+      x: finite(options.baseFrame?.x, 0), y: finite(options.baseFrame?.y, 0),
+      width: finite(options.baseFrame?.width, 260), height: finite(options.baseFrame?.height, 220)
+    };
+    if (options.type !== 'decorative') return { ...base, x: base.x + metrics.centerX - mobileMetrics.centerX };
+
+    const ratio = Number(options.assetMetadata?.width) > 0 && Number(options.assetMetadata?.height) > 0 ? Number(options.assetMetadata.width) / Number(options.assetMetadata.height) : 1;
+    const sectionHeight = finite(options.section?.height, SECTION_HEIGHT_PRESETS.standard);
+    const maxHeight = Math.max(32, sectionHeight - 40);
+    const width = Math.min(base.width, maxHeight * ratio);
+    const height = width / ratio;
+    const offset = (Math.max(0, Math.floor(finite(options.index, 0))) % 3) * 8;
+    return {
+      x: Math.max(metrics.safeMargin, Math.min(metrics.right - width - metrics.safeMargin, metrics.centerX - width / 2 + offset)),
+      y: Math.max(20, Math.min(sectionHeight - height - 20, (sectionHeight - height) / 2 + offset)),
+      width,
+      height
+    };
+  };
   const createId = (prefix = 'element') => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
   const getFont = (name) => FONT_BY_NAME[name] || FONT_BY_NAME['Instrument Serif'];
   const getTemplateAsset = (id) => TEMPLATE_ASSET_BY_ID[id] || null;
@@ -334,7 +357,7 @@
     schemaVersion: SCHEMA_VERSION, storageKey: STORAGE_KEY, fontCatalog: FONT_CATALOG,
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
     templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
-    getCanvasMetrics,
+    getCanvasMetrics, getDefaultElementPlacement,
     getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, load
   });
 })();
