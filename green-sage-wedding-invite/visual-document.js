@@ -323,14 +323,35 @@
     delete current[parts[parts.length - 1]];
     parents.reverse().forEach(([parent, key]) => { if (isObject(parent[key]) && !Object.keys(parent[key]).length) delete parent[key]; });
   };
+  const SECTION_RESPONSIVE_PATHS = new Set(['height', 'heightPreset', 'background.focalX', 'background.focalY', 'background.zoom']);
+  const ELEMENT_FRAME_RESPONSIVE_PATHS = new Set(['frame.x', 'frame.y', 'frame.width', 'frame.height']);
+  const TEXT_RESPONSIVE_PATHS = new Set(['style.fontSize', 'style.textAlign', 'style.lineHeight', 'style.letterSpacing']);
+  const IMAGE_RESPONSIVE_PATHS = new Set(['crop.fit', 'crop.focalX', 'crop.focalY', 'crop.zoom']);
+  const responsivePathSupported = (targetType, target, path) => {
+    const key = pathParts(path).join('.');
+    if (targetType === 'section') return SECTION_RESPONSIVE_PATHS.has(key);
+    if (targetType !== 'element') return false;
+    return ELEMENT_FRAME_RESPONSIVE_PATHS.has(key)
+      || (target?.type === 'text' && TEXT_RESPONSIVE_PATHS.has(key))
+      || (target?.type === 'image' && IMAGE_RESPONSIVE_PATHS.has(key));
+  };
+  const responsiveTarget = (authoredState, targetType, targetId) => targetType === 'section'
+    ? authoredState?.sections?.[targetId]
+    : targetType === 'element' ? authoredState?.elements?.[targetId] : null;
+  const resettableView = (view) => view === 'ipad' || view === 'desktop';
+  const pruneResponsiveView = (target, view) => {
+    if (isObject(target?.responsive?.overrides?.[view]) && !Object.keys(target.responsive.overrides[view]).length) delete target.responsive.overrides[view];
+    if (isObject(target?.responsive?.overrides) && !Object.keys(target.responsive.overrides).length) delete target.responsive.overrides;
+  };
   const normalizeResponsiveWrite = (targetType, target, path, value) => {
+    if (!responsivePathSupported(targetType, target, path)) return { valid: false };
     const candidate = {}; setPath(candidate, path, value);
     const normalized = targetType === 'section' ? normalizeSectionOverride(candidate) : normalizeElementOverride(candidate, target.type);
     return hasPath(normalized, path) ? { valid: true, value: readPath(normalized, path) } : { valid: false };
   };
   const writeAuthoredProperty = (authoredState, options = {}) => {
     const targetType = options.targetType === 'section' ? 'section' : options.targetType === 'element' ? 'element' : null;
-    const target = targetType === 'section' ? authoredState?.sections?.[options.targetId] : targetType === 'element' ? authoredState?.elements?.[options.targetId] : null;
+    const target = responsiveTarget(authoredState, targetType, options.targetId);
     const path = pathParts(options.path);
     if (!target || !path.length) return false;
     if (options.scope === 'global') return setPath(target, path, options.value);
@@ -345,12 +366,38 @@
     const baseValue = readPath(target, path);
     if (JSON.stringify(normalized.value) === JSON.stringify(baseValue)) {
       deletePath(target.responsive.overrides[view], path);
-      if (isObject(target.responsive.overrides[view]) && !Object.keys(target.responsive.overrides[view]).length) delete target.responsive.overrides[view];
-      if (!Object.keys(target.responsive.overrides).length) delete target.responsive.overrides;
+      pruneResponsiveView(target, view);
       return true;
     }
     if (!isObject(target.responsive.overrides[view])) target.responsive.overrides[view] = {};
     return setPath(target.responsive.overrides[view], path, normalized.value);
+  };
+  const removeResponsiveProperty = (authoredState, options = {}) => {
+    const targetType = options.targetType === 'section' ? 'section' : options.targetType === 'element' ? 'element' : null;
+    const target = responsiveTarget(authoredState, targetType, options.targetId);
+    const view = options.responsiveView;
+    const path = pathParts(options.path);
+    const breakpoint = target?.responsive?.overrides?.[view];
+    if (!target || !resettableView(view) || !path.length || !responsivePathSupported(targetType, target, path) || !isObject(breakpoint) || !hasPath(breakpoint, path)) return false;
+    deletePath(breakpoint, path);
+    pruneResponsiveView(target, view);
+    return true;
+  };
+  const resetResponsiveTarget = (authoredState, options = {}) => {
+    const targetType = options.targetType === 'section' ? 'section' : options.targetType === 'element' ? 'element' : null;
+    const target = responsiveTarget(authoredState, targetType, options.targetId);
+    const view = options.responsiveView;
+    if (!target || !resettableView(view) || !isObject(target.responsive?.overrides) || !hasOwn(target.responsive.overrides, view)) return false;
+    delete target.responsive.overrides[view];
+    pruneResponsiveView(target, view);
+    return true;
+  };
+  const resetResponsiveView = (authoredState, view) => {
+    if (!isObject(authoredState) || !resettableView(view)) return false;
+    let changed = false;
+    Object.keys(authoredState.sections || {}).forEach((targetId) => { changed = resetResponsiveTarget(authoredState, { targetType: 'section', targetId, responsiveView: view }) || changed; });
+    Object.keys(authoredState.elements || {}).forEach((targetId) => { changed = resetResponsiveTarget(authoredState, { targetType: 'element', targetId, responsiveView: view }) || changed; });
+    return changed;
   };
   const load = (storage = globalThis.localStorage) => { try { const saved = storage?.getItem(STORAGE_KEY); return normalize(saved ? JSON.parse(saved) : defaults); } catch { return clone(defaults); } };
   globalThis.GreenSageVisualDocument = Object.freeze({
@@ -358,6 +405,6 @@
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
     templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
     getCanvasMetrics, getDefaultElementPlacement,
-    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, load
+    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, removeResponsiveProperty, resetResponsiveTarget, resetResponsiveView, load
   });
 })();
