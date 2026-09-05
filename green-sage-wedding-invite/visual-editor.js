@@ -17,7 +17,7 @@
   const getCanvasMetrics = () => model.getCanvasMetrics(activeResponsiveView, { safeMargin: state.document.canvas.safeMargin });
   const ui = {
     canvas: $('visualCanvas'), previewFrame: $('previewFrame'), workspace: $('workspace'), saveStatus: $('saveStatus'),
-    undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'),
+    undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'), resetView: $('resetViewButton'), resetDialog: $('resetViewDialog'), resetTitle: $('resetViewTitle'), resetDescription: $('resetViewDescription'), resetCancel: $('cancelResetViewButton'), resetConfirm: $('confirmResetViewButton'),
     contextEmpty: $('contextEmpty'), textContext: $('textContext'), imageContext: $('imageContext'), sectionContext: $('sectionContext'), sectionContextName: $('sectionContextName'), backgroundEditContext: $('backgroundEditContext'), doneBackgroundToolbar: $('doneBackgroundToolbarButton'),
     fontButton: $('fontPickerButton'), fontValue: $('fontPickerValue'), fontPopover: $('fontPickerPopover'), fontSearch: $('fontSearch'), fontFilters: $('fontCategoryFilters'), fontList: $('fontList'),
     fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'),
@@ -66,6 +66,7 @@
   let uploadDeleteId = null;
   let deletingUploadId = null;
   let layerDrag = null;
+  let resetDialogView = null;
 
   const section = () => state.sections[selectedSectionId] || null;
   const element = () => state.elements[selectedElementId] || null;
@@ -203,6 +204,8 @@
     closePopovers(); setPanel('position'); setPositionTab(activePositionTab); renderLayers();
   };
   const closePositionPanel = () => setPanel(positionReturnPanel === 'position' ? 'design' : positionReturnPanel);
+  const responsiveViewLabel = (view) => view === 'ipad' ? 'iPad' : view === 'desktop' ? 'Desktop' : 'Mobile';
+  const renderResetAvailability = () => { ui.resetView.hidden = !model.hasResponsiveOverrides(state, activeResponsiveView); };
   const renderResponsiveView = () => {
     const metrics = getCanvasMetrics();
     const displayWidth = Math.min(metrics.logicalWidth, state.document.canvas.maxRenderedWidth);
@@ -213,6 +216,7 @@
       const active = button.dataset.responsiveView === activeResponsiveView;
       button.classList.toggle('is-active', active); button.setAttribute('aria-checked', String(active));
     });
+    renderResetAvailability();
   };
   const setResponsiveView = (view) => {
     if (!model.canvasViews[view] || view === activeResponsiveView) { closePopovers(); return; }
@@ -223,6 +227,28 @@
   };
   const selectSection = (id, sync = true) => { if (!state.sections[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
   const selectElement = (id, sync = true) => { if (!state.elements[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
+
+  const finishIncompatibleInteraction = () => {
+    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:end-interaction' }, ORIGIN);
+    finishTransaction(false); backgroundEditSectionId = null; imageEditElementId = null; closePopovers(); renderAll(); syncCanvas();
+  };
+  const openResetViewDialog = () => {
+    if (!model.hasResponsiveOverrides(state, activeResponsiveView)) { renderResetAvailability(); return; }
+    finishIncompatibleInteraction();
+    if (!model.hasResponsiveOverrides(state, activeResponsiveView)) { renderResetAvailability(); return; }
+    resetDialogView = activeResponsiveView; const label = responsiveViewLabel(resetDialogView);
+    ui.resetTitle.textContent = `Reset ${label} view?`;
+    ui.resetDescription.textContent = `This removes ${label}-specific layout changes and returns the view to the Mobile layout. You can undo this.`;
+    ui.resetDialog.showModal(); ui.resetCancel.focus({ preventScroll: true });
+  };
+  const confirmResetView = () => {
+    const view = resetDialogView;
+    finishIncompatibleInteraction();
+    if (view !== activeResponsiveView || !model.hasResponsiveOverrides(state, view)) { ui.resetDialog.close(); renderResetAvailability(); return; }
+    const next = clone(state);
+    if (model.resetResponsiveView(next, view)) commit(next, `Reset ${responsiveViewLabel(view)} view`);
+    ui.resetDialog.close();
+  };
 
   const ensureElementFont = async (elementId, nextFont) => {
     const current = effectiveElement(elementId); if (!current || current.type !== 'text') return false;
@@ -407,7 +433,7 @@
     ui.positionHelp.hidden = Boolean(selected);
   };
 
-  const renderAll = () => { renderContext(); renderDesign(); renderUploads(); renderSections(); renderLayers(); };
+  const renderAll = () => { renderContext(); renderDesign(); renderUploads(); renderSections(); renderLayers(); renderResetAvailability(); };
   const refreshAssets = async () => {
     const nextRecords = await assets.list(); const nextUrls = {}; const nextObjectUrls = [];
     try {
@@ -607,6 +633,12 @@
   ui.undo.addEventListener('click', () => applyHistory('undo')); ui.redo.addEventListener('click', () => applyHistory('redo'));
   ui.previewButton.addEventListener('click', () => togglePopover(ui.previewPopover, ui.previewButton));
   ui.previewPopover.addEventListener('click', (event) => { const button = event.target.closest('[data-responsive-view]'); if (button) setResponsiveView(button.dataset.responsiveView); });
+  ui.resetView.addEventListener('click', openResetViewDialog);
+  ui.resetConfirm.addEventListener('click', confirmResetView);
+  ui.resetDialog.addEventListener('close', () => {
+    resetDialogView = null;
+    requestAnimationFrame(() => (ui.resetView.hidden ? ui.previewButton : ui.resetView).focus({ preventScroll: true }));
+  });
 
   ui.fontButton.addEventListener('click', () => { if (togglePopover(ui.fontPopover, ui.fontButton)) { ui.fontSearch.focus(); renderFontList(); } });
   ui.fontSearch.addEventListener('input', renderFontList);

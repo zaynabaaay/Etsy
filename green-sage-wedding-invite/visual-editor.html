@@ -28,6 +28,7 @@
             <button type="button" data-responsive-view="desktop" role="menuitemradio" aria-checked="false">Desktop</button>
           </div>
         </div>
+        <button class="global-button view-reset-button" id="resetViewButton" type="button" hidden>Reset this view</button>
         <button class="global-button is-disabled" type="button" aria-disabled="true" title="Publishing will be added later">Publish later</button>
       </div>
     </header>
@@ -115,6 +116,16 @@
     </section>
     <input id="replaceImageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden>
   </main>
+  <dialog class="view-reset-dialog" id="resetViewDialog" aria-labelledby="resetViewTitle" aria-describedby="resetViewDescription">
+    <form method="dialog">
+      <h2 id="resetViewTitle">Reset this view?</h2>
+      <p id="resetViewDescription"></p>
+      <div class="view-reset-dialog-actions">
+        <button class="secondary-button" id="cancelResetViewButton" type="submit" value="cancel">Cancel</button>
+        <button class="view-reset-confirm" id="confirmResetViewButton" type="button">Reset this view</button>
+      </div>
+    </form>
+  </dialog>
   <script src="visual-document.js?v=20260902-section2"></script>
   <script src="visual-assets.js?v=20260902-section2"></script>
   <script src="visual-editor.js?v=20260902-section2"></script>

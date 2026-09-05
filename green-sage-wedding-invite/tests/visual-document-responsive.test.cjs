@@ -407,3 +407,31 @@ test('reset output remains sparse through serialization and normalization', () =
   assert.equal(restored.elements['proof-heading'].responsive.overrides.desktop.frame.x, 300);
   assert.deepEqual(plain(restored.elements['proof-heading'].responsive.overrides.futureWide), { frame: { x: 500 } });
 });
+
+test('responsive reset availability reads canonical iPad and Desktop overrides only', () => {
+  const state = model.cloneDefaults();
+  assert.equal(model.hasResponsiveOverrides(state, 'mobile'), false);
+  assert.equal(model.hasResponsiveOverrides(state, 'ipad'), false);
+  assert.equal(model.hasResponsiveOverrides(state, 'desktop'), false);
+  state.elements['proof-heading'].responsive.overrides = { ipad: { frame: {}, content: 'Not responsive' } };
+  assert.equal(model.hasResponsiveOverrides(state, 'ipad'), false);
+  state.elements['proof-heading'].responsive.overrides = { ipad: { frame: { x: 100 } }, futureWide: { frame: { x: 500 } } };
+  assert.equal(model.hasResponsiveOverrides(state, 'mobile'), false);
+  assert.equal(model.hasResponsiveOverrides(state, 'ipad'), true);
+  assert.equal(model.hasResponsiveOverrides(state, 'desktop'), false);
+  assert.equal(model.hasResponsiveOverrides(state, 'futureWide'), false);
+  state.sections['proof-section'].responsive.overrides = { desktop: { height: 700 } };
+  assert.equal(model.hasResponsiveOverrides(state, 'desktop'), true);
+});
+
+test('availability turns off after reset and returns with the exact undo snapshot', () => {
+  const before = resetFixture(); const after = model.clone(before);
+  assert.equal(model.hasResponsiveOverrides(after, 'ipad'), true);
+  assert.equal(model.resetResponsiveView(after, 'ipad'), true);
+  assert.equal(model.hasResponsiveOverrides(after, 'ipad'), false);
+  const undo = model.clone(before);
+  assert.equal(model.hasResponsiveOverrides(undo, 'ipad'), true);
+  assert.deepEqual(plain(undo.elements['proof-heading'].responsive.overrides.ipad), plain(before.elements['proof-heading'].responsive.overrides.ipad));
+  const redo = model.clone(after);
+  assert.equal(model.hasResponsiveOverrides(redo, 'ipad'), false);
+});

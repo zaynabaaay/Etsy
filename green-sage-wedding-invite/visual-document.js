@@ -399,12 +399,17 @@
     Object.keys(authoredState.elements || {}).forEach((targetId) => { changed = resetResponsiveTarget(authoredState, { targetType: 'element', targetId, responsiveView: view }) || changed; });
     return changed;
   };
+  const hasResponsiveOverrides = (authoredState, view) => {
+    if (!isObject(authoredState) || !resettableView(view)) return false;
+    return Object.values(authoredState.sections || {}).some((section) => Object.keys(normalizeSectionOverride(section?.responsive?.overrides?.[view])).length > 0)
+      || Object.values(authoredState.elements || {}).some((element) => Object.keys(normalizeElementOverride(element?.responsive?.overrides?.[view], element?.type)).length > 0);
+  };
   const load = (storage = globalThis.localStorage) => { try { const saved = storage?.getItem(STORAGE_KEY); return normalize(saved ? JSON.parse(saved) : defaults); } catch { return clone(defaults); } };
   globalThis.GreenSageVisualDocument = Object.freeze({
     schemaVersion: SCHEMA_VERSION, storageKey: STORAGE_KEY, fontCatalog: FONT_CATALOG,
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
     templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
     getCanvasMetrics, getDefaultElementPlacement,
-    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, removeResponsiveProperty, resetResponsiveTarget, resetResponsiveView, load
+    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, removeResponsiveProperty, resetResponsiveTarget, resetResponsiveView, hasResponsiveOverrides, load
   });
 })();

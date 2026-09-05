@@ -25,7 +25,17 @@ button:disabled,.is-disabled { cursor:not-allowed; opacity:.42; }
 .icon-button,.global-button { min-height:42px; border:1px solid var(--line); border-radius:8px; background:#fff; }
 .icon-button { width:42px; padding:0; font-size:18px; }
 .global-button { padding:8px 13px; font-size:11px; }
+.view-reset-button { color:#6f5148; background:#fffdfa; }
 .toolbar-popover-anchor { position:relative; }
+
+.view-reset-dialog { width:min(390px,calc(100vw - 32px)); padding:0; border:1px solid var(--line); border-radius:12px; color:var(--ink); background:var(--panel); box-shadow:0 24px 70px rgba(42,39,32,.26); }
+.view-reset-dialog::backdrop { background:rgba(52,54,46,.28); }
+.view-reset-dialog form { padding:22px; }
+.view-reset-dialog h2 { margin:0; font-family:"Instrument Serif",serif; font-size:23px; font-weight:400; }
+.view-reset-dialog p { margin:9px 0 18px; color:var(--muted); font-size:12px; line-height:1.55; }
+.view-reset-dialog-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.view-reset-dialog-actions .secondary-button { margin:0; }
+.view-reset-confirm { min-height:44px; padding:8px 11px; border:1px solid #b9a69d; border-radius:8px; color:#684b43; background:#f7f0ec; font-size:11px; }
 
 .storiel-nav { z-index:20; grid-area:2/1/4/2; display:flex; flex-direction:column; gap:4px; padding:10px 7px; border-right:1px solid #4b4e43; background:#55594c; }
 .nav-tool { display:grid; min-height:62px; place-items:center; gap:2px; padding:7px 3px; border:0; border-radius:8px; color:rgba(255,255,255,.76); background:transparent; font-size:9px; }

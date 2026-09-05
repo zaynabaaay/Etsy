@@ -431,6 +431,11 @@
 
   window.addEventListener('message', (event) => {
     if (event.source !== window.parent || !sameOrigin(event.origin) || !event.data) return;
+    if (event.data.type === 'green-sage-visual:end-interaction') {
+      if (gesture) finishGesture(gesture);
+      exitEdit(); imageEditElementId = null; backgroundEditSectionId = null;
+      return;
+    }
     if (event.data.type === 'green-sage-visual:state') {
       const nextResponsiveView = model.canvasViews[event.data.activeResponsiveView] ? event.data.activeResponsiveView : 'mobile';
       const viewChanged = nextResponsiveView !== activeResponsiveView;
