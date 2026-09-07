@@ -1,6 +1,5 @@
 (() => {
   const SCHEMA_VERSION = 4;
-  const STORAGE_KEY = 'green-sage-visual-proof-v1';
   const CANVAS_VIEWS = Object.freeze({
     mobile: Object.freeze({ logicalWidth: 390 }),
     ipad: Object.freeze({ logicalWidth: 768 }),
@@ -208,7 +207,7 @@
   };
   const defaultPermissions = Object.freeze({ editable: true, movable: true, resizable: true, deletable: true, locked: false });
   const baseElement = (overrides, type) => ({
-    id: overrides.id || createId(type), sectionId: overrides.sectionId || 'proof-section', type,
+    id: overrides.id || createId(type), sectionId: overrides.sectionId || 'document-section', type,
     frame: { x: overrides.frame?.x ?? 45, y: overrides.frame?.y ?? 180, width: overrides.frame?.width ?? 300, height: overrides.frame?.height ?? 76 },
     rotation: overrides.rotation ?? 0, opacity: overrides.opacity ?? 1,
     responsive: { strategy: 'scale', anchorX: 'center', ...(overrides.responsive || {}) },
@@ -230,14 +229,13 @@
     elementOrder: Array.isArray(overrides.elementOrder) ? [...overrides.elementOrder] : [],
     responsive: normalizeSectionResponsive(overrides.responsive)
   });
+  // Model-only recovery state. Product templates and development fixtures live in
+  // dedicated resources and are selected through the template loader.
   const defaults = {
     schemaVersion: SCHEMA_VERSION,
-    document: { id: 'green-sage-visual-editor', templateId: 'green-sage', title: 'Green Sage invitation', colors: TEMPLATE_PALETTE.map((color) => color.value), canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 }, sectionOrder: ['proof-section'], media: { audio: null } },
-    sections: { 'proof-section': createSection({ id: 'proof-section', name: 'Opening canvas', height: 844, heightPreset: 'full', background: { kind: 'color', color: '#EAE2D7' }, elementOrder: ['proof-heading', 'proof-copy'] }) },
-    elements: {
-      'proof-heading': createTextElement({ id: 'proof-heading', content: 'A BEAUTIFUL BEGINNING', frame: { x: 35, y: 184, width: 320, height: 92 }, style: { fontFamily: 'Instrument Serif', fontSize: 46, color: '#474232', textAlign: 'center', lineHeight: 1.04, letterSpacing: 0 } }),
-      'proof-copy': createTextElement({ id: 'proof-copy', content: 'Tap once to select. Tap again to place the caret and type.', frame: { x: 58, y: 324, width: 274, height: 78 }, style: { fontFamily: 'Instrument Sans', fontSize: 15, color: '#6B6A54', textAlign: 'center', lineHeight: 1.5, letterSpacing: 0.35 } })
-    }
+    document: { id: 'visual-document-fallback', templateId: 'visual-document', title: 'Visual document', colors: TEMPLATE_PALETTE.map((color) => color.value), canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 }, sectionOrder: ['document-section'], media: { audio: null } },
+    sections: { 'document-section': createSection({ id: 'document-section', name: 'Document', height: 844, heightPreset: 'full', background: { kind: 'color', color: '#F4EFE7' }, elementOrder: [] }) },
+    elements: {}
   };
   const normalizeFrame = (frame, fallback) => ({ x: finite(frame?.x, fallback.x), y: finite(frame?.y, fallback.y), width: clamp(frame?.width ?? fallback.width, 40, MAX_FRAME_WIDTH), height: clamp(frame?.height ?? fallback.height, 32, 1600) });
   const normalizeTextElement = (value, id, sectionId) => {
@@ -404,12 +402,11 @@
     return Object.values(authoredState.sections || {}).some((section) => Object.keys(normalizeSectionOverride(section?.responsive?.overrides?.[view])).length > 0)
       || Object.values(authoredState.elements || {}).some((element) => Object.keys(normalizeElementOverride(element?.responsive?.overrides?.[view], element?.type)).length > 0);
   };
-  const load = (storage = globalThis.localStorage) => { try { const saved = storage?.getItem(STORAGE_KEY); return normalize(saved ? JSON.parse(saved) : defaults); } catch { return clone(defaults); } };
   globalThis.GreenSageVisualDocument = Object.freeze({
-    schemaVersion: SCHEMA_VERSION, storageKey: STORAGE_KEY, fontCatalog: FONT_CATALOG,
+    schemaVersion: SCHEMA_VERSION, fontCatalog: FONT_CATALOG,
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
     templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
     getCanvasMetrics, getDefaultElementPlacement,
-    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, removeResponsiveProperty, resetResponsiveTarget, resetResponsiveView, hasResponsiveOverrides, load
+    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, removeResponsiveProperty, resetResponsiveTarget, resetResponsiveView, hasResponsiveOverrides
   });
 })();

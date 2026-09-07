@@ -7,7 +7,8 @@ const vm = require('node:vm');
 const context = { console, crypto: { randomUUID: () => 'test-id' }, setTimeout, clearTimeout };
 context.globalThis = context;
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'visual-document.js'), 'utf8'), context);
-const model = context.GreenSageVisualDocument;
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'visual-proof-fixture.js'), 'utf8'), context);
+const model = Object.freeze({ ...context.GreenSageVisualDocument, cloneDefaults: context.StorielVisualProofFixture.cloneDefault });
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
 test('schema 3 migrates to schema 4 without responsive overrides or geometry changes', () => {

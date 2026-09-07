@@ -1,8 +1,10 @@
 (() => {
   const model = globalThis.GreenSageVisualDocument;
+  const templateLoader = globalThis.StorielVisualTemplateLoader;
   const assets = globalThis.StorielVisualAssets;
-  if (!model || !assets) {
-    const missing = [!model && 'document model', !assets && 'local asset storage'].filter(Boolean).join(' and ');
+  const activeTemplate = templateLoader?.getTemplate('green-sage');
+  if (!model || !templateLoader || !activeTemplate || !assets) {
+    const missing = [!model && 'document model', !templateLoader && 'template loader', !activeTemplate && 'Green Sage template', !assets && 'local asset storage'].filter(Boolean).join(' and ');
     const message = document.createElement('section');
     message.className = 'editor-initialization-error';
     message.setAttribute('role', 'alert');
@@ -41,7 +43,7 @@
   const SIZE_PRESETS = [8, 10, 12, 14, 16, 18, 21, 24, 28, 32, 36, 42, 48, 56, 64, 72, 84, 96, 120];
   const history = { past: [], future: [] };
   const clone = model.clone;
-  let state = model.load();
+  let state = templateLoader.load(activeTemplate.templateId);
   let activeResponsiveView = 'mobile';
   let selectedSectionId = state.document.sectionOrder[0];
   let selectedElementId = null;
@@ -90,7 +92,10 @@
     saveTimer = 0;
     // Live transaction patches are previews; only persist committed authored state.
     const committedState = transaction ? transaction.before.state : state;
-    try { localStorage.setItem(model.storageKey, JSON.stringify(committedState)); ui.saveStatus.textContent = 'Saved'; }
+    try {
+      if (!templateLoader.save(activeTemplate.templateId, committedState)) throw new Error('Template identity mismatch');
+      ui.saveStatus.textContent = 'Saved';
+    }
     catch { ui.saveStatus.textContent = 'Draft not saved'; }
   };
   const scheduleSave = () => {
