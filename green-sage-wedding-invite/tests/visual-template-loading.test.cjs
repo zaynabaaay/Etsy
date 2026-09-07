@@ -33,6 +33,7 @@ test('Green Sage and proof have separate stable schema-4 identities', () => {
   assert.notEqual(proof.storageKey, greenSage.storageKey);
   assert.ok(proof.defaultDocument.sections['proof-section']);
   assert.equal(greenSage.defaultDocument.sections['proof-section'], undefined);
+  assert.ok(greenSage.defaultDocument.sections.ceremony);
 
   const proofClone = proof.cloneDefault();
   const greenClone = greenSage.cloneDefault();
@@ -56,7 +57,7 @@ test('Green Sage falls back to its dedicated default with no save or corrupt dat
   const empty = storage();
   const initial = loader.load('green-sage', empty);
   assert.equal(initial.document.templateId, 'green-sage');
-  assert.deepEqual(plain(initial.document.sectionOrder), ['green-sage-placeholder']);
+  assert.deepEqual(plain(initial.document.sectionOrder), ['ceremony']);
   assert.equal(initial.elements['proof-heading'], undefined);
 
   const corrupt = storage({ [greenSage.storageKey]: '{bad json' });
@@ -67,11 +68,11 @@ test('Green Sage falls back to its dedicated default with no save or corrupt dat
 
 test('valid Green Sage state restores and keeps its identity', () => {
   const saved = greenSage.cloneDefault();
-  saved.sections['green-sage-placeholder'].name = 'Saved Green Sage section';
+  saved.sections.ceremony.name = 'Saved Green Sage section';
   const store = storage({ [greenSage.storageKey]: JSON.stringify(saved) });
   const restored = loader.load('green-sage', store);
   assert.equal(restored.document.templateId, 'green-sage');
-  assert.equal(restored.sections['green-sage-placeholder'].name, 'Saved Green Sage section');
+  assert.equal(restored.sections.ceremony.name, 'Saved Green Sage section');
 });
 
 test('proof storage and wrong-template saved state cannot replace Green Sage', () => {
@@ -96,15 +97,15 @@ test('Green Sage save is isolated and round-trips responsive authored state', ()
   const store = storage({ [proof.storageKey]: JSON.stringify(proof.cloneDefault()) });
   const proofBefore = store.value(proof.storageKey);
   const authored = loader.load('green-sage', store);
-  authored.sections['green-sage-placeholder'].responsive = { overrides: { ipad: { height: 700 } } };
+  authored.sections.ceremony.responsive.overrides.ipad.height = 700;
   assert.equal(loader.save('green-sage', authored, store), true);
   assert.equal(store.value(proof.storageKey), proofBefore);
 
   const restored = loader.load('green-sage', store);
-  assert.equal(restored.sections['green-sage-placeholder'].responsive.overrides.ipad.height, 700);
-  assert.equal(model.resolveSection(restored.sections['green-sage-placeholder'], 'mobile').height, 844);
-  assert.equal(model.resolveSection(restored.sections['green-sage-placeholder'], 'ipad').height, 700);
-  assert.equal(model.resolveSection(restored.sections['green-sage-placeholder'], 'desktop').height, 844);
+  assert.equal(restored.sections.ceremony.responsive.overrides.ipad.height, 700);
+  assert.equal(model.resolveSection(restored.sections.ceremony, 'mobile').height, 844);
+  assert.equal(model.resolveSection(restored.sections.ceremony, 'ipad').height, 700);
+  assert.equal(model.resolveSection(restored.sections.ceremony, 'desktop').height, 1000);
 });
 
 test('save rejects a mismatched template without overwriting Green Sage storage', () => {
