@@ -80,6 +80,7 @@ input[type="range"] { width:100%; accent-color:var(--sage); }
 .text-add-list span,.text-add-list strong { display:block; }
 .text-add-list span { color:var(--muted); font-size:9px; }
 .text-add-list strong { margin-top:6px; font-family:"Instrument Serif",serif; font-size:20px; font-weight:400; }
+.element-add-divider { margin-bottom:12px; }
 .upload-grid { margin-top:14px; }
 .upload-card-actions { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:6px; }
 .upload-card-actions button { min-height:36px; border:0; border-radius:6px; background:#eceee8; font-size:9px; }
@@ -176,6 +177,8 @@ input[type="range"] { width:100%; accent-color:var(--sage); }
 .more-popover .button-row button { min-height:42px; border:1px solid var(--line); border-radius:7px; background:#fff; font-size:9px; }.more-popover .button-row .is-danger { color:var(--danger); }
 .case-buttons { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }.case-buttons button { min-height:38px; border:1px solid var(--line); border-radius:7px; background:#fff; }
 #textCaseControls { margin-top:13px; }
+.view-visibility-control { display:flex !important; min-height:42px; align-items:center; gap:9px; }
+.view-visibility-control input { width:18px; height:18px; margin:0; accent-color:var(--sage); }
 .color-popover { left:0; width:230px; }.color-popover label { display:grid; gap:7px; margin-top:12px; color:var(--muted); font-size:9px; }
 .color-custom-row { display:grid; grid-template-columns:44px 1fr; gap:7px; }.color-custom-row input { width:100%; min-height:40px; border:1px solid var(--line); border-radius:7px; background:#fff; }.color-custom-row input[type="color"] { padding:3px; }
 .section-color-row { grid-template-columns:50px 1fr; }.section-color-row input[type="text"] { padding:8px 9px; }

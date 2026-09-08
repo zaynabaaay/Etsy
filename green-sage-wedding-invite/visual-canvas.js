@@ -134,6 +134,7 @@
   };
 
   const isOutside = (item) => {
+    if (!item || item.visible === false) return false;
     const section = state.sections[item.sectionId]; const canvas = getCanvasMetrics();
     return item.frame.x < canvas.left || item.frame.y < 0 || item.frame.x + item.frame.width > canvas.right || item.frame.y + item.frame.height > section.height;
   };
@@ -172,7 +173,7 @@
   const snapFrame = (item, nextFrame) => {
     const threshold = 5 / Math.max(scale, 0.01); const section = state.sections[item.sectionId]; const canvas = getCanvasMetrics(); const margin = canvas.safeMargin;
     const xCandidates = [margin, canvas.centerX, canvas.right - margin]; const yCandidates = [margin, section.height / 2, section.height - margin];
-    section.elementOrder.filter((id) => id !== item.id).forEach((id) => {
+    section.elementOrder.filter((id) => id !== item.id && state.elements[id]?.visible !== false).forEach((id) => {
       const frame = state.elements[id].frame; xCandidates.push(frame.x, frame.x + frame.width / 2, frame.x + frame.width); yCandidates.push(frame.y, frame.y + frame.height / 2, frame.y + frame.height);
     });
     const xPoints = [{ key: 'left', value: nextFrame.x }, { key: 'center', value: nextFrame.x + nextFrame.width / 2 }, { key: 'right', value: nextFrame.x + nextFrame.width }];
@@ -229,10 +230,11 @@
         if (direction.includes('n')) next.y = start.frame.y + start.frame.height - next.height;
         applyFrame(item, frame, next); return;
       }
-      if (direction.includes('e')) next.width = Math.max(40, start.frame.width + dx);
-      if (direction.includes('s')) next.height = Math.max(32, start.frame.height + dy);
-      if (direction.includes('w')) { next.width = Math.max(40, start.frame.width - dx); next.x = start.frame.x + start.frame.width - next.width; }
-      if (direction.includes('n')) { next.height = Math.max(32, start.frame.height - dy); next.y = start.frame.y + start.frame.height - next.height; }
+      const minWidth = item.type === 'divider' ? 1 : 40; const minHeight = item.type === 'divider' ? 1 : 32;
+      if (direction.includes('e')) next.width = Math.max(minWidth, start.frame.width + dx);
+      if (direction.includes('s')) next.height = Math.max(minHeight, start.frame.height + dy);
+      if (direction.includes('w')) { next.width = Math.max(minWidth, start.frame.width - dx); next.x = start.frame.x + start.frame.width - next.width; }
+      if (direction.includes('n')) { next.height = Math.max(minHeight, start.frame.height - dy); next.y = start.frame.y + start.frame.height - next.height; }
       applyFrame(item, frame, next);
     };
     trackGesture(event, frame, move);
@@ -389,18 +391,26 @@
     return content;
   };
 
+  const createDividerContent = (item) => {
+    const content = document.createElement('div'); content.className = 'element-content divider-content'; content.style.backgroundColor = item.style.color;
+    const hitTarget = document.createElement('span'); hitTarget.className = 'divider-hit-target'; hitTarget.setAttribute('aria-hidden', 'true'); content.append(hitTarget);
+    return content;
+  };
+
   const createElement = (item) => {
     const frame = document.createElement('div'); frame.className = 'element-frame'; frame.dataset.elementId = item.id; frame.dataset.elementType = item.type;
     frame.classList.toggle('is-image-editing', imageEditElementId === item.id);
     frame.classList.toggle('is-selected', selectedElementId === item.id); frame.classList.toggle('is-locked', item.permissions.locked);
     Object.assign(frame.style, { left: `${item.frame.x}px`, top: `${item.frame.y}px`, width: `${item.frame.width}px`, height: `${item.frame.height}px`, opacity: item.opacity, rotate: `${item.rotation}deg` });
-    const animation = document.createElement('div'); animation.className = 'element-animation-layer'; animation.append(item.type === 'text' ? createTextContent(item, frame) : createImageContent(item)); frame.append(animation);
+    const animation = document.createElement('div'); animation.className = 'element-animation-layer'; animation.append(item.type === 'text' ? createTextContent(item, frame) : item.type === 'divider' ? createDividerContent(item) : createImageContent(item)); frame.append(animation);
     frame.addEventListener('pointerdown', (event) => {
       if (!canPointer(event) || event.target.closest('.resize-handle') || editingElementId === item.id || imageEditElementId === item.id) return;
       if (selectedElementId === item.id) startMove(event, item, frame);
+      else if (item.type === 'divider') { event.preventDefault(); event.stopPropagation(); post({ type: 'green-sage-visual:select-element', elementId: item.id }); }
     });
     if (selectedElementId === item.id && imageEditElementId !== item.id && !item.permissions.locked) {
-      if (item.permissions.resizable) (item.type === 'decorative' ? ['nw', 'ne', 'se', 'sw'] : resizeDirections).forEach((direction) => { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'resize-handle'; handle.dataset.direction = direction; handle.setAttribute('aria-label', `Resize ${direction}`); handle.addEventListener('pointerdown', (event) => startResize(event, item, frame, direction)); frame.append(handle); });
+      const directions = item.type === 'decorative' ? ['nw', 'ne', 'se', 'sw'] : item.type === 'divider' ? ['n', 'e', 's', 'w'] : resizeDirections;
+      if (item.permissions.resizable) directions.forEach((direction) => { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'resize-handle'; handle.dataset.direction = direction; handle.setAttribute('aria-label', `Resize ${direction}`); handle.addEventListener('pointerdown', (event) => startResize(event, item, frame, direction)); frame.append(handle); });
     }
     return frame;
   };
@@ -413,7 +423,7 @@
     const background = document.createElement('div'); background.className = 'section-background'; background.classList.toggle('is-editing', editingBackground);
     if (section.background.kind === 'image') { const image = document.createElement('img'); image.alt = ''; Object.assign(image.style, { objectPosition: `${section.background.focalX}% ${section.background.focalY}%`, transform: `scale(${section.background.zoom})` }); background.append(image); setImageSource(background, image, section.background); if (editingBackground) background.addEventListener('pointerdown', (event) => startBackgroundReframe(event, section, background, image)); }
     canvas.append(background);
-    section.elementOrder.forEach((id, index) => { const item = state.elements[id]; if (!item) return; const node = createElement(item); node.style.zIndex = String(index + 1); canvas.append(node); });
+    section.elementOrder.forEach((id, index) => { const item = state.elements[id]; if (!item || item.visible === false) return; const node = createElement(item); node.style.zIndex = String(index + 1); canvas.append(node); });
     canvas.addEventListener('pointerdown', (event) => { if (event.target !== canvas && event.target !== background) return; exitEdit(); post({ type: 'green-sage-visual:select-section', sectionId: section.id }); });
     if (editingBackground) { const indicator = document.createElement('span'); indicator.className = 'background-edit-indicator'; indicator.textContent = 'Drag to reposition'; canvas.append(indicator); }
     shell.append(canvas); return shell;

@@ -80,6 +80,10 @@
       x: finite(options.baseFrame?.x, 0), y: finite(options.baseFrame?.y, 0),
       width: finite(options.baseFrame?.width, 260), height: finite(options.baseFrame?.height, 220)
     };
+    if (options.type === 'divider') {
+      const sectionHeight = finite(options.section?.height, SECTION_HEIGHT_PRESETS.standard);
+      return { ...base, x: metrics.centerX - base.width / 2, y: (sectionHeight - base.height) / 2 };
+    }
     if (options.type !== 'decorative') return { ...base, x: base.x + metrics.centerX - mobileMetrics.centerX };
 
     const ratio = Number(options.assetMetadata?.width) > 0 && Number(options.assetMetadata?.height) > 0 ? Number(options.assetMetadata.width) / Number(options.assetMetadata.height) : 1;
@@ -115,12 +119,13 @@
   const normalizeElementOverride = (value, type) => {
     if (!isObject(value)) return {};
     const result = {};
+    if (hasOwn(value, 'visible') && typeof value.visible === 'boolean') result.visible = value.visible;
     if (isObject(value.frame)) {
       const frame = {};
       copyFinite(frame, value.frame, 'x');
       copyFinite(frame, value.frame, 'y');
-      copyFinite(frame, value.frame, 'width', 40, MAX_FRAME_WIDTH);
-      copyFinite(frame, value.frame, 'height', 32, 1600);
+      copyFinite(frame, value.frame, 'width', type === 'divider' ? 1 : 40, MAX_FRAME_WIDTH);
+      copyFinite(frame, value.frame, 'height', type === 'divider' ? 1 : 32, 1600);
       if (Object.keys(frame).length) result.frame = frame;
     }
     if (type === 'text' && isObject(value.style)) {
@@ -212,6 +217,7 @@
     id: overrides.id || createId(type), sectionId: overrides.sectionId || 'document-section', type,
     frame: { x: overrides.frame?.x ?? 45, y: overrides.frame?.y ?? 180, width: overrides.frame?.width ?? 300, height: overrides.frame?.height ?? 76 },
     rotation: overrides.rotation ?? 0, opacity: overrides.opacity ?? 1,
+    ...(typeof overrides.visible === 'boolean' ? { visible: overrides.visible } : {}),
     responsive: { strategy: 'scale', anchorX: 'center', ...(overrides.responsive || {}) },
     permissions: { ...defaultPermissions, ...(overrides.permissions || {}) }
   });
@@ -223,6 +229,10 @@
     ...baseElement({ frame: { x: 65, y: 430, width: 260, height: 220 }, ...overrides }, overrides.type === 'decorative' ? 'decorative' : 'image'),
     assetId: String(overrides.assetId || ''), assetKind: overrides.assetKind === 'template' ? 'template' : 'upload', alt: String(overrides.alt || 'Invitation image'),
     crop: { flipX: overrides.crop?.flipX === true, flipY: overrides.crop?.flipY === true, fit: overrides.crop?.fit === 'contain' ? 'contain' : 'cover', focalX: clamp(overrides.crop?.focalX ?? 50, 0, 100), focalY: clamp(overrides.crop?.focalY ?? 50, 0, 100), zoom: clamp(overrides.crop?.zoom ?? 1, 1, 4) }
+  });
+  const createDividerElement = (overrides = {}) => ({
+    ...baseElement({ frame: { x: 115, y: 309, width: 160, height: 2 }, ...overrides }, 'divider'),
+    style: { color: isHexColor(overrides.style?.color) ? overrides.style.color : '#6B6A54' }
   });
   const createSection = (overrides = {}) => ({
     id: overrides.id || createId('section'), name: String(overrides.name || 'Untitled section'), height: clamp(overrides.height ?? SECTION_HEIGHT_PRESETS.standard, 180, 2200),
@@ -239,17 +249,24 @@
     sections: { 'document-section': createSection({ id: 'document-section', name: 'Document', height: 844, heightPreset: 'full', background: { kind: 'color', color: '#F4EFE7' }, elementOrder: [] }) },
     elements: {}
   };
-  const normalizeFrame = (frame, fallback) => ({ x: finite(frame?.x, fallback.x), y: finite(frame?.y, fallback.y), width: clamp(frame?.width ?? fallback.width, 40, MAX_FRAME_WIDTH), height: clamp(frame?.height ?? fallback.height, 32, 1600) });
+  const normalizeFrame = (frame, fallback, type) => ({ x: finite(frame?.x, fallback.x), y: finite(frame?.y, fallback.y), width: clamp(frame?.width ?? fallback.width, type === 'divider' ? 1 : 40, MAX_FRAME_WIDTH), height: clamp(frame?.height ?? fallback.height, type === 'divider' ? 1 : 32, 1600) });
   const normalizeTextElement = (value, id, sectionId) => {
     const supplied = value && typeof value === 'object' ? value : {}; const fallback = createTextElement({ id, sectionId });
+    const { visible: suppliedVisibility, ...authored } = supplied;
     const fontFamily = FONT_BY_NAME[supplied.style?.fontFamily] ? supplied.style.fontFamily : fallback.style.fontFamily;
     const variant = resolveFontVariant(fontFamily, Math.round(finite(supplied.style?.fontWeight, 400)), supplied.style?.fontStyle);
-    return { ...fallback, ...supplied, id, sectionId, type: 'text', content: String(supplied.content ?? fallback.content), frame: normalizeFrame(supplied.frame, fallback.frame), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), style: { ...fallback.style, ...(supplied.style || {}), fontFamily, fontSize: clamp(supplied.style?.fontSize ?? fallback.style.fontSize, 8, 180), fontWeight: variant.weight, fontStyle: variant.style, color: isHexColor(supplied.style?.color) ? supplied.style.color : fallback.style.color, textAlign: ALIGNMENTS.includes(supplied.style?.textAlign) ? supplied.style.textAlign : fallback.style.textAlign, lineHeight: clamp(supplied.style?.lineHeight ?? fallback.style.lineHeight, 0.7, 3), letterSpacing: clamp(supplied.style?.letterSpacing ?? fallback.style.letterSpacing, -10, 30) }, responsive: normalizeElementResponsive(supplied.responsive, fallback.responsive, 'text'), permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
+    return { ...fallback, ...authored, id, sectionId, type: 'text', content: String(supplied.content ?? fallback.content), frame: normalizeFrame(supplied.frame, fallback.frame, 'text'), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), ...(typeof suppliedVisibility === 'boolean' ? { visible: suppliedVisibility } : {}), style: { ...fallback.style, ...(supplied.style || {}), fontFamily, fontSize: clamp(supplied.style?.fontSize ?? fallback.style.fontSize, 8, 180), fontWeight: variant.weight, fontStyle: variant.style, color: isHexColor(supplied.style?.color) ? supplied.style.color : fallback.style.color, textAlign: ALIGNMENTS.includes(supplied.style?.textAlign) ? supplied.style.textAlign : fallback.style.textAlign, lineHeight: clamp(supplied.style?.lineHeight ?? fallback.style.lineHeight, 0.7, 3), letterSpacing: clamp(supplied.style?.letterSpacing ?? fallback.style.letterSpacing, -10, 30) }, responsive: normalizeElementResponsive(supplied.responsive, fallback.responsive, 'text'), permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
   };
   const normalizeImageElement = (value, id, sectionId) => {
     const supplied = value && typeof value === 'object' ? value : {}; const fallback = createImageElement({ id, sectionId, type: supplied.type });
+    const { visible: suppliedVisibility, ...authored } = supplied;
     const type = supplied.type === 'decorative' ? 'decorative' : 'image';
-    return { ...fallback, ...supplied, id, sectionId, type, frame: normalizeFrame(supplied.frame, fallback.frame), assetId: String(supplied.assetId || ''), assetKind: supplied.assetKind === 'template' ? 'template' : 'upload', alt: String(supplied.alt || fallback.alt), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), crop: { flipX: supplied.crop?.flipX === true, flipY: supplied.crop?.flipY === true, fit: supplied.crop?.fit === 'contain' ? 'contain' : fallback.crop.fit, focalX: clamp(supplied.crop?.focalX ?? 50, 0, 100), focalY: clamp(supplied.crop?.focalY ?? 50, 0, 100), zoom: clamp(supplied.crop?.zoom ?? 1, 1, 4) }, responsive: normalizeElementResponsive(supplied.responsive, fallback.responsive, type), permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
+    return { ...fallback, ...authored, id, sectionId, type, frame: normalizeFrame(supplied.frame, fallback.frame, type), assetId: String(supplied.assetId || ''), assetKind: supplied.assetKind === 'template' ? 'template' : 'upload', alt: String(supplied.alt || fallback.alt), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), ...(typeof suppliedVisibility === 'boolean' ? { visible: suppliedVisibility } : {}), crop: { flipX: supplied.crop?.flipX === true, flipY: supplied.crop?.flipY === true, fit: supplied.crop?.fit === 'contain' ? 'contain' : fallback.crop.fit, focalX: clamp(supplied.crop?.focalX ?? 50, 0, 100), focalY: clamp(supplied.crop?.focalY ?? 50, 0, 100), zoom: clamp(supplied.crop?.zoom ?? 1, 1, 4) }, responsive: normalizeElementResponsive(supplied.responsive, fallback.responsive, type), permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
+  };
+  const normalizeDividerElement = (value, id, sectionId) => {
+    const supplied = value && typeof value === 'object' ? value : {}; const fallback = createDividerElement({ id, sectionId });
+    const { visible: suppliedVisibility, ...authored } = supplied;
+    return { ...fallback, ...authored, id, sectionId, type: 'divider', frame: normalizeFrame(supplied.frame, fallback.frame, 'divider'), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), ...(typeof suppliedVisibility === 'boolean' ? { visible: suppliedVisibility } : {}), style: { color: isHexColor(supplied.style?.color) ? supplied.style.color : fallback.style.color }, responsive: normalizeElementResponsive(supplied.responsive, fallback.responsive, 'divider'), permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
   };
   const migrate = (value) => {
     const migrated = isObject(value) ? clone(value) : clone(defaults);
@@ -268,11 +285,11 @@
       const rawSection = rawSections[sectionId];
       const section = createSection({ ...rawSection, id: sectionId, background: rawSection.background || { kind: 'color', color: rawSection.style?.backgroundColor || '#EAE2D7' } });
       const sectionElementIds = Object.keys(rawElements).filter((id) => rawElements[id]?.sectionId === sectionId);
-      section.elementOrder = [...new Set([...(Array.isArray(rawSection.elementOrder) ? rawSection.elementOrder : []), ...sectionElementIds])].filter((id) => ['text', 'image', 'decorative'].includes(rawElements[id]?.type));
+      section.elementOrder = [...new Set([...(Array.isArray(rawSection.elementOrder) ? rawSection.elementOrder : []), ...sectionElementIds])].filter((id) => ['text', 'image', 'decorative', 'divider'].includes(rawElements[id]?.type));
       sections[sectionId] = section;
-      section.elementOrder.forEach((elementId) => { const raw = rawElements[elementId]; elements[elementId] = raw.type === 'text' ? normalizeTextElement(raw, elementId, sectionId) : normalizeImageElement(raw, elementId, sectionId); });
+      section.elementOrder.forEach((elementId) => { const raw = rawElements[elementId]; elements[elementId] = raw.type === 'text' ? normalizeTextElement(raw, elementId, sectionId) : raw.type === 'divider' ? normalizeDividerElement(raw, elementId, sectionId) : normalizeImageElement(raw, elementId, sectionId); });
     });
-    const usedColors = [...Object.values(sections).map((section) => section.background.color), ...Object.values(elements).filter((item) => item.type === 'text').map((item) => item.style.color)];
+    const usedColors = [...Object.values(sections).map((section) => section.background.color), ...Object.values(elements).filter((item) => item.type === 'text' || item.type === 'divider').map((item) => item.style.color)];
     const colors = uniqueColors([...(Array.isArray(documentValue.colors) ? documentValue.colors : TEMPLATE_PALETTE.map((color) => color.value)), ...usedColors]);
     return { ...supplied, schemaVersion: SCHEMA_VERSION, document: { ...defaults.document, ...documentValue, colors, canvas: { ...defaults.document.canvas, ...(documentValue.canvas || {}), baseWidth: 390, maxRenderedWidth: clamp(documentValue.canvas?.maxRenderedWidth ?? 560, 390, 720), viewportBackground: isHexColor(documentValue.canvas?.viewportBackground) ? documentValue.canvas.viewportBackground : '#F4EFE7', safeMargin: clamp(documentValue.canvas?.safeMargin ?? 20, 0, 60) }, sectionOrder, media: { ...defaults.document.media, ...(documentValue.media || {}), audio: null } }, sections, elements };
   };
@@ -285,8 +302,10 @@
     return resolved;
   };
   const applyElementOverride = (resolved, authored, view) => {
+    if (!hasOwn(resolved, 'visible')) resolved.visible = true;
     if (view === 'mobile') return resolved;
     const override = normalizeElementOverride(authored?.responsive?.overrides?.[view], authored?.type);
+    if (hasOwn(override, 'visible')) resolved.visible = override.visible;
     if (override.frame) Object.assign(resolved.frame, override.frame);
     if (override.style && resolved.style) Object.assign(resolved.style, override.style);
     if (override.crop && resolved.crop) Object.assign(resolved.crop, override.crop);
@@ -324,14 +343,14 @@
     parents.reverse().forEach(([parent, key]) => { if (isObject(parent[key]) && !Object.keys(parent[key]).length) delete parent[key]; });
   };
   const SECTION_RESPONSIVE_PATHS = new Set(['height', 'heightPreset', 'background.focalX', 'background.focalY', 'background.zoom']);
-  const ELEMENT_FRAME_RESPONSIVE_PATHS = new Set(['frame.x', 'frame.y', 'frame.width', 'frame.height']);
+  const ELEMENT_RESPONSIVE_PATHS = new Set(['frame.x', 'frame.y', 'frame.width', 'frame.height', 'visible']);
   const TEXT_RESPONSIVE_PATHS = new Set(['style.fontSize', 'style.textAlign', 'style.lineHeight', 'style.letterSpacing']);
   const IMAGE_RESPONSIVE_PATHS = new Set(['crop.fit', 'crop.focalX', 'crop.focalY', 'crop.zoom']);
   const responsivePathSupported = (targetType, target, path) => {
     const key = pathParts(path).join('.');
     if (targetType === 'section') return SECTION_RESPONSIVE_PATHS.has(key);
     if (targetType !== 'element') return false;
-    return ELEMENT_FRAME_RESPONSIVE_PATHS.has(key)
+    return ELEMENT_RESPONSIVE_PATHS.has(key)
       || (target?.type === 'text' && TEXT_RESPONSIVE_PATHS.has(key))
       || (target?.type === 'image' && IMAGE_RESPONSIVE_PATHS.has(key));
   };
@@ -359,11 +378,14 @@
     const normalized = normalizeResponsiveWrite(targetType, target, path, options.value);
     if (!normalized.valid) return false;
     const view = CANVAS_VIEWS[options.responsiveView] ? options.responsiveView : 'mobile';
-    if (view === 'mobile') return setPath(target, path, normalized.value);
+    if (view === 'mobile') {
+      if (path.join('.') === 'visible' && normalized.value === true) { delete target.visible; return true; }
+      return setPath(target, path, normalized.value);
+    }
 
     if (!isObject(target.responsive)) target.responsive = targetType === 'element' ? { strategy: 'scale', anchorX: 'center' } : {};
     if (!isObject(target.responsive.overrides)) target.responsive.overrides = {};
-    const baseValue = readPath(target, path);
+    const baseValue = path.join('.') === 'visible' && !hasPath(target, path) ? true : readPath(target, path);
     if (JSON.stringify(normalized.value) === JSON.stringify(baseValue)) {
       deletePath(target.responsive.overrides[view], path);
       pruneResponsiveView(target, view);
@@ -409,6 +431,6 @@
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
     templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
     getCanvasMetrics, getDefaultElementPlacement,
-    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, removeResponsiveProperty, resetResponsiveTarget, resetResponsiveView, hasResponsiveOverrides
+    getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createDividerElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, removeResponsiveProperty, resetResponsiveTarget, resetResponsiveView, hasResponsiveOverrides
   });
 })();

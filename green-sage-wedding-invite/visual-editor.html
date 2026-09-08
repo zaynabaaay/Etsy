@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;1,400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="visual-editor.css?v=20260902-section2">
+  <link rel="stylesheet" href="visual-editor.css?v=20260907-divider">
 </head>
 <body>
   <main class="storiel-editor" id="storielEditor">
@@ -50,8 +50,9 @@
       </section>
 
       <section class="panel-view" data-panel-view="elements" hidden>
-        <div class="panel-heading"><div><p>Elements</p><h1>Decorative assets</h1></div></div>
-        <p class="panel-help">Select an asset to add it to the current section.</p>
+        <div class="panel-heading"><div><p>Elements</p><h1>Add an element</h1></div></div>
+        <button class="secondary-button element-add-divider" id="addDividerButton" type="button">Divider</button>
+        <p class="panel-help">Add a divider or select a decorative asset for the current section.</p>
         <div class="asset-grid" id="templateElements"></div>
       </section>
 
@@ -106,13 +107,14 @@
         <button class="context-button" data-open-position type="button">Position</button><button class="context-button" data-open-more type="button">More</button>
       </div>
       <div class="context-tools" id="imageContext" hidden><button class="context-button" id="editImageButton" type="button" aria-pressed="false">Edit image</button><button class="context-button is-active" id="doneImageButton" type="button" hidden>Done</button><label class="image-reframe-zoom" id="imageReframeZoom" hidden><span>Zoom</span><input id="imageZoom" type="range" min="1" max="4" step="0.05"></label><button class="context-button" id="replaceImageButton" type="button">Replace</button><button class="context-button" id="imageFitButton" type="button">Fit / Fill</button><button class="context-button" data-open-position type="button">Position</button><button class="context-button" data-open-more type="button">More</button></div>
+      <div class="context-tools" id="dividerContext" hidden><div class="toolbar-popover-anchor"><button class="color-button" id="dividerColorButton" type="button" title="Divider color" aria-label="Divider color" aria-haspopup="dialog"><span id="dividerColorSwatch"></span></button></div><button class="context-button" data-open-position type="button">Position</button><button class="context-button" data-open-more type="button">More</button></div>
       <div class="context-tools" id="sectionContext" hidden><strong id="sectionContextName">Section</strong><span>Use Sections for height presets or a custom value.</span></div>
       <div class="context-tools background-edit-context" id="backgroundEditContext" hidden><strong>Reframe background</strong><span>Drag the image to reposition its crop.</span><button class="context-button is-active" id="doneBackgroundToolbarButton" type="button">Done</button></div>
-      <div class="toolbar-popover more-popover" id="morePopover" hidden><label>Opacity<input id="elementOpacity" type="range" min="0.05" max="1" step="0.05"></label><label>Rotation<input id="elementRotation" type="number" min="-180" max="180" step="1"></label><div id="textCaseControls"><span class="popover-label">Text case</span><div class="case-buttons"><button type="button" data-text-case="upper">AA</button><button type="button" data-text-case="lower">aa</button><button type="button" data-text-case="title">Aa</button></div></div><div id="imageFlipControls" class="button-row"><button type="button" data-image-flip="flipX" aria-pressed="false">Flip horizontal</button><button type="button" data-image-flip="flipY" aria-pressed="false">Flip vertical</button></div></div>
+      <div class="toolbar-popover more-popover" id="morePopover" hidden><label>Opacity<input id="elementOpacity" type="range" min="0.05" max="1" step="0.05"></label><label>Rotation<input id="elementRotation" type="number" min="-180" max="180" step="1"></label><label class="view-visibility-control" id="elementVisibilityControl"><input id="elementVisible" type="checkbox">Show in this view</label><div id="textCaseControls"><span class="popover-label">Text case</span><div class="case-buttons"><button type="button" data-text-case="upper">AA</button><button type="button" data-text-case="lower">aa</button><button type="button" data-text-case="title">Aa</button></div></div><div id="imageFlipControls" class="button-row"><button type="button" data-image-flip="flipX" aria-pressed="false">Flip horizontal</button><button type="button" data-image-flip="flipY" aria-pressed="false">Flip vertical</button></div></div>
     </section>
 
     <section class="storiel-workspace" id="workspace" aria-label="Invitation editing workspace">
-      <div class="preview-frame canvas-view-mobile" id="previewFrame"><iframe id="visualCanvas" src="visual-canvas.html?editor=1&amp;v=20260902-section2" title="Editable invitation canvas"></iframe></div>
+      <div class="preview-frame canvas-view-mobile" id="previewFrame"><iframe id="visualCanvas" src="visual-canvas.html?editor=1&amp;v=20260907-divider" title="Editable invitation canvas"></iframe></div>
     </section>
     <input id="replaceImageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden>
   </main>
@@ -126,10 +128,10 @@
       </div>
     </form>
   </dialog>
-  <script src="visual-document.js?v=20260907-opening"></script>
+  <script src="visual-document.js?v=20260907-divider"></script>
   <script src="green-sage-visual-template.js?v=20260907-opening"></script>
   <script src="visual-template-loader.js?v=20260907-template-boundary"></script>
   <script src="visual-assets.js?v=20260902-section2"></script>
-  <script src="visual-editor.js?v=20260907-template-boundary"></script>
+  <script src="visual-editor.js?v=20260907-divider"></script>
 </body>
 </html>

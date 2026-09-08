@@ -203,6 +203,11 @@ html.is-manipulating .object-quick-actions {
   touch-action: pan-y;
 }
 
+.element-frame[data-element-type="divider"] {
+  min-width: 0;
+  min-height: 0;
+}
+
 .element-frame.is-selected {
   outline: calc(1.5px * var(--inverse-canvas-scale, 1)) solid var(--selection);
   outline-offset: 0;
@@ -267,6 +272,20 @@ html.is-manipulating .object-quick-actions {
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.element-content.divider-content {
+  position: relative;
+  overflow: visible;
+}
+
+/* Preserve a thin authored line while keeping roughly a 36px physical pointer target. */
+.divider-hit-target {
+  position: absolute;
+  z-index: 1;
+  inset: calc(-18px * var(--inverse-canvas-scale, 1));
+  background: transparent;
+  touch-action: none;
 }
 
 .image-content img {

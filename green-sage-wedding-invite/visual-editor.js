@@ -20,11 +20,12 @@
   const ui = {
     canvas: $('visualCanvas'), previewFrame: $('previewFrame'), workspace: $('workspace'), saveStatus: $('saveStatus'),
     undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'), resetView: $('resetViewButton'), resetDialog: $('resetViewDialog'), resetTitle: $('resetViewTitle'), resetDescription: $('resetViewDescription'), resetCancel: $('cancelResetViewButton'), resetConfirm: $('confirmResetViewButton'),
-    contextEmpty: $('contextEmpty'), textContext: $('textContext'), imageContext: $('imageContext'), sectionContext: $('sectionContext'), sectionContextName: $('sectionContextName'), backgroundEditContext: $('backgroundEditContext'), doneBackgroundToolbar: $('doneBackgroundToolbarButton'),
+    contextEmpty: $('contextEmpty'), textContext: $('textContext'), imageContext: $('imageContext'), dividerContext: $('dividerContext'), sectionContext: $('sectionContext'), sectionContextName: $('sectionContextName'), backgroundEditContext: $('backgroundEditContext'), doneBackgroundToolbar: $('doneBackgroundToolbarButton'),
     fontButton: $('fontPickerButton'), fontValue: $('fontPickerValue'), fontPopover: $('fontPickerPopover'), fontSearch: $('fontSearch'), fontFilters: $('fontCategoryFilters'), fontList: $('fontList'),
     fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'),
     bold: $('boldButton'), italic: $('italicButton'), alignButton: $('alignmentButton'), alignPopover: $('alignmentPopover'), spacingButton: $('spacingButton'), spacingPopover: $('spacingPopover'), lineHeight: $('lineHeight'), letterSpacing: $('letterSpacing'),
-    morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
+    morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), visibilityControl: $('elementVisibilityControl'), visible: $('elementVisible'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
+    dividerColorButton: $('dividerColorButton'), dividerColorSwatch: $('dividerColorSwatch'), addDivider: $('addDividerButton'),
     replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
     designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'), templateBackgrounds: $('templateBackgrounds'), uploadedBackgrounds: $('uploadedBackgrounds'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
     templateElements: $('templateElements'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'),
@@ -292,12 +293,18 @@
     $$('[data-image-flip]', ui.imageFlips).forEach(button => { button.disabled = !selected?.permissions.editable || selected?.permissions.locked; button.setAttribute('aria-pressed', String(Boolean(selected?.crop?.[button.dataset.imageFlip]))); });
     const editingBackground = Boolean(backgroundEditSectionId && backgroundEditSectionId === selectedSectionId && effectiveSection()?.background.kind === 'image');
     ui.contextEmpty.hidden = Boolean(selected || effectiveSection()); ui.textContext.hidden = selected?.type !== 'text' || editingBackground;
-    ui.imageContext.hidden = editingBackground || !selected || !['image', 'decorative'].includes(selected.type); ui.sectionContext.hidden = editingBackground || Boolean(selected) || !effectiveSection(); ui.backgroundEditContext.hidden = !editingBackground;
+    ui.imageContext.hidden = editingBackground || !selected || !['image', 'decorative'].includes(selected.type); ui.dividerContext.hidden = editingBackground || selected?.type !== 'divider'; ui.sectionContext.hidden = editingBackground || Boolean(selected) || !effectiveSection(); ui.backgroundEditContext.hidden = !editingBackground;
     if (!selected) { ui.sectionContextName.textContent = effectiveSection()?.name || 'Section'; return; }
     const locked = selected.permissions.locked;
     ui.opacity.value = selected.opacity; ui.rotation.value = selected.rotation;
+    ui.visible.checked = selected.visible !== false; ui.visible.disabled = locked || !selected.permissions.editable;
     ui.textCaseControls.hidden = selected.type !== 'text';
     if (selected.crop) { [ui.imageFit, ui.replace, ui.imageZoom].forEach(control => control.disabled = locked || !selected.permissions.editable); ui.imageZoom.value = selected.crop.zoom; ui.imageFit.textContent = selected.crop.fit === 'cover' ? 'Fit / Contain' : 'Fill / Cover'; }
+    if (selected.type === 'divider') {
+      ui.textColor.value = selected.style.color; ui.textColorHex.value = selected.style.color.toUpperCase(); ui.dividerColorSwatch.style.background = selected.style.color; renderColorSwatches(ui.textColorPalette, selected.style.color);
+      ui.dividerColorButton.disabled = locked || !selected.permissions.editable;
+      return;
+    }
     if (selected.type !== 'text') return;
     const font = model.getFont(selected.style.fontFamily); const editable = selected.permissions.editable && !locked;
     ui.fontValue.textContent = font.displayName; ui.fontValue.style.fontFamily = model.fontStack(font.name); ui.fontSize.value = selected.style.fontSize;
@@ -417,6 +424,7 @@
     if (item.type === 'text') return item.content.replace(/\s+/g, ' ').trim().slice(0, 42) || 'Text';
     if (item.type === 'image') return 'Image';
     if (item.type === 'decorative') return model.getTemplateAsset(item.assetId)?.name || 'Asset';
+    if (item.type === 'divider') return 'Divider';
     return `${item.type.charAt(0).toUpperCase()}${item.type.slice(1)}`;
   };
   const renderLayers = () => {
@@ -426,7 +434,7 @@
       const item = state.elements[id]; if (!item) return;
       const row = document.createElement('article'); row.className = 'layer-row'; row.dataset.elementId = id; row.classList.toggle('is-selected', id === selectedElementId);
       const select = document.createElement('button'); select.type = 'button'; select.className = 'layer-select'; select.dataset.layerSelect = id;
-      const type = document.createElement('small'); type.textContent = item.type === 'decorative' ? 'Asset' : item.type === 'image' ? 'Image' : 'Text';
+      const effective = effectiveElement(id); const type = document.createElement('small'); type.textContent = item.type === 'decorative' ? 'Asset' : item.type === 'image' ? 'Image' : item.type === 'divider' ? `Divider${effective?.visible === false ? ' · Hidden' : ''}` : 'Text';
       const label = document.createElement('span'); label.textContent = layerLabel(item); select.append(type, label);
       const drag = document.createElement('button'); drag.type = 'button'; drag.className = 'layer-drag-handle'; drag.dataset.layerDrag = id; drag.textContent = 'Drag'; drag.setAttribute('aria-label', `Reorder ${layerLabel(item)}`);
       row.append(select, drag); ui.layersList.append(row);
@@ -478,6 +486,15 @@
     const activeFrame = model.getDefaultElementPlacement({ type: 'text', view: activeResponsiveView, section: effectiveSection(current.id), baseFrame: preset.frame, safeMargin: state.document.canvas.safeMargin });
     const created = model.createTextElement({ sectionId: current.id, ...preset, frame: baseFrame });
     insertElement(created, activeFrame, 'Add text');
+  };
+
+  const addDivider = () => {
+    const current = section(); if (!current) return;
+    const presetFrame = { x: 115, y: 0, width: 160, height: 2 };
+    const baseFrame = model.getDefaultElementPlacement({ type: 'divider', view: 'mobile', section: current, baseFrame: presetFrame, safeMargin: state.document.canvas.safeMargin });
+    const activeFrame = model.getDefaultElementPlacement({ type: 'divider', view: activeResponsiveView, section: effectiveSection(current.id), baseFrame: presetFrame, safeMargin: state.document.canvas.safeMargin });
+    const created = model.createDividerElement({ sectionId: current.id, frame: baseFrame, style: { color: '#6B6A54' } });
+    insertElement(created, activeFrame, 'Add divider');
   };
 
   const addImage = (assetId, assetKind = 'upload', type = 'image') => {
@@ -661,11 +678,13 @@
   const stepFontSize = (delta) => { const source = effectiveElement(); if (!source) return; mutate('Change font size', (next) => { writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.fontSize', value: Math.max(8, Math.min(180, source.style.fontSize + delta)), scope: 'responsive' }); }); };
   ui.sizeMinus.addEventListener('click', () => stepFontSize(-1)); ui.sizePlus.addEventListener('click', () => stepFontSize(1));
   bindTransactionalInput(ui.fontSize, 'Change font size', (next, value) => { const source = effectiveElement(); if (source) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.fontSize', value: Number(value), scope: 'responsive' }); });
-  ui.textColorButton.addEventListener('click', () => { renderColorSwatches(ui.textColorPalette, element()?.style?.color); togglePopover(ui.textColorPopover, ui.textColorButton); });
-  ui.textColorPalette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); const source = element(); if (!swatch || source?.type !== 'text' || source.permissions.locked || !source.permissions.editable) return; mutate('Change text color', (next) => { next.elements[source.id].style.color = rememberColor(next, swatch.dataset.color); }); closePopovers(); });
-  bindTransactionalInput(ui.textColor, 'Change text color', (next, value) => { const source = element(); const color = rememberColor(next, value); if (source && color) next.elements[source.id].style.color = color; });
+  const opensElementColor = (button) => { renderColorSwatches(ui.textColorPalette, element()?.style?.color); togglePopover(ui.textColorPopover, button); };
+  ui.textColorButton.addEventListener('click', () => opensElementColor(ui.textColorButton));
+  ui.dividerColorButton.addEventListener('click', () => opensElementColor(ui.dividerColorButton));
+  ui.textColorPalette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); const source = element(); if (!swatch || !['text', 'divider'].includes(source?.type) || source.permissions.locked || !source.permissions.editable) return; mutate(source.type === 'divider' ? 'Change divider color' : 'Change text color', (next) => { next.elements[source.id].style.color = rememberColor(next, swatch.dataset.color); }); closePopovers(); });
+  bindTransactionalInput(ui.textColor, 'Change element color', (next, value) => { const source = element(); const color = rememberColor(next, value); if (['text', 'divider'].includes(source?.type) && color) next.elements[source.id].style.color = color; });
   ui.textColor.addEventListener('input', () => { ui.textColorHex.value = ui.textColor.value.toUpperCase(); });
-  bindHexColor(ui.textColorHex, 'Change text color', () => element()?.style.color || '#474232', (next, color) => { const source = element(); if (source && !source.permissions.locked && source.permissions.editable) next.elements[source.id].style.color = rememberColor(next, color); });
+  bindHexColor(ui.textColorHex, 'Change element color', () => element()?.style.color || '#474232', (next, color) => { const source = element(); if (['text', 'divider'].includes(source?.type) && !source.permissions.locked && source.permissions.editable) next.elements[source.id].style.color = rememberColor(next, color); });
   bindTransactionalInput(ui.lineHeight, 'Change line height', (next, value) => { const source = effectiveElement(); if (source) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.lineHeight', value: Number(value), scope: 'responsive' }); });
   bindTransactionalInput(ui.letterSpacing, 'Change letter spacing', (next, value) => { const source = effectiveElement(); if (source) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.letterSpacing', value: Number(value), scope: 'responsive' }); });
   ui.bold.addEventListener('click', () => { const source = element(); if (source) mutate('Toggle bold', (next) => { next.elements[source.id].style.fontWeight = source.style.fontWeight === 700 ? 400 : 700; }); });
@@ -678,6 +697,10 @@
   ui.arrangePanel.addEventListener('click', (event) => { const layer = event.target.closest('[data-layer]'); const x = event.target.closest('[data-position-x]'); const y = event.target.closest('[data-position-y]'); if (layer) layerElement(layer.dataset.layer); if (x) alignElement('x', x.dataset.positionX); if (y) alignElement('y', y.dataset.positionY); });
   bindTransactionalInput(ui.opacity, 'Change opacity', (next, value) => { const source = element(); if (source) next.elements[source.id].opacity = Number(value); });
   bindTransactionalInput(ui.rotation, 'Rotate element', (next, value) => { const source = element(); if (source) next.elements[source.id].rotation = Number(value); });
+  ui.visible.addEventListener('change', () => {
+    const source = effectiveElement(); if (!source || source.permissions.locked || !source.permissions.editable) return;
+    mutate(ui.visible.checked ? 'Show element in view' : 'Hide element in view', (next) => { writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'visible', value: ui.visible.checked, scope: 'responsive' }); }); closePopovers();
+  });
   bindTransactionalInput(ui.imageZoom, 'Crop image', (next, value) => { const source = effectiveElement(); if (source?.crop) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'crop.zoom', value: Number(value), scope: 'responsive' }); });
   const toggleElementLock = () => { const source = element(); if (source) mutate(source.permissions.locked ? 'Unlock element' : 'Lock element', (next) => { next.elements[source.id].permissions.locked = !source.permissions.locked; }); closePopovers(); };
   ui.textCaseControls.addEventListener('click', (event) => { const button = event.target.closest('[data-text-case]'); if (button) { changeTextCase(button.dataset.textCase); closePopovers(); } });
@@ -721,6 +744,7 @@
   bindTransactionalInput(ui.backgroundFocalY, 'Adjust background crop', (next, value) => { writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'background.focalY', value: Number(value), scope: 'responsive' }); });
   bindTransactionalInput(ui.backgroundZoom, 'Adjust background crop', (next, value) => { writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'background.zoom', value: Number(value), scope: 'responsive' }); });
   ui.templateElements.addEventListener('click', (event) => { const card = event.target.closest('[data-asset-id]'); if (card) addImage(card.dataset.assetId, 'template', 'decorative'); });
+  ui.addDivider.addEventListener('click', addDivider);
   ui.uploadInput.addEventListener('change', async () => { await uploadFiles(ui.uploadInput.files); ui.uploadInput.value = ''; });
   ui.uploadLibrary.addEventListener('click', (event) => {
     const card = event.target.closest('[data-asset-id]'); const action = event.target.closest('[data-upload-action]');
