@@ -18,13 +18,28 @@
       permissions: { ...permissions }
     };
   };
+  const dayText = (id, content, frame, style, overrides = {}) => {
+    const { opacity = 1, ...textStyle } = style;
+    return {
+      id, sectionId: 'the-day', type: 'text', content, frame, rotation: 0, opacity,
+      style: { fontWeight: 400, fontStyle: 'normal', textAlign: 'center', ...textStyle },
+      responsive: { strategy: 'scale', anchorX: 'center', ...(Object.keys(overrides).length ? { overrides } : {}) },
+      permissions: { ...permissions }
+    };
+  };
+  const dayDivider = (id, frame, overrides) => ({
+    id, sectionId: 'the-day', type: 'divider', visible: false, frame, rotation: 0, opacity: 0.18,
+    style: { color: '#F4EFE7' },
+    responsive: { strategy: 'scale', anchorX: 'center', overrides },
+    permissions: { ...permissions }
+  });
   const defaultDocument = {
     schemaVersion: 4,
     document: {
       id: 'green-sage-visual-template', templateId: 'green-sage', title: 'Green Sage invitation',
       colors: ['#F4EFE7', '#EAE2D7', '#D8CEC1', '#A3A792', '#6B6A54', '#474232'],
       canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 },
-      sectionOrder: ['opening', 'ceremony'], media: { audio: null }
+      sectionOrder: ['opening', 'ceremony', 'the-day'], media: { audio: null }
     },
     sections: {
       opening: {
@@ -38,6 +53,19 @@
         background: { kind: 'color', color: '#EAE2D7', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
         elementOrder: ['ceremony-label', 'ceremony-time', 'ceremony-glasshouse', 'ceremony-venue', 'ceremony-address', 'ceremony-note'],
         responsive: { overrides: { ipad: { height: 1024 }, desktop: { height: 1000 } } }
+      },
+      'the-day': {
+        id: 'the-day', name: 'The Day', height: 450.25, heightPreset: 'custom',
+        background: { kind: 'color', color: '#A3A792', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+        elementOrder: [
+          'the-day-label',
+          'the-day-time-1', 'the-day-event-1',
+          'the-day-divider-1', 'the-day-time-2', 'the-day-event-2',
+          'the-day-divider-2', 'the-day-time-3', 'the-day-event-3',
+          'the-day-divider-3', 'the-day-time-4', 'the-day-event-4',
+          'the-day-divider-4', 'the-day-time-5', 'the-day-event-5'
+        ],
+        responsive: { overrides: { ipad: { height: 500 }, desktop: { height: 540 } } }
       }
     },
     elements: {
@@ -92,7 +120,44 @@
         { ipad: { frame: { x: 259, y: 616 } }, desktop: { frame: { x: 475, y: 627 } } }),
       'ceremony-note': text('ceremony-note', 'Please arrive 15 minutes early.', { x: 65, y: 586, width: 260, height: 32 },
         { fontFamily: 'Instrument Serif', fontSize: 15, fontStyle: 'italic', color: '#474232', lineHeight: 1.45, letterSpacing: 0.15, opacity: 0.86 },
-        { ipad: { frame: { x: 254, y: 681 } }, desktop: { frame: { x: 470, y: 700 } } })
+        { ipad: { frame: { x: 254, y: 681 } }, desktop: { frame: { x: 470, y: 700 } } }),
+      'the-day-label': dayText('the-day-label', 'THE DAY', { x: 24, y: 80, width: 342, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 10, color: '#F4EFE7', lineHeight: 1.5, letterSpacing: 3.4, opacity: 0.94 },
+        { ipad: { frame: { x: 48, y: 160.5, width: 672 } }, desktop: { frame: { x: 48, y: 173.7, width: 1104 } } }),
+      'the-day-time-1': dayText('the-day-time-1', '3:00 PM', { x: 24, y: 144, width: 82, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 11, color: '#F4EFE7', textAlign: 'right', lineHeight: 1.4, letterSpacing: 1.76, opacity: 0.72 },
+        { ipad: { frame: { x: 48, y: 254.4, width: 134.4 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } }, desktop: { frame: { x: 48, y: 275.7, width: 220.8 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } } }),
+      'the-day-event-1': dayText('the-day-event-1', 'Ceremony', { x: 130, y: 135, width: 236, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 21, color: '#F4EFE7', textAlign: 'left', lineHeight: 1.25, letterSpacing: 0.315 },
+        { ipad: { frame: { x: 48, y: 285.1, width: 134.4 }, style: { fontSize: 22, textAlign: 'center', letterSpacing: 0.33 } }, desktop: { frame: { x: 48, y: 308.4, width: 220.8 }, style: { fontSize: 22.8, textAlign: 'center', letterSpacing: 0.342 } } }),
+      'the-day-time-2': dayText('the-day-time-2', '4:00 PM', { x: 24, y: 194.25, width: 82, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 11, color: '#F4EFE7', textAlign: 'right', lineHeight: 1.4, letterSpacing: 1.76, opacity: 0.72 },
+        { ipad: { frame: { x: 182.4, y: 254.4, width: 134.4 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } }, desktop: { frame: { x: 268.8, y: 275.7, width: 220.8 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } } }),
+      'the-day-event-2': dayText('the-day-event-2', 'Cocktail Hour', { x: 130, y: 185.25, width: 236, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 21, color: '#F4EFE7', textAlign: 'left', lineHeight: 1.25, letterSpacing: 0.315 },
+        { ipad: { frame: { x: 182.4, y: 285.1, width: 134.4 }, style: { fontSize: 22, textAlign: 'center', letterSpacing: 0.33 } }, desktop: { frame: { x: 268.8, y: 308.4, width: 220.8 }, style: { fontSize: 22.8, textAlign: 'center', letterSpacing: 0.342 } } }),
+      'the-day-time-3': dayText('the-day-time-3', '5:30 PM', { x: 24, y: 244.5, width: 82, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 11, color: '#F4EFE7', textAlign: 'right', lineHeight: 1.4, letterSpacing: 1.76, opacity: 0.72 },
+        { ipad: { frame: { x: 316.8, y: 254.4, width: 134.4 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } }, desktop: { frame: { x: 489.6, y: 275.7, width: 220.8 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } } }),
+      'the-day-event-3': dayText('the-day-event-3', 'Dinner', { x: 130, y: 235.5, width: 236, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 21, color: '#F4EFE7', textAlign: 'left', lineHeight: 1.25, letterSpacing: 0.315 },
+        { ipad: { frame: { x: 316.8, y: 285.1, width: 134.4 }, style: { fontSize: 22, textAlign: 'center', letterSpacing: 0.33 } }, desktop: { frame: { x: 489.6, y: 308.4, width: 220.8 }, style: { fontSize: 22.8, textAlign: 'center', letterSpacing: 0.342 } } }),
+      'the-day-time-4': dayText('the-day-time-4', '7:00 PM', { x: 24, y: 294.75, width: 82, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 11, color: '#F4EFE7', textAlign: 'right', lineHeight: 1.4, letterSpacing: 1.76, opacity: 0.72 },
+        { ipad: { frame: { x: 451.2, y: 254.4, width: 134.4 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } }, desktop: { frame: { x: 710.4, y: 275.7, width: 220.8 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } } }),
+      'the-day-event-4': dayText('the-day-event-4', 'Dancing', { x: 130, y: 285.75, width: 236, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 21, color: '#F4EFE7', textAlign: 'left', lineHeight: 1.25, letterSpacing: 0.315 },
+        { ipad: { frame: { x: 451.2, y: 285.1, width: 134.4 }, style: { fontSize: 22, textAlign: 'center', letterSpacing: 0.33 } }, desktop: { frame: { x: 710.4, y: 308.4, width: 220.8 }, style: { fontSize: 22.8, textAlign: 'center', letterSpacing: 0.342 } } }),
+      'the-day-time-5': dayText('the-day-time-5', '10:00 PM', { x: 24, y: 345, width: 82, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 11, color: '#F4EFE7', textAlign: 'right', lineHeight: 1.4, letterSpacing: 1.76, opacity: 0.72 },
+        { ipad: { frame: { x: 585.6, y: 254.4, width: 134.4 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } }, desktop: { frame: { x: 931.2, y: 275.7, width: 220.8 }, style: { fontSize: 10.5, textAlign: 'center', letterSpacing: 1.68 } } }),
+      'the-day-event-5': dayText('the-day-event-5', 'Late Night', { x: 130, y: 336, width: 236, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 21, color: '#F4EFE7', textAlign: 'left', lineHeight: 1.25, letterSpacing: 0.315 },
+        { ipad: { frame: { x: 585.6, y: 285.1, width: 134.4 }, style: { fontSize: 22, textAlign: 'center', letterSpacing: 0.33 } }, desktop: { frame: { x: 931.2, y: 308.4, width: 220.8 }, style: { fontSize: 22.8, textAlign: 'center', letterSpacing: 0.342 } } }),
+      'the-day-divider-1': dayDivider('the-day-divider-1', { x: 130, y: 135, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 182.4, y: 227.5 } }, desktop: { visible: true, frame: { x: 268.8, y: 246.3, height: 120 } } }),
+      'the-day-divider-2': dayDivider('the-day-divider-2', { x: 130, y: 185.25, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 316.8, y: 227.5 } }, desktop: { visible: true, frame: { x: 489.6, y: 246.3, height: 120 } } }),
+      'the-day-divider-3': dayDivider('the-day-divider-3', { x: 130, y: 235.5, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 451.2, y: 227.5 } }, desktop: { visible: true, frame: { x: 710.4, y: 246.3, height: 120 } } }),
+      'the-day-divider-4': dayDivider('the-day-divider-4', { x: 130, y: 285.75, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 585.6, y: 227.5 } }, desktop: { visible: true, frame: { x: 931.2, y: 246.3, height: 120 } } })
     }
   };
   const clone = () => JSON.parse(JSON.stringify(defaultDocument));
