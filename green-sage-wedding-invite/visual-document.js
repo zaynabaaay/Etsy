@@ -49,6 +49,7 @@
     Object.freeze({ id: 'background-ivory-silk', name: 'Ivory Silk', kind: 'background', url: 'invitation-assets/opening-background-ivory-silk-4k.png' }),
     Object.freeze({ id: 'background-sage-flatlay', name: 'Sage Flatlay', kind: 'background', url: 'invitation-assets/opening-background-sage-flatlay.png' }),
     Object.freeze({ id: 'background-botanical', name: 'Botanical Paper', kind: 'background', url: 'invitation-assets/invitation-background-optimized.jpg' }),
+    Object.freeze({ id: 'background-opening-reference', name: 'Green Sage Opening', kind: 'background', url: 'invitation-assets/opening-background-reference.jpg', width: 1280, height: 746 }),
     Object.freeze({ id: 'asset-botanical-left', name: 'Botanical Left', kind: 'decorative', url: 'invitation-assets/botanical-left.png', width: 1024, height: 1536 }),
     Object.freeze({ id: 'asset-botanical-right', name: 'Botanical Right', kind: 'decorative', url: 'invitation-assets/botanical-right.png', width: 1024, height: 1536 }),
     Object.freeze({ id: 'asset-botanical-accent', name: 'Botanical Accent', kind: 'decorative', url: 'invitation-assets/botanical-accent-v2.png', width: 1254, height: 1254 }),
