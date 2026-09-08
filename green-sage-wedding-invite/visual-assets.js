@@ -28,10 +28,18 @@
     if (!file || !ACCEPTED_TYPES.has(file.type)) throw new Error('Choose a JPG, PNG, WebP, GIF, or SVG image.');
     if (file.size > MAX_FILE_SIZE) throw new Error('Images must be 12 MB or smaller.');
   };
+  const isArrayBuffer = (value) => Object.prototype.toString.call(value) === '[object ArrayBuffer]';
+  const getRecordBlob = (record) => {
+    const bytes = isArrayBuffer(record?.bytes) || ArrayBuffer.isView(record?.bytes) ? record.bytes : null;
+    if (bytes) return new Blob([bytes], { type: record.type || 'application/octet-stream' });
+    if (record?.blob instanceof Blob) return record.blob;
+    throw new TypeError('Upload asset binary data is unavailable.');
+  };
   const addFile = async (file) => {
     validateFile(file);
+    const bytes = await file.arrayBuffer();
     const id = `upload-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
-    const record = { id, name: file.name || 'Uploaded image', type: file.type, size: file.size, createdAt: new Date().toISOString(), blob: file };
+    const record = { id, name: file.name || 'Uploaded image', type: file.type, size: file.size, createdAt: new Date().toISOString(), bytes };
     await run('readwrite', (store) => store.put(record));
     return { id, name: record.name, type: record.type, size: record.size, createdAt: record.createdAt };
   };
@@ -44,5 +52,5 @@
     .sort((first, second) => String(second.createdAt).localeCompare(String(first.createdAt)));
   const remove = (id) => run('readwrite', (store) => store.delete(id));
   const get = (id) => run('readonly', (store) => store.get(id));
-  globalThis.StorielVisualAssets = Object.freeze({ maxFileSize: MAX_FILE_SIZE, acceptedTypes: Object.freeze([...ACCEPTED_TYPES]), addFile, addFiles, list, remove, get });
+  globalThis.StorielVisualAssets = Object.freeze({ maxFileSize: MAX_FILE_SIZE, acceptedTypes: Object.freeze([...ACCEPTED_TYPES]), addFile, addFiles, list, remove, get, getRecordBlob });
 })();

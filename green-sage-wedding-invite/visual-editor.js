@@ -343,7 +343,7 @@
     if (backgroundEditSectionId && !editingBackground) backgroundEditSectionId = null;
     ui.designName.textContent = current.name; ui.sectionColor.value = current.background.color; ui.sectionColorHex.value = current.background.color.toUpperCase(); renderColorSwatches(ui.palette, current.background.kind === 'color' ? current.background.color : null);
     ui.templateBackgrounds.replaceChildren(); model.templateAssets.filter((asset) => asset.kind === 'background').forEach((asset) => ui.templateBackgrounds.append(assetCard(asset, { actionLabel: 'Set as background', selected: current.background.kind === 'image' && current.background.assetKind === 'template' && current.background.assetId === asset.id })));
-    ui.uploadedBackgrounds.replaceChildren(); assetRecords.forEach((asset) => ui.uploadedBackgrounds.append(assetCard(asset, { actionLabel: 'Set as background', url: assetUrls[asset.id], selected: current.background.kind === 'image' && current.background.assetKind === 'upload' && current.background.assetId === asset.id })));
+    ui.uploadedBackgrounds.replaceChildren(); assetRecords.filter((asset) => !asset.missing).forEach((asset) => ui.uploadedBackgrounds.append(assetCard(asset, { actionLabel: 'Set as background', url: assetUrls[asset.id], selected: current.background.kind === 'image' && current.background.assetKind === 'upload' && current.background.assetId === asset.id })));
     ui.editBackground.hidden = current.background.kind !== 'image' || editingBackground; ui.doneBackground.hidden = !editingBackground; ui.removeBackground.hidden = current.background.kind !== 'image'; ui.backgroundPosition.hidden = !editingBackground; ui.backgroundFocalX.value = current.background.focalX; ui.backgroundFocalY.value = current.background.focalY; ui.backgroundZoom.value = current.background.zoom;
   };
 
@@ -448,10 +448,15 @@
 
   const renderAll = () => { renderContext(); renderDesign(); renderUploads(); renderSections(); renderLayers(); renderResetAvailability(); };
   const refreshAssets = async () => {
-    const nextRecords = await assets.list(); const nextUrls = {}; const nextObjectUrls = [];
+    const storedRecords = await assets.list(); const nextRecords = []; const nextUrls = {}; const nextObjectUrls = [];
     try {
-      nextRecords.forEach((record) => {
-        const url = URL.createObjectURL(record.blob); nextObjectUrls.push(url); nextUrls[record.id] = url;
+      storedRecords.forEach((record) => {
+        try {
+          const url = URL.createObjectURL(assets.getRecordBlob(record)); nextObjectUrls.push(url); nextUrls[record.id] = url; nextRecords.push(record);
+        } catch (error) {
+          console.error('Upload asset could not be prepared for rendering.', { id: record?.id, name: error?.name, message: error?.message });
+          nextRecords.push({ ...record, missing: true });
+        }
       });
     } catch (error) {
       nextObjectUrls.forEach((url) => URL.revokeObjectURL(url));
@@ -627,7 +632,7 @@
     if (!fileList?.length) return [];
     ui.uploadStatus.textContent = 'Uploading…';
     try { const added = await assets.addFiles([...fileList]); await refreshAssets(); ui.uploadStatus.textContent = `${added.length} image${added.length === 1 ? '' : 's'} added.`; return added; }
-    catch (error) { ui.uploadStatus.textContent = error.message || 'The image could not be added.'; return []; }
+    catch (error) { console.error('Image upload failed.', { name: error?.name, message: error?.message }); ui.uploadStatus.textContent = error.message || 'The image could not be added.'; return []; }
   };
 
   const bindTransactionalInput = (control, label, apply, eventName = 'input') => {
