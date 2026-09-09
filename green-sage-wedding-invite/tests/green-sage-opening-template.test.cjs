@@ -113,7 +113,7 @@ test('test-only Opening override resets without deleting either section', () => 
 test('Ceremony identity and styling remain unchanged around its refined geometry', () => {
   assert.deepEqual(plain(authored.sections.ceremony), {
     id: 'ceremony', name: 'Ceremony', height: 844, heightPreset: 'full',
-    background: { kind: 'color', color: '#EAE2D7', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+    background: { kind: 'color', color: '#E6E5DF', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
     elementOrder: ceremonyIds,
     responsive: { overrides: { ipad: { height: 1024 }, desktop: { height: 1000 } } }
   });

@@ -64,7 +64,7 @@ test('Ceremony text and global styling match the live authored content', () => {
   assert.deepEqual(ids.filter((id) => authored.elements[id].type === 'text').map((id) => authored.elements[id].content), [
     'CEREMONY', '3:00 PM', 'The Glasshouse', '123 Example Street\nOttawa, Ontario', 'Please arrive 15 minutes early.'
   ]);
-  assert.equal(authored.sections.ceremony.background.color, '#EAE2D7');
+  assert.equal(authored.sections.ceremony.background.color, '#E6E5DF');
   assert.equal(authored.elements['ceremony-label'].style.fontFamily, 'Instrument Sans');
   assert.equal(authored.elements['ceremony-time'].style.fontFamily, 'Instrument Sans');
   assert.equal(authored.elements['ceremony-venue'].style.fontFamily, 'Instrument Serif');

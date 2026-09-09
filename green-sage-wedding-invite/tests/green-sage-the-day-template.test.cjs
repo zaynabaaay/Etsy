@@ -25,7 +25,7 @@ const storage = () => {
 test('Green Sage section order ends with the migrated The Day section', () => {
   assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day']);
   assert.deepEqual(Object.keys(authored.sections), ['opening', 'ceremony', 'the-day']);
-  assert.equal(authored.sections['the-day'].background.color, '#A3A792');
+  assert.equal(authored.sections['the-day'].background.color, '#858977');
 });
 
 test('The Day has one label, five editable times, five editable event names, and four dividers', () => {

@@ -41,9 +41,9 @@
   ].map((font) => Object.freeze({ ...font, weights: Object.freeze(font.weights), styles: Object.freeze(font.styles), italicWeights: Object.freeze(font.italicWeights || font.weights) })));
   const FONT_BY_NAME = Object.freeze(Object.fromEntries(FONT_CATALOG.map((font) => [font.name, font])));
   const TEMPLATE_PALETTE = Object.freeze([
-    Object.freeze({ name: 'Main Ivory', value: '#F4EFE7' }), Object.freeze({ name: 'Soft Linen', value: '#EAE2D7' }),
-    Object.freeze({ name: 'Stone Beige', value: '#D8CEC1' }), Object.freeze({ name: 'Muted Sage', value: '#A3A792' }),
-    Object.freeze({ name: 'Olive Ink', value: '#6B6A54' }), Object.freeze({ name: 'Deep Text', value: '#474232' })
+    Object.freeze({ name: 'Main Ivory', value: '#F4EFE7' }), Object.freeze({ name: 'Cool Stone', value: '#E6E5DF' }),
+    Object.freeze({ name: 'Muted Sage', value: '#858977' }), Object.freeze({ name: 'Deep Olive', value: '#626753' }),
+    Object.freeze({ name: 'Deep Neutral', value: '#44463D' }), Object.freeze({ name: 'Quiet Olive', value: '#5F6051' })
   ]);
   const TEMPLATE_ASSETS = Object.freeze([
     Object.freeze({ id: 'background-green-sage-opening', name: 'Green Sage Opening', kind: 'background', url: 'invitation-assets/green-sage-opening-background.jpg', width: 853, height: 1280 }),
