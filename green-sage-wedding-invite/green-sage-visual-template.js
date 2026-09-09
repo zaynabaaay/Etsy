@@ -96,31 +96,31 @@
       'ceremony-label': text('ceremony-label', 'CEREMONY', { x: 95, y: 228, width: 200, height: 32 },
         { fontFamily: 'Instrument Sans', fontSize: 10, color: '#6B6A54', lineHeight: 1.5, letterSpacing: 3, opacity: 0.92 },
         { ipad: { frame: { x: 284, y: 321 } }, desktop: { frame: { x: 500, y: 278 } } }),
-      'ceremony-time': text('ceremony-time', '3:00 PM', { x: 95, y: 265, width: 200, height: 32 },
+      'ceremony-time': text('ceremony-time', '3:00 PM', { x: 95, y: 264, width: 200, height: 32 },
         { fontFamily: 'Instrument Sans', fontSize: 13, color: '#6B6A54', lineHeight: 1.5, letterSpacing: 2.34, opacity: 0.92 },
-        { ipad: { frame: { x: 284, y: 358 } }, desktop: { frame: { x: 500, y: 317 } } }),
+        { ipad: { frame: { x: 284, y: 363 } }, desktop: { frame: { x: 500, y: 318 } } }),
       'ceremony-glasshouse': {
         id: 'ceremony-glasshouse', sectionId: 'ceremony', type: 'decorative', assetId: 'asset-glasshouse-line', assetKind: 'template', alt: 'Glasshouse illustration',
-        frame: { x: 63, y: 303, width: 264, height: 128.7 }, rotation: 0, opacity: 0.58,
+        frame: { x: 30, y: 306, width: 330, height: 160.875 }, rotation: 0, opacity: 0.58,
         crop: { flipX: false, flipY: false, fit: 'contain', focalX: 50, focalY: 50, zoom: 1 },
         responsive: { strategy: 'scale', anchorX: 'center', overrides: {
-          ipad: { frame: { x: 252, y: 396 } },
-          desktop: { frame: { x: 441.6, y: 356, width: 316.8, height: 154.44 } }
+          ipad: { frame: { x: 174, y: 405, width: 420, height: 204.75 } },
+          desktop: { frame: { x: 300, y: 360, width: 600, height: 292.5 } }
         } },
         permissions: { ...permissions }
       },
-      'ceremony-venue': text('ceremony-venue', 'The Glasshouse', { x: 35, y: 445, width: 320, height: 56 },
+      'ceremony-venue': text('ceremony-venue', 'The Glasshouse', { x: 35, y: 475, width: 320, height: 56 },
         { fontFamily: 'Instrument Serif', fontSize: 46.8, color: '#474232', lineHeight: 0.98, letterSpacing: 0.468 },
         {
-          ipad: { frame: { x: 224, y: 539 }, style: { fontSize: 48, letterSpacing: 0.48 } },
-          desktop: { frame: { x: 350, y: 528, width: 500, height: 74 }, style: { fontSize: 62.4, letterSpacing: 0.624 } }
+          ipad: { frame: { x: 224, y: 618 }, style: { fontSize: 48, letterSpacing: 0.48 } },
+          desktop: { frame: { x: 350, y: 661, width: 500, height: 74 }, style: { fontSize: 62.4, letterSpacing: 0.624 } }
         }),
-      'ceremony-address': text('ceremony-address', '123 Example Street\nOttawa, Ontario', { x: 70, y: 521, width: 250, height: 52 },
+      'ceremony-address': text('ceremony-address', '123 Example Street\nOttawa, Ontario', { x: 70, y: 545, width: 250, height: 52 },
         { fontFamily: 'Instrument Sans', fontSize: 11, color: '#474232', lineHeight: 2, letterSpacing: 0.88, opacity: 0.82 },
-        { ipad: { frame: { x: 259, y: 616 } }, desktop: { frame: { x: 475, y: 627 } } }),
-      'ceremony-note': text('ceremony-note', 'Please arrive 15 minutes early.', { x: 65, y: 586, width: 260, height: 32 },
+        { ipad: { frame: { x: 259, y: 690 } }, desktop: { frame: { x: 475, y: 743 } } }),
+      'ceremony-note': text('ceremony-note', 'Please arrive 15 minutes early.', { x: 65, y: 612, width: 260, height: 32 },
         { fontFamily: 'Instrument Serif', fontSize: 15, fontStyle: 'italic', color: '#474232', lineHeight: 1.45, letterSpacing: 0.15, opacity: 0.86 },
-        { ipad: { frame: { x: 254, y: 681 } }, desktop: { frame: { x: 470, y: 700 } } }),
+        { ipad: { frame: { x: 254, y: 757 } }, desktop: { frame: { x: 470, y: 810 } } }),
       'the-day-label': dayText('the-day-label', 'THE DAY', { x: 24, y: 80, width: 342, height: 32 },
         { fontFamily: 'Instrument Sans', fontSize: 10, color: '#F4EFE7', lineHeight: 1.5, letterSpacing: 3.4, opacity: 0.94 },
         { ipad: { frame: { x: 48, y: 160.5, width: 672 } }, desktop: { frame: { x: 48, y: 173.7, width: 1104 } } }),
