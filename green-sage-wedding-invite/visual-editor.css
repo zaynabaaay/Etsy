@@ -227,10 +227,14 @@ input[type="range"] { width:100%; accent-color:var(--sage); }
 .media-card-actions,.upload-card > .media-card-actions { display:grid; grid-template-columns:1fr; gap:4px; padding:6px; }
 .media-card-actions button { min-height:36px; padding:4px; border:0; border-radius:6px; background:#eceee8; font-size:9px; }
 .media-manage { position:absolute; top:5px; right:5px; min-width:36px; min-height:36px; border:1px solid var(--line); border-radius:6px; background:#fff; font-size:20px; }
+.media-action-popover { width:180px; padding:6px; }
+.media-action-popover button { display:block; width:100%; min-height:44px; padding:8px 10px; border:0; border-radius:7px; background:#fff; font-size:10px; text-align:left; }
+.media-action-popover button:hover,.media-action-popover button:focus-visible { background:#f1f2ed; }
+.media-action-popover button.is-danger { color:var(--danger); }
 .upload-usage { display: block; padding: 0 8px 5px; color: var(--muted); font-size: 10px; }
-.media-management, .upload-delete-confirmation { padding:8px; border-top:1px solid var(--line); }
-.media-management button, .upload-delete-confirmation button { width:100%; min-height:44px; margin-top:4px; border:1px solid var(--line); border-radius:6px; background:#fff; font:inherit; font-size:11px; }
+.upload-delete-confirmation { padding:8px; border-top:1px solid var(--line); }
+.upload-delete-confirmation button { width:100%; min-height:44px; margin-top:4px; border:1px solid var(--line); border-radius:6px; background:#fff; font:inherit; font-size:11px; }
 .upload-delete-confirmation p { margin: 0 0 6px; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
-.upload-card [data-upload-action="delete"], .upload-card [data-upload-action="confirm-delete"] { color: #8b302c; }
+.upload-card [data-upload-action="confirm-delete"] { color: #8b302c; }
 .upload-unavailable { display: grid; place-items: center; aspect-ratio: 1.15; margin: 0; padding: 8px; background: #eae2d7; color: #474232; font-size: 11px; }
 @media (pointer: coarse) { .media-manage { min-width:44px; min-height:44px; } }

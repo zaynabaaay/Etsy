@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;1,400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="visual-editor.css?v=20260907-divider">
+  <link rel="stylesheet" href="visual-editor.css?v=20260909-media-menu">
 </head>
 <body>
   <main class="storiel-editor" id="storielEditor">
@@ -102,6 +102,7 @@
       <div class="context-tools" id="sectionContext" hidden><strong id="sectionContextName">Section</strong><span>Use Sections for height presets or a custom value.</span></div>
       <div class="context-tools background-edit-context" id="backgroundEditContext" hidden><strong>Reframe background</strong><span>Drag the image to reposition its crop.</span><button class="context-button is-active" id="doneBackgroundToolbarButton" type="button">Done</button></div>
       <div class="toolbar-popover more-popover" id="morePopover" hidden><label>Opacity<input id="elementOpacity" type="range" min="0.05" max="1" step="0.05"></label><label>Rotation<input id="elementRotation" type="number" min="-180" max="180" step="1"></label><label class="view-visibility-control" id="elementVisibilityControl"><input id="elementVisible" type="checkbox">Show in this view</label><div id="textCaseControls"><span class="popover-label">Text case</span><div class="case-buttons"><button type="button" data-text-case="upper">AA</button><button type="button" data-text-case="lower">aa</button><button type="button" data-text-case="title">Aa</button></div></div><div id="imageFlipControls" class="button-row"><button type="button" data-image-flip="flipX" aria-pressed="false">Flip horizontal</button><button type="button" data-image-flip="flipY" aria-pressed="false">Flip vertical</button></div></div>
+      <div class="toolbar-popover media-action-popover" id="mediaActionPopover" role="menu" aria-label="Media actions" hidden></div>
     </section>
 
     <section class="storiel-workspace" id="workspace" aria-label="Invitation editing workspace">
@@ -123,6 +124,6 @@
   <script src="green-sage-visual-template.js?v=20260908-the-day"></script>
   <script src="visual-template-loader.js?v=20260907-template-boundary"></script>
   <script src="visual-assets.js?v=20260902-section2"></script>
-  <script src="visual-editor.js?v=20260907-divider"></script>
+  <script src="visual-editor.js?v=20260909-media-menu"></script>
 </body>
 </html>

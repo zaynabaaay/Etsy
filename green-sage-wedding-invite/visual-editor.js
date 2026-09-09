@@ -18,13 +18,13 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const getCanvasMetrics = () => model.getCanvasMetrics(activeResponsiveView, { safeMargin: state.document.canvas.safeMargin });
   const ui = {
-    canvas: $('visualCanvas'), previewFrame: $('previewFrame'), workspace: $('workspace'), saveStatus: $('saveStatus'),
+    canvas: $('visualCanvas'), previewFrame: $('previewFrame'), workspace: $('workspace'), panel: document.querySelector('.storiel-panel'), saveStatus: $('saveStatus'),
     undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'), resetView: $('resetViewButton'), resetDialog: $('resetViewDialog'), resetTitle: $('resetViewTitle'), resetDescription: $('resetViewDescription'), resetCancel: $('cancelResetViewButton'), resetConfirm: $('confirmResetViewButton'),
     contextEmpty: $('contextEmpty'), textContext: $('textContext'), imageContext: $('imageContext'), dividerContext: $('dividerContext'), sectionContext: $('sectionContext'), sectionContextName: $('sectionContextName'), backgroundEditContext: $('backgroundEditContext'), doneBackgroundToolbar: $('doneBackgroundToolbarButton'),
     fontButton: $('fontPickerButton'), fontValue: $('fontPickerValue'), fontPopover: $('fontPickerPopover'), fontSearch: $('fontSearch'), fontFilters: $('fontCategoryFilters'), fontList: $('fontList'),
     fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'),
     bold: $('boldButton'), italic: $('italicButton'), alignButton: $('alignmentButton'), alignPopover: $('alignmentPopover'), spacingButton: $('spacingButton'), spacingPopover: $('spacingPopover'), lineHeight: $('lineHeight'), letterSpacing: $('letterSpacing'),
-    morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), visibilityControl: $('elementVisibilityControl'), visible: $('elementVisible'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
+    morePopover: $('morePopover'), mediaActionPopover: $('mediaActionPopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), visibilityControl: $('elementVisibilityControl'), visible: $('elementVisible'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
     dividerColorButton: $('dividerColorButton'), dividerColorSwatch: $('dividerColorSwatch'), addDivider: $('addDividerButton'),
     replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
     designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'), backgroundCurrent: $('backgroundCurrent'), backgroundCurrentThumb: $('backgroundCurrentThumb'), backgroundCurrentName: $('backgroundCurrentName'), backgroundCurrentSource: $('backgroundCurrentSource'), chooseBackground: $('chooseBackgroundButton'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
@@ -34,7 +34,7 @@
   };
 
   // Keep existing popover nodes and handlers outside the toolbar scroll containers.
-  const popovers = [ui.fontPopover, ui.sizePresets, ui.textColorPopover, ui.alignPopover, ui.spacingPopover, ui.morePopover, ui.previewPopover];
+  const popovers = [ui.fontPopover, ui.sizePresets, ui.textColorPopover, ui.alignPopover, ui.spacingPopover, ui.morePopover, ui.mediaActionPopover, ui.previewPopover];
   const popoverLayer = document.createElement('div'); popoverLayer.className = 'popover-layer';
   popoverLayer.append(...popovers); document.body.append(popoverLayer);
   let openPopover = null;
@@ -65,8 +65,7 @@
   let assetUrls = {};
   let assetObjectUrls = [];
   let replaceTargetElementId = null;
-  let templateMediaMenuId = null;
-  let uploadMenuId = null;
+  let mediaMenu = null;
   let uploadDeleteId = null;
   let deletingUploadId = null;
   let layerDrag = null;
@@ -161,12 +160,15 @@
     updateHistory(); scheduleSave(); renderAll(); syncCanvas();
   };
 
-  const closePopovers = (except = null) => {
+  const closePopovers = (except = null, options = {}) => {
+    const returnFocus = options.restoreFocus && openPopover?.popover === ui.mediaActionPopover ? openPopover.trigger : null;
     popovers.forEach((popover) => { if (popover !== except) popover.hidden = true; });
     if (openPopover && openPopover.popover !== except) { openPopover.trigger.setAttribute('aria-expanded', 'false'); openPopover = null; }
+    if (except !== ui.mediaActionPopover) mediaMenu = null;
     ui.fontButton.setAttribute('aria-expanded', String(!ui.fontPopover.hidden));
     ui.previewButton.setAttribute('aria-expanded', String(!ui.previewPopover.hidden));
     if (except !== ui.fontPopover) fontObserver?.disconnect();
+    if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
   };
   const positionOpenPopover = () => {
     if (!openPopover) return;
@@ -191,12 +193,25 @@
     if (opening) { openPopover = { popover, trigger }; positionOpenPopover(); }
     return opening;
   };
+  const openMediaActionPopover = (trigger, assetKind, assetId, assetName) => {
+    const sameTrigger = openPopover?.popover === ui.mediaActionPopover && openPopover.trigger === trigger && !ui.mediaActionPopover.hidden;
+    if (!ui.mediaActionPopover.hidden) closePopovers();
+    if (sameTrigger) { trigger.focus({ preventScroll: true }); return; }
+    const action = (name, label) => { const button = document.createElement('button'); button.type = 'button'; button.setAttribute('role', 'menuitem'); button.dataset.mediaAction = name; button.textContent = label; if (name === 'delete') button.className = 'is-danger'; return button; };
+    ui.mediaActionPopover.setAttribute('aria-label', `${assetName} actions`);
+    ui.mediaActionPopover.replaceChildren(action('background', 'Set as background'));
+    if (assetKind === 'upload') ui.mediaActionPopover.append(action('delete', 'Delete'));
+    mediaMenu = { assetKind, assetId, assetName };
+    if (togglePopover(ui.mediaActionPopover, trigger)) requestAnimationFrame(() => ui.mediaActionPopover.querySelector('[role="menuitem"]')?.focus({ preventScroll: true }));
+  };
   $$('.context-tools').forEach((toolbar) => toolbar.addEventListener('scroll', positionOpenPopover, { passive: true }));
   window.addEventListener('resize', positionOpenPopover);
   window.visualViewport?.addEventListener('resize', positionOpenPopover);
   window.visualViewport?.addEventListener('scroll', positionOpenPopover);
+  ui.panel.addEventListener('scroll', () => { if (openPopover?.popover === ui.mediaActionPopover) closePopovers(); }, { passive: true });
 
   const setPanel = (name) => {
+    if (name !== activePanel) closePopovers();
     activePanel = name;
     $$('.nav-tool').forEach((button) => { const active = button.dataset.panel === name; button.classList.toggle('is-active', active); button.setAttribute('aria-pressed', String(active)); });
     $$('.panel-view').forEach((view) => { const active = view.dataset.panelView === name; view.hidden = !active; view.classList.toggle('is-active', active); });
@@ -356,8 +371,7 @@
       const name = document.createElement('span'); name.className = 'media-card-name'; name.textContent = asset.name;
       const button = (action, label) => { const node = document.createElement('button'); node.type = 'button'; node.dataset.templateMediaAction = action; node.textContent = label; return node; };
       const actions = document.createElement('div'); actions.className = 'media-card-actions'; actions.append(button('insert', 'Add to section')); card.append(thumb, name, actions);
-      const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-expanded', String(templateMediaMenuId === asset.id)); card.append(manage);
-      if (templateMediaMenuId === asset.id) { const menu = document.createElement('section'); menu.className = 'media-management'; menu.append(button('background', 'Set as background')); card.append(menu); }
+      const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-haspopup', 'menu'); manage.setAttribute('aria-controls', ui.mediaActionPopover.id); manage.setAttribute('aria-expanded', 'false'); card.append(manage);
       ui.templateMedia.append(card);
       if (asset.id === focusedId) card.querySelector(`[data-template-media-action="${CSS.escape(focusedAction || '')}"]`)?.focus({ preventScroll: true });
     });
@@ -387,12 +401,12 @@
       const button = (action, label) => { const node = document.createElement('button'); node.type = 'button'; node.dataset.uploadAction = action; node.textContent = label; node.disabled = busy; return node; };
       const actions = document.createElement('div'); actions.className = 'media-card-actions';
       const insert = button('insert', 'Add to section'); insert.disabled = busy || Boolean(asset.missing); actions.append(insert); card.append(actions);
-      if (!asset.missing) { const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-expanded', String(uploadMenuId === asset.id || uploadDeleteId === asset.id)); card.append(manage); }
+      if (!asset.missing) { const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-haspopup', 'menu'); manage.setAttribute('aria-controls', ui.mediaActionPopover.id); manage.setAttribute('aria-expanded', 'false'); card.append(manage); }
       if (uploadDeleteId === asset.id) {
         const confirmation = document.createElement('section'); confirmation.className = 'upload-delete-confirmation'; confirmation.setAttribute('role', 'group'); confirmation.setAttribute('aria-label', 'Delete upload confirmation');
         const message = document.createElement('p'); message.textContent = count ? `This image is used in ${count} ${count === 1 ? 'place' : 'places'}. Deleting it will make those images unavailable.` : 'Delete this upload?';
         confirmation.append(message, button('cancel-delete', 'Cancel'), button('confirm-delete', busy ? 'Deleting…' : 'Delete anyway')); card.append(confirmation);
-      } else if (uploadMenuId === asset.id) { const menu = document.createElement('section'); menu.className = 'media-management upload-management'; menu.append(button('background', 'Set as background'), button('delete', busy ? 'Deleting…' : 'Delete upload')); card.append(menu); }
+      }
       ui.uploadLibrary.append(card);
       if (asset.id === focusedId) {
         const focusTarget = card.querySelector(`[data-upload-action="${CSS.escape(focusedAction || '')}"]:not(:disabled)`) || card.querySelector('[data-upload-action="cancel-delete"]:not(:disabled), [data-upload-action="manage"]:not(:disabled)');
@@ -402,14 +416,13 @@
   };
   const deleteUpload = async (assetId, confirmed = false) => {
     if (deletingUploadId) return;
-    if (!confirmed && (uploadUsage().get(assetId) || 0) > 0) { uploadDeleteId = assetId; uploadMenuId = null; renderUploads(); return; }
+    if (!confirmed && (uploadUsage().get(assetId) || 0) > 0) { uploadDeleteId = assetId; renderUploads(); return; }
     deletingUploadId = assetId; renderUploads();
     try {
       await assets.remove(assetId); // Missing records are a safe no-op; authored references stay intact.
       await refreshAssets();
       ui.uploadStatus.textContent = 'Upload deleted.';
       if (uploadDeleteId === assetId) uploadDeleteId = null;
-      if (uploadMenuId === assetId) uploadMenuId = null;
     } catch { ui.uploadStatus.textContent = 'Could not finish deleting the upload. Please try again.'; }
     finally { deletingUploadId = null; renderUploads(); }
   };
@@ -765,8 +778,7 @@
     const asset = model.getTemplateAsset(card.dataset.assetId); if (!asset) return;
     switch (action.dataset.templateMediaAction) {
       case 'insert': addImage(asset.id, 'template', asset.kind === 'decorative' ? 'decorative' : 'image'); break;
-      case 'background': templateMediaMenuId = null; applyBackgroundAsset(asset.id, 'template'); break;
-      case 'manage': templateMediaMenuId = templateMediaMenuId === asset.id ? null : asset.id; uploadMenuId = null; uploadDeleteId = null; renderTemplateMedia(); renderUploads(); break;
+      case 'manage': uploadDeleteId = null; openMediaActionPopover(action, 'template', asset.id, asset.name); break;
       default: break;
     }
   });
@@ -777,13 +789,18 @@
     if (!card || !action) return;
     switch (action.dataset.uploadAction) {
       case 'insert': addImage(card.dataset.assetId); break;
-      case 'background': uploadMenuId = null; applyBackgroundAsset(card.dataset.assetId, 'upload'); break;
-      case 'manage': uploadMenuId = uploadMenuId === card.dataset.assetId ? null : card.dataset.assetId; uploadDeleteId = null; templateMediaMenuId = null; renderTemplateMedia(); renderUploads(); break;
-      case 'delete': void deleteUpload(card.dataset.assetId); break;
-      case 'cancel-delete': uploadDeleteId = null; uploadMenuId = null; renderUploads(); break;
+      case 'manage': uploadDeleteId = null; openMediaActionPopover(action, 'upload', card.dataset.assetId, card.querySelector(':scope > span')?.textContent || 'upload'); break;
+      case 'cancel-delete': uploadDeleteId = null; renderUploads(); break;
       case 'confirm-delete': if (uploadDeleteId === card.dataset.assetId) void deleteUpload(uploadDeleteId, true); break;
       default: break;
     }
+  });
+  ui.mediaActionPopover.addEventListener('click', (event) => {
+    const action = event.target.closest('[data-media-action]'); const target = mediaMenu;
+    if (!action || !target) return;
+    closePopovers();
+    if (action.dataset.mediaAction === 'background') applyBackgroundAsset(target.assetId, target.assetKind);
+    if (action.dataset.mediaAction === 'delete' && target.assetKind === 'upload') void deleteUpload(target.assetId);
   });
 
   ui.addSection.addEventListener('click', addSection); ui.duplicateSection.addEventListener('click', duplicateSection); ui.deleteSection.addEventListener('click', deleteSection);
@@ -857,8 +874,9 @@
     }
   });
 
-  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.toolbar-popover, .compact-popover, .toolbar-popover-anchor, [data-open-position], [data-open-more]')) closePopovers(); });
+  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.toolbar-popover, .compact-popover, .toolbar-popover-anchor, [data-open-position], [data-open-more], .media-manage')) closePopovers(); });
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && openPopover?.popover === ui.mediaActionPopover) { event.preventDefault(); closePopovers(null, { restoreFocus: true }); return; }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') { event.preventDefault(); applyHistory(event.shiftKey ? 'redo' : 'undo'); }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'y') { event.preventDefault(); applyHistory('redo'); }
     if ((event.key === 'Delete' || event.key === 'Backspace') && !event.target.closest('input, textarea, [contenteditable="true"]') && element()) { event.preventDefault(); deleteElement(); }
