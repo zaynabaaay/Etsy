@@ -138,16 +138,28 @@
     const section = state.sections[item.sectionId]; const canvas = getCanvasMetrics();
     return item.frame.x < canvas.left || item.frame.y < 0 || item.frame.x + item.frame.width > canvas.right || item.frame.y + item.frame.height > section.height;
   };
-  const textExceedsFrame = (frame, content) => {
+  const countTextLines = (lineRects, tolerance) => {
+    const lineTops = [];
+    lineRects.forEach((rect) => {
+      if (!lineTops.some((top) => Math.abs(top - rect.top) <= tolerance)) lineTops.push(rect.top);
+    });
+    return Math.max(1, lineTops.length);
+  };
+  const textExceedsFrame = (_frame, content) => {
     if (!content?.textContent) return false;
     const tolerance = 1;
     const range = document.createRange();
     range.selectNodeContents(content);
     const lineRects = [...range.getClientRects()].filter((rect) => rect.width || rect.height);
-    const frameRect = frame.getBoundingClientRect();
-    const visualOverflow = lineRects.some((rect) => rect.left < frameRect.left - tolerance || rect.top < frameRect.top - tolerance || rect.right > frameRect.right + tolerance || rect.bottom > frameRect.bottom + tolerance);
-    const layoutOverflow = content.scrollWidth > content.clientWidth + tolerance || content.scrollHeight > content.clientHeight + tolerance;
-    return visualOverflow || layoutOverflow;
+    const lineHeight = Number.parseFloat(getComputedStyle(content).lineHeight);
+    const requiredLineBoxHeight = countTextLines(lineRects, tolerance) * lineHeight;
+    const horizontalOverflow = content.scrollWidth > content.clientWidth + tolerance;
+    // Font ink/em bounds can extend beyond an intentionally tight line-height even
+    // when the CSS line boxes fit. Measure vertical fit from line boxes instead.
+    const verticalOverflow = Number.isFinite(lineHeight)
+      ? requiredLineBoxHeight > content.clientHeight + tolerance
+      : content.scrollHeight > content.clientHeight + tolerance;
+    return horizontalOverflow || verticalOverflow;
   };
   const updateOverflow = (item) => {
     const frame = frameNode(item.id); if (!frame) return;
