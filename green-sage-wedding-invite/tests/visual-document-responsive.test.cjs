@@ -260,7 +260,7 @@ test('wide-view image insertion remains conservatively sized with shared source 
 });
 
 test('decorative insertion preserves natural ratio in Mobile and Desktop', () => {
-  const asset = model.getTemplateAsset('asset-botanical-left');
+  const asset = model.getTemplateAsset('venue-mansion');
   const result = insertFixtureElement({ view: 'desktop', type: 'decorative', assetId: asset.id, assetMetadata: asset, baseFrame: { x: 65, y: 410, width: 260, height: 220 } });
   const element = result.state.elements[result.id];
   const desktopFrame = model.resolveElement(element, 'desktop').frame;

@@ -46,15 +46,11 @@
     Object.freeze({ name: 'Olive Ink', value: '#6B6A54' }), Object.freeze({ name: 'Deep Text', value: '#474232' })
   ]);
   const TEMPLATE_ASSETS = Object.freeze([
-    Object.freeze({ id: 'background-ivory-silk', name: 'Ivory Silk', kind: 'background', url: 'invitation-assets/opening-background-ivory-silk-4k.png' }),
-    Object.freeze({ id: 'background-sage-flatlay', name: 'Sage Flatlay', kind: 'background', url: 'invitation-assets/opening-background-sage-flatlay.png' }),
-    Object.freeze({ id: 'background-botanical', name: 'Botanical Paper', kind: 'background', url: 'invitation-assets/invitation-background-optimized.jpg' }),
-    Object.freeze({ id: 'background-opening-reference', name: 'Green Sage Opening', kind: 'background', url: 'invitation-assets/opening-background-reference.jpg', width: 1280, height: 746 }),
-    Object.freeze({ id: 'asset-botanical-left', name: 'Botanical Left', kind: 'decorative', url: 'invitation-assets/botanical-left.png', width: 1024, height: 1536 }),
-    Object.freeze({ id: 'asset-botanical-right', name: 'Botanical Right', kind: 'decorative', url: 'invitation-assets/botanical-right.png', width: 1024, height: 1536 }),
-    Object.freeze({ id: 'asset-botanical-accent', name: 'Botanical Accent', kind: 'decorative', url: 'invitation-assets/botanical-accent-v2.png', width: 1254, height: 1254 }),
-    Object.freeze({ id: 'asset-deckled-frame', name: 'Deckled Frame', kind: 'decorative', url: 'invitation-assets/deckled-edge.png', width: 1672, height: 941 }),
-    Object.freeze({ id: 'asset-glasshouse-line', name: 'Glasshouse', kind: 'decorative', url: 'assets/glasshouse-line-transparent.png', width: 1280, height: 624 })
+    Object.freeze({ id: 'background-green-sage-opening', name: 'Green Sage Opening', kind: 'background', url: 'invitation-assets/green-sage-opening-background.jpg', width: 853, height: 1280 }),
+    Object.freeze({ id: 'venue-glasshouse', name: 'Glasshouse', kind: 'decorative', url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876 }),
+    Object.freeze({ id: 'venue-mansion', name: 'Mansion', kind: 'decorative', url: 'invitation-assets/venue-mansion.svg', width: 1536, height: 768 }),
+    Object.freeze({ id: 'venue-pergola', name: 'Pergola', kind: 'decorative', url: 'invitation-assets/venue-pergola.svg', width: 1536, height: 768 }),
+    Object.freeze({ id: 'venue-barn', name: 'Barn', kind: 'decorative', url: 'invitation-assets/venue-barn.svg', width: 1536, height: 768 })
   ]);
   const TEMPLATE_ASSET_BY_ID = Object.freeze(Object.fromEntries(TEMPLATE_ASSETS.map((asset) => [asset.id, asset])));
   const SECTION_HEIGHT_PRESETS = Object.freeze({ strip: 280, standard: 620, full: 844 });

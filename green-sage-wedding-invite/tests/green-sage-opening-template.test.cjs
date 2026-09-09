@@ -42,13 +42,13 @@ test('Opening contains the stable editable text elements exactly once', () => {
 });
 
 test('Opening uses the exact registered live background with inherited crop', () => {
-  assert.deepEqual(plain(model.getTemplateAsset('background-opening-reference')), {
-    id: 'background-opening-reference', name: 'Green Sage Opening', kind: 'background',
-    url: 'invitation-assets/opening-background-reference.jpg', width: 1280, height: 746
+  assert.deepEqual(plain(model.getTemplateAsset('background-green-sage-opening')), {
+    id: 'background-green-sage-opening', name: 'Green Sage Opening', kind: 'background',
+    url: 'invitation-assets/green-sage-opening-background.jpg', width: 853, height: 1280
   });
-  assert.ok(fs.existsSync(path.join(__dirname, '..', 'invitation-assets/opening-background-reference.jpg')));
+  assert.ok(fs.existsSync(path.join(__dirname, '..', 'invitation-assets/green-sage-opening-background.jpg')));
   assert.deepEqual(plain(authored.sections.opening.background), {
-    kind: 'image', color: '#ECE6DF', assetId: 'background-opening-reference', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1
+    kind: 'image', color: '#ECE6DF', assetId: 'background-green-sage-opening', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1
   });
   assert.equal(authored.sections.opening.responsive.overrides.ipad.background, undefined);
   assert.equal(authored.sections.opening.responsive.overrides.desktop.background, undefined);

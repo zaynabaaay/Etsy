@@ -44,7 +44,7 @@
     sections: {
       opening: {
         id: 'opening', name: 'Opening', height: 844, heightPreset: 'full',
-        background: { kind: 'image', color: '#ECE6DF', assetId: 'background-opening-reference', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+        background: { kind: 'image', color: '#ECE6DF', assetId: 'background-green-sage-opening', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
         elementOrder: ['opening-intro-1', 'opening-intro-2', 'opening-isabella', 'opening-and', 'opening-julian', 'opening-date', 'opening-location', 'opening-scroll'],
         responsive: { overrides: { ipad: { height: 1024 }, desktop: { height: 1000 } } }
       },
@@ -100,7 +100,7 @@
         { fontFamily: 'Instrument Sans', fontSize: 13, color: '#6B6A54', lineHeight: 1.5, letterSpacing: 2.34, opacity: 0.92 },
         { ipad: { frame: { x: 284, y: 363 } }, desktop: { frame: { x: 500, y: 318 } } }),
       'ceremony-glasshouse': {
-        id: 'ceremony-glasshouse', sectionId: 'ceremony', type: 'decorative', assetId: 'asset-glasshouse-line', assetKind: 'template', alt: 'Glasshouse illustration',
+        id: 'ceremony-glasshouse', sectionId: 'ceremony', type: 'decorative', assetId: 'venue-glasshouse', assetKind: 'template', alt: 'Glasshouse illustration',
         frame: { x: 30, y: 306, width: 330, height: 160.875 }, rotation: 0, opacity: 0.58,
         crop: { flipX: false, flipY: false, fit: 'contain', focalX: 50, focalY: 50, zoom: 1 },
         responsive: { strategy: 'scale', anchorX: 'center', overrides: {

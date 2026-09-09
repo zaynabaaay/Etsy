@@ -29,20 +29,19 @@ test('Ceremony layer order contains every stable element ID exactly once', () =>
   ids.forEach((id) => assert.equal(authored.elements[id].sectionId, 'ceremony'));
 });
 
-test('Glasshouse resolves to the exact supplied transparent PNG metadata', () => {
-  const asset = model.getTemplateAsset('asset-glasshouse-line');
+test('Glasshouse resolves to the exact supplied fixed-color SVG metadata', () => {
+  const asset = model.getTemplateAsset('venue-glasshouse');
   assert.deepEqual(plain(asset), {
-    id: 'asset-glasshouse-line', name: 'Glasshouse', kind: 'decorative',
-    url: 'assets/glasshouse-line-transparent.png', width: 1280, height: 624
+    id: 'venue-glasshouse', name: 'Glasshouse', kind: 'decorative',
+    url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876
   });
   assert.equal(authored.elements['ceremony-glasshouse'].type, 'decorative');
   assert.equal(authored.elements['ceremony-glasshouse'].assetId, asset.id);
   assert.equal(authored.elements['ceremony-glasshouse'].crop.fit, 'contain');
-  const png = fs.readFileSync(path.join(__dirname, '..', asset.url));
-  assert.equal(png.subarray(1, 4).toString(), 'PNG');
-  assert.equal(png.readUInt32BE(16), 1280);
-  assert.equal(png.readUInt32BE(20), 624);
-  assert.equal(png[25], 6, 'Glasshouse source must remain an RGBA PNG');
+  const svg = fs.readFileSync(path.join(__dirname, '..', asset.url), 'utf8');
+  assert.match(svg, /<svg[^>]*width="1796"[^>]*height="876"[^>]*viewBox="0 0 1796 876"/);
+  assert.match(svg, /fill="#[0-9a-f]{6}"/i);
+  assert.doesNotMatch(svg, /<script|<foreignObject|javascript:|<image|\shref=/i);
 });
 
 test('Ceremony responsive projection uses sparse measured overrides', () => {
