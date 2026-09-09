@@ -64,7 +64,11 @@ button:disabled,.is-disabled { cursor:not-allowed; opacity:.42; }
 .asset-card span,.upload-card span { display:block; overflow:hidden; padding:7px 8px; font-size:9px; text-overflow:ellipsis; white-space:nowrap; }
 .asset-card .asset-action-label { padding-top:0; color:var(--muted); font-size:8px; }
 .asset-card.is-selected { border-color:var(--sage); box-shadow:0 0 0 2px rgba(116,121,99,.14); }
-.background-grid + .background-grid { margin-top:9px; }
+.background-current { display:grid; grid-template-columns:64px minmax(0,1fr); align-items:center; gap:10px; min-height:64px; padding:7px; border:1px solid var(--line); border-radius:9px; background:#f8f6f0; }
+.background-current-thumb { width:50px; height:50px; padding:0 !important; border-radius:6px; background-position:center; background-size:cover; }
+.background-current strong,.background-current small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.background-current strong { font-size:10px; }.background-current small { margin-top:4px; color:var(--muted); font-size:9px; }
+.background-current.is-missing .background-current-thumb { background-image:none !important; }
 .background-action-row { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:10px; }
 .background-action-row .primary-button { grid-column:1/-1; }
 .background-action-row .secondary-button { grid-column:1/-1; margin-top:0; }
@@ -80,7 +84,9 @@ input[type="range"] { width:100%; accent-color:var(--sage); }
 .text-add-list span,.text-add-list strong { display:block; }
 .text-add-list span { color:var(--muted); font-size:9px; }
 .text-add-list strong { margin-top:6px; font-family:"Instrument Serif",serif; font-size:20px; font-weight:400; }
-.element-add-divider { margin-bottom:12px; }
+.media-group > h2 { margin:0 0 11px; font-size:11px; font-weight:700; letter-spacing:.02em; }
+.element-add-divider { display:flex; align-items:center; justify-content:space-between; margin-bottom:0; text-align:left; }
+.element-add-divider small { color:var(--muted); font-size:9px; font-weight:400; }
 .upload-grid { margin-top:14px; }
 .upload-card-actions { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:6px; }
 .upload-card-actions button { min-height:36px; border:0; border-radius:6px; background:#eceee8; font-size:9px; }
@@ -217,12 +223,14 @@ input[type="range"] { width:100%; accent-color:var(--sage); }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; transition:none !important; } }
 
-/* Secondary upload management stays inside its card, including confirmation. */
-.upload-manage { position: absolute; top: 5px; right: 5px; min-width: 36px; min-height: 36px; border: 1px solid var(--line); border-radius: 6px; background: #fff; font-size: 20px; }
+/* Secondary media management stays inside its card, including upload deletion confirmation. */
+.media-card-actions,.upload-card > .media-card-actions { display:grid; grid-template-columns:1fr; gap:4px; padding:6px; }
+.media-card-actions button { min-height:36px; padding:4px; border:0; border-radius:6px; background:#eceee8; font-size:9px; }
+.media-manage { position:absolute; top:5px; right:5px; min-width:36px; min-height:36px; border:1px solid var(--line); border-radius:6px; background:#fff; font-size:20px; }
 .upload-usage { display: block; padding: 0 8px 5px; color: var(--muted); font-size: 10px; }
-.upload-management, .upload-delete-confirmation { padding: 8px; border-top: 1px solid var(--line); }
-.upload-management button, .upload-delete-confirmation button { width: 100%; min-height: 44px; margin-top: 4px; border: 1px solid var(--line); border-radius: 6px; background: #fff; font: inherit; font-size: 11px; }
+.media-management, .upload-delete-confirmation { padding:8px; border-top:1px solid var(--line); }
+.media-management button, .upload-delete-confirmation button { width:100%; min-height:44px; margin-top:4px; border:1px solid var(--line); border-radius:6px; background:#fff; font:inherit; font-size:11px; }
 .upload-delete-confirmation p { margin: 0 0 6px; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
 .upload-card [data-upload-action="delete"], .upload-card [data-upload-action="confirm-delete"] { color: #8b302c; }
 .upload-unavailable { display: grid; place-items: center; aspect-ratio: 1.15; margin: 0; padding: 8px; background: #eae2d7; color: #474232; font-size: 11px; }
-@media (pointer: coarse) { .upload-manage { min-width: 44px; min-height: 44px; } }
+@media (pointer: coarse) { .media-manage { min-width:44px; min-height:44px; } }

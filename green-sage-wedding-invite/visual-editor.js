@@ -27,8 +27,8 @@
     morePopover: $('morePopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), visibilityControl: $('elementVisibilityControl'), visible: $('elementVisible'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
     dividerColorButton: $('dividerColorButton'), dividerColorSwatch: $('dividerColorSwatch'), addDivider: $('addDividerButton'),
     replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
-    designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'), templateBackgrounds: $('templateBackgrounds'), uploadedBackgrounds: $('uploadedBackgrounds'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
-    templateElements: $('templateElements'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'),
+    designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'), backgroundCurrent: $('backgroundCurrent'), backgroundCurrentThumb: $('backgroundCurrentThumb'), backgroundCurrentName: $('backgroundCurrentName'), backgroundCurrentSource: $('backgroundCurrentSource'), chooseBackground: $('chooseBackgroundButton'), editBackground: $('editBackgroundButton'), doneBackground: $('doneBackgroundButton'), removeBackground: $('removeBackgroundButton'), backgroundPosition: $('backgroundPositionControls'), backgroundFocalX: $('backgroundFocalX'), backgroundFocalY: $('backgroundFocalY'), backgroundZoom: $('backgroundZoom'),
+    templateMedia: $('templateMedia'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'),
     addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton'),
     closePosition: $('closePositionPanel'), positionTabs: $$('[data-position-tab]'), arrangePanel: $('positionArrangePanel'), layersPanel: $('positionLayersPanel'), layersList: $('layersList'), positionHelp: $('positionSelectionHelp')
   };
@@ -65,6 +65,7 @@
   let assetUrls = {};
   let assetObjectUrls = [];
   let replaceTargetElementId = null;
+  let templateMediaMenuId = null;
   let uploadMenuId = null;
   let uploadDeleteId = null;
   let deletingUploadId = null;
@@ -328,26 +329,39 @@
   };
 
   const assetUrl = (assetId, kind) => kind === 'upload' ? assetUrls[assetId] : model.getTemplateAsset(assetId)?.url;
-  const assetCard = (asset, options = {}) => {
-    const card = document.createElement('button'); card.type = 'button'; card.className = options.className || 'asset-card'; card.dataset.assetId = asset.id;
-    const thumb = document.createElement('span'); thumb.className = 'asset-thumb'; thumb.style.backgroundImage = `url("${options.url || asset.url}")`;
-    const name = document.createElement('span'); name.textContent = asset.name;
-    card.append(thumb, name);
-    if (options.actionLabel) { const action = document.createElement('span'); action.className = 'asset-action-label'; action.textContent = options.actionLabel; card.append(action); }
-    if (options.selected) card.classList.add('is-selected'); return card;
-  };
-
   const renderDesign = () => {
     const current = effectiveSection(); if (!current) return;
     const editingBackground = backgroundEditSectionId === current.id && current.background.kind === 'image';
     if (backgroundEditSectionId && !editingBackground) backgroundEditSectionId = null;
     ui.designName.textContent = current.name; ui.sectionColor.value = current.background.color; ui.sectionColorHex.value = current.background.color.toUpperCase(); renderColorSwatches(ui.palette, current.background.kind === 'color' ? current.background.color : null);
-    ui.templateBackgrounds.replaceChildren(); model.templateAssets.filter((asset) => asset.kind === 'background').forEach((asset) => ui.templateBackgrounds.append(assetCard(asset, { actionLabel: 'Set as background', selected: current.background.kind === 'image' && current.background.assetKind === 'template' && current.background.assetId === asset.id })));
-    ui.uploadedBackgrounds.replaceChildren(); assetRecords.filter((asset) => !asset.missing).forEach((asset) => ui.uploadedBackgrounds.append(assetCard(asset, { actionLabel: 'Set as background', url: assetUrls[asset.id], selected: current.background.kind === 'image' && current.background.assetKind === 'upload' && current.background.assetId === asset.id })));
+    const hasImage = current.background.kind === 'image';
+    const templateAsset = hasImage && current.background.assetKind === 'template' ? model.getTemplateAsset(current.background.assetId) : null;
+    const uploadAsset = hasImage && current.background.assetKind === 'upload' ? assetRecords.find((asset) => asset.id === current.background.assetId) : null;
+    const backgroundName = templateAsset?.name || uploadAsset?.name || (hasImage ? 'Image unavailable' : 'No image selected');
+    const backgroundSource = templateAsset ? 'Included with template' : uploadAsset && !uploadAsset.missing ? 'Your uploads' : hasImage ? 'Source unavailable' : 'Choose an image from Media.';
+    const backgroundUrl = hasImage ? assetUrl(current.background.assetId, current.background.assetKind) : '';
+    ui.backgroundCurrent.classList.toggle('is-missing', hasImage && !backgroundUrl); ui.backgroundCurrentThumb.style.backgroundColor = current.background.color; ui.backgroundCurrentThumb.style.backgroundImage = backgroundUrl ? `url("${backgroundUrl}")` : '';
+    ui.backgroundCurrentName.textContent = backgroundName; ui.backgroundCurrentSource.textContent = backgroundSource; ui.chooseBackground.textContent = hasImage ? 'Replace from Media' : 'Choose from Media';
     ui.editBackground.hidden = current.background.kind !== 'image' || editingBackground; ui.doneBackground.hidden = !editingBackground; ui.removeBackground.hidden = current.background.kind !== 'image'; ui.backgroundPosition.hidden = !editingBackground; ui.backgroundFocalX.value = current.background.focalX; ui.backgroundFocalY.value = current.background.focalY; ui.backgroundZoom.value = current.background.zoom;
   };
 
-  const renderTemplateElements = () => { ui.templateElements.replaceChildren(); model.templateAssets.filter((asset) => asset.kind === 'decorative').forEach((asset) => ui.templateElements.append(assetCard(asset))); };
+  const renderTemplateMedia = () => {
+    const focusedId = document.activeElement.closest('.media-card')?.dataset.assetId;
+    const focusedAction = document.activeElement.dataset.templateMediaAction;
+    const current = effectiveSection(); ui.templateMedia.replaceChildren();
+    model.templateAssets.forEach((asset) => {
+      const selected = current?.background.kind === 'image' && current.background.assetKind === 'template' && current.background.assetId === asset.id;
+      const card = document.createElement('article'); card.className = 'asset-card media-card'; card.dataset.assetId = asset.id; card.classList.toggle('is-selected', selected);
+      const thumb = document.createElement('span'); thumb.className = 'asset-thumb'; thumb.style.backgroundImage = `url("${asset.url}")`;
+      const name = document.createElement('span'); name.className = 'media-card-name'; name.textContent = asset.name;
+      const button = (action, label) => { const node = document.createElement('button'); node.type = 'button'; node.dataset.templateMediaAction = action; node.textContent = label; return node; };
+      const actions = document.createElement('div'); actions.className = 'media-card-actions'; actions.append(button('insert', 'Add to section')); card.append(thumb, name, actions);
+      const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-expanded', String(templateMediaMenuId === asset.id)); card.append(manage);
+      if (templateMediaMenuId === asset.id) { const menu = document.createElement('section'); menu.className = 'media-management'; menu.append(button('background', 'Set as background')); card.append(menu); }
+      ui.templateMedia.append(card);
+      if (asset.id === focusedId) card.querySelector(`[data-template-media-action="${CSS.escape(focusedAction || '')}"]`)?.focus({ preventScroll: true });
+    });
+  };
   const uploadUsage = () => {
     const counts = new Map();
     const count = (item) => { if (item.assetKind === 'upload' && item.assetId) counts.set(item.assetId, (counts.get(item.assetId) || 0) + 1); };
@@ -371,15 +385,14 @@
       const name = document.createElement('span'); name.textContent = asset.name; card.append(name);
       if (count) { const used = document.createElement('small'); used.className = 'upload-usage'; used.textContent = count === 1 ? 'Used' : `Used ${count} times`; card.append(used); }
       const button = (action, label) => { const node = document.createElement('button'); node.type = 'button'; node.dataset.uploadAction = action; node.textContent = label; node.disabled = busy; return node; };
-      const actions = document.createElement('div');
-      const insert = button('insert', 'Insert'); const background = button('background', 'Set as background');
-      insert.disabled = background.disabled = busy || Boolean(asset.missing); actions.append(insert, background); card.append(actions);
-      if (!asset.missing) { const manage = button('manage', '…'); manage.className = 'upload-manage'; manage.setAttribute('aria-label', `Manage ${asset.name}`); manage.setAttribute('aria-expanded', String(uploadMenuId === asset.id || uploadDeleteId === asset.id)); card.append(manage); }
+      const actions = document.createElement('div'); actions.className = 'media-card-actions';
+      const insert = button('insert', 'Add to section'); insert.disabled = busy || Boolean(asset.missing); actions.append(insert); card.append(actions);
+      if (!asset.missing) { const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-expanded', String(uploadMenuId === asset.id || uploadDeleteId === asset.id)); card.append(manage); }
       if (uploadDeleteId === asset.id) {
         const confirmation = document.createElement('section'); confirmation.className = 'upload-delete-confirmation'; confirmation.setAttribute('role', 'group'); confirmation.setAttribute('aria-label', 'Delete upload confirmation');
         const message = document.createElement('p'); message.textContent = count ? `This image is used in ${count} ${count === 1 ? 'place' : 'places'}. Deleting it will make those images unavailable.` : 'Delete this upload?';
         confirmation.append(message, button('cancel-delete', 'Cancel'), button('confirm-delete', busy ? 'Deleting…' : 'Delete anyway')); card.append(confirmation);
-      } else if (uploadMenuId === asset.id) { const menu = document.createElement('section'); menu.className = 'upload-management'; menu.append(button('delete', busy ? 'Deleting…' : 'Delete upload')); card.append(menu); }
+      } else if (uploadMenuId === asset.id) { const menu = document.createElement('section'); menu.className = 'media-management upload-management'; menu.append(button('background', 'Set as background'), button('delete', busy ? 'Deleting…' : 'Delete upload')); card.append(menu); }
       ui.uploadLibrary.append(card);
       if (asset.id === focusedId) {
         const focusTarget = card.querySelector(`[data-upload-action="${CSS.escape(focusedAction || '')}"]:not(:disabled)`) || card.querySelector('[data-upload-action="cancel-delete"]:not(:disabled), [data-upload-action="manage"]:not(:disabled)');
@@ -446,7 +459,7 @@
     ui.positionHelp.hidden = Boolean(selected);
   };
 
-  const renderAll = () => { renderContext(); renderDesign(); renderUploads(); renderSections(); renderLayers(); renderResetAvailability(); };
+  const renderAll = () => { renderContext(); renderDesign(); renderTemplateMedia(); renderUploads(); renderSections(); renderLayers(); renderResetAvailability(); };
   const refreshAssets = async () => {
     const storedRecords = await assets.list(); const nextRecords = []; const nextUrls = {}; const nextObjectUrls = [];
     try {
@@ -738,9 +751,7 @@
   bindTransactionalInput(ui.sectionColor, 'Change section color', (next, value) => { const color = rememberColor(next, value); if (color) Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color, assetId: '' }); });
   ui.sectionColor.addEventListener('input', () => { ui.sectionColorHex.value = ui.sectionColor.value.toUpperCase(); });
   bindHexColor(ui.sectionColorHex, 'Change section color', () => section()?.background.color || '#EAE2D7', (next, color) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color: rememberColor(next, color), assetId: '' }); });
-  const backgroundClick = (event, kind) => { const card = event.target.closest('[data-asset-id]'); if (card) applyBackgroundAsset(card.dataset.assetId, kind); };
-  ui.templateBackgrounds.addEventListener('click', (event) => backgroundClick(event, 'template'));
-  ui.uploadedBackgrounds.addEventListener('click', (event) => backgroundClick(event, 'upload'));
+  ui.chooseBackground.addEventListener('click', () => setPanel('media'));
   ui.editBackground.addEventListener('click', () => setBackgroundEditMode(true));
   ui.doneBackground.addEventListener('click', () => setBackgroundEditMode(false));
   ui.doneBackgroundToolbar.addEventListener('click', () => setBackgroundEditMode(false));
@@ -748,7 +759,17 @@
   bindTransactionalInput(ui.backgroundFocalX, 'Adjust background crop', (next, value) => { writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'background.focalX', value: Number(value), scope: 'responsive' }); });
   bindTransactionalInput(ui.backgroundFocalY, 'Adjust background crop', (next, value) => { writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'background.focalY', value: Number(value), scope: 'responsive' }); });
   bindTransactionalInput(ui.backgroundZoom, 'Adjust background crop', (next, value) => { writeAuthoredProperty(next, { targetType: 'section', targetId: selectedSectionId, path: 'background.zoom', value: Number(value), scope: 'responsive' }); });
-  ui.templateElements.addEventListener('click', (event) => { const card = event.target.closest('[data-asset-id]'); if (card) addImage(card.dataset.assetId, 'template', 'decorative'); });
+  ui.templateMedia.addEventListener('click', (event) => {
+    const card = event.target.closest('[data-asset-id]'); const action = event.target.closest('[data-template-media-action]');
+    if (!card || !action) return;
+    const asset = model.getTemplateAsset(card.dataset.assetId); if (!asset) return;
+    switch (action.dataset.templateMediaAction) {
+      case 'insert': addImage(asset.id, 'template', asset.kind === 'decorative' ? 'decorative' : 'image'); break;
+      case 'background': templateMediaMenuId = null; applyBackgroundAsset(asset.id, 'template'); break;
+      case 'manage': templateMediaMenuId = templateMediaMenuId === asset.id ? null : asset.id; uploadMenuId = null; uploadDeleteId = null; renderTemplateMedia(); renderUploads(); break;
+      default: break;
+    }
+  });
   ui.addDivider.addEventListener('click', addDivider);
   ui.uploadInput.addEventListener('change', async () => { await uploadFiles(ui.uploadInput.files); ui.uploadInput.value = ''; });
   ui.uploadLibrary.addEventListener('click', (event) => {
@@ -756,8 +777,8 @@
     if (!card || !action) return;
     switch (action.dataset.uploadAction) {
       case 'insert': addImage(card.dataset.assetId); break;
-      case 'background': applyBackgroundAsset(card.dataset.assetId, 'upload'); break;
-      case 'manage': uploadMenuId = uploadMenuId === card.dataset.assetId ? null : card.dataset.assetId; uploadDeleteId = null; renderUploads(); break;
+      case 'background': uploadMenuId = null; applyBackgroundAsset(card.dataset.assetId, 'upload'); break;
+      case 'manage': uploadMenuId = uploadMenuId === card.dataset.assetId ? null : card.dataset.assetId; uploadDeleteId = null; templateMediaMenuId = null; renderTemplateMedia(); renderUploads(); break;
       case 'delete': void deleteUpload(card.dataset.assetId); break;
       case 'cancel-delete': uploadDeleteId = null; uploadMenuId = null; renderUploads(); break;
       case 'confirm-delete': if (uploadDeleteId === card.dataset.assetId) void deleteUpload(uploadDeleteId, true); break;
@@ -871,6 +892,6 @@
     }
   });
 
-  renderTemplateElements(); setPanel(activePanel); renderResponsiveView(); renderAll(); updateHistory();
+  setPanel(activePanel); renderResponsiveView(); renderAll(); updateHistory();
   refreshAssets().catch(() => { ui.uploadStatus.textContent = 'Local upload storage is unavailable in this browser.'; });
 })();

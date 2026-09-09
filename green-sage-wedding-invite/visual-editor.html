@@ -35,9 +35,8 @@
 
     <nav class="storiel-nav" aria-label="Editor tools">
       <button class="nav-tool is-active" type="button" data-panel="design" aria-pressed="true"><span aria-hidden="true">◐</span><span>Design</span></button>
-      <button class="nav-tool" type="button" data-panel="elements" aria-pressed="false"><span aria-hidden="true">◇</span><span>Elements</span></button>
+      <button class="nav-tool" type="button" data-panel="media" aria-pressed="false"><span aria-hidden="true">◇</span><span>Media</span></button>
       <button class="nav-tool" type="button" data-panel="text" aria-pressed="false"><span aria-hidden="true">T</span><span>Text</span></button>
-      <button class="nav-tool" type="button" data-panel="uploads" aria-pressed="false"><span aria-hidden="true">↑</span><span>Uploads</span></button>
       <button class="nav-tool" type="button" data-panel="sections" aria-pressed="false"><span aria-hidden="true">☷</span><span>Sections</span></button>
     </nav>
 
@@ -45,15 +44,15 @@
       <section class="panel-view is-active" data-panel-view="design">
         <div class="panel-heading"><div><p>Design</p><h1>Section appearance</h1></div><span class="panel-selection" id="designSectionName">Opening canvas</span></div>
         <div class="panel-block"><h2>Document colors</h2><div class="palette-grid" id="sectionPalette"></div><label class="field-row">Custom color<div class="color-custom-row section-color-row"><input id="sectionBackgroundColor" type="color" value="#EAE2D7"><input id="sectionBackgroundHex" type="text" value="#EAE2D7" maxlength="7" spellcheck="false" aria-label="Section background hex value"></div></label></div>
-        <div class="panel-block" id="backgroundImageControls"><h2>Choose or replace background</h2><div class="asset-grid background-grid" id="templateBackgrounds"></div><div id="uploadedBackgrounds" class="asset-grid background-grid"></div><p class="panel-help" id="uploadedBackgroundHelp">Uploads can be inserted as elements or set as this section’s background.</p><div class="background-action-row"><button class="primary-button" id="editBackgroundButton" type="button">Edit background</button><button class="primary-button" id="doneBackgroundButton" type="button" hidden>Done</button><button class="secondary-button" id="removeBackgroundButton" type="button">Remove image</button></div></div>
+        <div class="panel-block" id="backgroundImageControls"><h2>Background image</h2><div class="background-current" id="backgroundCurrent"><span class="background-current-thumb" id="backgroundCurrentThumb" aria-hidden="true"></span><span><strong id="backgroundCurrentName">No image selected</strong><small id="backgroundCurrentSource">Choose an image from Media.</small></span></div><div class="background-action-row"><button class="secondary-button" id="chooseBackgroundButton" type="button">Choose from Media</button><button class="primary-button" id="editBackgroundButton" type="button">Edit / Reframe</button><button class="primary-button" id="doneBackgroundButton" type="button" hidden>Done</button><button class="secondary-button" id="removeBackgroundButton" type="button">Remove image</button></div></div>
         <div class="panel-block" id="backgroundPositionControls"><h2>Reframe background</h2><p class="panel-help">Drag the image directly on the canvas, then use these controls for precise adjustment.</p><label class="range-field">Horizontal focal point<input id="backgroundFocalX" type="range" min="0" max="100" step="1"></label><label class="range-field">Vertical focal point<input id="backgroundFocalY" type="range" min="0" max="100" step="1"></label><label class="range-field">Zoom<input id="backgroundZoom" type="range" min="1" max="4" step="0.05"></label></div>
       </section>
 
-      <section class="panel-view" data-panel-view="elements" hidden>
-        <div class="panel-heading"><div><p>Elements</p><h1>Add an element</h1></div></div>
-        <button class="secondary-button element-add-divider" id="addDividerButton" type="button">Divider</button>
-        <p class="panel-help">Add a divider or select a decorative asset for the current section.</p>
-        <div class="asset-grid" id="templateElements"></div>
+      <section class="panel-view" data-panel-view="media" hidden>
+        <div class="panel-heading"><div><p>Media</p><h1>Images and accents</h1></div></div>
+        <section class="media-group" aria-labelledby="includedMediaHeading"><h2 id="includedMediaHeading">Included with template</h2><div class="asset-grid" id="templateMedia"></div></section>
+        <section class="media-group panel-block" aria-labelledby="basicMediaHeading"><h2 id="basicMediaHeading">Basic</h2><button class="secondary-button element-add-divider" id="addDividerButton" type="button"><span>Divider</span><small>Add to section</small></button></section>
+        <section class="media-group panel-block" aria-labelledby="uploadsMediaHeading"><h2 id="uploadsMediaHeading">Your uploads</h2><label class="upload-button" for="uploadInput">Upload images</label><input id="uploadInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" multiple hidden><p class="upload-status" id="uploadStatus">JPG, PNG, WebP, GIF, or SVG up to 12 MB.</p><div class="upload-grid" id="uploadLibrary"></div></section>
       </section>
 
       <section class="panel-view" data-panel-view="text" hidden>
@@ -64,14 +63,6 @@
           <button type="button" data-add-text="body"><span>Add body text</span><strong>Practical information</strong></button>
         </div>
         <p class="panel-help">Select a text box, then use the toolbar above the canvas. Double-click or double-tap it to type directly.</p>
-      </section>
-
-      <section class="panel-view" data-panel-view="uploads" hidden>
-        <div class="panel-heading"><div><p>Uploads</p><h1>Your images</h1></div></div>
-        <label class="upload-button" for="uploadInput">Upload images</label>
-        <input id="uploadInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" multiple hidden>
-        <p class="upload-status" id="uploadStatus">JPG, PNG, WebP, GIF, or SVG up to 12 MB.</p>
-        <div class="upload-grid" id="uploadLibrary"></div>
       </section>
 
       <section class="panel-view" data-panel-view="sections" hidden>
