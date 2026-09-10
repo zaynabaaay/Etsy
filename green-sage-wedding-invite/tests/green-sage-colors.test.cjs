@@ -42,7 +42,7 @@ test('Green Sage authored colors use the reconciled restrained palette', () => {
   });
 });
 
-test('authored geometry retains the approved palette-era structure plus the Mobile The Day shift', () => {
+test('authored geometry retains the approved sections plus the migrated Details layout', () => {
   const geometry = {
     order: authored.document.sectionOrder,
     sections: Object.fromEntries(Object.entries(authored.sections).map(([id, section]) => [id, {
@@ -52,7 +52,7 @@ test('authored geometry retains the approved palette-era structure plus the Mobi
       sectionId: element.sectionId, frame: element.frame, responsive: element.responsive
     }]))
   };
-  assert.equal(digest(JSON.stringify(geometry)), 'd426a160d50a62ed88ec2f315463ce45a40aa0fadf33ff73b37e170e9ce6d72d');
+  assert.equal(digest(JSON.stringify(geometry)), '1f765bf9400f9bf69a25558096dc93b4b037ef932b253873e3e5d20921439569');
 });
 
 test('palette reconciliation changes no authored asset reference, crop, or supplied path', () => {
@@ -65,7 +65,7 @@ test('palette reconciliation changes no authored asset reference, crop, or suppl
       assetId: element.assetId, assetKind: element.assetKind, type: element.type, crop: element.crop
     }]))
   };
-  assert.equal(digest(JSON.stringify(assets)), '4ae74c8a16ec4055129b79a81adedba2d07dd2b9518a3f552a5cfd837b7916ca');
+  assert.equal(digest(JSON.stringify(assets)), '989e22bac135a483daa100ab3d0ab23eeeecca014baf3c9db354ce525a0747a3');
   assert.equal(model.getTemplateAsset('background-green-sage-opening').url, 'invitation-assets/green-sage-opening-background.jpg');
   assert.equal(model.getTemplateAsset('venue-glasshouse').url, 'invitation-assets/venue-glasshouse.svg');
 });

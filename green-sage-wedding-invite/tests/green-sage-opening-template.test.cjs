@@ -21,9 +21,9 @@ const storage = () => {
   return { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, String(value)) };
 };
 
-test('Green Sage keeps Opening and Ceremony before The Day', () => {
-  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day']);
-  assert.deepEqual(Object.keys(authored.sections), ['opening', 'ceremony', 'the-day']);
+test('Green Sage keeps Opening and Ceremony before The Day and Details', () => {
+  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details']);
+  assert.deepEqual(Object.keys(authored.sections), ['opening', 'ceremony', 'the-day', 'details']);
   assert.equal(authored.sections['green-sage-placeholder'], undefined);
 });
 
@@ -93,7 +93,7 @@ test('Opening and Ceremony survive Green Sage save and reload with stable respon
   const store = storage();
   assert.equal(loader.save('green-sage', authored, store), true);
   const restored = loader.load('green-sage', store);
-  assert.deepEqual(plain(restored.document.sectionOrder), ['opening', 'ceremony', 'the-day']);
+  assert.deepEqual(plain(restored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details']);
   assert.deepEqual(plain(restored.sections.opening.elementOrder), ids);
   assert.deepEqual(plain(restored.sections.ceremony.elementOrder), ceremonyIds);
   [...ids, ...ceremonyIds].forEach((id) => assert.equal(restored.elements[id].id, id));

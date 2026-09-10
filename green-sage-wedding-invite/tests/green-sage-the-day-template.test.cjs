@@ -30,9 +30,9 @@ const storage = () => {
   return { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, String(value)) };
 };
 
-test('Green Sage section order ends with the migrated The Day section', () => {
-  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day']);
-  assert.deepEqual(Object.keys(authored.sections), ['opening', 'ceremony', 'the-day']);
+test('Green Sage keeps The Day before the migrated Details section', () => {
+  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details']);
+  assert.deepEqual(Object.keys(authored.sections), ['opening', 'ceremony', 'the-day', 'details']);
   assert.equal(authored.sections['the-day'].background.color, '#858977');
 });
 
@@ -134,7 +134,7 @@ test('Opening, Ceremony, and The Day survive persistence with stable sparse data
   const store = storage();
   assert.equal(loader.save('green-sage', authored, store), true);
   const restored = loader.load('green-sage', store);
-  assert.deepEqual(plain(restored.document.sectionOrder), ['opening', 'ceremony', 'the-day']);
+  assert.deepEqual(plain(restored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details']);
   assert.deepEqual(plain(restored.sections['the-day'].elementOrder), plain(authored.sections['the-day'].elementOrder));
   allIds.forEach((id) => assert.equal(restored.elements[id].id, id));
   dividerIds.forEach((id) => assert.deepEqual(plain(restored.elements[id].responsive), plain(authored.elements[id].responsive)));

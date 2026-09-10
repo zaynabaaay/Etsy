@@ -33,13 +33,28 @@
     responsive: { strategy: 'scale', anchorX: 'center', overrides },
     permissions: { ...permissions }
   });
+  const detailsText = (id, content, frame, style, overrides = {}) => {
+    const { opacity = 1, ...textStyle } = style;
+    return {
+      id, sectionId: 'details', type: 'text', content, frame, rotation: 0, opacity,
+      style: { fontWeight: 400, fontStyle: 'normal', textAlign: 'left', ...textStyle },
+      responsive: { strategy: 'scale', anchorX: 'center', ...(Object.keys(overrides).length ? { overrides } : {}) },
+      permissions: { ...permissions }
+    };
+  };
+  const detailsDivider = (id, frame, overrides) => ({
+    id, sectionId: 'details', type: 'divider', visible: false, frame, rotation: 0, opacity: 0.28,
+    style: { color: '#858977' },
+    responsive: { strategy: 'scale', anchorX: 'center', overrides },
+    permissions: { ...permissions }
+  });
   const defaultDocument = {
     schemaVersion: 4,
     document: {
       id: 'green-sage-visual-template', templateId: 'green-sage', title: 'Green Sage invitation',
       colors: ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051'],
       canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 },
-      sectionOrder: ['opening', 'ceremony', 'the-day'], media: { audio: null }
+      sectionOrder: ['opening', 'ceremony', 'the-day', 'details'], media: { audio: null }
     },
     sections: {
       opening: {
@@ -64,6 +79,17 @@
           'the-day-divider-2', 'the-day-time-3', 'the-day-event-3',
           'the-day-divider-3', 'the-day-time-4', 'the-day-event-4',
           'the-day-divider-4', 'the-day-time-5', 'the-day-event-5'
+        ],
+        responsive: { overrides: { ipad: { height: 500 }, desktop: { height: 540 } } }
+      },
+      details: {
+        id: 'details', name: 'Details', height: 423.09, heightPreset: 'custom',
+        background: { kind: 'color', color: '#F4EFE7', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+        elementOrder: [
+          'details-label',
+          'details-dress-code-title', 'details-dress-code-copy',
+          'details-divider-1', 'details-parking-title', 'details-parking-copy',
+          'details-divider-2', 'details-adults-only-title', 'details-adults-only-copy'
         ],
         responsive: { overrides: { ipad: { height: 500 }, desktop: { height: 540 } } }
       }
@@ -157,7 +183,30 @@
       'the-day-divider-1': dayDivider('the-day-divider-1', { x: 130, y: 135, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 182.4, y: 227.5 } }, desktop: { visible: true, frame: { x: 268.8, y: 246.3, height: 120 } } }),
       'the-day-divider-2': dayDivider('the-day-divider-2', { x: 130, y: 185.25, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 316.8, y: 227.5 } }, desktop: { visible: true, frame: { x: 489.6, y: 246.3, height: 120 } } }),
       'the-day-divider-3': dayDivider('the-day-divider-3', { x: 130, y: 235.5, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 451.2, y: 227.5 } }, desktop: { visible: true, frame: { x: 710.4, y: 246.3, height: 120 } } }),
-      'the-day-divider-4': dayDivider('the-day-divider-4', { x: 130, y: 285.75, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 585.6, y: 227.5 } }, desktop: { visible: true, frame: { x: 931.2, y: 246.3, height: 120 } } })
+      'the-day-divider-4': dayDivider('the-day-divider-4', { x: 130, y: 285.75, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 585.6, y: 227.5 } }, desktop: { visible: true, frame: { x: 931.2, y: 246.3, height: 120 } } }),
+      'details-label': detailsText('details-label', 'DETAILS', { x: 24, y: 78, width: 342, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 10, color: '#626753', lineHeight: 1.5, letterSpacing: 3.2, opacity: 0.9 },
+        { ipad: { frame: { x: 48, y: 167.5, width: 672 } }, desktop: { frame: { x: 80, y: 182.5, width: 1040 } } }),
+      'details-dress-code-title': detailsText('details-dress-code-title', 'Dress Code', { x: 24, y: 133, width: 342, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 13.5, color: '#44463D', lineHeight: 1.4, letterSpacing: 1.485 },
+        { ipad: { frame: { x: 78, y: 232.5, width: 164 }, style: { textAlign: 'center' } }, desktop: { frame: { x: 122, y: 253.5, width: 262.67 }, style: { fontSize: 13, textAlign: 'center', letterSpacing: 1.43 } } }),
+      'details-dress-code-copy': detailsText('details-dress-code-copy', 'Formal attire', { x: 24, y: 160.9, width: 310, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 13, color: '#5F6051', lineHeight: 1.6, letterSpacing: 0.325, opacity: 0.82 },
+        { ipad: { frame: { x: 78, y: 264.4, width: 164, height: 42 }, style: { fontSize: 12.5, textAlign: 'center', letterSpacing: 0.3125, lineHeight: 1.65 } }, desktop: { frame: { x: 128.33, y: 285.7, width: 250, height: 40 }, style: { fontSize: 12, textAlign: 'center', letterSpacing: 0.3, lineHeight: 1.65 } } }),
+      'details-divider-1': detailsDivider('details-divider-1', { x: 24, y: 133, width: 1, height: 206.1 }, { ipad: { visible: true, frame: { x: 272, y: 230.5, height: 102 } }, desktop: { visible: true, frame: { x: 426.67, y: 251.5, height: 106 } } }),
+      'details-parking-title': detailsText('details-parking-title', 'Parking', { x: 24, y: 211.7, width: 342, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 13.5, color: '#44463D', lineHeight: 1.4, letterSpacing: 1.485 },
+        { ipad: { frame: { x: 302, y: 232.5, width: 164 }, style: { textAlign: 'center' } }, desktop: { frame: { x: 468.67, y: 253.5, width: 262.67 }, style: { fontSize: 13, textAlign: 'center', letterSpacing: 1.43 } } }),
+      'details-parking-copy': detailsText('details-parking-copy', 'Complimentary parking is available on site.', { x: 24, y: 239.6, width: 310, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 13, color: '#5F6051', lineHeight: 1.6, letterSpacing: 0.325, opacity: 0.82 },
+        { ipad: { frame: { x: 302, y: 264.4, width: 164, height: 42 }, style: { fontSize: 12.5, textAlign: 'center', letterSpacing: 0.3125, lineHeight: 1.65 } }, desktop: { frame: { x: 475, y: 285.7, width: 250, height: 40 }, style: { fontSize: 12, textAlign: 'center', letterSpacing: 0.3, lineHeight: 1.65 } } }),
+      'details-divider-2': detailsDivider('details-divider-2', { x: 24, y: 211.7, width: 1, height: 127.4 }, { ipad: { visible: true, frame: { x: 496, y: 230.5, height: 102 } }, desktop: { visible: true, frame: { x: 773.33, y: 251.5, height: 106 } } }),
+      'details-adults-only-title': detailsText('details-adults-only-title', 'Adults Only', { x: 24, y: 290.4, width: 342, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 13.5, color: '#44463D', lineHeight: 1.4, letterSpacing: 1.485 },
+        { ipad: { frame: { x: 526, y: 232.5, width: 164 }, style: { textAlign: 'center' } }, desktop: { frame: { x: 815.33, y: 253.5, width: 262.67 }, style: { fontSize: 13, textAlign: 'center', letterSpacing: 1.43 } } }),
+      'details-adults-only-copy': detailsText('details-adults-only-copy', 'We kindly request an adults-only celebration.', { x: 24, y: 318.3, width: 310, height: 32 },
+        { fontFamily: 'Instrument Sans', fontSize: 13, color: '#5F6051', lineHeight: 1.6, letterSpacing: 0.325, opacity: 0.82 },
+        { ipad: { frame: { x: 526, y: 264.4, width: 164, height: 42 }, style: { fontSize: 12.5, textAlign: 'center', letterSpacing: 0.3125, lineHeight: 1.65 } }, desktop: { frame: { x: 821.67, y: 285.7, width: 250, height: 40 }, style: { fontSize: 12, textAlign: 'center', letterSpacing: 0.3, lineHeight: 1.65 } } })
     }
   };
   const clone = () => JSON.parse(JSON.stringify(defaultDocument));
