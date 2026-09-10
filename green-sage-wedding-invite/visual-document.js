@@ -105,6 +105,7 @@
     if (hasOwn(value, 'heightPreset') && (Object.hasOwn(SECTION_HEIGHT_PRESETS, value.heightPreset) || value.heightPreset === 'custom')) result.heightPreset = value.heightPreset;
     if (isObject(value.background)) {
       const background = {};
+      if (hasOwn(value.background, 'fit') && ['cover', 'contain'].includes(value.background.fit)) background.fit = value.background.fit;
       copyFinite(background, value.background, 'focalX', 0, 100);
       copyFinite(background, value.background, 'focalY', 0, 100);
       copyFinite(background, value.background, 'zoom', 1, 4);
@@ -233,7 +234,7 @@
   const createSection = (overrides = {}) => ({
     id: overrides.id || createId('section'), name: String(overrides.name || 'Untitled section'), height: clamp(overrides.height ?? SECTION_HEIGHT_PRESETS.standard, 180, 2200),
     heightPreset: Object.hasOwn(SECTION_HEIGHT_PRESETS, overrides.heightPreset) || overrides.heightPreset === 'custom' ? overrides.heightPreset : 'standard',
-    background: { kind: overrides.background?.kind === 'image' ? 'image' : 'color', color: isHexColor(overrides.background?.color) ? overrides.background.color : '#EAE2D7', assetId: String(overrides.background?.assetId || ''), assetKind: overrides.background?.assetKind === 'upload' ? 'upload' : 'template', focalX: clamp(overrides.background?.focalX ?? 50, 0, 100), focalY: clamp(overrides.background?.focalY ?? 50, 0, 100), zoom: clamp(overrides.background?.zoom ?? 1, 1, 4) },
+    background: { kind: overrides.background?.kind === 'image' ? 'image' : 'color', color: isHexColor(overrides.background?.color) ? overrides.background.color : '#EAE2D7', assetId: String(overrides.background?.assetId || ''), assetKind: overrides.background?.assetKind === 'upload' ? 'upload' : 'template', ...(overrides.background?.fit === 'contain' || overrides.background?.fit === 'cover' ? { fit: overrides.background.fit } : {}), focalX: clamp(overrides.background?.focalX ?? 50, 0, 100), focalY: clamp(overrides.background?.focalY ?? 50, 0, 100), zoom: clamp(overrides.background?.zoom ?? 1, 1, 4) },
     elementOrder: Array.isArray(overrides.elementOrder) ? [...overrides.elementOrder] : [],
     responsive: normalizeSectionResponsive(overrides.responsive)
   });
@@ -338,7 +339,7 @@
     delete current[parts[parts.length - 1]];
     parents.reverse().forEach(([parent, key]) => { if (isObject(parent[key]) && !Object.keys(parent[key]).length) delete parent[key]; });
   };
-  const SECTION_RESPONSIVE_PATHS = new Set(['height', 'heightPreset', 'background.focalX', 'background.focalY', 'background.zoom']);
+  const SECTION_RESPONSIVE_PATHS = new Set(['height', 'heightPreset', 'background.fit', 'background.focalX', 'background.focalY', 'background.zoom']);
   const ELEMENT_RESPONSIVE_PATHS = new Set(['frame.x', 'frame.y', 'frame.width', 'frame.height', 'visible']);
   const TEXT_RESPONSIVE_PATHS = new Set(['style.fontSize', 'style.textAlign', 'style.lineHeight', 'style.letterSpacing']);
   const IMAGE_RESPONSIVE_PATHS = new Set(['crop.fit', 'crop.focalX', 'crop.focalY', 'crop.zoom']);

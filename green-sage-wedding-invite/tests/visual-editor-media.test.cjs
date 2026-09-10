@@ -59,18 +59,17 @@ test('uploads retain one record identity for insertion and background assignment
 
   const backgroundMutation = between(source, 'const applyBackgroundAsset = (assetId, assetKind) => {', 'const setSectionHeightPreset');
   assert.match(backgroundMutation, /mutate\('Change section background'/);
-  assert.match(backgroundMutation, /kind: 'image', assetId, assetKind, focalX: 50, focalY: 50, zoom: 1/);
+  assert.match(backgroundMutation, /kind: 'image', assetId, assetKind, fit: 'cover', focalX: 50, focalY: 50, zoom: 1/);
   assert.doesNotMatch(backgroundMutation, /assets\.|addFile|addFiles|put\(/);
 });
 
-test('Design shows current background controls and delegates replacement to Media', () => {
+test('Design retains solid color controls without a duplicate image-management block', () => {
   const design = between(html, 'data-panel-view="design"', 'data-panel-view="media"');
-  assert.match(design, /id="backgroundCurrent"/);
-  assert.match(design, /id="chooseBackgroundButton"/);
-  assert.match(design, /id="editBackgroundButton"/);
-  assert.match(design, /id="removeBackgroundButton"/);
+  assert.match(design, /id="sectionBackgroundColor"/);
+  assert.match(design, /id="sectionBackgroundHex"/);
+  assert.doesNotMatch(design, /Background image|backgroundCurrent|chooseBackgroundButton|editBackgroundButton|removeBackgroundButton|backgroundPositionControls/);
   assert.doesNotMatch(design, /templateMedia|uploadLibrary|templateBackgrounds|uploadedBackgrounds/);
-  assert.match(source, /ui\.chooseBackground\.addEventListener\('click', \(\) => setPanel\('media'\)\)/);
+  assert.match(source, /ui\.replaceBackground\.addEventListener\('click', \(\) => setPanel\('media'\)\)/);
 });
 
 test('upload cards keep Add to section primary and background/delete secondary', () => {

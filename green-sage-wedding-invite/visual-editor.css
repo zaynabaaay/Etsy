@@ -142,7 +142,7 @@ input[type="range"] { width:100%; accent-color:var(--sage); }
 .context-tools > strong { font-family:"Instrument Serif",serif; font-size:16px; font-weight:400; }
 .context-tools > span { color:var(--muted); font-size:10px; }
 .background-edit-context { width:100%; }
-.background-edit-context .context-button { margin-left:auto; }
+.background-edit-context .context-button:first-of-type { margin-left:auto; }
 .context-button,.color-button { display:flex; min-height:42px; align-items:center; justify-content:center; padding:7px 10px; border:1px solid var(--line); border-radius:8px; background:#fff; font-size:10px; white-space:nowrap; }
 .context-button.square { width:42px; padding:0; font-size:14px; }
 .context-button.is-active { color:#fff; border-color:var(--sage); background:var(--sage); }

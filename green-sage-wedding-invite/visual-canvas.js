@@ -433,10 +433,14 @@
     const shell = document.createElement('div'); shell.className = 'section-shell'; shell.style.width = `${canvasMetrics.logicalWidth * scale}px`; shell.style.height = `${section.height * scale}px`;
     const canvas = document.createElement('section'); canvas.className = 'section-canvas'; canvas.dataset.sectionId = section.id; canvas.classList.toggle('is-section-selected', section.id === selectedSectionId && !selectedElementId); canvas.classList.toggle('is-background-editing', editingBackground); canvas.style.height = `${section.height}px`; canvas.style.transform = `scale(${scale})`; canvas.style.background = section.background.color;
     const background = document.createElement('div'); background.className = 'section-background'; background.classList.toggle('is-editing', editingBackground);
-    if (section.background.kind === 'image') { const image = document.createElement('img'); image.alt = ''; Object.assign(image.style, { objectPosition: `${section.background.focalX}% ${section.background.focalY}%`, transform: `scale(${section.background.zoom})` }); background.append(image); setImageSource(background, image, section.background); if (editingBackground) background.addEventListener('pointerdown', (event) => startBackgroundReframe(event, section, background, image)); }
+    if (section.background.kind === 'image') { const image = document.createElement('img'); image.alt = ''; image.draggable = false; Object.assign(image.style, { objectFit: section.background.fit === 'contain' ? 'contain' : 'cover', objectPosition: `${section.background.focalX}% ${section.background.focalY}%`, transform: `scale(${section.background.zoom})` }); background.append(image); setImageSource(background, image, section.background); if (editingBackground) background.addEventListener('pointerdown', (event) => startBackgroundReframe(event, section, background, image)); }
     canvas.append(background);
     section.elementOrder.forEach((id, index) => { const item = state.elements[id]; if (!item || item.visible === false) return; const node = createElement(item); node.style.zIndex = String(index + 1); canvas.append(node); });
-    canvas.addEventListener('pointerdown', (event) => { if (event.target !== canvas && event.target !== background) return; exitEdit(); post({ type: 'green-sage-visual:select-section', sectionId: section.id }); });
+    canvas.addEventListener('pointerdown', (event) => {
+      if (event.target !== canvas && event.target !== background) return;
+      exitEdit();
+      post({ type: section.background.kind === 'image' ? 'green-sage-visual:select-background' : 'green-sage-visual:select-section', sectionId: section.id });
+    });
     if (editingBackground) { const indicator = document.createElement('span'); indicator.className = 'background-edit-indicator'; indicator.textContent = 'Drag to reposition'; canvas.append(indicator); }
     shell.append(canvas); return shell;
   };

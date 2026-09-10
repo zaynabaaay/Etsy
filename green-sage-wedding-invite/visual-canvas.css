@@ -147,10 +147,6 @@ html.is-manipulating .object-quick-actions {
   outline-offset: -1px;
 }
 
-.section-canvas.is-background-editing > .element-frame {
-  pointer-events: none;
-}
-
 .background-edit-indicator {
   position: absolute;
   z-index: 10010;
