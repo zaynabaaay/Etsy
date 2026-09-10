@@ -49,6 +49,7 @@
   let selectedSectionId = state.document.sectionOrder[0];
   let selectedElementId = null;
   let canvasReady = false;
+  let canvasTextEditing = false;
   let activePanel = 'design';
   let positionReturnPanel = 'design';
   let activePositionTab = 'arrange';
@@ -109,6 +110,22 @@
     saveRevision += 1;
     const resolvedState = model.resolveDocument(state, activeResponsiveView);
     ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:state', state: resolvedState, selectedSectionId, selectedElementId, backgroundEditSectionId, imageEditElementId, activeResponsiveView, assetUrls, revision: saveRevision }, ORIGIN);
+  };
+  const syncEditingViewport = () => {
+    if (!canvasReady || !canvasTextEditing) return;
+    // An iframe's viewport does not expose the top-level software-keyboard occlusion.
+    // Translate the parent's visual viewport into the canvas coordinate space instead.
+    const frame = ui.canvas.getBoundingClientRect(); const viewport = window.visualViewport;
+    const viewportTop = viewport?.offsetTop || 0; const viewportBottom = viewportTop + (viewport?.height || window.innerHeight);
+    const visibleTop = Math.max(frame.top, viewportTop); const visibleBottom = Math.min(frame.bottom, viewportBottom);
+    const coordinateScale = frame.height > 0 ? ui.canvas.clientHeight / frame.height : 1;
+    ui.canvas.contentWindow?.postMessage({
+      type: 'green-sage-visual:editing-viewport',
+      viewport: {
+        top: Math.max(0, visibleTop - frame.top) * coordinateScale,
+        bottom: Math.max(0, visibleBottom - frame.top) * coordinateScale,
+      },
+    }, ORIGIN);
   };
 
   const finishTransaction = (sync = true) => {
@@ -824,7 +841,8 @@
   window.addEventListener('message', (event) => {
     if (event.source !== ui.canvas.contentWindow || !sameOrigin(event.origin) || !event.data) return;
     const message = event.data;
-    if (message.type === 'green-sage-visual:ready') { canvasReady = true; syncCanvas(); return; }
+    if (message.type === 'green-sage-visual:ready') { canvasReady = true; canvasTextEditing = false; syncCanvas(); return; }
+    if (message.type === 'green-sage-visual:text-editing') { canvasTextEditing = message.active === true; if (canvasTextEditing) requestAnimationFrame(syncEditingViewport); return; }
     if (message.type === 'green-sage-visual:canvas-interaction') { closePopovers(); return; }
     if (message.type === 'green-sage-visual:select-element') { selectElement(message.elementId, true); return; }
     if (message.type === 'green-sage-visual:select-background') { selectBackground(message.sectionId, true); return; }
@@ -874,6 +892,10 @@
       finishTransaction(false); renderAll(); syncCanvas();
     }
   });
+
+  window.addEventListener('resize', syncEditingViewport);
+  window.visualViewport?.addEventListener('resize', syncEditingViewport);
+  window.visualViewport?.addEventListener('scroll', syncEditingViewport);
 
   document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.toolbar-popover, .compact-popover, .toolbar-popover-anchor, [data-open-position], [data-open-more], .media-manage')) closePopovers(); });
   document.addEventListener('keydown', (event) => {

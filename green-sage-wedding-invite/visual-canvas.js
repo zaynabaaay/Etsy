@@ -48,6 +48,7 @@
   let transaction = null;
   let gesture = null;
   let lastTextTap = null;
+  const editingViewportMargin = 16;
 
   const frameNode = (id) => root.querySelector(`[data-element-id="${CSS.escape(id)}"]`);
   const sectionNode = (id) => root.querySelector(`[data-section-id="${CSS.escape(id)}"]`);
@@ -276,18 +277,36 @@
     selection.removeAllRanges(); selection.addRange(range);
   };
 
+  const minimumVisibilityScroll = (bounds, viewport, margin = editingViewportMargin) => {
+    const values = [bounds?.top, bounds?.bottom, viewport?.top, viewport?.bottom, margin].map(Number);
+    if (!values.every(Number.isFinite) || viewport.bottom <= viewport.top) return 0;
+    const safeTop = viewport.top + margin; const safeBottom = viewport.bottom - margin;
+    if (safeBottom <= safeTop || bounds.bottom - bounds.top > safeBottom - safeTop) return bounds.top - safeTop;
+    if (bounds.bottom > safeBottom) return bounds.bottom - safeBottom;
+    if (bounds.top < safeTop) return bounds.top - safeTop;
+    return 0;
+  };
+  const keepEditingElementVisible = (viewport) => {
+    if (!editingElementId) return;
+    const frame = frameNode(editingElementId); if (!frame) return;
+    const deltaY = minimumVisibilityScroll(frame.getBoundingClientRect(), viewport);
+    if (Math.abs(deltaY) >= 1) window.scrollBy({ top: deltaY, behavior: 'auto' });
+  };
+  const reportTextEditing = (active) => post({ type: 'green-sage-visual:text-editing', active });
+
   const exitEdit = () => {
     if (!editingElementId) return;
     const frame = frameNode(editingElementId); const content = frame?.querySelector('.element-content'); editingElementId = null;
     frame?.classList.remove('is-editing'); if (content) { content.setAttribute('contenteditable', 'false'); content.blur(); }
     if (transaction?.label === 'Edit text') sendCommit();
+    reportTextEditing(false);
     requestAnimationFrame(positionQuickActions);
   };
   const enterEdit = (item, frame, content, event) => {
     if (item.permissions.locked || !item.permissions.editable) return;
     exitEdit(); renderToken += 1; editingElementId = item.id; frame.classList.add('is-editing'); content.setAttribute('contenteditable', 'plaintext-only'); content.spellcheck = true;
     positionQuickActions();
-    sendStart('element', item.id, 'Edit text'); placeCaret(content, event.clientX, event.clientY);
+    sendStart('element', item.id, 'Edit text'); placeCaret(content, event.clientX, event.clientY); reportTextEditing(true);
   };
 
   const syncEditableContent = (item) => {
@@ -478,6 +497,7 @@
       exitEdit(); transaction = null; render();
     }
     if (event.data.type === 'green-sage-visual:scroll-by') window.scrollBy({ top: Number(event.data.deltaY) || 0, behavior: 'auto' });
+    if (event.data.type === 'green-sage-visual:editing-viewport') keepEditingElementVisible(event.data.viewport);
   });
   window.addEventListener('resize', render);
   window.addEventListener('scroll', positionQuickActions, { passive: true });
