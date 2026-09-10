@@ -16,170 +16,165 @@ const loader = context.StorielVisualTemplateLoader;
 const plain = (value) => JSON.parse(JSON.stringify(value));
 const digest = (value) => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const authored = model.normalize(template.cloneDefault());
-const textIds = [
-  'details-label',
-  'details-dress-code-title', 'details-dress-code-copy',
-  'details-parking-title', 'details-parking-copy',
-  'details-adults-only-title', 'details-adults-only-copy'
+const groups = [
+  ['dress-code', 'Dress Code', 'Formal attire', 'details-icon-dress-code'],
+  ['parking', 'Parking', 'Complimentary parking is available on site.', 'details-icon-parking'],
+  ['adults-only', 'Adults Only', 'We kindly request an adults-only celebration.', 'details-icon-adults-only'],
+  ['accommodation', 'Accommodation', 'A list of nearby hotels is available on our website.', 'details-icon-accommodation'],
+  ['transportation', 'Transportation', 'Shuttle service will be provided to and from the venue.', 'details-icon-transportation'],
+  ['gifts', 'Gifts', 'Your presence is the greatest gift. A registry is available for those who wish to contribute.', 'details-icon-gifts']
 ];
-const dividerIds = ['details-divider-1', 'details-divider-2'];
+const textIds = ['details-label', 'details-subtitle', ...groups.flatMap(([key]) => [`details-${key}-title`, `details-${key}-copy`])];
+const iconIds = groups.map(([key]) => `details-${key}-icon`);
+const dividerIds = ['details-divider-column-1', 'details-divider-column-2', 'details-divider-row-1', 'details-divider-row-2'];
 const orderedIds = [
-  'details-label',
-  'details-dress-code-title', 'details-dress-code-copy',
-  'details-divider-1', 'details-parking-title', 'details-parking-copy',
-  'details-divider-2', 'details-adults-only-title', 'details-adults-only-copy'
+  'details-label', 'details-subtitle',
+  ...groups.flatMap(([key]) => [`details-${key}-icon`, `details-${key}-title`, `details-${key}-copy`]),
+  ...dividerIds
 ];
 const storage = () => {
   const values = new Map();
   return { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, String(value)) };
 };
 
-test('Details follows The Day in the Green Sage section order', () => {
+test('Details remains fourth and contains the complete editorial element order', () => {
   assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details']);
   assert.deepEqual(plain(authored.sections.details.elementOrder), orderedIds);
   assert.equal(new Set(authored.sections.details.elementOrder).size, orderedIds.length);
 });
 
-test('Details preserves the exact live title and three title-copy groups', () => {
+test('Details contains the requested heading and six exact information groups', () => {
   assert.equal(authored.elements['details-label'].content, 'DETAILS');
-  assert.deepEqual([
-    ['details-dress-code-title', 'details-dress-code-copy'],
-    ['details-parking-title', 'details-parking-copy'],
-    ['details-adults-only-title', 'details-adults-only-copy']
-  ].map(([titleId, copyId]) => [authored.elements[titleId].content, authored.elements[copyId].content]), [
-    ['Dress Code', 'Formal attire'],
-    ['Parking', 'Complimentary parking is available on site.'],
-    ['Adults Only', 'We kindly request an adults-only celebration.']
-  ]);
+  assert.equal(authored.elements['details-subtitle'].content, 'A few things to know');
+  assert.deepEqual(groups.map(([key]) => [
+    authored.elements[`details-${key}-title`].content,
+    authored.elements[`details-${key}-copy`].content,
+    authored.elements[`details-${key}-icon`].assetId
+  ]), groups.map(([, title, copy, assetId]) => [title, copy, assetId]));
 });
 
-test('Details uses stable semantic IDs and standard element permissions', () => {
+test('Details uses stable semantic IDs and standard editable element behavior', () => {
   textIds.forEach((id) => {
     assert.equal(authored.elements[id].id, id);
     assert.equal(authored.elements[id].sectionId, 'details');
     assert.equal(authored.elements[id].type, 'text');
-    assert.deepEqual(plain(authored.elements[id].permissions), { editable: true, movable: true, resizable: true, deletable: true, locked: false });
   });
-  dividerIds.forEach((id) => {
+  iconIds.forEach((id) => {
     assert.equal(authored.elements[id].id, id);
     assert.equal(authored.elements[id].sectionId, 'details');
-    assert.equal(authored.elements[id].type, 'divider');
-    assert.deepEqual(plain(authored.elements[id].permissions), { editable: true, movable: true, resizable: true, deletable: true, locked: false });
+    assert.equal(authored.elements[id].type, 'decorative');
+    assert.equal(authored.elements[id].crop.fit, 'contain');
   });
+  dividerIds.forEach((id) => assert.equal(authored.elements[id].type, 'divider'));
+  orderedIds.forEach((id) => assert.deepEqual(plain(authored.elements[id].permissions), {
+    editable: true, movable: true, resizable: true, deletable: true, locked: false
+  }));
 });
 
-test('Mobile is the authored vertical Details base', () => {
+test('Details uses the supplied botanical paper background and increased responsive heights', () => {
+  assert.deepEqual(plain(authored.sections.details.background), {
+    kind: 'image', color: '#F4EFE7', assetId: 'background-green-sage-opening', assetKind: 'template', fit: 'cover', focalX: 50, focalY: 50, zoom: 1
+  });
+  assert.equal(model.resolveDocument(authored, 'mobile').sections.details.height, 844);
+  assert.equal(model.resolveDocument(authored, 'ipad').sections.details.height, 760);
+  assert.equal(model.resolveDocument(authored, 'desktop').sections.details.height, 760);
+  assert.deepEqual(plain(authored.sections.details.responsive.overrides), { ipad: { height: 760 }, desktop: { height: 760 } });
+});
+
+test('Mobile resolves to a centered two-column by three-row layout', () => {
   const mobile = model.resolveDocument(authored, 'mobile');
-  assert.equal(mobile.sections.details.height, 423.09);
-  assert.equal(mobile.sections.details.heightPreset, 'custom');
-  assert.deepEqual(textIds.map((id) => plain(mobile.elements[id].frame)), [
-    { x: 24, y: 78, width: 342, height: 32 },
-    { x: 24, y: 133, width: 342, height: 32 },
-    { x: 24, y: 160.9, width: 310, height: 32 },
-    { x: 24, y: 211.7, width: 342, height: 32 },
-    { x: 24, y: 239.6, width: 310, height: 32 },
-    { x: 24, y: 290.4, width: 342, height: 32 },
-    { x: 24, y: 318.3, width: 310, height: 32 }
+  assert.deepEqual(iconIds.map((id) => plain(mobile.elements[id].frame)), [
+    { x: 81, y: 170, width: 48, height: 48 }, { x: 262, y: 170, width: 48, height: 48 },
+    { x: 81, y: 370, width: 48, height: 48 }, { x: 262, y: 370, width: 48, height: 48 },
+    { x: 81, y: 570, width: 48, height: 48 }, { x: 262, y: 570, width: 48, height: 48 }
   ]);
-  textIds.forEach((id) => assert.equal(mobile.elements[id].style.textAlign, 'left'));
-  dividerIds.forEach((id) => assert.equal(mobile.elements[id].visible, false));
+  assert.deepEqual(groups.map(([key]) => plain(mobile.elements[`details-${key}-title`].frame)), [
+    { x: 22, y: 217, width: 166, height: 32 }, { x: 202, y: 217, width: 166, height: 32 },
+    { x: 22, y: 417, width: 166, height: 32 }, { x: 202, y: 417, width: 166, height: 32 },
+    { x: 22, y: 617, width: 166, height: 32 }, { x: 202, y: 617, width: 166, height: 32 }
+  ]);
+  textIds.forEach((id) => assert.equal(mobile.elements[id].style.textAlign, 'center'));
 });
 
-test('Details authors only the iPad properties needed for its three-column layout', () => {
-  assert.deepEqual(plain(authored.sections.details.responsive.overrides.ipad), { height: 500 });
-  assert.deepEqual(plain(authored.elements['details-label'].responsive.overrides.ipad), { frame: { x: 48, y: 167.5, width: 672 } });
-  assert.deepEqual(plain(authored.elements['details-parking-title'].responsive.overrides.ipad), {
-    frame: { x: 302, y: 232.5, width: 164 }, style: { textAlign: 'center' }
-  });
-  assert.deepEqual(plain(authored.elements['details-parking-copy'].responsive.overrides.ipad), {
-    frame: { x: 302, y: 264.4, width: 164, height: 42 },
-    style: { fontSize: 12.5, textAlign: 'center', lineHeight: 1.65, letterSpacing: 0.3125 }
-  });
-  [...textIds, ...dividerIds].forEach((id) => {
-    const override = authored.elements[id].responsive.overrides?.ipad;
-    assert.equal(override?.content, undefined);
-    assert.equal(override?.opacity, undefined);
-    assert.equal(override?.rotation, undefined);
-  });
-});
-
-test('Details authors only the Desktop properties needed for its three-column layout', () => {
-  assert.deepEqual(plain(authored.sections.details.responsive.overrides.desktop), { height: 540 });
-  assert.deepEqual(plain(authored.elements['details-label'].responsive.overrides.desktop), { frame: { x: 80, y: 182.5, width: 1040 } });
-  assert.deepEqual(plain(authored.elements['details-adults-only-title'].responsive.overrides.desktop), {
-    frame: { x: 815.33, y: 253.5, width: 262.67 },
-    style: { fontSize: 13, textAlign: 'center', letterSpacing: 1.43 }
-  });
-  assert.deepEqual(plain(authored.elements['details-adults-only-copy'].responsive.overrides.desktop), {
-    frame: { x: 821.67, y: 285.7, width: 250, height: 40 },
-    style: { fontSize: 12, textAlign: 'center', lineHeight: 1.65, letterSpacing: 0.3 }
-  });
-  [...textIds, ...dividerIds].forEach((id) => {
-    const override = authored.elements[id].responsive.overrides?.desktop;
-    assert.equal(override?.content, undefined);
-    assert.equal(override?.opacity, undefined);
-    assert.equal(override?.rotation, undefined);
-  });
-});
-
-test('iPad and Desktop resolve the measured live Details geometry', () => {
+test('iPad resolves to a balanced three-column by two-row layout', () => {
   const ipad = model.resolveDocument(authored, 'ipad');
-  const desktop = model.resolveDocument(authored, 'desktop');
-  assert.equal(ipad.sections.details.height, 500);
-  assert.equal(desktop.sections.details.height, 540);
-  assert.deepEqual(textIds.map((id) => plain(ipad.elements[id].frame)), [
-    { x: 48, y: 167.5, width: 672, height: 32 },
-    { x: 78, y: 232.5, width: 164, height: 32 },
-    { x: 78, y: 264.4, width: 164, height: 42 },
-    { x: 302, y: 232.5, width: 164, height: 32 },
-    { x: 302, y: 264.4, width: 164, height: 42 },
-    { x: 526, y: 232.5, width: 164, height: 32 },
-    { x: 526, y: 264.4, width: 164, height: 42 }
+  assert.deepEqual(iconIds.map((id) => plain(ipad.elements[id].frame)), [
+    { x: 125, y: 197, width: 48, height: 48 }, { x: 360, y: 197, width: 48, height: 48 }, { x: 595, y: 197, width: 48, height: 48 },
+    { x: 125, y: 437, width: 48, height: 48 }, { x: 360, y: 437, width: 48, height: 48 }, { x: 595, y: 437, width: 48, height: 48 }
   ]);
-  assert.deepEqual(textIds.map((id) => plain(desktop.elements[id].frame)), [
-    { x: 80, y: 182.5, width: 1040, height: 32 },
-    { x: 122, y: 253.5, width: 262.67, height: 32 },
-    { x: 128.33, y: 285.7, width: 250, height: 40 },
-    { x: 468.67, y: 253.5, width: 262.67, height: 32 },
-    { x: 475, y: 285.7, width: 250, height: 40 },
-    { x: 815.33, y: 253.5, width: 262.67, height: 32 },
-    { x: 821.67, y: 285.7, width: 250, height: 40 }
+  assert.deepEqual(groups.map(([key]) => plain(ipad.elements[`details-${key}-title`].frame)), [
+    { x: 54, y: 245, width: 190, height: 32 }, { x: 289, y: 245, width: 190, height: 32 }, { x: 524, y: 245, width: 190, height: 32 },
+    { x: 54, y: 485, width: 190, height: 32 }, { x: 289, y: 485, width: 190, height: 32 }, { x: 524, y: 485, width: 190, height: 32 }
   ]);
 });
 
-test('Details dividers are hidden on Mobile and match the two live wide separators', () => {
+test('Desktop resolves to a balanced three-column by two-row layout', () => {
+  const desktop = model.resolveDocument(authored, 'desktop');
+  assert.deepEqual(iconIds.map((id) => plain(desktop.elements[id].frame)), [
+    { x: 226, y: 208, width: 48, height: 48 }, { x: 576, y: 208, width: 48, height: 48 }, { x: 926, y: 208, width: 48, height: 48 },
+    { x: 226, y: 445, width: 48, height: 48 }, { x: 576, y: 445, width: 48, height: 48 }, { x: 926, y: 445, width: 48, height: 48 }
+  ]);
+  assert.deepEqual(groups.map(([key]) => plain(desktop.elements[`details-${key}-title`].frame)), [
+    { x: 110, y: 258, width: 280, height: 32 }, { x: 460, y: 258, width: 280, height: 32 }, { x: 810, y: 258, width: 280, height: 32 },
+    { x: 110, y: 495, width: 280, height: 32 }, { x: 460, y: 495, width: 280, height: 32 }, { x: 810, y: 495, width: 280, height: 32 }
+  ]);
+});
+
+test('divider visibility changes from the Mobile grid to the wide grid without changing style', () => {
   const mobile = model.resolveDocument(authored, 'mobile');
   const ipad = model.resolveDocument(authored, 'ipad');
   const desktop = model.resolveDocument(authored, 'desktop');
-  assert.deepEqual(dividerIds.map((id) => mobile.elements[id].visible), [false, false]);
-  assert.deepEqual(dividerIds.map((id) => ({ visible: ipad.elements[id].visible, frame: plain(ipad.elements[id].frame) })), [
-    { visible: true, frame: { x: 272, y: 230.5, width: 1, height: 102 } },
-    { visible: true, frame: { x: 496, y: 230.5, width: 1, height: 102 } }
+  assert.deepEqual(dividerIds.map((id) => mobile.elements[id].visible), [true, false, true, true]);
+  assert.deepEqual(dividerIds.map((id) => ipad.elements[id].visible), [true, true, true, false]);
+  assert.deepEqual(dividerIds.map((id) => desktop.elements[id].visible), [true, true, true, false]);
+  assert.deepEqual(dividerIds.map((id) => plain(ipad.elements[id].frame)), [
+    { x: 266, y: 195, width: 1, height: 430 }, { x: 501, y: 195, width: 1, height: 430 },
+    { x: 54, y: 400, width: 660, height: 1 }, { x: 28, y: 550, width: 334, height: 1 }
   ]);
-  assert.deepEqual(dividerIds.map((id) => ({ visible: desktop.elements[id].visible, frame: plain(desktop.elements[id].frame) })), [
-    { visible: true, frame: { x: 426.67, y: 251.5, width: 1, height: 106 } },
-    { visible: true, frame: { x: 773.33, y: 251.5, width: 1, height: 106 } }
+  assert.deepEqual(dividerIds.map((id) => plain(desktop.elements[id].frame)), [
+    { x: 425, y: 202, width: 1, height: 430 }, { x: 775, y: 202, width: 1, height: 430 },
+    { x: 110, y: 405, width: 980, height: 1 }, { x: 28, y: 550, width: 334, height: 1 }
   ]);
   dividerIds.forEach((id) => {
     assert.equal(authored.elements[id].style.color, '#858977');
-    assert.equal(authored.elements[id].opacity, 0.28);
+    assert.equal(authored.elements[id].opacity, 0.22);
   });
 });
 
-test('Details maps live semantic roles to the approved Green Sage palette', () => {
-  assert.equal(authored.sections.details.background.color, '#F4EFE7');
+test('Details icon assets are safe, crisp, consistent fixed-color SVGs', () => {
+  groups.forEach(([, , , assetId]) => {
+    const asset = model.getTemplateAsset(assetId);
+    assert.deepEqual([asset.kind, asset.width, asset.height], ['decorative', 24, 24]);
+    const svg = fs.readFileSync(path.join(__dirname, '..', asset.url), 'utf8');
+    assert.match(svg, /viewBox="0 0 24 24"/);
+    assert.match(svg, /stroke="#626753"/);
+    assert.match(svg, /stroke-width="1\.4"/);
+    assert.doesNotMatch(svg, /<script|<foreignObject|javascript:|<image|\shref=/i);
+  });
+});
+
+test('Details uses only approved palette roles and established typography', () => {
   assert.equal(authored.elements['details-label'].style.color, '#626753');
-  ['details-dress-code-title', 'details-parking-title', 'details-adults-only-title'].forEach((id) => assert.equal(authored.elements[id].style.color, '#44463D'));
-  ['details-dress-code-copy', 'details-parking-copy', 'details-adults-only-copy'].forEach((id) => assert.equal(authored.elements[id].style.color, '#5F6051'));
-  [...textIds, ...dividerIds].forEach((id) => assert.ok(authored.document.colors.includes(authored.elements[id].style.color)));
+  assert.equal(authored.elements['details-subtitle'].style.color, '#44463D');
+  groups.forEach(([key]) => {
+    assert.equal(authored.elements[`details-${key}-title`].style.color, '#44463D');
+    assert.equal(authored.elements[`details-${key}-copy`].style.color, '#5F6051');
+    assert.equal(authored.elements[`details-${key}-title`].style.fontFamily, 'Instrument Serif');
+    assert.equal(authored.elements[`details-${key}-copy`].style.fontFamily, 'Instrument Sans');
+  });
   assert.deepEqual(plain(template.cloneDefault().document.colors), ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051']);
 });
 
-test('Details uses the live Instrument Sans hierarchy without adding a font family', () => {
-  textIds.forEach((id) => assert.equal(authored.elements[id].style.fontFamily, 'Instrument Sans'));
-  assert.equal(authored.elements['details-label'].style.fontSize, 10);
-  ['details-dress-code-title', 'details-parking-title', 'details-adults-only-title'].forEach((id) => assert.equal(authored.elements[id].style.fontSize, 13.5));
-  ['details-dress-code-copy', 'details-parking-copy', 'details-adults-only-copy'].forEach((id) => assert.equal(authored.elements[id].style.fontSize, 13));
+test('responsive authoring remains sparse and never duplicates content', () => {
+  orderedIds.forEach((id) => {
+    ['ipad', 'desktop'].forEach((view) => {
+      const override = authored.elements[id].responsive.overrides?.[view];
+      assert.equal(override?.content, undefined);
+      assert.equal(override?.opacity, undefined);
+      assert.equal(override?.rotation, undefined);
+      assert.equal(override?.assetId, undefined);
+    });
+  });
 });
 
 test('Opening, Ceremony, and The Day remain byte-for-byte equivalent as authored data', () => {
@@ -196,7 +191,7 @@ test('Details participates in generic responsive mutation, Reset, and persistenc
   assert.equal(model.writeAuthoredProperty(state, { targetType: 'element', targetId: 'details-parking-title', path: 'frame.x', value: 312, scope: 'responsive', responsiveView: 'ipad' }), true);
   assert.equal(model.resolveElement(state.elements['details-parking-title'], 'ipad').frame.x, 312);
   assert.equal(model.resetResponsiveTarget(state, { targetType: 'element', targetId: 'details-parking-title', responsiveView: 'ipad' }), true);
-  assert.equal(model.resolveElement(state.elements['details-parking-title'], 'ipad').frame.x, 24);
+  assert.equal(model.resolveElement(state.elements['details-parking-title'], 'ipad').frame.x, 202);
 
   const store = storage();
   assert.equal(loader.save('green-sage', authored, store), true);
@@ -205,5 +200,5 @@ test('Details participates in generic responsive mutation, Reset, and persistenc
   orderedIds.forEach((id) => assert.deepEqual(plain(restored.elements[id]), plain(authored.elements[id])));
 
   const editorSource = fs.readFileSync(path.join(__dirname, '..', 'visual-editor.js'), 'utf8');
-  assert.doesNotMatch(editorSource, /details-(?:label|dress-code|parking|adults-only|divider)/);
+  assert.doesNotMatch(editorSource, /details-(?:label|subtitle|dress-code|parking|adults-only|accommodation|transportation|gifts|divider)/);
 });

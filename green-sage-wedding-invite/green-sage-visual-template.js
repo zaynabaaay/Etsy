@@ -37,13 +37,19 @@
     const { opacity = 1, ...textStyle } = style;
     return {
       id, sectionId: 'details', type: 'text', content, frame, rotation: 0, opacity,
-      style: { fontWeight: 400, fontStyle: 'normal', textAlign: 'left', ...textStyle },
+      style: { fontWeight: 400, fontStyle: 'normal', textAlign: 'center', ...textStyle },
       responsive: { strategy: 'scale', anchorX: 'center', ...(Object.keys(overrides).length ? { overrides } : {}) },
       permissions: { ...permissions }
     };
   };
-  const detailsDivider = (id, frame, overrides) => ({
-    id, sectionId: 'details', type: 'divider', visible: false, frame, rotation: 0, opacity: 0.28,
+  const detailsIcon = (id, assetId, alt, frame, overrides = {}) => ({
+    id, sectionId: 'details', type: 'decorative', assetId, assetKind: 'template', alt, frame, rotation: 0, opacity: 0.9,
+    crop: { flipX: false, flipY: false, fit: 'contain', focalX: 50, focalY: 50, zoom: 1 },
+    responsive: { strategy: 'scale', anchorX: 'center', ...(Object.keys(overrides).length ? { overrides } : {}) },
+    permissions: { ...permissions }
+  });
+  const detailsDivider = (id, frame, visible, overrides) => ({
+    id, sectionId: 'details', type: 'divider', visible, frame, rotation: 0, opacity: 0.22,
     style: { color: '#858977' },
     responsive: { strategy: 'scale', anchorX: 'center', overrides },
     permissions: { ...permissions }
@@ -83,15 +89,20 @@
         responsive: { overrides: { ipad: { height: 500 }, desktop: { height: 540 } } }
       },
       details: {
-        id: 'details', name: 'Details', height: 423.09, heightPreset: 'custom',
-        background: { kind: 'color', color: '#F4EFE7', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+        id: 'details', name: 'Details', height: 844, heightPreset: 'custom',
+        background: { kind: 'image', color: '#F4EFE7', assetId: 'background-green-sage-opening', assetKind: 'template', fit: 'cover', focalX: 50, focalY: 50, zoom: 1 },
         elementOrder: [
-          'details-label',
-          'details-dress-code-title', 'details-dress-code-copy',
-          'details-divider-1', 'details-parking-title', 'details-parking-copy',
-          'details-divider-2', 'details-adults-only-title', 'details-adults-only-copy'
+          'details-label', 'details-subtitle',
+          'details-dress-code-icon', 'details-dress-code-title', 'details-dress-code-copy',
+          'details-parking-icon', 'details-parking-title', 'details-parking-copy',
+          'details-adults-only-icon', 'details-adults-only-title', 'details-adults-only-copy',
+          'details-accommodation-icon', 'details-accommodation-title', 'details-accommodation-copy',
+          'details-transportation-icon', 'details-transportation-title', 'details-transportation-copy',
+          'details-gifts-icon', 'details-gifts-title', 'details-gifts-copy',
+          'details-divider-column-1', 'details-divider-column-2',
+          'details-divider-row-1', 'details-divider-row-2'
         ],
-        responsive: { overrides: { ipad: { height: 500 }, desktop: { height: 540 } } }
+        responsive: { overrides: { ipad: { height: 760 }, desktop: { height: 760 } } }
       }
     },
     elements: {
@@ -184,29 +195,75 @@
       'the-day-divider-2': dayDivider('the-day-divider-2', { x: 130, y: 185.25, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 316.8, y: 227.5 } }, desktop: { visible: true, frame: { x: 489.6, y: 246.3, height: 120 } } }),
       'the-day-divider-3': dayDivider('the-day-divider-3', { x: 130, y: 235.5, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 451.2, y: 227.5 } }, desktop: { visible: true, frame: { x: 710.4, y: 246.3, height: 120 } } }),
       'the-day-divider-4': dayDivider('the-day-divider-4', { x: 130, y: 285.75, width: 1, height: 112 }, { ipad: { visible: true, frame: { x: 585.6, y: 227.5 } }, desktop: { visible: true, frame: { x: 931.2, y: 246.3, height: 120 } } }),
-      'details-label': detailsText('details-label', 'DETAILS', { x: 24, y: 78, width: 342, height: 32 },
-        { fontFamily: 'Instrument Sans', fontSize: 10, color: '#626753', lineHeight: 1.5, letterSpacing: 3.2, opacity: 0.9 },
-        { ipad: { frame: { x: 48, y: 167.5, width: 672 } }, desktop: { frame: { x: 80, y: 182.5, width: 1040 } } }),
-      'details-dress-code-title': detailsText('details-dress-code-title', 'Dress Code', { x: 24, y: 133, width: 342, height: 32 },
-        { fontFamily: 'Instrument Sans', fontSize: 13.5, color: '#44463D', lineHeight: 1.4, letterSpacing: 1.485 },
-        { ipad: { frame: { x: 78, y: 232.5, width: 164 }, style: { textAlign: 'center' } }, desktop: { frame: { x: 122, y: 253.5, width: 262.67 }, style: { fontSize: 13, textAlign: 'center', letterSpacing: 1.43 } } }),
-      'details-dress-code-copy': detailsText('details-dress-code-copy', 'Formal attire', { x: 24, y: 160.9, width: 310, height: 32 },
-        { fontFamily: 'Instrument Sans', fontSize: 13, color: '#5F6051', lineHeight: 1.6, letterSpacing: 0.325, opacity: 0.82 },
-        { ipad: { frame: { x: 78, y: 264.4, width: 164, height: 42 }, style: { fontSize: 12.5, textAlign: 'center', letterSpacing: 0.3125, lineHeight: 1.65 } }, desktop: { frame: { x: 128.33, y: 285.7, width: 250, height: 40 }, style: { fontSize: 12, textAlign: 'center', letterSpacing: 0.3, lineHeight: 1.65 } } }),
-      'details-divider-1': detailsDivider('details-divider-1', { x: 24, y: 133, width: 1, height: 206.1 }, { ipad: { visible: true, frame: { x: 272, y: 230.5, height: 102 } }, desktop: { visible: true, frame: { x: 426.67, y: 251.5, height: 106 } } }),
-      'details-parking-title': detailsText('details-parking-title', 'Parking', { x: 24, y: 211.7, width: 342, height: 32 },
-        { fontFamily: 'Instrument Sans', fontSize: 13.5, color: '#44463D', lineHeight: 1.4, letterSpacing: 1.485 },
-        { ipad: { frame: { x: 302, y: 232.5, width: 164 }, style: { textAlign: 'center' } }, desktop: { frame: { x: 468.67, y: 253.5, width: 262.67 }, style: { fontSize: 13, textAlign: 'center', letterSpacing: 1.43 } } }),
-      'details-parking-copy': detailsText('details-parking-copy', 'Complimentary parking is available on site.', { x: 24, y: 239.6, width: 310, height: 32 },
-        { fontFamily: 'Instrument Sans', fontSize: 13, color: '#5F6051', lineHeight: 1.6, letterSpacing: 0.325, opacity: 0.82 },
-        { ipad: { frame: { x: 302, y: 264.4, width: 164, height: 42 }, style: { fontSize: 12.5, textAlign: 'center', letterSpacing: 0.3125, lineHeight: 1.65 } }, desktop: { frame: { x: 475, y: 285.7, width: 250, height: 40 }, style: { fontSize: 12, textAlign: 'center', letterSpacing: 0.3, lineHeight: 1.65 } } }),
-      'details-divider-2': detailsDivider('details-divider-2', { x: 24, y: 211.7, width: 1, height: 127.4 }, { ipad: { visible: true, frame: { x: 496, y: 230.5, height: 102 } }, desktop: { visible: true, frame: { x: 773.33, y: 251.5, height: 106 } } }),
-      'details-adults-only-title': detailsText('details-adults-only-title', 'Adults Only', { x: 24, y: 290.4, width: 342, height: 32 },
-        { fontFamily: 'Instrument Sans', fontSize: 13.5, color: '#44463D', lineHeight: 1.4, letterSpacing: 1.485 },
-        { ipad: { frame: { x: 526, y: 232.5, width: 164 }, style: { textAlign: 'center' } }, desktop: { frame: { x: 815.33, y: 253.5, width: 262.67 }, style: { fontSize: 13, textAlign: 'center', letterSpacing: 1.43 } } }),
-      'details-adults-only-copy': detailsText('details-adults-only-copy', 'We kindly request an adults-only celebration.', { x: 24, y: 318.3, width: 310, height: 32 },
-        { fontFamily: 'Instrument Sans', fontSize: 13, color: '#5F6051', lineHeight: 1.6, letterSpacing: 0.325, opacity: 0.82 },
-        { ipad: { frame: { x: 526, y: 264.4, width: 164, height: 42 }, style: { fontSize: 12.5, textAlign: 'center', letterSpacing: 0.3125, lineHeight: 1.65 } }, desktop: { frame: { x: 821.67, y: 285.7, width: 250, height: 40 }, style: { fontSize: 12, textAlign: 'center', letterSpacing: 0.3, lineHeight: 1.65 } } })
+      'details-label': detailsText('details-label', 'DETAILS', { x: 24, y: 62, width: 342, height: 24 },
+        { fontFamily: 'Instrument Sans', fontSize: 10, color: '#626753', lineHeight: 1.4, letterSpacing: 3.2, opacity: 0.92 },
+        { ipad: { frame: { x: 48, y: 62, width: 672 } }, desktop: { frame: { x: 48, y: 70, width: 1104 } } }),
+      'details-subtitle': detailsText('details-subtitle', 'A few things to know', { x: 30, y: 94, width: 330, height: 46 },
+        { fontFamily: 'Instrument Serif', fontSize: 31, fontStyle: 'italic', color: '#44463D', lineHeight: 1.15, letterSpacing: 0.31 },
+        { ipad: { frame: { x: 84, y: 100, width: 600, height: 52 }, style: { fontSize: 38, letterSpacing: 0.38 } }, desktop: { frame: { x: 100, y: 104, width: 1000, height: 56 }, style: { fontSize: 42, letterSpacing: 0.42 } } }),
+
+      'details-dress-code-icon': detailsIcon('details-dress-code-icon', 'details-icon-dress-code', 'Dress code', { x: 81, y: 170, width: 48, height: 48 },
+        { ipad: { frame: { x: 125, y: 197 } }, desktop: { frame: { x: 226, y: 208 } } }),
+      'details-dress-code-title': detailsText('details-dress-code-title', 'Dress Code', { x: 22, y: 217, width: 166, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 18, color: '#44463D', lineHeight: 1.2, letterSpacing: 0.18 },
+        { ipad: { frame: { x: 54, y: 245, width: 190 } }, desktop: { frame: { x: 110, y: 258, width: 280 }, style: { fontSize: 20, letterSpacing: 0.2 } } }),
+      'details-dress-code-copy': detailsText('details-dress-code-copy', 'Formal attire', { x: 26, y: 250, width: 158, height: 70 },
+        { fontFamily: 'Instrument Sans', fontSize: 10.5, color: '#5F6051', lineHeight: 1.5, letterSpacing: 0.105, opacity: 0.9 },
+        { ipad: { frame: { x: 62, y: 278, width: 174, height: 72 }, style: { fontSize: 11.5, letterSpacing: 0.115 } }, desktop: { frame: { x: 125, y: 294, width: 250, height: 76 }, style: { fontSize: 12, letterSpacing: 0.12 } } }),
+
+      'details-parking-icon': detailsIcon('details-parking-icon', 'details-icon-parking', 'Parking', { x: 262, y: 170, width: 48, height: 48 },
+        { ipad: { frame: { x: 360, y: 197 } }, desktop: { frame: { x: 576, y: 208 } } }),
+      'details-parking-title': detailsText('details-parking-title', 'Parking', { x: 202, y: 217, width: 166, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 18, color: '#44463D', lineHeight: 1.2, letterSpacing: 0.18 },
+        { ipad: { frame: { x: 289, y: 245, width: 190 } }, desktop: { frame: { x: 460, y: 258, width: 280 }, style: { fontSize: 20, letterSpacing: 0.2 } } }),
+      'details-parking-copy': detailsText('details-parking-copy', 'Complimentary parking is available on site.', { x: 206, y: 250, width: 158, height: 70 },
+        { fontFamily: 'Instrument Sans', fontSize: 10.5, color: '#5F6051', lineHeight: 1.5, letterSpacing: 0.105, opacity: 0.9 },
+        { ipad: { frame: { x: 297, y: 278, width: 174, height: 72 }, style: { fontSize: 11.5, letterSpacing: 0.115 } }, desktop: { frame: { x: 475, y: 294, width: 250, height: 76 }, style: { fontSize: 12, letterSpacing: 0.12 } } }),
+
+      'details-adults-only-icon': detailsIcon('details-adults-only-icon', 'details-icon-adults-only', 'Adults only', { x: 81, y: 370, width: 48, height: 48 },
+        { ipad: { frame: { x: 595, y: 197 } }, desktop: { frame: { x: 926, y: 208 } } }),
+      'details-adults-only-title': detailsText('details-adults-only-title', 'Adults Only', { x: 22, y: 417, width: 166, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 18, color: '#44463D', lineHeight: 1.2, letterSpacing: 0.18 },
+        { ipad: { frame: { x: 524, y: 245, width: 190 } }, desktop: { frame: { x: 810, y: 258, width: 280 }, style: { fontSize: 20, letterSpacing: 0.2 } } }),
+      'details-adults-only-copy': detailsText('details-adults-only-copy', 'We kindly request an adults-only celebration.', { x: 26, y: 450, width: 158, height: 76 },
+        { fontFamily: 'Instrument Sans', fontSize: 10.5, color: '#5F6051', lineHeight: 1.5, letterSpacing: 0.105, opacity: 0.9 },
+        { ipad: { frame: { x: 532, y: 278, width: 174, height: 72 }, style: { fontSize: 11.5, letterSpacing: 0.115 } }, desktop: { frame: { x: 825, y: 294, width: 250, height: 76 }, style: { fontSize: 12, letterSpacing: 0.12 } } }),
+
+      'details-accommodation-icon': detailsIcon('details-accommodation-icon', 'details-icon-accommodation', 'Accommodation', { x: 262, y: 370, width: 48, height: 48 },
+        { ipad: { frame: { x: 125, y: 437 } }, desktop: { frame: { x: 226, y: 445 } } }),
+      'details-accommodation-title': detailsText('details-accommodation-title', 'Accommodation', { x: 202, y: 417, width: 166, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 18, color: '#44463D', lineHeight: 1.2, letterSpacing: 0.18 },
+        { ipad: { frame: { x: 54, y: 485, width: 190 } }, desktop: { frame: { x: 110, y: 495, width: 280 }, style: { fontSize: 20, letterSpacing: 0.2 } } }),
+      'details-accommodation-copy': detailsText('details-accommodation-copy', 'A list of nearby hotels is available on our website.', { x: 206, y: 450, width: 158, height: 76 },
+        { fontFamily: 'Instrument Sans', fontSize: 10.5, color: '#5F6051', lineHeight: 1.5, letterSpacing: 0.105, opacity: 0.9 },
+        { ipad: { frame: { x: 62, y: 518, width: 174, height: 88 }, style: { fontSize: 11.5, letterSpacing: 0.115 } }, desktop: { frame: { x: 125, y: 531, width: 250, height: 96 }, style: { fontSize: 12, letterSpacing: 0.12 } } }),
+
+      'details-transportation-icon': detailsIcon('details-transportation-icon', 'details-icon-transportation', 'Transportation', { x: 81, y: 570, width: 48, height: 48 },
+        { ipad: { frame: { x: 360, y: 437 } }, desktop: { frame: { x: 576, y: 445 } } }),
+      'details-transportation-title': detailsText('details-transportation-title', 'Transportation', { x: 22, y: 617, width: 166, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 18, color: '#44463D', lineHeight: 1.2, letterSpacing: 0.18 },
+        { ipad: { frame: { x: 289, y: 485, width: 190 } }, desktop: { frame: { x: 460, y: 495, width: 280 }, style: { fontSize: 20, letterSpacing: 0.2 } } }),
+      'details-transportation-copy': detailsText('details-transportation-copy', 'Shuttle service will be provided to and from the venue.', { x: 26, y: 650, width: 158, height: 96 },
+        { fontFamily: 'Instrument Sans', fontSize: 10.5, color: '#5F6051', lineHeight: 1.5, letterSpacing: 0.105, opacity: 0.9 },
+        { ipad: { frame: { x: 297, y: 518, width: 174, height: 88 }, style: { fontSize: 11.5, letterSpacing: 0.115 } }, desktop: { frame: { x: 475, y: 531, width: 250, height: 96 }, style: { fontSize: 12, letterSpacing: 0.12 } } }),
+
+      'details-gifts-icon': detailsIcon('details-gifts-icon', 'details-icon-gifts', 'Gifts', { x: 262, y: 570, width: 48, height: 48 },
+        { ipad: { frame: { x: 595, y: 437 } }, desktop: { frame: { x: 926, y: 445 } } }),
+      'details-gifts-title': detailsText('details-gifts-title', 'Gifts', { x: 202, y: 617, width: 166, height: 32 },
+        { fontFamily: 'Instrument Serif', fontSize: 18, color: '#44463D', lineHeight: 1.2, letterSpacing: 0.18 },
+        { ipad: { frame: { x: 524, y: 485, width: 190 } }, desktop: { frame: { x: 810, y: 495, width: 280 }, style: { fontSize: 20, letterSpacing: 0.2 } } }),
+      'details-gifts-copy': detailsText('details-gifts-copy', 'Your presence is the greatest gift. A registry is available for those who wish to contribute.', { x: 206, y: 650, width: 158, height: 96 },
+        { fontFamily: 'Instrument Sans', fontSize: 10.5, color: '#5F6051', lineHeight: 1.5, letterSpacing: 0.105, opacity: 0.9 },
+        { ipad: { frame: { x: 532, y: 518, width: 174, height: 88 }, style: { fontSize: 11.5, letterSpacing: 0.115 } }, desktop: { frame: { x: 825, y: 531, width: 250, height: 96 }, style: { fontSize: 12, letterSpacing: 0.12 } } }),
+
+      'details-divider-column-1': detailsDivider('details-divider-column-1', { x: 195, y: 170, width: 1, height: 610 }, true,
+        { ipad: { frame: { x: 266, y: 195, height: 430 } }, desktop: { frame: { x: 425, y: 202, height: 430 } } }),
+      'details-divider-column-2': detailsDivider('details-divider-column-2', { x: 195, y: 170, width: 1, height: 610 }, false,
+        { ipad: { visible: true, frame: { x: 501, y: 195, height: 430 } }, desktop: { visible: true, frame: { x: 775, y: 202, height: 430 } } }),
+      'details-divider-row-1': detailsDivider('details-divider-row-1', { x: 28, y: 350, width: 334, height: 1 }, true,
+        { ipad: { frame: { x: 54, y: 400, width: 660 } }, desktop: { frame: { x: 110, y: 405, width: 980 } } }),
+      'details-divider-row-2': detailsDivider('details-divider-row-2', { x: 28, y: 550, width: 334, height: 1 }, true,
+        { ipad: { visible: false }, desktop: { visible: false } })
     }
   };
   const clone = () => JSON.parse(JSON.stringify(defaultDocument));

@@ -42,7 +42,7 @@ test('Green Sage authored colors use the reconciled restrained palette', () => {
   });
 });
 
-test('authored geometry retains the approved sections plus the migrated Details layout', () => {
+test('authored geometry retains the approved sections plus the redesigned Details layout', () => {
   const geometry = {
     order: authored.document.sectionOrder,
     sections: Object.fromEntries(Object.entries(authored.sections).map(([id, section]) => [id, {
@@ -52,10 +52,10 @@ test('authored geometry retains the approved sections plus the migrated Details 
       sectionId: element.sectionId, frame: element.frame, responsive: element.responsive
     }]))
   };
-  assert.equal(digest(JSON.stringify(geometry)), '1f765bf9400f9bf69a25558096dc93b4b037ef932b253873e3e5d20921439569');
+  assert.equal(digest(JSON.stringify(geometry)), 'db148de375221b19322c1647cea96c12dab6139cb949a520674ce149a3e86c91');
 });
 
-test('palette reconciliation changes no authored asset reference, crop, or supplied path', () => {
+test('authored asset references and crops match the approved template including Details', () => {
   const assets = {
     sections: Object.fromEntries(Object.entries(authored.sections).map(([id, section]) => [id, {
       kind: section.background.kind, assetId: section.background.assetId, assetKind: section.background.assetKind,
@@ -65,7 +65,7 @@ test('palette reconciliation changes no authored asset reference, crop, or suppl
       assetId: element.assetId, assetKind: element.assetKind, type: element.type, crop: element.crop
     }]))
   };
-  assert.equal(digest(JSON.stringify(assets)), '989e22bac135a483daa100ab3d0ab23eeeecca014baf3c9db354ce525a0747a3');
+  assert.equal(digest(JSON.stringify(assets)), '213c1c51049caf8aeaa7884a5035d8b614dec45bf8ff0e37d7e7e419ff83521b');
   assert.equal(model.getTemplateAsset('background-green-sage-opening').url, 'invitation-assets/green-sage-opening-background.jpg');
   assert.equal(model.getTemplateAsset('venue-glasshouse').url, 'invitation-assets/venue-glasshouse.svg');
 });
