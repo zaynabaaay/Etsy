@@ -42,7 +42,7 @@ test('Green Sage authored colors use the reconciled restrained palette', () => {
   });
 });
 
-test('palette reconciliation changes no authored geometry or responsive structure', () => {
+test('authored geometry retains the approved palette-era structure plus the Mobile The Day shift', () => {
   const geometry = {
     order: authored.document.sectionOrder,
     sections: Object.fromEntries(Object.entries(authored.sections).map(([id, section]) => [id, {
@@ -52,7 +52,7 @@ test('palette reconciliation changes no authored geometry or responsive structur
       sectionId: element.sectionId, frame: element.frame, responsive: element.responsive
     }]))
   };
-  assert.equal(digest(JSON.stringify(geometry)), '2dd5bf5688d9d5117d4ec9ef81d5f555d4fe718170e20e01fd78f775c477db14');
+  assert.equal(digest(JSON.stringify(geometry)), 'd426a160d50a62ed88ec2f315463ce45a40aa0fadf33ff73b37e170e9ce6d72d');
 });
 
 test('palette reconciliation changes no authored asset reference, crop, or supplied path', () => {
