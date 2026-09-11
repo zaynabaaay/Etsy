@@ -31,9 +31,15 @@
   const quickDelete = quickActionButton('delete', 'trash2', 'Delete');
   const quickMore = quickActionButton('more', 'ellipsis', 'More');
   document.body.append(quickActions);
+  const recoveryHandles = document.createElement('div');
+  recoveryHandles.className = 'recovery-resize-handles';
+  recoveryHandles.hidden = true;
+  recoveryHandles.setAttribute('aria-label', 'Off-canvas resize controls');
+  document.body.append(recoveryHandles);
   const ORIGIN = window.location.origin === 'null' ? '*' : window.location.origin;
   const sameOrigin = (origin) => origin === window.location.origin || (origin === 'null' && window.location.origin === 'null');
   const resizeDirections = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+  const resizeDirectionsFor = (item) => item.type === 'decorative' ? ['nw', 'ne', 'se', 'sw'] : item.type === 'divider' ? ['n', 'e', 's', 'w'] : resizeDirections;
   const post = (message) => window.parent.postMessage(message, ORIGIN);
   let state = null;
   let activeResponsiveView = 'mobile';
@@ -101,6 +107,7 @@
     document.documentElement.classList.remove('is-manipulating'); clearGuides();
     try { if (active.target.hasPointerCapture(active.pointerId)) active.target.releasePointerCapture(active.pointerId); } catch {}
     sendCommit();
+    renderRecoveryHandles();
     requestAnimationFrame(positionQuickActions);
     if (event?.type === 'pointerup') active.onPointerUp?.(event);
     else lastTextTap = null;
@@ -203,7 +210,7 @@
     item.frame = { ...item.frame, ...nextFrame };
     Object.assign(frame.style, { left: `${item.frame.x}px`, top: `${item.frame.y}px`, width: `${item.frame.width}px`, height: `${item.frame.height}px` });
     if (item.crop) layoutImage(item, frame.querySelector('.image-content img'));
-    updateOverflow(item); drawGuides(item.sectionId, guides); positionQuickActions(); sendPatch({ frame: item.frame });
+    updateOverflow(item); drawGuides(item.sectionId, guides); positionRecoveryHandles(); positionQuickActions(); sendPatch({ frame: item.frame });
   };
 
   const startMove = (event, item, frame) => {
@@ -251,6 +258,46 @@
       applyFrame(item, frame, next);
     };
     trackGesture(event, frame, move);
+  };
+
+  const recoveryHandlePosition = (bounds, viewport, size, padding = 4) => {
+    const values = [bounds?.left, bounds?.top, bounds?.width, bounds?.height, viewport?.left, viewport?.top, viewport?.right, viewport?.bottom, size, padding].map(Number);
+    if (!values.every(Number.isFinite) || size <= 0 || viewport.right <= viewport.left || viewport.bottom <= viewport.top) return null;
+    const half = size / 2; const centerX = bounds.left + bounds.width / 2; const centerY = bounds.top + bounds.height / 2;
+    const minX = viewport.left + half + padding; const maxX = viewport.right - half - padding;
+    const minY = viewport.top + half + padding; const maxY = viewport.bottom - half - padding;
+    return {
+      left: Math.max(minX, Math.min(centerX, maxX)) - half,
+      top: Math.max(minY, Math.min(centerY, maxY)) - half,
+    };
+  };
+  const positionRecoveryHandles = () => {
+    if (recoveryHandles.hidden) return;
+    const frame = frameNode(selectedElementId); if (!frame) return;
+    const viewport = window.visualViewport;
+    const visible = {
+      left: viewport?.offsetLeft || 0,
+      top: viewport?.offsetTop || 0,
+      right: (viewport?.offsetLeft || 0) + (viewport?.width || window.innerWidth),
+      bottom: (viewport?.offsetTop || 0) + (viewport?.height || window.innerHeight),
+    };
+    recoveryHandles.querySelectorAll('.resize-handle').forEach((handle) => {
+      const source = frame.querySelector(`:scope > .resize-handle[data-direction="${handle.dataset.direction}"]`);
+      const point = source && recoveryHandlePosition(source.getBoundingClientRect(), visible, handle.offsetWidth || 32);
+      if (point) handle.style.transform = `translate(${Math.round(point.left)}px, ${Math.round(point.top)}px)`;
+    });
+  };
+  const renderRecoveryHandles = () => {
+    root.querySelectorAll('.element-frame.has-recovery-handles').forEach((frame) => frame.classList.remove('has-recovery-handles'));
+    recoveryHandles.replaceChildren(); recoveryHandles.hidden = true;
+    const item = state?.elements[selectedElementId]; const frame = item && frameNode(item.id);
+    if (!item || !frame || item.permissions.locked || !item.permissions.resizable || imageEditElementId === item.id || !isOutside(item)) return;
+    frame.classList.add('has-recovery-handles');
+    resizeDirectionsFor(item).forEach((direction) => {
+      const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'resize-handle'; handle.dataset.direction = direction;
+      handle.setAttribute('aria-label', `Resize ${direction}`); handle.addEventListener('pointerdown', (event) => startResize(event, item, frame, direction)); recoveryHandles.append(handle);
+    });
+    recoveryHandles.hidden = false; positionRecoveryHandles();
   };
 
   const startBackgroundReframe = (event, section, background, image) => {
@@ -440,7 +487,7 @@
       else if (item.type === 'divider') { event.preventDefault(); event.stopPropagation(); post({ type: 'green-sage-visual:select-element', elementId: item.id }); }
     });
     if (selectedElementId === item.id && imageEditElementId !== item.id && !item.permissions.locked) {
-      const directions = item.type === 'decorative' ? ['nw', 'ne', 'se', 'sw'] : item.type === 'divider' ? ['n', 'e', 's', 'w'] : resizeDirections;
+      const directions = resizeDirectionsFor(item);
       if (item.permissions.resizable) directions.forEach((direction) => { const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'resize-handle'; handle.dataset.direction = direction; handle.setAttribute('aria-label', `Resize ${direction}`); handle.addEventListener('pointerdown', (event) => startResize(event, item, frame, direction)); frame.append(handle); });
     }
     return frame;
@@ -471,7 +518,7 @@
     const fonts = Object.values(state.elements).filter((item) => item.type === 'text').map((item) => model.loadFont(item.style.fontFamily, { document, weight: item.style.fontWeight, style: item.style.fontStyle, size: item.style.fontSize, sample: item.content }));
     await Promise.allSettled(fonts); await document.fonts?.ready; if (token !== renderToken) return;
     root.replaceChildren(...state.document.sectionOrder.map((id) => createSection(state.sections[id])));
-    requestAnimationFrame(() => requestAnimationFrame(() => { if (token !== renderToken) return; window.scrollTo(0, scrollY); Object.values(state.elements).forEach(updateOverflow); positionQuickActions(); }));
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (token !== renderToken) return; window.scrollTo(0, scrollY); Object.values(state.elements).forEach(updateOverflow); renderRecoveryHandles(); positionQuickActions(); }));
   };
 
   window.addEventListener('message', (event) => {
@@ -500,9 +547,11 @@
     if (event.data.type === 'green-sage-visual:editing-viewport') keepEditingElementVisible(event.data.viewport);
   });
   window.addEventListener('resize', render);
-  window.addEventListener('scroll', positionQuickActions, { passive: true });
+  window.addEventListener('scroll', () => { positionQuickActions(); positionRecoveryHandles(); }, { passive: true });
   window.visualViewport?.addEventListener('resize', positionQuickActions);
   window.visualViewport?.addEventListener('scroll', positionQuickActions);
+  window.visualViewport?.addEventListener('resize', positionRecoveryHandles);
+  window.visualViewport?.addEventListener('scroll', positionRecoveryHandles);
   document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.object-quick-actions')) post({ type: 'green-sage-visual:canvas-interaction' }); }, true);
   document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.element-frame')) { lastTextTap = null; exitEdit(); } });
   document.addEventListener('keydown', (event) => {

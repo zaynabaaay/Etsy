@@ -399,6 +399,29 @@ html.is-manipulating {
   display: block;
 }
 
+.element-frame.has-recovery-handles > .resize-handle {
+  visibility: hidden;
+}
+
+.recovery-resize-handles {
+  position: fixed;
+  z-index: 19990;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.recovery-resize-handles .resize-handle[data-direction] {
+  position: fixed;
+  top: 0;
+  right: auto;
+  bottom: auto;
+  left: 0;
+  display: block;
+  pointer-events: auto;
+  transform: none;
+}
+
 .resize-handle::after {
   position: absolute;
   top: 50%;
