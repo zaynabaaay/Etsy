@@ -30,7 +30,7 @@ test('the white side panel retains independent contained vertical scrolling', ()
 test('the workspace shell stays contained while the canvas iframe remains available', () => {
   assert.match(styles, /\.storiel-workspace \{[^}]*min-height:0[^}]*overflow:hidden[^}]*overscroll-behavior:none[^}]*touch-action:none/);
   assert.match(styles, /\.preview-frame iframe \{[^}]*width:100%[^}]*height:100%/);
-  assert.match(html, /<iframe id="visualCanvas"[^>]*src="visual-canvas\.html/);
+  assert.match(html, /<iframe id="visualCanvas"[^>]*data-entry="visual-canvas\.html\?editor=1"/);
 });
 
 test('invitation navigation remains owned by the canvas document, not the parent shell', () => {

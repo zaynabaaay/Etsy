@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-editor-surface="parent">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;1,400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="visual-editor.css?v=20260911-shell-scroll">
+  <link rel="stylesheet" id="editorStylesheet">
 </head>
 <body>
   <main class="storiel-editor" id="storielEditor">
@@ -106,7 +106,7 @@
     </section>
 
     <section class="storiel-workspace" id="workspace" aria-label="Invitation editing workspace">
-      <div class="preview-frame canvas-view-mobile" id="previewFrame"><iframe id="visualCanvas" src="visual-canvas.html?editor=1&amp;v=20260910-keyboard-visibility" title="Editable invitation canvas"></iframe></div>
+      <div class="preview-frame canvas-view-mobile" id="previewFrame"><iframe id="visualCanvas" data-entry="visual-canvas.html?editor=1" title="Editable invitation canvas"></iframe></div>
     </section>
   </main>
   <dialog class="view-reset-dialog" id="resetViewDialog" aria-labelledby="resetViewTitle" aria-describedby="resetViewDescription">
@@ -119,10 +119,8 @@
       </div>
     </form>
   </dialog>
-  <script src="visual-document.js?v=20260911-svg-color"></script>
-  <script src="green-sage-visual-template.js?v=20260909-green-sage-assets"></script>
-  <script src="visual-template-loader.js?v=20260907-template-boundary"></script>
-  <script src="visual-assets.js?v=20260902-section2"></script>
-  <script src="visual-editor.js?v=20260911-svg-color"></script>
+  <script>
+    (() => { const loader = document.createElement('script'); loader.src = `visual-editor-bootstrap.js?refresh=${Date.now()}`; document.head.append(loader); })();
+  </script>
 </body>
 </html>
