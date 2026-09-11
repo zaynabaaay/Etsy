@@ -16,8 +16,8 @@ const authored = model.normalize(template.cloneDefault());
 const ids = ['ceremony-label', 'ceremony-time', 'ceremony-glasshouse', 'ceremony-venue', 'ceremony-address', 'ceremony-note'];
 
 test('Green Sage default retains Ceremony between Opening and The Day before Details', () => {
-  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details']);
-  assert.deepEqual(Object.keys(authored.sections), ['opening', 'ceremony', 'the-day', 'details']);
+  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
+  assert.deepEqual(Object.keys(authored.sections), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
   assert.equal(authored.sections['green-sage-placeholder'], undefined);
   assert.equal(Object.values(authored.elements).filter((item) => item.sectionId === 'ceremony').length, ids.length);
   ids.forEach((id) => assert.ok(authored.elements[id], `missing ${id}`));
@@ -118,7 +118,7 @@ test('Ceremony elements retain the shared editor interaction permissions', () =>
 
 test('Ceremony IDs and sparse responsive data survive serialization', () => {
   const restored = model.normalize(JSON.parse(JSON.stringify(authored)));
-  assert.deepEqual(plain(restored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details']);
+  assert.deepEqual(plain(restored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
   assert.deepEqual(plain(restored.sections.ceremony.elementOrder), ids);
   assert.deepEqual(plain(restored.sections.ceremony.responsive), plain(authored.sections.ceremony.responsive));
   ids.forEach((id) => assert.deepEqual(plain(restored.elements[id].responsive), plain(authored.elements[id].responsive)));

@@ -57,7 +57,7 @@ test('Green Sage falls back to its dedicated default with no save or corrupt dat
   const empty = storage();
   const initial = loader.load('green-sage', empty);
   assert.equal(initial.document.templateId, 'green-sage');
-  assert.deepEqual(plain(initial.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details']);
+  assert.deepEqual(plain(initial.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
   assert.equal(initial.elements['proof-heading'], undefined);
 
   const corrupt = storage({ [greenSage.storageKey]: '{bad json' });

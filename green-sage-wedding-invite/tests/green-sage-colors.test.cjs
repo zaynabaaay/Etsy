@@ -42,7 +42,7 @@ test('Green Sage authored colors use the reconciled restrained palette', () => {
   });
 });
 
-test('Opening fallback reuses the primary ivory without adding a redundant Document Color', () => {
+test('Opening fallback reuses the primary ivory while Our Story contributes only its public colors', () => {
   assert.equal(
     digest(fs.readFileSync(path.join(root, 'invitation-assets/green-sage-opening-background.jpg'))),
     '08f15870be58403ee5093b2a1ea170bf35e657c2f9fffbde285407535d81dfff'
@@ -50,7 +50,7 @@ test('Opening fallback reuses the primary ivory without adding a redundant Docum
   assert.equal(authored.sections.opening.background.color, '#F4EFE7');
 
   const normalized = model.normalize(authored);
-  assert.deepEqual(plain(normalized.document.colors), ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051']);
+  assert.deepEqual(plain(normalized.document.colors), ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051', '#F3F2ED', '#AD9B78', '#3F4037', '#D2CEC5']);
   assert.equal(normalized.document.colors.includes('#ECE6DF'), false);
 });
 
@@ -66,7 +66,7 @@ test('palette reconciliation preserves custom colors and recolorable SVG color a
   assert.equal(model.getTemplateAsset('venue-glasshouse').recolorable, true);
 });
 
-test('authored geometry retains the approved sections plus the redesigned Details layout', () => {
+test('authored geometry retains the approved sections plus Details and Our Story', () => {
   const geometry = {
     order: authored.document.sectionOrder,
     sections: Object.fromEntries(Object.entries(authored.sections).map(([id, section]) => [id, {
@@ -76,10 +76,10 @@ test('authored geometry retains the approved sections plus the redesigned Detail
       sectionId: element.sectionId, frame: element.frame, responsive: element.responsive
     }]))
   };
-  assert.equal(digest(JSON.stringify(geometry)), '50007637d7f836a314b093aec26a51b98e6366e0d7a730293734ce2c5877eeec');
+  assert.equal(digest(JSON.stringify(geometry)), '52952ab446c2d5ceed8d8d49b213ec76a28de239c0d47f7f63c1bf1709850886');
 });
 
-test('authored asset references and crops match the approved template including Details', () => {
+test('authored asset references and crops match the approved template including Our Story', () => {
   const assets = {
     sections: Object.fromEntries(Object.entries(authored.sections).map(([id, section]) => [id, {
       kind: section.background.kind, assetId: section.background.assetId, assetKind: section.background.assetKind,
@@ -89,7 +89,7 @@ test('authored asset references and crops match the approved template including 
       assetId: element.assetId, assetKind: element.assetKind, type: element.type, crop: element.crop
     }]))
   };
-  assert.equal(digest(JSON.stringify(assets)), '213c1c51049caf8aeaa7884a5035d8b614dec45bf8ff0e37d7e7e419ff83521b');
+  assert.equal(digest(JSON.stringify(assets)), '22b90e1219175b72dedaa990e084b644258732ebe60777f9d06014d4a59527e7');
   assert.equal(model.getTemplateAsset('background-green-sage-opening').url, 'invitation-assets/green-sage-opening-background.jpg');
   assert.equal(model.getTemplateAsset('venue-glasshouse').url, 'invitation-assets/venue-glasshouse.svg');
 });

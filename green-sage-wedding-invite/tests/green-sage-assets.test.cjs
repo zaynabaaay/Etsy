@@ -16,6 +16,8 @@ const plain = (value) => JSON.parse(JSON.stringify(value));
 
 const expectedIncludedAssets = [
   { id: 'background-green-sage-opening', name: 'Green Sage Opening', kind: 'background', url: 'invitation-assets/green-sage-opening-background.jpg', width: 853, height: 1280 },
+  { id: 'our-story-photo', name: 'Our Story Photo', kind: 'image', url: 'https://images.unsplash.com/photo-1616687818402-c768b3638374?auto=format&fit=crop&fm=jpg&q=90&w=1800', width: 1800, height: 1200 },
+  { id: 'our-story-motif', name: 'Our Story Motif', kind: 'decorative', url: 'invitation-assets/our-story-motif.svg', width: 220, height: 18, recolorable: true, defaultColor: '#626753' },
   { id: 'venue-glasshouse', name: 'Glasshouse', kind: 'decorative', url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876, recolorable: true, defaultColor: '#605D42' },
   { id: 'venue-mansion', name: 'Mansion', kind: 'decorative', url: 'invitation-assets/venue-mansion.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#8C887C' },
   { id: 'venue-pergola', name: 'Pergola', kind: 'decorative', url: 'invitation-assets/venue-pergola.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#827D6A' },
@@ -24,7 +26,7 @@ const expectedIncludedAssets = [
 
 test('Included with template contains exactly the Green Sage-specific supplied assets', () => {
   assert.deepEqual(plain(model.templateAssets.filter((asset) => asset.collection !== 'icons')), expectedIncludedAssets);
-  model.templateAssets.forEach((asset) => assert.ok(fs.existsSync(path.join(root, asset.url)), `missing ${asset.url}`));
+  model.templateAssets.filter((asset) => !/^https?:/.test(asset.url)).forEach((asset) => assert.ok(fs.existsSync(path.join(root, asset.url)), `missing ${asset.url}`));
 });
 
 test('obsolete supplied assets are absent and no authored template reference is broken', () => {

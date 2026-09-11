@@ -39,7 +39,7 @@ const storage = () => {
 };
 
 test('Details remains fourth and contains the complete editorial element order', () => {
-  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details']);
+  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
   assert.deepEqual(plain(authored.sections.details.elementOrder), orderedIds);
   assert.equal(new Set(authored.sections.details.elementOrder).size, orderedIds.length);
 });

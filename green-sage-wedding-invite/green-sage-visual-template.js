@@ -54,13 +54,28 @@
     responsive: { strategy: 'scale', anchorX: 'center', overrides },
     permissions: { ...permissions }
   });
+  const storyText = (id, content, frame, style, overrides = {}) => {
+    const { opacity = 1, ...textStyle } = style;
+    return {
+      id, sectionId: 'our-story', type: 'text', content, frame, rotation: 0, opacity,
+      style: { fontWeight: 400, fontStyle: 'normal', textAlign: 'left', ...textStyle },
+      responsive: { strategy: 'scale', anchorX: 'center', ...(Object.keys(overrides).length ? { overrides } : {}) },
+      permissions: { ...permissions }
+    };
+  };
+  const storyDivider = (id, frame, color, opacity, overrides = {}) => ({
+    id, sectionId: 'our-story', type: 'divider', frame, rotation: 0, opacity,
+    style: { color },
+    responsive: { strategy: 'scale', anchorX: 'center', ...(Object.keys(overrides).length ? { overrides } : {}) },
+    permissions: { ...permissions }
+  });
   const defaultDocument = {
     schemaVersion: 4,
     document: {
       id: 'green-sage-visual-template', templateId: 'green-sage', title: 'Green Sage invitation',
       colors: ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051'],
       canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 },
-      sectionOrder: ['opening', 'ceremony', 'the-day', 'details'], media: { audio: null }
+      sectionOrder: ['opening', 'ceremony', 'the-day', 'details', 'our-story'], media: { audio: null }
     },
     sections: {
       opening: {
@@ -103,6 +118,18 @@
           'details-divider-row-1', 'details-divider-row-2'
         ],
         responsive: { overrides: { ipad: { height: 760 }, desktop: { height: 760 } } }
+      },
+      'our-story': {
+        id: 'our-story', name: 'Our Story', height: 1081, heightPreset: 'custom',
+        background: { kind: 'color', color: '#F3F2ED', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+        elementOrder: [
+          'our-story-offset-top', 'our-story-offset-right', 'our-story-offset-bottom', 'our-story-offset-left',
+          'our-story-label', 'our-story-motif',
+          'our-story-heading', 'our-story-body-1', 'our-story-body-2', 'our-story-body-3', 'our-story-signoff',
+          'our-story-photo',
+          'our-story-border-top', 'our-story-border-right', 'our-story-border-bottom', 'our-story-border-left'
+        ],
+        responsive: { overrides: { ipad: { height: 1024 }, desktop: { height: 1000 } } }
       }
     },
     elements: {
@@ -263,7 +290,63 @@
       'details-divider-row-1': detailsDivider('details-divider-row-1', { x: 28, y: 350, width: 334, height: 1 }, true,
         { ipad: { frame: { x: 54, y: 400, width: 660 } }, desktop: { frame: { x: 110, y: 405, width: 980 } } }),
       'details-divider-row-2': detailsDivider('details-divider-row-2', { x: 28, y: 550, width: 334, height: 1 }, true,
-        { ipad: { visible: false }, desktop: { visible: false } })
+        { ipad: { visible: false }, desktop: { visible: false } }),
+
+      'our-story-offset-top': storyDivider('our-story-offset-top', { x: 39.3, y: 581.27, width: 335.4, height: 1 }, '#AD9B78', 0.38,
+        { ipad: { frame: { x: 404.27, y: 150.02, width: 320 } }, desktop: { frame: { x: 664, y: 126, width: 470 } } }),
+      'our-story-offset-right': storyDivider('our-story-offset-right', { x: 373.7, y: 581.27, width: 1, height: 419.24 }, '#AD9B78', 0.38,
+        { ipad: { frame: { x: 723.27, y: 150.02, height: 400 } }, desktop: { frame: { x: 1133, y: 126, height: 587.5 } } }),
+      'our-story-offset-bottom': storyDivider('our-story-offset-bottom', { x: 39.3, y: 999.51, width: 335.4, height: 1 }, '#AD9B78', 0.38,
+        { ipad: { frame: { x: 404.27, y: 549.02, width: 320 } }, desktop: { frame: { x: 664, y: 712.5, width: 470 } } }),
+      'our-story-offset-left': storyDivider('our-story-offset-left', { x: 39.3, y: 581.27, width: 1, height: 419.24 }, '#AD9B78', 0.38,
+        { ipad: { frame: { x: 404.27, y: 150.02, height: 400 } }, desktop: { frame: { x: 664, y: 126, height: 587.5 } } }),
+
+      'our-story-label': storyText('our-story-label', 'OUR STORY', { x: 24, y: 82, width: 342, height: 18 },
+        { fontFamily: 'Libre Baskerville', fontSize: 10, color: '#626753', lineHeight: 1.45, letterSpacing: 3.4 },
+        { ipad: { frame: { x: 56, y: 88, width: 280.27 } }, desktop: { frame: { x: 84, y: 185.16, width: 457.91 } } }),
+      'our-story-motif': {
+        id: 'our-story-motif', sectionId: 'our-story', type: 'decorative', assetId: 'our-story-motif', assetKind: 'template', alt: '',
+        frame: { x: 24, y: 112.34, width: 118, height: 9.65 }, rotation: 0, opacity: 0.62, svgColor: '#626753',
+        crop: { flipX: false, flipY: false, fit: 'contain', focalX: 50, focalY: 50, zoom: 1 },
+        responsive: { strategy: 'scale', anchorX: 'center', overrides: {
+          ipad: { frame: { x: 56, y: 118.5 } },
+          desktop: { frame: { x: 84, y: 217.66, width: 132, height: 10.8 } }
+        } },
+        permissions: { ...permissions }
+      },
+      'our-story-heading': storyText('our-story-heading', 'How We Met', { x: 24, y: 145.98, width: 342, height: 58 },
+        { fontFamily: 'Cormorant Garamond', fontSize: 50.7, color: '#3F4037', lineHeight: 0.94, letterSpacing: -1.2675 },
+        { ipad: { frame: { x: 56, y: 156.15, width: 280.27 }, style: { fontSize: 52, letterSpacing: -1.3 } }, desktop: { frame: { x: 84, y: 258.46, width: 457.91, height: 64 }, style: { fontSize: 61.8, letterSpacing: -1.545 } } }),
+      'our-story-body-1': storyText('our-story-body-1', 'We met the way the best things often happen — unexpectedly, and at exactly the right time.', { x: 24, y: 219.64, width: 342, height: 50 },
+        { fontFamily: 'Libre Baskerville', fontSize: 14, color: '#3F4037', lineHeight: 1.78, letterSpacing: 0 },
+        { ipad: { frame: { x: 56, y: 233.02, width: 280.27, height: 77 }, style: { lineHeight: 1.82 } }, desktop: { frame: { x: 84, y: 347.74, width: 457.91, height: 51 }, style: { lineHeight: 1.82 } } }),
+      'our-story-body-2': storyText('our-story-body-2', 'What started with easy conversation became long walks, shared plans, and the kind of everyday moments that quietly turn into a life together.', { x: 24, y: 285.47, width: 342, height: 100 },
+        { fontFamily: 'Libre Baskerville', fontSize: 14, color: '#3F4037', lineHeight: 1.78, letterSpacing: 0 },
+        { ipad: { frame: { x: 56, y: 327.45, width: 280.27, height: 102 }, style: { lineHeight: 1.82 } }, desktop: { frame: { x: 84, y: 416.7, width: 457.91, height: 77 }, style: { lineHeight: 1.82 } } }),
+      'our-story-body-3': storyText('our-story-body-3', 'Now we get to celebrate the next chapter with the people who have been part of our story along the way.', { x: 24, y: 401.13, width: 342, height: 75 },
+        { fontFamily: 'Libre Baskerville', fontSize: 14, color: '#3F4037', lineHeight: 1.78, letterSpacing: 0 },
+        { ipad: { frame: { x: 56, y: 447.36, width: 280.27, height: 77 }, style: { lineHeight: 1.82 } }, desktop: { frame: { x: 84, y: 511.13, width: 457.91, height: 51 }, style: { lineHeight: 1.82 } } }),
+      'our-story-signoff': storyText('our-story-signoff', 'With love, Isabella & Julian', { x: 24, y: 499.87, width: 342, height: 36 },
+        { fontFamily: 'Allura', fontSize: 28, color: '#626753', lineHeight: 1.05, letterSpacing: 0 },
+        { ipad: { frame: { x: 56, y: 549.79, width: 280.27 }, style: { fontSize: 25 } }, desktop: { frame: { x: 84, y: 592.08, width: 457.91 }, style: { fontSize: 25 } } }),
+      'our-story-photo': {
+        id: 'our-story-photo', sectionId: 'our-story', type: 'image', assetId: 'our-story-photo', assetKind: 'template', alt: 'Couple sharing a warm moment',
+        frame: { x: 27.3, y: 569.27, width: 335.4, height: 419.24 }, rotation: 0, opacity: 1,
+        crop: { flipX: false, flipY: false, fit: 'cover', focalX: 50, focalY: 50, zoom: 1 },
+        responsive: { strategy: 'scale', anchorX: 'center', overrides: {
+          ipad: { frame: { x: 386.27, y: 132.02, width: 320, height: 400 } },
+          desktop: { frame: { x: 646, y: 108, width: 470, height: 587.5 } }
+        } },
+        permissions: { ...permissions }
+      },
+      'our-story-border-top': storyDivider('our-story-border-top', { x: 27.3, y: 569.27, width: 335.4, height: 1 }, '#D2CEC5', 1,
+        { ipad: { frame: { x: 386.27, y: 132.02, width: 320 } }, desktop: { frame: { x: 646, y: 108, width: 470 } } }),
+      'our-story-border-right': storyDivider('our-story-border-right', { x: 361.7, y: 569.27, width: 1, height: 419.24 }, '#D2CEC5', 1,
+        { ipad: { frame: { x: 705.27, y: 132.02, height: 400 } }, desktop: { frame: { x: 1115, y: 108, height: 587.5 } } }),
+      'our-story-border-bottom': storyDivider('our-story-border-bottom', { x: 27.3, y: 987.51, width: 335.4, height: 1 }, '#D2CEC5', 1,
+        { ipad: { frame: { x: 386.27, y: 531.02, width: 320 } }, desktop: { frame: { x: 646, y: 694.5, width: 470 } } }),
+      'our-story-border-left': storyDivider('our-story-border-left', { x: 27.3, y: 569.27, width: 1, height: 419.24 }, '#D2CEC5', 1,
+        { ipad: { frame: { x: 386.27, y: 132.02, height: 400 } }, desktop: { frame: { x: 646, y: 108, height: 587.5 } } })
     }
   };
   const clone = () => JSON.parse(JSON.stringify(defaultDocument));
