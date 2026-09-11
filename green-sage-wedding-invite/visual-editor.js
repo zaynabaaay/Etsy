@@ -28,7 +28,7 @@
     dividerColorButton: $('dividerColorButton'), dividerColorSwatch: $('dividerColorSwatch'), addDivider: $('addDividerButton'),
     replace: $('replaceImageButton'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
     designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'),
-    templateMedia: $('templateMedia'), iconSearch: $('iconSearch'), iconLibrary: $('iconLibrary'), iconEmpty: $('iconEmpty'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'), mediaReplaceBanner: $('mediaReplaceBanner'), cancelMediaReplace: $('cancelMediaReplaceButton'),
+    templateMedia: $('templateMedia'), iconSearch: $('iconSearch'), iconDefaultHeading: $('iconDefaultHeading'), iconLibrary: $('iconLibrary'), iconEmpty: $('iconEmpty'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'), mediaReplaceBanner: $('mediaReplaceBanner'), cancelMediaReplace: $('cancelMediaReplaceButton'),
     addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton'),
     closePosition: $('closePositionPanel'), positionTabs: $$('[data-position-tab]'), arrangePanel: $('positionArrangePanel'), layersPanel: $('positionLayersPanel'), layersList: $('layersList'), positionHelp: $('positionSelectionHelp')
   };
@@ -413,7 +413,9 @@
   };
   const renderIcons = () => {
     const focusedId = document.activeElement.closest('.icon-tile')?.dataset.assetId;
-    const target = replacementTarget(); const matches = model.searchTemplateIcons(ui.iconSearch.value); ui.iconLibrary.replaceChildren();
+    const target = replacementTarget(); const query = ui.iconSearch.value.trim();
+    const matches = query ? model.searchTemplateIcons(query) : model.getUsedTemplateIcons(state);
+    ui.iconDefaultHeading.hidden = Boolean(query); ui.iconLibrary.replaceChildren();
     matches.forEach((asset) => {
       const item = document.createElement('article'); item.setAttribute('role', 'listitem');
       const tile = document.createElement('button'); tile.type = 'button'; tile.className = 'icon-tile'; tile.dataset.assetId = asset.id; tile.dataset.iconAction = target ? 'replace' : 'insert';
@@ -424,6 +426,7 @@
       tile.append(preview, name); item.append(tile); ui.iconLibrary.append(item);
       if (asset.id === focusedId) tile.focus({ preventScroll: true });
     });
+    ui.iconEmpty.textContent = query ? 'No icons found' : 'No icons used yet';
     ui.iconEmpty.hidden = matches.length > 0;
   };
   const uploadUsage = () => {

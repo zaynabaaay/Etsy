@@ -106,6 +106,21 @@
     if (!needle) return [...ICON_ASSETS];
     return ICON_ASSETS.filter((asset) => normalizeSearchText([asset.name, asset.sourceName, ...asset.keywords].join(' ')).includes(needle));
   };
+  const getUsedTemplateIcons = (authoredState) => {
+    const used = [];
+    const seen = new Set();
+    (authoredState?.document?.sectionOrder || []).forEach((sectionId) => {
+      (authoredState?.sections?.[sectionId]?.elementOrder || []).forEach((elementId) => {
+        const element = authoredState?.elements?.[elementId];
+        if (element?.assetKind !== 'template' || !element.assetId || seen.has(element.assetId)) return;
+        const asset = TEMPLATE_ASSET_BY_ID[element.assetId];
+        if (asset?.collection !== 'icons') return;
+        seen.add(asset.id);
+        used.push(asset);
+      });
+    });
+    return used;
+  };
   const SECTION_HEIGHT_PRESETS = Object.freeze({ strip: 280, standard: 620, full: 844 });
   const ALIGNMENTS = Object.freeze(['left', 'center', 'right']);
   const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -481,7 +496,7 @@
   globalThis.GreenSageVisualDocument = Object.freeze({
     schemaVersion: SCHEMA_VERSION, fontCatalog: FONT_CATALOG,
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
-    templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, templateIcons: ICON_ASSETS, searchTemplateIcons, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
+    templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, templateIcons: ICON_ASSETS, searchTemplateIcons, getUsedTemplateIcons, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
     getCanvasMetrics, getDefaultElementPlacement,
     getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createDividerElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, removeResponsiveProperty, resetResponsiveTarget, resetResponsiveView, hasResponsiveOverrides
   });

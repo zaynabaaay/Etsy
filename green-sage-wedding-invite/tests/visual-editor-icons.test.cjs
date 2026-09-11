@@ -35,8 +35,10 @@ test('Media exposes a searchable Icons collection with a compact touch-safe grid
   const panel = between(html, 'data-panel-view="media"', 'data-panel-view="text"');
   assert.match(panel, /id="iconsMediaHeading">Icons<\/h2>/);
   assert.match(panel, /id="iconSearch"[^>]*type="search"[^>]*placeholder="Search icons"/);
+  assert.match(panel, /id="iconDefaultHeading">Used in this design/);
   assert.match(panel, /id="iconLibrary"/);
-  assert.match(panel, /id="iconEmpty"[^>]*hidden>No icons found/);
+  assert.match(panel, /id="iconEmpty"[^>]*hidden>No icons used yet/);
+  assert.match(styles, /\.icon-context-heading \{/);
   assert.match(styles, /\.icon-grid \{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(styles, /\.icon-tile \{[^}]*min-height:70px/);
   assert.doesNotMatch(panel, /icon categor|icon filter/i);
@@ -70,9 +72,62 @@ test('icon search is case-insensitive and includes friendly invitation synonyms'
   assert.deepEqual(names('does not exist'), []);
 });
 
+test('empty-query icon selection derives used library assets in first document occurrence order', () => {
+  const authored = template.cloneDefault();
+  assert.deepEqual(plain(model.getUsedTemplateIcons(authored).map((asset) => asset.id)), [
+    'details-icon-dress-code', 'details-icon-parking', 'details-icon-adults-only',
+    'details-icon-accommodation', 'details-icon-transportation', 'details-icon-gifts'
+  ]);
+
+  authored.elements['opening-train'] = { ...authored.elements['details-transportation-icon'], id: 'opening-train', sectionId: 'opening', assetId: 'icon-tabler-train' };
+  authored.sections.opening.elementOrder.push('opening-train');
+  authored.elements['ceremony-heart'] = { ...authored.elements['details-transportation-icon'], id: 'ceremony-heart', sectionId: 'ceremony', assetId: 'icon-tabler-heart' };
+  authored.sections.ceremony.elementOrder.push('ceremony-heart');
+  authored.elements['details-train-repeat'] = { ...authored.elements['opening-train'], id: 'details-train-repeat', sectionId: 'details' };
+  authored.sections.details.elementOrder.push('details-train-repeat');
+
+  assert.deepEqual(plain(model.getUsedTemplateIcons(authored).map((asset) => asset.id)), [
+    'icon-tabler-train', 'icon-tabler-heart',
+    'details-icon-dress-code', 'details-icon-parking', 'details-icon-adults-only',
+    'details-icon-accommodation', 'details-icon-transportation', 'details-icon-gifts'
+  ]);
+});
+
+test('used icon selection updates after add and only removes the final document instance', () => {
+  const authored = template.cloneDefault();
+  const icon = { ...authored.elements['details-transportation-icon'], assetId: 'icon-tabler-train' };
+  authored.elements['opening-train'] = { ...icon, id: 'opening-train', sectionId: 'opening' };
+  authored.elements['ceremony-train'] = { ...icon, id: 'ceremony-train', sectionId: 'ceremony' };
+  authored.sections.opening.elementOrder.push('opening-train');
+  authored.sections.ceremony.elementOrder.push('ceremony-train');
+  assert.ok(model.getUsedTemplateIcons(authored).some((asset) => asset.id === 'icon-tabler-train'));
+
+  delete authored.elements['opening-train'];
+  authored.sections.opening.elementOrder = authored.sections.opening.elementOrder.filter((id) => id !== 'opening-train');
+  assert.ok(model.getUsedTemplateIcons(authored).some((asset) => asset.id === 'icon-tabler-train'));
+
+  delete authored.elements['ceremony-train'];
+  authored.sections.ceremony.elementOrder = authored.sections.ceremony.elementOrder.filter((id) => id !== 'ceremony-train');
+  assert.ok(!model.getUsedTemplateIcons(authored).some((asset) => asset.id === 'icon-tabler-train'));
+});
+
+test('used icon selection ignores non-library assets and supports an empty document', () => {
+  const authored = template.cloneDefault();
+  Object.values(authored.sections).forEach((section) => {
+    section.elementOrder = section.elementOrder.filter((id) => model.getTemplateAsset(authored.elements[id]?.assetId)?.collection !== 'icons');
+  });
+  Object.keys(authored.elements).forEach((id) => {
+    if (model.getTemplateAsset(authored.elements[id]?.assetId)?.collection === 'icons') delete authored.elements[id];
+  });
+  assert.deepEqual(plain(model.getUsedTemplateIcons(authored)), []);
+});
+
 test('Icons renderer searches immediately and routes Add through the existing decorative insertion path', () => {
   const renderer = between(source, 'const renderIcons = () => {', 'const uploadUsage = () => {');
-  assert.match(renderer, /model\.searchTemplateIcons\(ui\.iconSearch\.value\)/);
+  assert.match(renderer, /const query = ui\.iconSearch\.value\.trim\(\)/);
+  assert.match(renderer, /query \? model\.searchTemplateIcons\(query\) : model\.getUsedTemplateIcons\(state\)/);
+  assert.match(renderer, /ui\.iconDefaultHeading\.hidden = Boolean\(query\)/);
+  assert.match(renderer, /query \? 'No icons found' : 'No icons used yet'/);
   assert.match(renderer, /target \? 'replace' : 'insert'/);
   assert.match(renderer, /ui\.iconEmpty\.hidden = matches\.length > 0/);
   assert.match(source, /ui\.iconSearch\.addEventListener\('input', renderIcons\)/);
@@ -84,6 +139,15 @@ test('Icons renderer searches immediately and routes Add through the existing de
   const frame = model.getDefaultElementPlacement({ type: 'decorative', view: 'mobile', section: state.sections.opening, assetMetadata: asset, baseFrame: { x: 65, y: 410, width: 260, height: 220 } });
   const created = model.createImageElement({ sectionId: 'opening', type: 'decorative', assetId: asset.id, assetKind: 'template', frame, crop: { fit: 'contain' } });
   assert.deepEqual(plain({ type: created.type, assetId: created.assetId, assetKind: created.assetKind, fit: created.crop.fit }), { type: 'decorative', assetId: 'icon-tabler-heart', assetKind: 'template', fit: 'contain' });
+});
+
+test('search reaches the full library and clearing it returns to the contextual used-icons path in Replace mode too', () => {
+  assert.ok(model.searchTemplateIcons('train').some((asset) => asset.id === 'icon-tabler-train'));
+  assert.ok(!model.getUsedTemplateIcons(template.cloneDefault()).some((asset) => asset.id === 'icon-tabler-train'));
+  const renderer = between(source, 'const renderIcons = () => {', 'const uploadUsage = () => {');
+  assert.match(renderer, /const target = replacementTarget\(\)/);
+  assert.match(renderer, /query \? model\.searchTemplateIcons\(query\) : model\.getUsedTemplateIcons\(state\)/);
+  assert.match(renderer, /tile\.dataset\.iconAction = target \? 'replace' : 'insert'/);
 });
 
 test('Icons participate in existing Replace and recolorable SVG behavior without icon-specific state', () => {

@@ -66,6 +66,7 @@ button:disabled,.is-disabled { cursor:not-allowed; opacity:.42; }
 .asset-card.is-selected { border-color:var(--sage); box-shadow:0 0 0 2px rgba(116,121,99,.14); }
 .icon-search { display:block; margin-bottom:10px; }
 .icon-search input { width:100%; min-height:42px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; color:var(--ink); background:#fff; font:inherit; font-size:11px; }
+.icon-context-heading { margin:0 0 9px; color:var(--muted); font-size:9px; font-weight:600; letter-spacing:.02em; }
 .icon-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
 .icon-grid > article { min-width:0; }
 .icon-tile { display:grid; width:100%; min-height:70px; place-items:center; align-content:center; gap:7px; padding:8px 4px; border:1px solid var(--line); border-radius:8px; color:var(--ink); background:#fff; text-align:center; }
