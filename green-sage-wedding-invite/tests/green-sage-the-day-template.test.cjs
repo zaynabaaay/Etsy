@@ -18,12 +18,12 @@ const textIds = ['the-day-label', ...Array.from({ length: 5 }, (_, index) => `th
 const dividerIds = Array.from({ length: 4 }, (_, index) => `the-day-divider-${index + 1}`);
 const allIds = [...textIds, ...dividerIds];
 const previousMobileY = {
-  'the-day-label': 80,
-  'the-day-time-1': 144, 'the-day-event-1': 135,
-  'the-day-time-2': 194.25, 'the-day-event-2': 185.25,
-  'the-day-time-3': 244.5, 'the-day-event-3': 235.5,
-  'the-day-time-4': 294.75, 'the-day-event-4': 285.75,
-  'the-day-time-5': 345, 'the-day-event-5': 336
+  'the-day-label': 120,
+  'the-day-time-1': 184, 'the-day-event-1': 175,
+  'the-day-time-2': 234.25, 'the-day-event-2': 225.25,
+  'the-day-time-3': 284.5, 'the-day-event-3': 275.5,
+  'the-day-time-4': 334.75, 'the-day-event-4': 325.75,
+  'the-day-time-5': 385, 'the-day-event-5': 376
 };
 const storage = () => {
   const values = new Map();
@@ -54,19 +54,19 @@ test('The Day elementOrder contains every authored element exactly once', () => 
 test('Mobile resolves the measured stacked schedule with hidden dividers', () => {
   const mobile = model.resolveDocument(authored, 'mobile');
   assert.equal(mobile.sections['the-day'].height, 450.25);
-  assert.deepEqual(plain(mobile.elements['the-day-label'].frame), { x: 24, y: 120, width: 342, height: 32 });
-  assert.deepEqual(plain(mobile.elements['the-day-time-1'].frame), { x: 24, y: 184, width: 82, height: 32 });
-  assert.deepEqual(plain(mobile.elements['the-day-event-5'].frame), { x: 130, y: 376, width: 236, height: 32 });
+  assert.deepEqual(plain(mobile.elements['the-day-label'].frame), { x: 24, y: 96, width: 342, height: 32 });
+  assert.deepEqual(plain(mobile.elements['the-day-time-1'].frame), { x: 24, y: 160, width: 82, height: 32 });
+  assert.deepEqual(plain(mobile.elements['the-day-event-5'].frame), { x: 130, y: 352, width: 236, height: 32 });
   dividerIds.forEach((id) => assert.equal(mobile.elements[id].visible, false));
 });
 
-test('every Mobile The Day text frame moves down uniformly by 40px', () => {
+test('every Mobile The Day text frame moves up uniformly by 24px', () => {
   const mobile = model.resolveDocument(authored, 'mobile');
   textIds.forEach((id) => {
-    assert.equal(mobile.elements[id].frame.y - previousMobileY[id], 40, id);
+    assert.equal(mobile.elements[id].frame.y - previousMobileY[id], -24, id);
   });
-  assert.equal(Math.max(...textIds.map((id) => mobile.elements[id].frame.y + mobile.elements[id].frame.height)), 417);
-  assert.ok(417 < mobile.sections['the-day'].height);
+  assert.equal(Math.max(...textIds.map((id) => mobile.elements[id].frame.y + mobile.elements[id].frame.height)), 393);
+  assert.equal(mobile.sections['the-day'].height - 393, 57.25);
 });
 
 test('Mobile label, row, and time-to-event spacing remains unchanged', () => {
