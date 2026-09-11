@@ -42,6 +42,30 @@ test('Green Sage authored colors use the reconciled restrained palette', () => {
   });
 });
 
+test('Opening fallback reuses the primary ivory without adding a redundant Document Color', () => {
+  assert.equal(
+    digest(fs.readFileSync(path.join(root, 'invitation-assets/green-sage-opening-background.jpg'))),
+    '08f15870be58403ee5093b2a1ea170bf35e657c2f9fffbde285407535d81dfff'
+  );
+  assert.equal(authored.sections.opening.background.color, '#F4EFE7');
+
+  const normalized = model.normalize(authored);
+  assert.deepEqual(plain(normalized.document.colors), ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051']);
+  assert.equal(normalized.document.colors.includes('#ECE6DF'), false);
+});
+
+test('palette reconciliation preserves custom colors and recolorable SVG color aggregation', () => {
+  const customized = model.clone(authored);
+  customized.document.colors.push('#123ABC');
+  customized.elements['ceremony-glasshouse'].svgColor = '#ABCDEF';
+
+  const normalized = model.normalize(customized);
+  assert.ok(normalized.document.colors.includes('#123ABC'));
+  assert.ok(normalized.document.colors.includes('#ABCDEF'));
+  assert.equal(normalized.elements['ceremony-glasshouse'].svgColor, '#ABCDEF');
+  assert.equal(model.getTemplateAsset('venue-glasshouse').recolorable, true);
+});
+
 test('authored geometry retains the approved sections plus the redesigned Details layout', () => {
   const geometry = {
     order: authored.document.sectionOrder,

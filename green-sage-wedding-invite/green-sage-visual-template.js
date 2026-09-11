@@ -65,7 +65,7 @@
     sections: {
       opening: {
         id: 'opening', name: 'Opening', height: 844, heightPreset: 'full',
-        background: { kind: 'image', color: '#ECE6DF', assetId: 'background-green-sage-opening', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+        background: { kind: 'image', color: '#F4EFE7', assetId: 'background-green-sage-opening', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
         elementOrder: ['opening-intro-1', 'opening-intro-2', 'opening-isabella', 'opening-and', 'opening-julian', 'opening-date', 'opening-location', 'opening-scroll'],
         responsive: { overrides: { ipad: { height: 1024 }, desktop: { height: 1000 } } }
       },

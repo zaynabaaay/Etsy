@@ -48,7 +48,7 @@ test('Opening uses the exact registered live background with inherited crop', ()
   });
   assert.ok(fs.existsSync(path.join(__dirname, '..', 'invitation-assets/green-sage-opening-background.jpg')));
   assert.deepEqual(plain(authored.sections.opening.background), {
-    kind: 'image', color: '#ECE6DF', assetId: 'background-green-sage-opening', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1
+    kind: 'image', color: '#F4EFE7', assetId: 'background-green-sage-opening', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1
   });
   assert.equal(authored.sections.opening.responsive.overrides.ipad.background, undefined);
   assert.equal(authored.sections.opening.responsive.overrides.desktop.background, undefined);
