@@ -178,7 +178,7 @@
   };
 
   const closePopovers = (except = null, options = {}) => {
-    const returnFocus = options.restoreFocus && openPopover?.popover === ui.mediaActionPopover ? openPopover.trigger : null;
+    const returnFocus = options.restoreFocus ? openPopover?.trigger : null;
     popovers.forEach((popover) => { if (popover !== except) popover.hidden = true; });
     if (openPopover && openPopover.popover !== except) { openPopover.trigger.setAttribute('aria-expanded', 'false'); openPopover = null; }
     if (except !== ui.mediaActionPopover) mediaMenu = null;
@@ -741,7 +741,6 @@
   ui.alignPopover.addEventListener('click', (event) => { const button = event.target.closest('[data-align]'); const source = effectiveElement(); if (!button || !source) return; mutate('Change text alignment', (next) => { writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.textAlign', value: button.dataset.align, scope: 'responsive' }); }); closePopovers(); });
   ui.spacingButton.addEventListener('click', () => togglePopover(ui.spacingPopover, ui.spacingButton));
   $$('[data-open-position]').forEach((button) => button.addEventListener('click', openPositionPanel));
-  $$('[data-open-more]').forEach((button) => button.addEventListener('click', () => togglePopover(ui.morePopover, button)));
   ui.arrangePanel.addEventListener('click', (event) => { const layer = event.target.closest('[data-layer]'); const x = event.target.closest('[data-position-x]'); const y = event.target.closest('[data-position-y]'); if (layer) layerElement(layer.dataset.layer); if (x) alignElement('x', x.dataset.positionX); if (y) alignElement('y', y.dataset.positionY); });
   bindTransactionalInput(ui.opacity, 'Change opacity', (next, value) => { const source = element(); if (source) next.elements[source.id].opacity = Number(value); });
   bindTransactionalInput(ui.rotation, 'Rotate element', (next, value) => { const source = element(); if (source) next.elements[source.id].rotation = Number(value); });
@@ -859,7 +858,13 @@
         if (!values.every(Number.isFinite)) return;
         const [left, right, top, bottom, width, height] = values;
         const rect = { left: frame.left + left, right: frame.left + right, top: frame.top + top, bottom: frame.top + bottom, width, height, x: frame.left + left, y: frame.top + top, toJSON() { return this; } };
-        togglePopover(ui.morePopover, { getBoundingClientRect: () => rect, setAttribute() {} });
+        const trigger = {
+          getBoundingClientRect: () => rect,
+          setAttribute: (name, value) => { if (name === 'aria-expanded') ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:object-action-expanded', action: 'more', expanded: value === 'true' }, ORIGIN); },
+          get isConnected() { return true; },
+          focus: () => ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:focus-object-action', action: 'more' }, ORIGIN),
+        };
+        togglePopover(ui.morePopover, trigger);
       }
       return;
     }
@@ -897,9 +902,9 @@
   window.visualViewport?.addEventListener('resize', syncEditingViewport);
   window.visualViewport?.addEventListener('scroll', syncEditingViewport);
 
-  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.toolbar-popover, .compact-popover, .toolbar-popover-anchor, [data-open-position], [data-open-more], .media-manage')) closePopovers(); });
+  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.toolbar-popover, .compact-popover, .toolbar-popover-anchor, [data-open-position], .media-manage')) closePopovers(); });
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && openPopover?.popover === ui.mediaActionPopover) { event.preventDefault(); closePopovers(null, { restoreFocus: true }); return; }
+    if (event.key === 'Escape' && openPopover) { event.preventDefault(); closePopovers(null, { restoreFocus: true }); return; }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') { event.preventDefault(); applyHistory(event.shiftKey ? 'redo' : 'undo'); }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'y') { event.preventDefault(); applyHistory('redo'); }
     if ((event.key === 'Delete' || event.key === 'Backspace') && !event.target.closest('input, textarea, [contenteditable="true"]') && element()) { event.preventDefault(); deleteElement(); }

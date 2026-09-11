@@ -102,7 +102,7 @@ test('opening another Media menu closes the first without changing card structur
 test('Media popover closes for outside click, Escape, navigation, and panel scroll', () => {
   assert.match(source, /ui\.panel\.addEventListener\('scroll'.*mediaActionPopover.*closePopovers/);
   assert.match(source, /if \(name !== activePanel\) closePopovers\(\)/);
-  assert.match(source, /event\.key === 'Escape'.*mediaActionPopover.*restoreFocus: true/);
+  assert.match(source, /event\.key === 'Escape' && openPopover.*restoreFocus: true/);
   assert.match(source, /document\.addEventListener\('pointerdown'.*\.media-manage.*closePopovers/);
   const close = between(source, 'const closePopovers = (except = null, options = {}) => {', 'const positionOpenPopover');
   assert.match(close, /returnFocus\?\.isConnected.*focus\(\{ preventScroll: true \}\)/);

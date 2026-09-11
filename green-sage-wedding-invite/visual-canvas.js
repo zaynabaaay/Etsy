@@ -30,6 +30,8 @@
   const quickDuplicate = quickActionButton('duplicate', 'copy', 'Duplicate');
   const quickDelete = quickActionButton('delete', 'trash2', 'Delete');
   const quickMore = quickActionButton('more', 'ellipsis', 'More');
+  quickMore.setAttribute('aria-haspopup', 'dialog');
+  quickMore.setAttribute('aria-expanded', 'false');
   document.body.append(quickActions);
   const recoveryHandles = document.createElement('div');
   recoveryHandles.className = 'recovery-resize-handles';
@@ -545,6 +547,8 @@
     }
     if (event.data.type === 'green-sage-visual:scroll-by') window.scrollBy({ top: Number(event.data.deltaY) || 0, behavior: 'auto' });
     if (event.data.type === 'green-sage-visual:editing-viewport') keepEditingElementVisible(event.data.viewport);
+    if (event.data.type === 'green-sage-visual:object-action-expanded' && event.data.action === 'more') quickMore.setAttribute('aria-expanded', String(event.data.expanded === true));
+    if (event.data.type === 'green-sage-visual:focus-object-action' && event.data.action === 'more') quickMore.focus({ preventScroll: true });
   });
   window.addEventListener('resize', render);
   window.addEventListener('scroll', () => { positionQuickActions(); positionRecoveryHandles(); }, { passive: true });
