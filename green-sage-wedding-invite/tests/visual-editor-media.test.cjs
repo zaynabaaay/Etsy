@@ -74,7 +74,8 @@ test('Design retains solid color controls without a duplicate image-management b
 
 test('upload cards keep Add to section primary and background/delete secondary', () => {
   const renderer = between(source, 'const renderUploads = () => {', 'const deleteUpload = async');
-  assert.match(renderer, /button\('insert', 'Add to section'\)/);
+  assert.match(renderer, /target \? 'replace' : 'insert'/);
+  assert.match(renderer, /target \? 'Replace' : 'Add to section'/);
   assert.match(renderer, /aria-haspopup', 'menu'/);
   assert.doesNotMatch(renderer, /Set as background|media-management|append\(menu\)/);
   assert.match(renderer, /upload-delete-confirmation/);

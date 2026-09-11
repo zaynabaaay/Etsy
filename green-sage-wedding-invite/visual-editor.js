@@ -26,9 +26,9 @@
     bold: $('boldButton'), italic: $('italicButton'), alignButton: $('alignmentButton'), alignPopover: $('alignmentPopover'), spacingButton: $('spacingButton'), spacingPopover: $('spacingPopover'), lineHeight: $('lineHeight'), letterSpacing: $('letterSpacing'),
     morePopover: $('morePopover'), mediaActionPopover: $('mediaActionPopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), visibilityControl: $('elementVisibilityControl'), visible: $('elementVisible'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
     dividerColorButton: $('dividerColorButton'), dividerColorSwatch: $('dividerColorSwatch'), addDivider: $('addDividerButton'),
-    replace: $('replaceImageButton'), replaceInput: $('replaceImageInput'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
+    replace: $('replaceImageButton'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
     designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'),
-    templateMedia: $('templateMedia'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'),
+    templateMedia: $('templateMedia'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'), mediaReplaceBanner: $('mediaReplaceBanner'), cancelMediaReplace: $('cancelMediaReplaceButton'),
     addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton'),
     closePosition: $('closePositionPanel'), positionTabs: $$('[data-position-tab]'), arrangePanel: $('positionArrangePanel'), layersPanel: $('positionLayersPanel'), layersList: $('layersList'), positionHelp: $('positionSelectionHelp')
   };
@@ -74,6 +74,8 @@
 
   const section = () => state.sections[selectedSectionId] || null;
   const element = () => state.elements[selectedElementId] || null;
+  const isImageLike = (item) => item?.type === 'image' || item?.type === 'decorative';
+  const replacementTarget = () => { const target = state.elements[replaceTargetElementId]; return isImageLike(target) ? target : null; };
   const effectiveSection = (id = selectedSectionId, view = activeResponsiveView) => state.sections[id] ? model.resolveSection(state.sections[id], view) : null;
   const effectiveElement = (id = selectedElementId, view = activeResponsiveView) => state.elements[id] ? model.resolveElement(state.elements[id], view) : null;
   const writeAuthoredProperty = (next, options) => model.writeAuthoredProperty(next, { responsiveView: transaction?.responsiveView || activeResponsiveView, ...options });
@@ -171,7 +173,7 @@
     if (!source.length) return;
     destination.push(snapshot(direction));
     const entry = source.pop(); state = model.normalize(entry.state);
-    backgroundEditSectionId = null; imageEditElementId = null;
+    replaceTargetElementId = null; backgroundEditSectionId = null; imageEditElementId = null;
     selectedSectionId = state.sections[entry.selectedSectionId] ? entry.selectedSectionId : state.document.sectionOrder[0];
     selectedElementId = state.elements[entry.selectedElementId] ? entry.selectedElementId : null;
     updateHistory(); scheduleSave(); renderAll(); syncCanvas();
@@ -229,9 +231,17 @@
 
   const setPanel = (name) => {
     if (name !== activePanel) closePopovers();
+    const cancelledReplacement = Boolean(replaceTargetElementId && activePanel === 'media' && name !== 'media');
+    if (cancelledReplacement) replaceTargetElementId = null;
     activePanel = name;
     $$('.nav-tool').forEach((button) => { const active = button.dataset.panel === name; button.classList.toggle('is-active', active); button.setAttribute('aria-pressed', String(active)); });
     $$('.panel-view').forEach((view) => { const active = view.dataset.panelView === name; view.hidden = !active; view.classList.toggle('is-active', active); });
+    if (cancelledReplacement) renderAll();
+  };
+  const cancelReplaceMode = (restoreFocus = false) => {
+    const targetId = replaceTargetElementId; if (!targetId) return;
+    replaceTargetElementId = null; closePopovers(); renderAll();
+    if (restoreFocus && selectedElementId === targetId) requestAnimationFrame(() => ui.replace.focus({ preventScroll: true }));
   };
   const setPositionTab = (name) => {
     activePositionTab = name === 'layers' ? 'layers' : 'arrange';
@@ -264,12 +274,12 @@
     backgroundEditSectionId = null; imageEditElementId = null;
     renderResponsiveView(); closePopovers(); renderAll(); syncCanvas();
   };
-  const selectSection = (id, sync = true) => { if (!state.sections[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
-  const selectElement = (id, sync = true) => { if (!state.elements[id]) return; backgroundEditSectionId = null; imageEditElementId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
+  const selectSection = (id, sync = true) => { if (!state.sections[id]) return; replaceTargetElementId = null; backgroundEditSectionId = null; imageEditElementId = null; selectedSectionId = id; selectedElementId = null; closePopovers(); renderAll(); if (sync) syncCanvas(); };
+  const selectElement = (id, sync = true) => { if (!state.elements[id]) return; if (replaceTargetElementId !== id) replaceTargetElementId = null; backgroundEditSectionId = null; imageEditElementId = null; selectedElementId = id; selectedSectionId = state.elements[id].sectionId; closePopovers(); renderAll(); if (sync) syncCanvas(); };
 
   const finishIncompatibleInteraction = () => {
     ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:end-interaction' }, ORIGIN);
-    finishTransaction(false); backgroundEditSectionId = null; imageEditElementId = null; closePopovers(); renderAll(); syncCanvas();
+    finishTransaction(false); replaceTargetElementId = null; backgroundEditSectionId = null; imageEditElementId = null; closePopovers(); renderAll(); syncCanvas();
   };
   const openResetViewDialog = () => {
     if (!model.hasResponsiveOverrides(state, activeResponsiveView)) { renderResetAvailability(); return; }
@@ -318,7 +328,7 @@
     ui.editImage.hidden = selected?.type !== 'image' || Boolean(imageEditElementId);
     ui.doneImage.hidden = !imageEditElementId;
     ui.imageZoomControl.hidden = !imageEditElementId;
-    ui.replace.hidden = selected?.type !== 'image'; ui.imageFit.hidden = selected?.type !== 'image';
+    ui.replace.hidden = !isImageLike(selected); ui.imageFit.hidden = selected?.type !== 'image';
     $$('[data-open-position]', ui.imageContext).forEach(button => { button.disabled = Boolean(imageEditElementId); });
     ui.editImage.disabled = !selected?.permissions.editable || selected?.permissions.locked;
     ui.editImage.setAttribute('aria-pressed', String(Boolean(imageEditElementId)));
@@ -366,6 +376,10 @@
   };
 
   const assetUrl = (assetId, kind) => kind === 'upload' ? assetUrls[assetId] : model.getTemplateAsset(assetId)?.url;
+  const renderReplaceMode = () => {
+    const target = replacementTarget(); if (replaceTargetElementId && !target) replaceTargetElementId = null;
+    ui.mediaReplaceBanner.hidden = !target; ui.addDivider.disabled = Boolean(target);
+  };
   const renderDesign = () => {
     const current = effectiveSection(); if (!current) return;
     ui.designName.textContent = current.name; ui.sectionColor.value = current.background.color; ui.sectionColorHex.value = current.background.color.toUpperCase(); renderColorSwatches(ui.palette, current.background.kind === 'color' ? current.background.color : null);
@@ -374,15 +388,15 @@
   const renderTemplateMedia = () => {
     const focusedId = document.activeElement.closest('.media-card')?.dataset.assetId;
     const focusedAction = document.activeElement.dataset.templateMediaAction;
-    const current = effectiveSection(); ui.templateMedia.replaceChildren();
+    const current = effectiveSection(); const target = replacementTarget(); ui.templateMedia.replaceChildren();
     model.templateAssets.forEach((asset) => {
-      const selected = current?.background.kind === 'image' && current.background.assetKind === 'template' && current.background.assetId === asset.id;
+      const selected = target ? target.assetKind === 'template' && target.assetId === asset.id : current?.background.kind === 'image' && current.background.assetKind === 'template' && current.background.assetId === asset.id;
       const card = document.createElement('article'); card.className = 'asset-card media-card'; card.dataset.assetId = asset.id; card.classList.toggle('is-selected', selected);
       const thumb = document.createElement('span'); thumb.className = 'asset-thumb'; thumb.style.backgroundImage = `url("${asset.url}")`;
       const name = document.createElement('span'); name.className = 'media-card-name'; name.textContent = asset.name;
       const button = (action, label) => { const node = document.createElement('button'); node.type = 'button'; node.dataset.templateMediaAction = action; node.textContent = label; return node; };
-      const actions = document.createElement('div'); actions.className = 'media-card-actions'; actions.append(button('insert', 'Add to section')); card.append(thumb, name, actions);
-      const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-haspopup', 'menu'); manage.setAttribute('aria-controls', ui.mediaActionPopover.id); manage.setAttribute('aria-expanded', 'false'); card.append(manage);
+      const actions = document.createElement('div'); actions.className = 'media-card-actions'; const primary = button(target ? 'replace' : 'insert', target ? 'Replace' : 'Add to section'); primary.classList.toggle('is-replace', Boolean(target)); actions.append(primary); card.append(thumb, name, actions);
+      if (!target) { const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-haspopup', 'menu'); manage.setAttribute('aria-controls', ui.mediaActionPopover.id); manage.setAttribute('aria-expanded', 'false'); card.append(manage); }
       ui.templateMedia.append(card);
       if (asset.id === focusedId) card.querySelector(`[data-template-media-action="${CSS.escape(focusedAction || '')}"]`)?.focus({ preventScroll: true });
     });
@@ -397,22 +411,22 @@
   const renderUploads = () => {
     const focusedId = document.activeElement.closest('.upload-card')?.dataset.assetId;
     const focusedAction = document.activeElement.dataset.uploadAction;
-    ui.uploadLibrary.replaceChildren();
+    const target = replacementTarget(); ui.uploadLibrary.replaceChildren();
     const usage = uploadUsage(); const library = new Map(assetRecords.map(asset => [asset.id, asset]));
     // Authored references remain visible and Used even when their binary is absent.
     usage.forEach((count, id) => { if (!library.has(id)) library.set(id, { id, name: 'Image unavailable', missing: true }); });
     if (!library.size) { const empty = document.createElement('p'); empty.className = 'panel-help'; empty.textContent = 'Uploaded images will appear here.'; ui.uploadLibrary.append(empty); return; }
     library.forEach((asset) => {
       const count = usage.get(asset.id) || 0; const busy = deletingUploadId === asset.id;
-      const card = document.createElement('article'); card.className = 'upload-card'; card.dataset.assetId = asset.id;
+      const card = document.createElement('article'); card.className = 'upload-card'; card.dataset.assetId = asset.id; card.classList.toggle('is-selected', target?.assetKind === 'upload' && target.assetId === asset.id);
       if (asset.missing) { const placeholder = document.createElement('p'); placeholder.className = 'upload-unavailable'; placeholder.textContent = 'Image unavailable'; card.append(placeholder); }
       else { const image = document.createElement('img'); image.src = assetUrls[asset.id]; image.alt = ''; card.append(image); }
       const name = document.createElement('span'); name.textContent = asset.name; card.append(name);
       if (count) { const used = document.createElement('small'); used.className = 'upload-usage'; used.textContent = count === 1 ? 'Used' : `Used ${count} times`; card.append(used); }
       const button = (action, label) => { const node = document.createElement('button'); node.type = 'button'; node.dataset.uploadAction = action; node.textContent = label; node.disabled = busy; return node; };
       const actions = document.createElement('div'); actions.className = 'media-card-actions';
-      const insert = button('insert', 'Add to section'); insert.disabled = busy || Boolean(asset.missing); actions.append(insert); card.append(actions);
-      if (!asset.missing) { const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-haspopup', 'menu'); manage.setAttribute('aria-controls', ui.mediaActionPopover.id); manage.setAttribute('aria-expanded', 'false'); card.append(manage); }
+      const insert = button(target ? 'replace' : 'insert', target ? 'Replace' : 'Add to section'); insert.classList.toggle('is-replace', Boolean(target)); insert.disabled = busy || Boolean(asset.missing); actions.append(insert); card.append(actions);
+      if (!target && !asset.missing) { const manage = button('manage', '…'); manage.className = 'media-manage'; manage.setAttribute('aria-label', `More actions for ${asset.name}`); manage.setAttribute('aria-haspopup', 'menu'); manage.setAttribute('aria-controls', ui.mediaActionPopover.id); manage.setAttribute('aria-expanded', 'false'); card.append(manage); }
       if (uploadDeleteId === asset.id) {
         const confirmation = document.createElement('section'); confirmation.className = 'upload-delete-confirmation'; confirmation.setAttribute('role', 'group'); confirmation.setAttribute('aria-label', 'Delete upload confirmation');
         const message = document.createElement('p'); message.textContent = count ? `This image is used in ${count} ${count === 1 ? 'place' : 'places'}. Deleting it will make those images unavailable.` : 'Delete this upload?';
@@ -483,7 +497,7 @@
     ui.positionHelp.hidden = Boolean(selected);
   };
 
-  const renderAll = () => { renderContext(); renderDesign(); renderTemplateMedia(); renderUploads(); renderSections(); renderLayers(); renderResetAvailability(); };
+  const renderAll = () => { renderContext(); renderDesign(); renderReplaceMode(); renderTemplateMedia(); renderUploads(); renderSections(); renderLayers(); renderResetAvailability(); };
   const refreshAssets = async () => {
     const storedRecords = await assets.list(); const nextRecords = []; const nextUrls = {}; const nextObjectUrls = [];
     try {
@@ -531,6 +545,7 @@
   };
 
   const addDivider = () => {
+    if (replacementTarget()) return;
     const current = section(); if (!current) return;
     const presetFrame = { x: 115, y: 0, width: 160, height: 2 };
     const baseFrame = model.getDefaultElementPlacement({ type: 'divider', view: 'mobile', section: current, baseFrame: presetFrame, safeMargin: state.document.canvas.safeMargin });
@@ -647,12 +662,20 @@
   const selectBackground = (sectionId, sync = true) => {
     const current = state.sections[sectionId];
     if (current?.background.kind !== 'image') return;
-    finishTransaction(false); selectedSectionId = sectionId; selectedElementId = null; imageEditElementId = null; backgroundEditSectionId = sectionId;
+    finishTransaction(false); replaceTargetElementId = null; selectedSectionId = sectionId; selectedElementId = null; imageEditElementId = null; backgroundEditSectionId = sectionId;
     closePopovers(); renderAll(); if (sync) syncCanvas();
   };
   const applyBackgroundAsset = (assetId, assetKind) => {
     backgroundEditSectionId = null; imageEditElementId = null;
     mutate('Change section background', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'image', assetId, assetKind, fit: 'cover', focalX: 50, focalY: 50, zoom: 1 }); });
+  };
+  const replaceElementAsset = (assetId, assetKind) => {
+    const target = replacementTarget(); if (!target) return false;
+    const targetId = target.id; const sectionId = target.sectionId;
+    replaceTargetElementId = null; uploadDeleteId = null; closePopovers();
+    // Asset identity is global; frame/crop/responsive/layer properties remain on this element slot.
+    mutate('Replace image', (next) => { next.elements[targetId].assetId = assetId; next.elements[targetId].assetKind = assetKind; }, { sectionId, elementId: targetId });
+    requestAnimationFrame(() => ui.replace.focus({ preventScroll: true })); return true;
   };
   const setSectionHeightPreset = (preset) => {
     const current = effectiveSection(); if (!current) return;
@@ -764,17 +787,11 @@
   ui.imageFit.addEventListener('click', () => { const source = effectiveElement(); if (source) mutate('Change image fit', (next) => { writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'crop.fit', value: source.crop.fit === 'cover' ? 'contain' : 'cover', scope: 'responsive' }); }); });
   ui.replace.addEventListener('click', () => {
     const source = element();
-    replaceTargetElementId = source?.type === 'image' ? source.id : null;
-    if (replaceTargetElementId) ui.replaceInput.click();
+    if (!isImageLike(source) || source.permissions.locked || !source.permissions.editable) return;
+    finishTransaction(false); backgroundEditSectionId = null; imageEditElementId = null; replaceTargetElementId = source.id; closePopovers(); setPanel('media'); renderAll(); syncCanvas();
+    requestAnimationFrame(() => ui.cancelMediaReplace.focus({ preventScroll: true }));
   });
-  ui.replaceInput.addEventListener('change', async () => {
-    const targetId = replaceTargetElementId; const files = [...ui.replaceInput.files]; replaceTargetElementId = null; ui.replaceInput.value = '';
-    if (!targetId || !files.length) return;
-    const [added] = await uploadFiles(files); const target = state.elements[targetId];
-    if (!added || target?.type !== 'image') return;
-    // Preserve fit, focal position, zoom and flips alongside the existing frame/layout.
-    mutate('Replace image', (next) => { next.elements[targetId].assetId = added.id; next.elements[targetId].assetKind = 'upload'; });
-  });
+  ui.cancelMediaReplace.addEventListener('click', () => cancelReplaceMode(true));
 
   ui.palette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); if (!swatch) return; mutate('Change section color', (next) => { Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color: rememberColor(next, swatch.dataset.color), assetId: '' }); }); });
   bindTransactionalInput(ui.sectionColor, 'Change section color', (next, value) => { const color = rememberColor(next, value); if (color) Object.assign(next.sections[selectedSectionId].background, { kind: 'color', color, assetId: '' }); });
@@ -794,6 +811,7 @@
     const asset = model.getTemplateAsset(card.dataset.assetId); if (!asset) return;
     switch (action.dataset.templateMediaAction) {
       case 'insert': addImage(asset.id, 'template', asset.kind === 'decorative' ? 'decorative' : 'image'); break;
+      case 'replace': replaceElementAsset(asset.id, 'template'); break;
       case 'manage': uploadDeleteId = null; openMediaActionPopover(action, 'template', asset.id, asset.name); break;
       default: break;
     }
@@ -805,6 +823,7 @@
     if (!card || !action) return;
     switch (action.dataset.uploadAction) {
       case 'insert': addImage(card.dataset.assetId); break;
+      case 'replace': replaceElementAsset(card.dataset.assetId, 'upload'); break;
       case 'manage': uploadDeleteId = null; openMediaActionPopover(action, 'upload', card.dataset.assetId, card.querySelector(':scope > span')?.textContent || 'upload'); break;
       case 'cancel-delete': uploadDeleteId = null; renderUploads(); break;
       case 'confirm-delete': if (uploadDeleteId === card.dataset.assetId) void deleteUpload(uploadDeleteId, true); break;
@@ -904,6 +923,7 @@
 
   document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.toolbar-popover, .compact-popover, .toolbar-popover-anchor, [data-open-position], .media-manage')) closePopovers(); });
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && replaceTargetElementId) { event.preventDefault(); cancelReplaceMode(true); return; }
     if (event.key === 'Escape' && openPopover) { event.preventDefault(); closePopovers(null, { restoreFocus: true }); return; }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') { event.preventDefault(); applyHistory(event.shiftKey ? 'redo' : 'undo'); }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'y') { event.preventDefault(); applyHistory('redo'); }

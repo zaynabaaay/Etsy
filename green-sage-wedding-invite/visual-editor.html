@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;1,400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="visual-editor.css?v=20260910-background-direct">
+  <link rel="stylesheet" href="visual-editor.css?v=20260910-element-replace">
 </head>
 <body>
   <main class="storiel-editor" id="storielEditor">
@@ -48,6 +48,7 @@
 
       <section class="panel-view" data-panel-view="media" hidden>
         <div class="panel-heading"><div><p>Media</p><h1>Images and accents</h1></div></div>
+        <div class="media-replace-banner" id="mediaReplaceBanner" role="status" hidden><div><strong>Replacing selected image</strong><span>Choose media below to swap it in place.</span></div><button type="button" id="cancelMediaReplaceButton">Cancel</button></div>
         <section class="media-group" aria-labelledby="includedMediaHeading"><h2 id="includedMediaHeading">Included with template</h2><div class="asset-grid" id="templateMedia"></div></section>
         <section class="media-group panel-block" aria-labelledby="basicMediaHeading"><h2 id="basicMediaHeading">Basic</h2><button class="secondary-button element-add-divider" id="addDividerButton" type="button"><span>Divider</span><small>Add to section</small></button></section>
         <section class="media-group panel-block" aria-labelledby="uploadsMediaHeading"><h2 id="uploadsMediaHeading">Your uploads</h2><label class="upload-button" for="uploadInput">Upload images</label><input id="uploadInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" multiple hidden><p class="upload-status" id="uploadStatus">JPG, PNG, WebP, GIF, or SVG up to 12 MB.</p><div class="upload-grid" id="uploadLibrary"></div></section>
@@ -106,7 +107,6 @@
     <section class="storiel-workspace" id="workspace" aria-label="Invitation editing workspace">
       <div class="preview-frame canvas-view-mobile" id="previewFrame"><iframe id="visualCanvas" src="visual-canvas.html?editor=1&amp;v=20260910-keyboard-visibility" title="Editable invitation canvas"></iframe></div>
     </section>
-    <input id="replaceImageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden>
   </main>
   <dialog class="view-reset-dialog" id="resetViewDialog" aria-labelledby="resetViewTitle" aria-describedby="resetViewDescription">
     <form method="dialog">
@@ -122,6 +122,6 @@
   <script src="green-sage-visual-template.js?v=20260909-green-sage-assets"></script>
   <script src="visual-template-loader.js?v=20260907-template-boundary"></script>
   <script src="visual-assets.js?v=20260902-section2"></script>
-  <script src="visual-editor.js?v=20260910-single-more"></script>
+  <script src="visual-editor.js?v=20260910-element-replace"></script>
 </body>
 </html>
