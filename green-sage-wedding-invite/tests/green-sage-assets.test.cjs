@@ -14,23 +14,17 @@ const model = context.GreenSageVisualDocument;
 const authored = model.normalize(context.GreenSageVisualTemplate.cloneDefault());
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
-const expectedAssets = [
+const expectedIncludedAssets = [
   { id: 'background-green-sage-opening', name: 'Green Sage Opening', kind: 'background', url: 'invitation-assets/green-sage-opening-background.jpg', width: 853, height: 1280 },
   { id: 'venue-glasshouse', name: 'Glasshouse', kind: 'decorative', url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876, recolorable: true, defaultColor: '#605D42' },
   { id: 'venue-mansion', name: 'Mansion', kind: 'decorative', url: 'invitation-assets/venue-mansion.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#8C887C' },
   { id: 'venue-pergola', name: 'Pergola', kind: 'decorative', url: 'invitation-assets/venue-pergola.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#827D6A' },
-  { id: 'venue-barn', name: 'Barn', kind: 'decorative', url: 'invitation-assets/venue-barn.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#888273' },
-  { id: 'details-icon-dress-code', name: 'Dress Code Icon', kind: 'decorative', url: 'invitation-assets/details-icon-dress-code.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' },
-  { id: 'details-icon-parking', name: 'Parking Icon', kind: 'decorative', url: 'invitation-assets/details-icon-parking.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' },
-  { id: 'details-icon-adults-only', name: 'Adults Only Icon', kind: 'decorative', url: 'invitation-assets/details-icon-adults-only.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' },
-  { id: 'details-icon-accommodation', name: 'Accommodation Icon', kind: 'decorative', url: 'invitation-assets/details-icon-accommodation.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' },
-  { id: 'details-icon-transportation', name: 'Transportation Icon', kind: 'decorative', url: 'invitation-assets/details-icon-transportation.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' },
-  { id: 'details-icon-gifts', name: 'Gifts Icon', kind: 'decorative', url: 'invitation-assets/details-icon-gifts.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }
+  { id: 'venue-barn', name: 'Barn', kind: 'decorative', url: 'invitation-assets/venue-barn.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#888273' }
 ];
 
-test('supplied catalog contains exactly the new Green Sage assets', () => {
-  assert.deepEqual(plain(model.templateAssets), expectedAssets);
-  expectedAssets.forEach((asset) => assert.ok(fs.existsSync(path.join(root, asset.url)), `missing ${asset.url}`));
+test('Included with template contains exactly the Green Sage-specific supplied assets', () => {
+  assert.deepEqual(plain(model.templateAssets.filter((asset) => asset.collection !== 'icons')), expectedIncludedAssets);
+  model.templateAssets.forEach((asset) => assert.ok(fs.existsSync(path.join(root, asset.url)), `missing ${asset.url}`));
 });
 
 test('obsolete supplied assets are absent and no authored template reference is broken', () => {
@@ -47,7 +41,7 @@ test('obsolete supplied assets are absent and no authored template reference is 
 });
 
 test('venue SVG sources remain safe monochrome transparent artwork', () => {
-  expectedAssets.filter((asset) => asset.id.startsWith('venue-')).forEach((asset) => {
+  expectedIncludedAssets.filter((asset) => asset.id.startsWith('venue-')).forEach((asset) => {
     const svg = fs.readFileSync(path.join(root, asset.url), 'utf8');
     assert.match(svg, new RegExp(`viewBox="0 0 ${asset.width} ${asset.height}"`));
     assert.match(svg, /fill="#[0-9a-f]{6}"/i);

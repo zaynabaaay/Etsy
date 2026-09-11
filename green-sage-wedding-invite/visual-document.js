@@ -45,20 +45,67 @@
     Object.freeze({ name: 'Muted Sage', value: '#858977' }), Object.freeze({ name: 'Deep Olive', value: '#626753' }),
     Object.freeze({ name: 'Deep Neutral', value: '#44463D' }), Object.freeze({ name: 'Quiet Olive', value: '#5F6051' })
   ]);
+  const tablerIcon = (id, name, sourceName, url, keywords) => Object.freeze({
+    id, name, kind: 'decorative', collection: 'icons', source: 'tabler', sourceName,
+    keywords: Object.freeze(keywords), url, width: 24, height: 24, recolorable: true, defaultColor: '#626753'
+  });
+  const ICON_ASSETS = Object.freeze([
+    tablerIcon('details-icon-dress-code', 'Hanger', 'hanger', 'invitation-assets/details-icon-dress-code.svg', ['dress code', 'attire', 'clothes', 'shirt', 'bow tie', 'formal', 'wardrobe']),
+    tablerIcon('details-icon-parking', 'Parking', 'parking-circle', 'invitation-assets/details-icon-parking.svg', ['parking', 'car park', 'vehicle', 'lot']),
+    tablerIcon('details-icon-adults-only', 'Users', 'users', 'invitation-assets/details-icon-adults-only.svg', ['adults only', 'guests', 'people', 'group', 'kids', 'children', 'family']),
+    tablerIcon('details-icon-accommodation', 'Bed', 'bed', 'invitation-assets/details-icon-accommodation.svg', ['hotel', 'accommodation', 'lodging', 'sleep', 'room']),
+    tablerIcon('details-icon-transportation', 'Bus', 'bus', 'invitation-assets/details-icon-transportation.svg', ['shuttle', 'transportation', 'transport', 'travel', 'vehicle']),
+    tablerIcon('details-icon-gifts', 'Gift', 'gift', 'invitation-assets/details-icon-gifts.svg', ['gift', 'gifts', 'registry', 'present', 'contribution']),
+    tablerIcon('icon-tabler-heart', 'Heart', 'heart', 'invitation-assets/icon-tabler-heart.svg', ['love', 'wedding', 'romance', 'favorite']),
+    tablerIcon('icon-tabler-diamond', 'Diamond', 'diamond', 'invitation-assets/icon-tabler-diamond.svg', ['engagement', 'ring', 'jewelry', 'wedding']),
+    tablerIcon('icon-tabler-calendar-event', 'Calendar', 'calendar-event', 'invitation-assets/icon-tabler-calendar-event.svg', ['calendar', 'date', 'event', 'schedule', 'rsvp']),
+    tablerIcon('icon-tabler-clock', 'Clock', 'clock', 'invitation-assets/icon-tabler-clock.svg', ['time', 'schedule', 'hour', 'timing']),
+    tablerIcon('icon-tabler-map-pin', 'Location Pin', 'map-pin', 'invitation-assets/icon-tabler-map-pin.svg', ['location', 'venue', 'address', 'map', 'pin']),
+    tablerIcon('icon-tabler-map', 'Map', 'map', 'invitation-assets/icon-tabler-map.svg', ['map', 'directions', 'location', 'venue']),
+    tablerIcon('icon-tabler-navigation', 'Navigation', 'navigation', 'invitation-assets/icon-tabler-navigation.svg', ['navigation', 'directions', 'map', 'route', 'travel']),
+    tablerIcon('icon-tabler-car', 'Car', 'car', 'invitation-assets/icon-tabler-car.svg', ['car', 'shuttle', 'transport', 'parking', 'vehicle', 'ride']),
+    tablerIcon('icon-tabler-caravan', 'Van', 'caravan', 'invitation-assets/icon-tabler-caravan.svg', ['van', 'shuttle', 'transport', 'camper', 'vehicle']),
+    tablerIcon('icon-tabler-train', 'Train', 'train', 'invitation-assets/icon-tabler-train.svg', ['train', 'rail', 'transport', 'travel', 'shuttle']),
+    tablerIcon('icon-tabler-plane', 'Plane', 'plane', 'invitation-assets/icon-tabler-plane.svg', ['plane', 'flight', 'airport', 'travel']),
+    tablerIcon('icon-tabler-walk', 'Walking', 'walk', 'invitation-assets/icon-tabler-walk.svg', ['walk', 'walking', 'pedestrian', 'directions']),
+    tablerIcon('icon-tabler-building', 'Building', 'building', 'invitation-assets/icon-tabler-building.svg', ['building', 'hotel', 'venue', 'city', 'accommodation']),
+    tablerIcon('icon-tabler-home', 'Home', 'home', 'invitation-assets/icon-tabler-home.svg', ['home', 'hotel', 'house', 'accommodation', 'lodging']),
+    tablerIcon('icon-tabler-building-cottage', 'Cottage', 'building-cottage', 'invitation-assets/icon-tabler-building-cottage.svg', ['cottage', 'hotel', 'venue', 'accommodation', 'estate']),
+    tablerIcon('icon-tabler-glass-cocktail', 'Cocktail', 'glass-cocktail', 'invitation-assets/icon-tabler-glass-cocktail.svg', ['cocktail', 'drink', 'glass', 'bar', 'reception']),
+    tablerIcon('icon-tabler-bottle', 'Bottle', 'bottle', 'invitation-assets/icon-tabler-bottle.svg', ['bottle', 'drink', 'wine', 'bar', 'champagne']),
+    tablerIcon('icon-tabler-cake', 'Cake', 'cake', 'invitation-assets/icon-tabler-cake.svg', ['cake', 'wedding cake', 'dessert', 'food']),
+    tablerIcon('icon-tabler-tools-kitchen-2', 'Dining', 'tools-kitchen-2', 'invitation-assets/icon-tabler-tools-kitchen-2.svg', ['food', 'dinner', 'meal', 'catering', 'restaurant', 'dining']),
+    tablerIcon('icon-tabler-music', 'Music', 'music', 'invitation-assets/icon-tabler-music.svg', ['music', 'dancing', 'song', 'audio']),
+    tablerIcon('icon-tabler-microphone', 'Microphone', 'microphone', 'invitation-assets/icon-tabler-microphone.svg', ['microphone', 'speech', 'toast', 'music', 'announcement']),
+    tablerIcon('icon-tabler-speakerphone', 'Announcement', 'speakerphone', 'invitation-assets/icon-tabler-speakerphone.svg', ['speaker', 'announcement', 'communication', 'audio']),
+    tablerIcon('icon-tabler-camera', 'Camera', 'camera', 'invitation-assets/icon-tabler-camera.svg', ['camera', 'photo', 'photography', 'picture']),
+    tablerIcon('icon-tabler-photo', 'Photo', 'photo', 'invitation-assets/icon-tabler-photo.svg', ['photo', 'photograph', 'picture', 'image']),
+    tablerIcon('icon-tabler-sun', 'Sun', 'sun', 'invitation-assets/icon-tabler-sun.svg', ['sun', 'weather', 'outdoor', 'day']),
+    tablerIcon('icon-tabler-cloud-rain', 'Rain', 'cloud-rain', 'invitation-assets/icon-tabler-cloud-rain.svg', ['rain', 'weather', 'cloud', 'umbrella']),
+    tablerIcon('icon-tabler-trees', 'Trees', 'trees', 'invitation-assets/icon-tabler-trees.svg', ['trees', 'outdoor', 'garden', 'nature', 'forest']),
+    tablerIcon('icon-tabler-flower', 'Flower', 'flower', 'invitation-assets/icon-tabler-flower.svg', ['flower', 'floral', 'botanical', 'wedding', 'garden']),
+    tablerIcon('icon-tabler-wheelchair', 'Accessibility', 'wheelchair', 'invitation-assets/icon-tabler-wheelchair.svg', ['accessibility', 'accessible', 'wheelchair', 'mobility']),
+    tablerIcon('icon-tabler-baby-carriage', 'Baby', 'baby-carriage', 'invitation-assets/icon-tabler-baby-carriage.svg', ['baby', 'kids', 'child', 'children', 'family']),
+    tablerIcon('icon-tabler-user-heart', 'Guest', 'user-heart', 'invitation-assets/icon-tabler-user-heart.svg', ['guest', 'guests', 'people', 'couple', 'love']),
+    tablerIcon('icon-tabler-message', 'Message', 'message', 'invitation-assets/icon-tabler-message.svg', ['message', 'communication', 'chat', 'contact']),
+    tablerIcon('icon-tabler-mail', 'Mail', 'mail', 'invitation-assets/icon-tabler-mail.svg', ['mail', 'email', 'invitation', 'communication', 'contact']),
+    tablerIcon('icon-tabler-phone', 'Phone', 'phone', 'invitation-assets/icon-tabler-phone.svg', ['phone', 'call', 'contact', 'communication'])
+  ]);
   const TEMPLATE_ASSETS = Object.freeze([
     Object.freeze({ id: 'background-green-sage-opening', name: 'Green Sage Opening', kind: 'background', url: 'invitation-assets/green-sage-opening-background.jpg', width: 853, height: 1280 }),
     Object.freeze({ id: 'venue-glasshouse', name: 'Glasshouse', kind: 'decorative', url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876, recolorable: true, defaultColor: '#605D42' }),
     Object.freeze({ id: 'venue-mansion', name: 'Mansion', kind: 'decorative', url: 'invitation-assets/venue-mansion.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#8C887C' }),
     Object.freeze({ id: 'venue-pergola', name: 'Pergola', kind: 'decorative', url: 'invitation-assets/venue-pergola.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#827D6A' }),
     Object.freeze({ id: 'venue-barn', name: 'Barn', kind: 'decorative', url: 'invitation-assets/venue-barn.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#888273' }),
-    Object.freeze({ id: 'details-icon-dress-code', name: 'Dress Code Icon', kind: 'decorative', url: 'invitation-assets/details-icon-dress-code.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
-    Object.freeze({ id: 'details-icon-parking', name: 'Parking Icon', kind: 'decorative', url: 'invitation-assets/details-icon-parking.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
-    Object.freeze({ id: 'details-icon-adults-only', name: 'Adults Only Icon', kind: 'decorative', url: 'invitation-assets/details-icon-adults-only.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
-    Object.freeze({ id: 'details-icon-accommodation', name: 'Accommodation Icon', kind: 'decorative', url: 'invitation-assets/details-icon-accommodation.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
-    Object.freeze({ id: 'details-icon-transportation', name: 'Transportation Icon', kind: 'decorative', url: 'invitation-assets/details-icon-transportation.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
-    Object.freeze({ id: 'details-icon-gifts', name: 'Gifts Icon', kind: 'decorative', url: 'invitation-assets/details-icon-gifts.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' })
+    ...ICON_ASSETS
   ]);
   const TEMPLATE_ASSET_BY_ID = Object.freeze(Object.fromEntries(TEMPLATE_ASSETS.map((asset) => [asset.id, asset])));
+  const normalizeSearchText = (value) => String(value || '').trim().toLocaleLowerCase();
+  const searchTemplateIcons = (query = '') => {
+    const needle = normalizeSearchText(query);
+    if (!needle) return [...ICON_ASSETS];
+    return ICON_ASSETS.filter((asset) => normalizeSearchText([asset.name, asset.sourceName, ...asset.keywords].join(' ')).includes(needle));
+  };
   const SECTION_HEIGHT_PRESETS = Object.freeze({ strip: 280, standard: 620, full: 844 });
   const ALIGNMENTS = Object.freeze(['left', 'center', 'right']);
   const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -434,7 +481,7 @@
   globalThis.GreenSageVisualDocument = Object.freeze({
     schemaVersion: SCHEMA_VERSION, fontCatalog: FONT_CATALOG,
     fontCategories: Object.freeze([Object.freeze({ id: 'serif', label: 'Serif' }), Object.freeze({ id: 'sans', label: 'Sans Serif' }), Object.freeze({ id: 'script', label: 'Script / Handwritten' }), Object.freeze({ id: 'display', label: 'Display' })]),
-    templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
+    templatePalette: TEMPLATE_PALETTE, templateAssets: TEMPLATE_ASSETS, templateIcons: ICON_ASSETS, searchTemplateIcons, sectionHeightPresets: SECTION_HEIGHT_PRESETS, canvasViews: CANVAS_VIEWS,
     getCanvasMetrics, getDefaultElementPlacement,
     getFont, getTemplateAsset, resolveFontVariant, fontStack, fontStylesheetUrl, loadFont, normalizeColor, defaults, clone, cloneDefaults: () => clone(defaults), createId, createTextElement, createImageElement, createDividerElement, createSection, migrate, normalize, resolveDocument, resolveSection, resolveElement, writeAuthoredProperty, removeResponsiveProperty, resetResponsiveTarget, resetResponsiveView, hasResponsiveOverrides
   });

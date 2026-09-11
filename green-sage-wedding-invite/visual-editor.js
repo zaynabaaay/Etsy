@@ -28,7 +28,7 @@
     dividerColorButton: $('dividerColorButton'), dividerColorSwatch: $('dividerColorSwatch'), addDivider: $('addDividerButton'),
     replace: $('replaceImageButton'), imageFit: $('imageFitButton'), editImage: $('editImageButton'), doneImage: $('doneImageButton'), imageFlips: $('imageFlipControls'),
     designName: $('designSectionName'), palette: $('sectionPalette'), sectionColor: $('sectionBackgroundColor'), sectionColorHex: $('sectionBackgroundHex'),
-    templateMedia: $('templateMedia'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'), mediaReplaceBanner: $('mediaReplaceBanner'), cancelMediaReplace: $('cancelMediaReplaceButton'),
+    templateMedia: $('templateMedia'), iconSearch: $('iconSearch'), iconLibrary: $('iconLibrary'), iconEmpty: $('iconEmpty'), uploadInput: $('uploadInput'), uploadStatus: $('uploadStatus'), uploadLibrary: $('uploadLibrary'), mediaReplaceBanner: $('mediaReplaceBanner'), cancelMediaReplace: $('cancelMediaReplaceButton'),
     addSection: $('addSectionButton'), sectionList: $('sectionList'), sectionName: $('sectionName'), sectionHeightPresets: $('sectionHeightPresets'), sectionHeight: $('sectionHeight'), sectionHeightMinus: $('sectionHeightDecrease'), sectionHeightPlus: $('sectionHeightIncrease'), duplicateSection: $('duplicateSectionButton'), deleteSection: $('deleteSectionButton'),
     closePosition: $('closePositionPanel'), positionTabs: $$('[data-position-tab]'), arrangePanel: $('positionArrangePanel'), layersPanel: $('positionLayersPanel'), layersList: $('layersList'), positionHelp: $('positionSelectionHelp')
   };
@@ -399,7 +399,7 @@
     const focusedId = document.activeElement.closest('.media-card')?.dataset.assetId;
     const focusedAction = document.activeElement.dataset.templateMediaAction;
     const current = effectiveSection(); const target = replacementTarget(); ui.templateMedia.replaceChildren();
-    model.templateAssets.forEach((asset) => {
+    model.templateAssets.filter((asset) => asset.collection !== 'icons').forEach((asset) => {
       const selected = target ? target.assetKind === 'template' && target.assetId === asset.id : current?.background.kind === 'image' && current.background.assetKind === 'template' && current.background.assetId === asset.id;
       const card = document.createElement('article'); card.className = 'asset-card media-card'; card.dataset.assetId = asset.id; card.classList.toggle('is-selected', selected);
       const thumb = document.createElement('span'); thumb.className = 'asset-thumb'; thumb.style.backgroundImage = `url("${asset.url}")`;
@@ -410,6 +410,21 @@
       ui.templateMedia.append(card);
       if (asset.id === focusedId) card.querySelector(`[data-template-media-action="${CSS.escape(focusedAction || '')}"]`)?.focus({ preventScroll: true });
     });
+  };
+  const renderIcons = () => {
+    const focusedId = document.activeElement.closest('.icon-tile')?.dataset.assetId;
+    const target = replacementTarget(); const matches = model.searchTemplateIcons(ui.iconSearch.value); ui.iconLibrary.replaceChildren();
+    matches.forEach((asset) => {
+      const item = document.createElement('article'); item.setAttribute('role', 'listitem');
+      const tile = document.createElement('button'); tile.type = 'button'; tile.className = 'icon-tile'; tile.dataset.assetId = asset.id; tile.dataset.iconAction = target ? 'replace' : 'insert';
+      tile.classList.toggle('is-selected', target?.assetKind === 'template' && target.assetId === asset.id);
+      tile.setAttribute('aria-label', `${target ? 'Replace with' : 'Add'} ${asset.name}`);
+      const preview = document.createElement('span'); preview.className = 'icon-tile-preview'; preview.style.backgroundImage = `url("${asset.url}")`; preview.setAttribute('aria-hidden', 'true');
+      const name = document.createElement('span'); name.className = 'icon-tile-name'; name.textContent = asset.name;
+      tile.append(preview, name); item.append(tile); ui.iconLibrary.append(item);
+      if (asset.id === focusedId) tile.focus({ preventScroll: true });
+    });
+    ui.iconEmpty.hidden = matches.length > 0;
   };
   const uploadUsage = () => {
     const counts = new Map();
@@ -507,7 +522,7 @@
     ui.positionHelp.hidden = Boolean(selected);
   };
 
-  const renderAll = () => { renderContext(); renderDesign(); renderReplaceMode(); renderTemplateMedia(); renderUploads(); renderSections(); renderLayers(); renderResetAvailability(); };
+  const renderAll = () => { renderContext(); renderDesign(); renderReplaceMode(); renderTemplateMedia(); renderIcons(); renderUploads(); renderSections(); renderLayers(); renderResetAvailability(); };
   const refreshAssets = async () => {
     const storedRecords = await assets.list(); const nextRecords = []; const nextUrls = {}; const nextObjectUrls = [];
     try {
@@ -839,6 +854,13 @@
       case 'manage': uploadDeleteId = null; openMediaActionPopover(action, 'template', asset.id, asset.name); break;
       default: break;
     }
+  });
+  ui.iconSearch.addEventListener('input', renderIcons);
+  ui.iconLibrary.addEventListener('click', (event) => {
+    const tile = event.target.closest('[data-icon-action][data-asset-id]'); if (!tile) return;
+    const asset = model.getTemplateAsset(tile.dataset.assetId); if (!asset || asset.collection !== 'icons') return;
+    if (tile.dataset.iconAction === 'replace') replaceElementAsset(asset.id, 'template');
+    else addImage(asset.id, 'template', 'decorative');
   });
   ui.addDivider.addEventListener('click', addDivider);
   ui.uploadInput.addEventListener('change', async () => { await uploadFiles(ui.uploadInput.files); ui.uploadInput.value = ''; });

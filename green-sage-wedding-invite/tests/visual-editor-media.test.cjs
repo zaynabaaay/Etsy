@@ -29,19 +29,21 @@ test('left rail destinations are exactly Design, Media, Text, and Sections', () 
   assert.doesNotMatch(rail, /Elements|Uploads|data-panel="elements"|data-panel="uploads"/);
 });
 
-test('Media exposes the three product groups in order without nested panel destinations', () => {
+test('Media exposes Included, Icons, Basic, and uploads in order without nested panel destinations', () => {
   const panel = between(html, 'data-panel-view="media"', 'data-panel-view="text"');
   const headings = [...panel.matchAll(/<h2[^>]*>([^<]+)<\/h2>/g)].map((match) => match[1]);
-  assert.deepEqual(headings, ['Included with template', 'Basic', 'Your uploads']);
+  assert.deepEqual(headings, ['Included with template', 'Icons', 'Basic', 'Your uploads']);
   assert.ok(panel.indexOf('id="templateMedia"') < panel.indexOf('id="addDividerButton"'));
+  assert.ok(panel.indexOf('id="templateMedia"') < panel.indexOf('id="iconLibrary"'));
+  assert.ok(panel.indexOf('id="iconLibrary"') < panel.indexOf('id="addDividerButton"'));
   assert.ok(panel.indexOf('id="addDividerButton"') < panel.indexOf('id="uploadInput"'));
   assert.match(panel, /for="uploadInput">Upload images<\/label>/);
   assert.doesNotMatch(html, /data-panel-view="elements"|data-panel-view="uploads"/);
 });
 
-test('all supplied assets share one Media renderer with insertion and background actions', () => {
-  const renderer = between(source, 'const renderTemplateMedia = () => {', 'const uploadUsage = () => {');
-  assert.match(renderer, /model\.templateAssets\.forEach/);
+test('template-specific supplied assets retain the existing Media renderer and actions', () => {
+  const renderer = between(source, 'const renderTemplateMedia = () => {', 'const renderIcons = () => {');
+  assert.match(renderer, /model\.templateAssets\.filter\(\(asset\) => asset\.collection !== 'icons'\)\.forEach/);
   assert.match(renderer, /'Add to section'/);
   assert.match(renderer, /aria-haspopup', 'menu'/);
   assert.doesNotMatch(renderer, /Set as background|media-management|append\(menu\)/);

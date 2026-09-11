@@ -45,7 +45,7 @@ test('entering Replace mode retains the selected target and opens Media', () => 
 });
 
 test('Media cards switch their primary action label during Replace mode', () => {
-  const supplied = between(source, 'const renderTemplateMedia = () => {', 'const uploadUsage = () => {');
+  const supplied = between(source, 'const renderTemplateMedia = () => {', 'const renderIcons = () => {');
   const uploads = between(source, 'const renderUploads = () => {', 'const deleteUpload = async');
   for (const renderer of [supplied, uploads]) {
     assert.match(renderer, /target \? 'replace' : 'insert'/);
