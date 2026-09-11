@@ -141,10 +141,11 @@ test('divider visibility changes from the Mobile grid to the wide grid without c
   });
 });
 
-test('Details icon assets are safe, crisp, consistent fixed-color SVGs', () => {
+test('Details icon assets are safe, crisp, consistently recolorable SVGs', () => {
   groups.forEach(([, , , assetId]) => {
     const asset = model.getTemplateAsset(assetId);
     assert.deepEqual([asset.kind, asset.width, asset.height], ['decorative', 24, 24]);
+    assert.deepEqual([asset.recolorable, asset.defaultColor], [true, '#626753']);
     const svg = fs.readFileSync(path.join(__dirname, '..', asset.url), 'utf8');
     assert.match(svg, /viewBox="0 0 24 24"/);
     assert.match(svg, /stroke="#626753"/);

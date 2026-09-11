@@ -191,6 +191,7 @@ input[type="range"] { width:100%; accent-color:var(--sage); }
 .view-visibility-control input { width:18px; height:18px; margin:0; accent-color:var(--sage); }
 .color-popover { left:0; width:230px; }.color-popover label { display:grid; gap:7px; margin-top:12px; color:var(--muted); font-size:9px; }
 .color-custom-row { display:grid; grid-template-columns:44px 1fr; gap:7px; }.color-custom-row input { width:100%; min-height:40px; border:1px solid var(--line); border-radius:7px; background:#fff; }.color-custom-row input[type="color"] { padding:3px; }
+.color-popover .color-original-button { margin-top:10px; }
 .section-color-row { grid-template-columns:50px 1fr; }.section-color-row input[type="text"] { padding:8px 9px; }
 
 .popover-layer { position:fixed; z-index:100; inset:0; pointer-events:none; }

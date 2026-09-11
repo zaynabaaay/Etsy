@@ -70,7 +70,7 @@ test('authored asset references and crops match the approved template including 
   assert.equal(model.getTemplateAsset('venue-glasshouse').url, 'invitation-assets/venue-glasshouse.svg');
 });
 
-test('venue SVG sources remain byte-identical and no SVG recoloring path exists', () => {
+test('venue SVG sources remain byte-identical while recoloring stays non-destructive', () => {
   const expected = {
     'venue-glasshouse.svg': '8ca3f725913251a229b1381e759181df3833a1725ab2b72c8b2df68b86747e9b',
     'venue-mansion.svg': '24ad2a846bddc5c39f8e7a2f3a4e7ef9236ad3989c2cb7850b8edfc1077e52ff',
@@ -81,5 +81,5 @@ test('venue SVG sources remain byte-identical and no SVG recoloring path exists'
     assert.equal(digest(fs.readFileSync(path.join(root, 'invitation-assets', file))), hash);
   });
   const editor = fs.readFileSync(path.join(root, 'visual-editor.js'), 'utf8');
-  assert.doesNotMatch(editor, /svg(?:Fill|Stroke)|(?:fill|stroke)Svg|setAttribute\(['"](?:fill|stroke)/i);
+  assert.doesNotMatch(editor, /DOMParser|setAttribute\(['"](?:fill|stroke)/i);
 });

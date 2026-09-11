@@ -47,16 +47,16 @@
   ]);
   const TEMPLATE_ASSETS = Object.freeze([
     Object.freeze({ id: 'background-green-sage-opening', name: 'Green Sage Opening', kind: 'background', url: 'invitation-assets/green-sage-opening-background.jpg', width: 853, height: 1280 }),
-    Object.freeze({ id: 'venue-glasshouse', name: 'Glasshouse', kind: 'decorative', url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876 }),
-    Object.freeze({ id: 'venue-mansion', name: 'Mansion', kind: 'decorative', url: 'invitation-assets/venue-mansion.svg', width: 1536, height: 768 }),
-    Object.freeze({ id: 'venue-pergola', name: 'Pergola', kind: 'decorative', url: 'invitation-assets/venue-pergola.svg', width: 1536, height: 768 }),
-    Object.freeze({ id: 'venue-barn', name: 'Barn', kind: 'decorative', url: 'invitation-assets/venue-barn.svg', width: 1536, height: 768 }),
-    Object.freeze({ id: 'details-icon-dress-code', name: 'Dress Code Icon', kind: 'decorative', url: 'invitation-assets/details-icon-dress-code.svg', width: 24, height: 24 }),
-    Object.freeze({ id: 'details-icon-parking', name: 'Parking Icon', kind: 'decorative', url: 'invitation-assets/details-icon-parking.svg', width: 24, height: 24 }),
-    Object.freeze({ id: 'details-icon-adults-only', name: 'Adults Only Icon', kind: 'decorative', url: 'invitation-assets/details-icon-adults-only.svg', width: 24, height: 24 }),
-    Object.freeze({ id: 'details-icon-accommodation', name: 'Accommodation Icon', kind: 'decorative', url: 'invitation-assets/details-icon-accommodation.svg', width: 24, height: 24 }),
-    Object.freeze({ id: 'details-icon-transportation', name: 'Transportation Icon', kind: 'decorative', url: 'invitation-assets/details-icon-transportation.svg', width: 24, height: 24 }),
-    Object.freeze({ id: 'details-icon-gifts', name: 'Gifts Icon', kind: 'decorative', url: 'invitation-assets/details-icon-gifts.svg', width: 24, height: 24 })
+    Object.freeze({ id: 'venue-glasshouse', name: 'Glasshouse', kind: 'decorative', url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876, recolorable: true, defaultColor: '#605D42' }),
+    Object.freeze({ id: 'venue-mansion', name: 'Mansion', kind: 'decorative', url: 'invitation-assets/venue-mansion.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#8C887C' }),
+    Object.freeze({ id: 'venue-pergola', name: 'Pergola', kind: 'decorative', url: 'invitation-assets/venue-pergola.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#827D6A' }),
+    Object.freeze({ id: 'venue-barn', name: 'Barn', kind: 'decorative', url: 'invitation-assets/venue-barn.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#888273' }),
+    Object.freeze({ id: 'details-icon-dress-code', name: 'Dress Code Icon', kind: 'decorative', url: 'invitation-assets/details-icon-dress-code.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
+    Object.freeze({ id: 'details-icon-parking', name: 'Parking Icon', kind: 'decorative', url: 'invitation-assets/details-icon-parking.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
+    Object.freeze({ id: 'details-icon-adults-only', name: 'Adults Only Icon', kind: 'decorative', url: 'invitation-assets/details-icon-adults-only.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
+    Object.freeze({ id: 'details-icon-accommodation', name: 'Accommodation Icon', kind: 'decorative', url: 'invitation-assets/details-icon-accommodation.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
+    Object.freeze({ id: 'details-icon-transportation', name: 'Transportation Icon', kind: 'decorative', url: 'invitation-assets/details-icon-transportation.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' }),
+    Object.freeze({ id: 'details-icon-gifts', name: 'Gifts Icon', kind: 'decorative', url: 'invitation-assets/details-icon-gifts.svg', width: 24, height: 24, recolorable: true, defaultColor: '#626753' })
   ]);
   const TEMPLATE_ASSET_BY_ID = Object.freeze(Object.fromEntries(TEMPLATE_ASSETS.map((asset) => [asset.id, asset])));
   const SECTION_HEIGHT_PRESETS = Object.freeze({ strip: 280, standard: 620, full: 844 });
@@ -231,6 +231,7 @@
   const createImageElement = (overrides = {}) => ({
     ...baseElement({ frame: { x: 65, y: 430, width: 260, height: 220 }, ...overrides }, overrides.type === 'decorative' ? 'decorative' : 'image'),
     assetId: String(overrides.assetId || ''), assetKind: overrides.assetKind === 'template' ? 'template' : 'upload', alt: String(overrides.alt || 'Invitation image'),
+    ...(isHexColor(overrides.svgColor) ? { svgColor: normalizeColor(overrides.svgColor) } : {}),
     crop: { flipX: overrides.crop?.flipX === true, flipY: overrides.crop?.flipY === true, fit: overrides.crop?.fit === 'contain' ? 'contain' : 'cover', focalX: clamp(overrides.crop?.focalX ?? 50, 0, 100), focalY: clamp(overrides.crop?.focalY ?? 50, 0, 100), zoom: clamp(overrides.crop?.zoom ?? 1, 1, 4) }
   });
   const createDividerElement = (overrides = {}) => ({
@@ -262,9 +263,9 @@
   };
   const normalizeImageElement = (value, id, sectionId) => {
     const supplied = value && typeof value === 'object' ? value : {}; const fallback = createImageElement({ id, sectionId, type: supplied.type });
-    const { visible: suppliedVisibility, ...authored } = supplied;
+    const { visible: suppliedVisibility, svgColor: suppliedSvgColor, ...authored } = supplied;
     const type = supplied.type === 'decorative' ? 'decorative' : 'image';
-    return { ...fallback, ...authored, id, sectionId, type, frame: normalizeFrame(supplied.frame, fallback.frame, type), assetId: String(supplied.assetId || ''), assetKind: supplied.assetKind === 'template' ? 'template' : 'upload', alt: String(supplied.alt || fallback.alt), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), ...(typeof suppliedVisibility === 'boolean' ? { visible: suppliedVisibility } : {}), crop: { flipX: supplied.crop?.flipX === true, flipY: supplied.crop?.flipY === true, fit: supplied.crop?.fit === 'contain' ? 'contain' : fallback.crop.fit, focalX: clamp(supplied.crop?.focalX ?? 50, 0, 100), focalY: clamp(supplied.crop?.focalY ?? 50, 0, 100), zoom: clamp(supplied.crop?.zoom ?? 1, 1, 4) }, responsive: normalizeElementResponsive(supplied.responsive, fallback.responsive, type), permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
+    return { ...fallback, ...authored, id, sectionId, type, frame: normalizeFrame(supplied.frame, fallback.frame, type), assetId: String(supplied.assetId || ''), assetKind: supplied.assetKind === 'template' ? 'template' : 'upload', alt: String(supplied.alt || fallback.alt), rotation: clamp(supplied.rotation ?? 0, -180, 180), opacity: clamp(supplied.opacity ?? 1, 0.05, 1), ...(typeof suppliedVisibility === 'boolean' ? { visible: suppliedVisibility } : {}), ...(isHexColor(suppliedSvgColor) ? { svgColor: normalizeColor(suppliedSvgColor) } : {}), crop: { flipX: supplied.crop?.flipX === true, flipY: supplied.crop?.flipY === true, fit: supplied.crop?.fit === 'contain' ? 'contain' : fallback.crop.fit, focalX: clamp(supplied.crop?.focalX ?? 50, 0, 100), focalY: clamp(supplied.crop?.focalY ?? 50, 0, 100), zoom: clamp(supplied.crop?.zoom ?? 1, 1, 4) }, responsive: normalizeElementResponsive(supplied.responsive, fallback.responsive, type), permissions: { ...defaultPermissions, ...(supplied.permissions || {}) } };
   };
   const normalizeDividerElement = (value, id, sectionId) => {
     const supplied = value && typeof value === 'object' ? value : {}; const fallback = createDividerElement({ id, sectionId });
@@ -292,7 +293,8 @@
       sections[sectionId] = section;
       section.elementOrder.forEach((elementId) => { const raw = rawElements[elementId]; elements[elementId] = raw.type === 'text' ? normalizeTextElement(raw, elementId, sectionId) : raw.type === 'divider' ? normalizeDividerElement(raw, elementId, sectionId) : normalizeImageElement(raw, elementId, sectionId); });
     });
-    const usedColors = [...Object.values(sections).map((section) => section.background.color), ...Object.values(elements).filter((item) => item.type === 'text' || item.type === 'divider').map((item) => item.style.color)];
+    const activeSvgColors = Object.values(elements).filter((item) => item.assetKind === 'template' && getTemplateAsset(item.assetId)?.recolorable === true && isHexColor(item.svgColor)).map((item) => item.svgColor);
+    const usedColors = [...Object.values(sections).map((section) => section.background.color), ...Object.values(elements).filter((item) => item.type === 'text' || item.type === 'divider').map((item) => item.style.color), ...activeSvgColors];
     const colors = uniqueColors([...(Array.isArray(documentValue.colors) ? documentValue.colors : TEMPLATE_PALETTE.map((color) => color.value)), ...usedColors]);
     return { ...supplied, schemaVersion: SCHEMA_VERSION, document: { ...defaults.document, ...documentValue, colors, canvas: { ...defaults.document.canvas, ...(documentValue.canvas || {}), baseWidth: 390, maxRenderedWidth: clamp(documentValue.canvas?.maxRenderedWidth ?? 560, 390, 720), viewportBackground: isHexColor(documentValue.canvas?.viewportBackground) ? documentValue.canvas.viewportBackground : '#F4EFE7', safeMargin: clamp(documentValue.canvas?.safeMargin ?? 20, 0, 60) }, sectionOrder, media: { ...defaults.document.media, ...(documentValue.media || {}), audio: null } }, sections, elements };
   };

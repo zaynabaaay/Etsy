@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;1,400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="visual-editor.css?v=20260910-element-replace">
+  <link rel="stylesheet" href="visual-editor.css?v=20260911-svg-color">
 </head>
 <body>
   <main class="storiel-editor" id="storielEditor">
@@ -90,13 +90,13 @@
           <div class="toolbar-popover font-popover" id="fontPickerPopover" hidden><label class="font-search"><span class="sr-only">Search fonts</span><input id="fontSearch" type="search" placeholder="Search fonts"></label><div class="font-filters" id="fontCategoryFilters"><button class="is-active" type="button" data-font-category="all">All</button><button type="button" data-font-category="serif">Serif</button><button type="button" data-font-category="sans">Sans</button><button type="button" data-font-category="script">Script</button><button type="button" data-font-category="display">Display</button></div><div class="font-list" id="fontList" role="listbox"></div></div>
         </div>
         <div class="toolbar-popover-anchor"><div class="font-size-control"><button id="fontSizeDecrease" type="button" aria-label="Decrease font size">−</button><input id="fontSize" aria-label="Font size" type="number" min="8" max="180" step="1" inputmode="decimal" aria-haspopup="listbox"><button id="fontSizeIncrease" type="button" aria-label="Increase font size">+</button></div><div class="toolbar-popover size-popover" id="fontSizePresets" role="listbox" hidden></div></div>
-        <div class="toolbar-popover-anchor"><button class="color-button" id="textColorButton" type="button" title="Text color" aria-label="Text color" aria-haspopup="dialog"><span id="textColorSwatch"></span></button><div class="toolbar-popover color-popover" id="textColorPopover" hidden><strong>Document colors</strong><div class="palette-grid" id="textColorPalette"></div><label>Custom color<div class="color-custom-row"><input id="textColor" type="color"><input id="textColorHex" type="text" maxlength="7" spellcheck="false" aria-label="Text color hex value"></div></label></div></div>
+        <div class="toolbar-popover-anchor"><button class="color-button" id="textColorButton" type="button" title="Text color" aria-label="Text color" aria-haspopup="dialog"><span id="textColorSwatch"></span></button><div class="toolbar-popover color-popover" id="textColorPopover" hidden><strong>Document colors</strong><div class="palette-grid" id="textColorPalette"></div><label>Custom color<div class="color-custom-row"><input id="textColor" type="color"><input id="textColorHex" type="text" maxlength="7" spellcheck="false" aria-label="Text color hex value"></div></label><button class="secondary-button color-original-button" id="svgOriginalColorButton" type="button" hidden>Original color</button></div></div>
         <button class="context-button square" id="boldButton" type="button" aria-label="Bold"><strong>B</strong></button><button class="context-button square" id="italicButton" type="button" aria-label="Italic"><em>I</em></button>
         <div class="toolbar-popover-anchor"><button class="context-button" id="alignmentButton" type="button" aria-haspopup="menu">Alignment</button><div class="toolbar-popover compact-menu" id="alignmentPopover" hidden><button type="button" data-align="left">Left</button><button type="button" data-align="center">Center</button><button type="button" data-align="right">Right</button></div></div>
         <div class="toolbar-popover-anchor"><button class="context-button" id="spacingButton" type="button">Spacing</button><div class="toolbar-popover control-popover" id="spacingPopover" hidden><label>Line height<input id="lineHeight" type="number" min="0.7" max="3" step="0.05"></label><label>Letter spacing<input id="letterSpacing" type="number" min="-10" max="30" step="0.1"></label></div></div>
         <button class="context-button" data-open-position type="button">Position</button>
       </div>
-      <div class="context-tools" id="imageContext" hidden><button class="context-button" id="editImageButton" type="button" aria-pressed="false">Edit image</button><button class="context-button is-active" id="doneImageButton" type="button" hidden>Done</button><label class="image-reframe-zoom" id="imageReframeZoom" hidden><span>Zoom</span><input id="imageZoom" type="range" min="1" max="4" step="0.05"></label><button class="context-button" id="replaceImageButton" type="button">Replace</button><button class="context-button" id="imageFitButton" type="button">Fit / Fill</button><button class="context-button" data-open-position type="button">Position</button></div>
+      <div class="context-tools" id="imageContext" hidden><button class="context-button" id="editImageButton" type="button" aria-pressed="false">Edit image</button><button class="context-button is-active" id="doneImageButton" type="button" hidden>Done</button><label class="image-reframe-zoom" id="imageReframeZoom" hidden><span>Zoom</span><input id="imageZoom" type="range" min="1" max="4" step="0.05"></label><button class="context-button" id="replaceImageButton" type="button">Replace</button><button class="color-button" id="svgColorButton" type="button" title="Artwork color" aria-label="Artwork color" aria-haspopup="dialog" hidden><span id="svgColorSwatch"></span></button><button class="context-button" id="imageFitButton" type="button">Fit / Fill</button><button class="context-button" data-open-position type="button">Position</button></div>
       <div class="context-tools" id="dividerContext" hidden><div class="toolbar-popover-anchor"><button class="color-button" id="dividerColorButton" type="button" title="Divider color" aria-label="Divider color" aria-haspopup="dialog"><span id="dividerColorSwatch"></span></button></div><button class="context-button" data-open-position type="button">Position</button></div>
       <div class="context-tools" id="sectionContext" hidden><strong id="sectionContextName">Section</strong><span>Use Sections for height presets or a custom value.</span></div>
       <div class="context-tools background-edit-context" id="backgroundEditContext" hidden><strong>Background</strong><span>Drag on the canvas to reposition.</span><button class="context-button" id="replaceBackgroundButton" type="button">Replace</button><button class="context-button" id="backgroundFitButton" type="button">Fit</button><label class="image-reframe-zoom"><span>Zoom</span><input id="backgroundZoom" type="range" min="1" max="4" step="0.05" aria-label="Background zoom"></label><button class="context-button is-active" id="doneBackgroundToolbarButton" type="button">Done</button></div>
@@ -118,10 +118,10 @@
       </div>
     </form>
   </dialog>
-  <script src="visual-document.js?v=20260910-background-direct"></script>
+  <script src="visual-document.js?v=20260911-svg-color"></script>
   <script src="green-sage-visual-template.js?v=20260909-green-sage-assets"></script>
   <script src="visual-template-loader.js?v=20260907-template-boundary"></script>
   <script src="visual-assets.js?v=20260902-section2"></script>
-  <script src="visual-editor.js?v=20260910-element-replace"></script>
+  <script src="visual-editor.js?v=20260911-svg-color"></script>
 </body>
 </html>

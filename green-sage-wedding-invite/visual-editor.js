@@ -22,7 +22,7 @@
     undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'), resetView: $('resetViewButton'), resetDialog: $('resetViewDialog'), resetTitle: $('resetViewTitle'), resetDescription: $('resetViewDescription'), resetCancel: $('cancelResetViewButton'), resetConfirm: $('confirmResetViewButton'),
     contextEmpty: $('contextEmpty'), textContext: $('textContext'), imageContext: $('imageContext'), dividerContext: $('dividerContext'), sectionContext: $('sectionContext'), sectionContextName: $('sectionContextName'), backgroundEditContext: $('backgroundEditContext'), replaceBackground: $('replaceBackgroundButton'), backgroundFit: $('backgroundFitButton'), backgroundZoom: $('backgroundZoom'), doneBackgroundToolbar: $('doneBackgroundToolbarButton'),
     fontButton: $('fontPickerButton'), fontValue: $('fontPickerValue'), fontPopover: $('fontPickerPopover'), fontSearch: $('fontSearch'), fontFilters: $('fontCategoryFilters'), fontList: $('fontList'),
-    fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'),
+    fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'), svgColorButton: $('svgColorButton'), svgColorSwatch: $('svgColorSwatch'), svgOriginalColor: $('svgOriginalColorButton'),
     bold: $('boldButton'), italic: $('italicButton'), alignButton: $('alignmentButton'), alignPopover: $('alignmentPopover'), spacingButton: $('spacingButton'), spacingPopover: $('spacingPopover'), lineHeight: $('lineHeight'), letterSpacing: $('letterSpacing'),
     morePopover: $('morePopover'), mediaActionPopover: $('mediaActionPopover'), opacity: $('elementOpacity'), rotation: $('elementRotation'), visibilityControl: $('elementVisibilityControl'), visible: $('elementVisible'), textCaseControls: $('textCaseControls'), imageZoomControl: $('imageReframeZoom'), imageZoom: $('imageZoom'),
     dividerColorButton: $('dividerColorButton'), dividerColorSwatch: $('dividerColorSwatch'), addDivider: $('addDividerButton'),
@@ -75,6 +75,7 @@
   const section = () => state.sections[selectedSectionId] || null;
   const element = () => state.elements[selectedElementId] || null;
   const isImageLike = (item) => item?.type === 'image' || item?.type === 'decorative';
+  const recolorableAsset = (item) => item?.assetKind === 'template' && isImageLike(item) && model.getTemplateAsset(item.assetId)?.recolorable === true ? model.getTemplateAsset(item.assetId) : null;
   const replacementTarget = () => { const target = state.elements[replaceTargetElementId]; return isImageLike(target) ? target : null; };
   const effectiveSection = (id = selectedSectionId, view = activeResponsiveView) => state.sections[id] ? model.resolveSection(state.sections[id], view) : null;
   const effectiveElement = (id = selectedElementId, view = activeResponsiveView) => state.elements[id] ? model.resolveElement(state.elements[id], view) : null;
@@ -324,11 +325,14 @@
 
   const renderContext = () => {
     const selected = effectiveElement();
+    const svgAsset = recolorableAsset(selected);
     if (selected?.id !== imageEditElementId || selected?.type !== 'image' || selected.permissions.locked || !selected.permissions.editable) imageEditElementId = null;
     ui.editImage.hidden = selected?.type !== 'image' || Boolean(imageEditElementId);
     ui.doneImage.hidden = !imageEditElementId;
     ui.imageZoomControl.hidden = !imageEditElementId;
     ui.replace.hidden = !isImageLike(selected); ui.imageFit.hidden = selected?.type !== 'image';
+    ui.svgColorButton.hidden = !svgAsset;
+    ui.svgOriginalColor.hidden = !svgAsset;
     $$('[data-open-position]', ui.imageContext).forEach(button => { button.disabled = Boolean(imageEditElementId); });
     ui.editImage.disabled = !selected?.permissions.editable || selected?.permissions.locked;
     ui.editImage.setAttribute('aria-pressed', String(Boolean(imageEditElementId)));
@@ -348,6 +352,12 @@
     ui.visible.checked = selected.visible !== false; ui.visible.disabled = locked || !selected.permissions.editable;
     ui.textCaseControls.hidden = selected.type !== 'text';
     if (selected.crop) { [ui.imageFit, ui.replace, ui.imageZoom].forEach(control => control.disabled = locked || !selected.permissions.editable); ui.imageZoom.value = selected.crop.zoom; ui.imageFit.textContent = selected.crop.fit === 'cover' ? 'Fit / Contain' : 'Fill / Cover'; }
+    if (svgAsset) {
+      const color = selected.svgColor || svgAsset.defaultColor;
+      ui.svgColorButton.disabled = locked || !selected.permissions.editable;
+      ui.svgColorSwatch.style.background = color;
+      ui.svgOriginalColor.disabled = !selected.svgColor || locked || !selected.permissions.editable;
+    }
     if (selected.type === 'divider') {
       ui.textColor.value = selected.style.color; ui.textColorHex.value = selected.style.color.toUpperCase(); ui.dividerColorSwatch.style.background = selected.style.color; renderColorSwatches(ui.textColorPalette, selected.style.color);
       ui.dividerColorButton.disabled = locked || !selected.permissions.editable;
@@ -749,13 +759,27 @@
   const stepFontSize = (delta) => { const source = effectiveElement(); if (!source) return; mutate('Change font size', (next) => { writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.fontSize', value: Math.max(8, Math.min(180, source.style.fontSize + delta)), scope: 'responsive' }); }); };
   ui.sizeMinus.addEventListener('click', () => stepFontSize(-1)); ui.sizePlus.addEventListener('click', () => stepFontSize(1));
   bindTransactionalInput(ui.fontSize, 'Change font size', (next, value) => { const source = effectiveElement(); if (source) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.fontSize', value: Number(value), scope: 'responsive' }); });
-  const opensElementColor = (button) => { renderColorSwatches(ui.textColorPalette, element()?.style?.color); togglePopover(ui.textColorPopover, button); };
+  const opensElementColor = (button) => {
+    const source = element(); const svgAsset = recolorableAsset(source);
+    const selectedColor = svgAsset ? source.svgColor : source?.style?.color;
+    const displayedColor = selectedColor || svgAsset?.defaultColor || '#474232';
+    ui.textColor.value = displayedColor; ui.textColorHex.value = displayedColor.toUpperCase();
+    ui.svgOriginalColor.hidden = !svgAsset; ui.svgOriginalColor.disabled = !source?.svgColor;
+    renderColorSwatches(ui.textColorPalette, selectedColor); togglePopover(ui.textColorPopover, button);
+  };
   ui.textColorButton.addEventListener('click', () => opensElementColor(ui.textColorButton));
   ui.dividerColorButton.addEventListener('click', () => opensElementColor(ui.dividerColorButton));
-  ui.textColorPalette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); const source = element(); if (!swatch || !['text', 'divider'].includes(source?.type) || source.permissions.locked || !source.permissions.editable) return; mutate(source.type === 'divider' ? 'Change divider color' : 'Change text color', (next) => { next.elements[source.id].style.color = rememberColor(next, swatch.dataset.color); }); closePopovers(); });
-  bindTransactionalInput(ui.textColor, 'Change element color', (next, value) => { const source = element(); const color = rememberColor(next, value); if (['text', 'divider'].includes(source?.type) && color) next.elements[source.id].style.color = color; });
+  ui.svgColorButton.addEventListener('click', () => opensElementColor(ui.svgColorButton));
+  const applyElementColor = (next, source, value) => {
+    const color = rememberColor(next, value); if (!color) return;
+    if (['text', 'divider'].includes(source?.type)) next.elements[source.id].style.color = color;
+    else if (recolorableAsset(source)) next.elements[source.id].svgColor = color;
+  };
+  ui.textColorPalette.addEventListener('click', (event) => { const swatch = event.target.closest('[data-color]'); const source = element(); if (!swatch || (!['text', 'divider'].includes(source?.type) && !recolorableAsset(source)) || source.permissions.locked || !source.permissions.editable) return; mutate(source.type === 'divider' ? 'Change divider color' : source.type === 'text' ? 'Change text color' : 'Change artwork color', (next) => { applyElementColor(next, source, swatch.dataset.color); }); closePopovers(); });
+  bindTransactionalInput(ui.textColor, 'Change element color', (next, value) => { const source = element(); if (source && (['text', 'divider'].includes(source.type) || recolorableAsset(source))) applyElementColor(next, source, value); });
   ui.textColor.addEventListener('input', () => { ui.textColorHex.value = ui.textColor.value.toUpperCase(); });
-  bindHexColor(ui.textColorHex, 'Change element color', () => element()?.style.color || '#474232', (next, color) => { const source = element(); if (['text', 'divider'].includes(source?.type) && !source.permissions.locked && source.permissions.editable) next.elements[source.id].style.color = rememberColor(next, color); });
+  bindHexColor(ui.textColorHex, 'Change element color', () => { const source = element(); return source?.style?.color || source?.svgColor || recolorableAsset(source)?.defaultColor || '#474232'; }, (next, color) => { const source = element(); if (source && (['text', 'divider'].includes(source.type) || recolorableAsset(source)) && !source.permissions.locked && source.permissions.editable) applyElementColor(next, source, color); });
+  ui.svgOriginalColor.addEventListener('click', () => { const source = element(); if (!source?.svgColor || !recolorableAsset(source) || source.permissions.locked || !source.permissions.editable) return; finishTransaction(false); mutate('Restore original artwork color', (next) => { delete next.elements[source.id].svgColor; }); closePopovers(); });
   bindTransactionalInput(ui.lineHeight, 'Change line height', (next, value) => { const source = effectiveElement(); if (source) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.lineHeight', value: Number(value), scope: 'responsive' }); });
   bindTransactionalInput(ui.letterSpacing, 'Change letter spacing', (next, value) => { const source = effectiveElement(); if (source) writeAuthoredProperty(next, { targetType: 'element', targetId: source.id, path: 'style.letterSpacing', value: Number(value), scope: 'responsive' }); });
   ui.bold.addEventListener('click', () => { const source = element(); if (source) mutate('Toggle bold', (next) => { next.elements[source.id].style.fontWeight = source.style.fontWeight === 700 ? 400 : 700; }); });

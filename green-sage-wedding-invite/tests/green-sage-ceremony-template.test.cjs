@@ -29,11 +29,12 @@ test('Ceremony layer order contains every stable element ID exactly once', () =>
   ids.forEach((id) => assert.equal(authored.elements[id].sectionId, 'ceremony'));
 });
 
-test('Glasshouse resolves to the exact supplied fixed-color SVG metadata', () => {
+test('Glasshouse resolves to the exact supplied recolorable SVG metadata', () => {
   const asset = model.getTemplateAsset('venue-glasshouse');
   assert.deepEqual(plain(asset), {
     id: 'venue-glasshouse', name: 'Glasshouse', kind: 'decorative',
-    url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876
+    url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876,
+    recolorable: true, defaultColor: '#605D42'
   });
   assert.equal(authored.elements['ceremony-glasshouse'].type, 'decorative');
   assert.equal(authored.elements['ceremony-glasshouse'].assetId, asset.id);

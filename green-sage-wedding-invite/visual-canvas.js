@@ -61,6 +61,7 @@
   const frameNode = (id) => root.querySelector(`[data-element-id="${CSS.escape(id)}"]`);
   const sectionNode = (id) => root.querySelector(`[data-section-id="${CSS.escape(id)}"]`);
   const getAssetUrl = (item) => item.assetKind === 'upload' ? assetUrls[item.assetId] : model.getTemplateAsset(item.assetId)?.url;
+  const recolorableAsset = (item) => item?.assetKind === 'template' && model.getTemplateAsset(item.assetId)?.recolorable === true ? model.getTemplateAsset(item.assetId) : null;
   const calculateScale = () => {
     if (!state) return 1;
     const canvas = getCanvasMetrics();
@@ -440,7 +441,18 @@
     if (!image) return;
     const size = imageSize(item, image);
     const focalX = item.type === 'decorative' ? 50 : item.crop.focalX; const focalY = item.type === 'decorative' ? 50 : item.crop.focalY;
-    Object.assign(image.style, { position: 'absolute', maxWidth: 'none', width: `${size.width}px`, height: `${size.height}px`, left: `${(item.frame.width - size.width) * focalX / 100}px`, top: `${(item.frame.height - size.height) * focalY / 100}px`, objectFit: 'fill', transform: `scale(${item.crop.flipX ? -1 : 1}, ${item.crop.flipY ? -1 : 1})` });
+    const fittedStyle = { position: 'absolute', maxWidth: 'none', width: `${size.width}px`, height: `${size.height}px`, left: `${(item.frame.width - size.width) * focalX / 100}px`, top: `${(item.frame.height - size.height) * focalY / 100}px`, objectFit: 'fill', transform: `scale(${item.crop.flipX ? -1 : 1}, ${item.crop.flipY ? -1 : 1})` };
+    Object.assign(image.style, fittedStyle);
+    const mask = image.parentElement?.querySelector(':scope > .svg-color-mask'); if (mask) Object.assign(mask.style, fittedStyle);
+  };
+  const applySvgColor = (item, content, image) => {
+    const asset = recolorableAsset(item); const color = model.normalizeColor(item.svgColor);
+    let mask = content.querySelector(':scope > .svg-color-mask');
+    if (!asset || !color) { image.style.opacity = ''; mask?.remove(); return; }
+    if (!mask) { mask = document.createElement('span'); mask.className = 'svg-color-mask'; mask.setAttribute('aria-hidden', 'true'); content.append(mask); }
+    const source = getAssetUrl(item);
+    Object.assign(mask.style, { backgroundColor: color, maskImage: `url("${source}")`, webkitMaskImage: `url("${source}")` });
+    image.style.opacity = '0';
   };
   const startImageReframe = (event, item, content, image) => {
     if (!canPointer(event) || gesture || item.permissions.locked || !item.permissions.editable) return;
@@ -462,7 +474,7 @@
     const content = document.createElement('div'); content.className = 'element-content image-content';
     const image = document.createElement('img'); image.alt = item.alt || ''; image.draggable = false;
     image.addEventListener('load', () => { const current = state.elements[item.id]; if (current?.crop) layoutImage(current, image); });
-    layoutImage(item, image); content.append(image); setImageSource(content, image, item);
+    content.append(image); setImageSource(content, image, item); applySvgColor(item, content, image); layoutImage(item, image);
     content.addEventListener('pointerdown', (event) => {
       if (!canPointer(event)) return;
       if (imageEditElementId === item.id) { startImageReframe(event, item, content, image); return; }
