@@ -125,7 +125,7 @@ test('typography maps public roles to supported editor fonts', () => {
 
 test('Opening, Ceremony, The Day, and Details remain byte-for-byte stable as document-model objects', () => {
   const expected = {
-    opening: 'fa428637afc2cf3a433233cb819fa31bd2a546d584d6290aa4bf31109a1a1d80',
+    opening: '60d314f8838bae54ed3917b0f88ebee079deae3fcd65e0d1b8309ccfacbff57c',
     ceremony: 'd4c0637d23ee291ec449348ae3926d93cd5558442d69bb86f766390a630305ae',
     'the-day': 'c76c5c20412e0d508591268f18d75abd3d99b2308a11228f17bbaad697d5ae6b',
     details: '5f8a903d8bb1e1d3f6967e0acf9969205757e0ef6d1f02900de24138164c075b'

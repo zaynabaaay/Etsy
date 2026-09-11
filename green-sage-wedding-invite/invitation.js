@@ -26,7 +26,7 @@
 
   const typographyStyles = document.createElement('link');
   typographyStyles.rel = 'stylesheet';
-  typographyStyles.href = 'typography-system.css?v=20260831-scroll-arrow-v1';
+  typographyStyles.href = 'typography-system.css?v=20260911-opening-hierarchy-v1';
   document.head.appendChild(typographyStyles);
 
   const scheduleSection = document.querySelector('.schedule-section');

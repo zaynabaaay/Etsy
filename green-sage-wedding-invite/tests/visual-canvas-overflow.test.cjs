@@ -49,7 +49,7 @@ test('approved ISABELLA and JULIAN line boxes fit in Mobile, iPad, and Desktop',
   });
 });
 
-test('Opening conjunction remains contained despite Instrument Serif ink overhang', () => {
+test('Opening conjunction remains contained with Cormorant Garamond italic ink overhang', () => {
   const check = loadOverflowCheck({
     lineHeight: '19.2px',
     lineRects: [{ top: -3, width: 28.21, height: 25 }],

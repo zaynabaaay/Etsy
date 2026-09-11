@@ -1892,74 +1892,46 @@
       }
     }
 
-    /* Opening reveal: animation-only treatment; the resting layout is unchanged. */
+    /* Opening reveal: compact editorial pacing; the resting layout is unchanged. */
     html.standalone-invitation.opening-animation-ready .reference-invite .hero-formal-copy p {
       opacity: 0;
-      animation: openingInvitationFade .82s cubic-bezier(.22,.66,.2,1) .42s both;
+      transform: translateY(6px);
+      animation: openingInvitationFade .72s cubic-bezier(.22,.66,.2,1) .18s both;
     }
 
-    html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span:first-child {
-      clip-path: inset(-8px 0 calc(100% + 8px) 0);
-      transform: translateY(18px);
-      animation: openingFirstNameReveal 1.05s cubic-bezier(.22,.72,.2,1) 1.12s both;
-    }
-
-    html.standalone-invitation.opening-animation-ready .reference-invite .couple-names .ampersand {
+    html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span {
       opacity: 0;
-      transform: translateY(10px);
-      animation: openingInvitationFade .72s cubic-bezier(.22,.66,.2,1) 2.00s both;
-    }
-
-    html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span:last-child {
-      clip-path: inset(0 0 100% 0);
-      transform: translateY(18px);
-      animation: openingNameReveal 1.05s cubic-bezier(.22,.72,.2,1) 2.28s both;
-    }
-
-    html.standalone-invitation.opening-animation-ready .reference-name-motif {
-      opacity: 0;
-      transform: translateY(8px);
-      animation: openingInvitationFade .78s cubic-bezier(.22,.66,.2,1) 3.62s both;
+      transform: translateY(6px);
+      animation: openingInvitationFade .86s cubic-bezier(.22,.66,.2,1) .92s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-date-row {
       opacity: 0;
-      transform: translateY(8px);
-      animation: openingInvitationFade .82s cubic-bezier(.22,.66,.2,1) 4.10s both;
+      transform: translateY(6px);
+      animation: openingInvitationFade .72s cubic-bezier(.22,.66,.2,1) 1.80s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-city {
       opacity: 0;
-      transform: translateY(8px);
-      animation: openingInvitationFade .82s cubic-bezier(.22,.66,.2,1) 4.48s both;
+      transform: translateY(6px);
+      animation: openingInvitationFade .72s cubic-bezier(.22,.66,.2,1) 1.90s both;
     }
 
     html.standalone-invitation.opening-animation-ready .reference-scroll {
       opacity: 0;
-      transform: translateY(8px);
-      animation: openingInvitationFade .82s cubic-bezier(.22,.66,.2,1) 4.92s both;
+      transform: translateY(6px);
+      animation: openingInvitationFade .64s cubic-bezier(.22,.66,.2,1) 2.48s both;
     }
 
     /* The hidden iframe supplies only the seamless handoff background. Keep its
        copy concealed so a completed preload animation cannot flash on screen. */
     html.standalone-invitation.invitation-handoff-preview .reference-invite .hero-formal-copy p,
-    html.standalone-invitation.invitation-handoff-preview .reference-invite .couple-names .ampersand,
-    html.standalone-invitation.invitation-handoff-preview .reference-name-motif,
+    html.standalone-invitation.invitation-handoff-preview .reference-invite .couple-names > span,
     html.standalone-invitation.invitation-handoff-preview .reference-date-row,
-    html.standalone-invitation.invitation-handoff-preview .reference-city {
-      opacity: 0;
-      animation: none;
-    }
-
+    html.standalone-invitation.invitation-handoff-preview .reference-city,
     html.standalone-invitation.invitation-handoff-preview .reference-scroll {
       opacity: 0;
-      animation: none;
-    }
-
-    html.standalone-invitation.invitation-handoff-preview .reference-invite .couple-names > span:first-child,
-    html.standalone-invitation.invitation-handoff-preview .reference-invite .couple-names > span:last-child {
-      clip-path: inset(0 0 100% 0);
-      transform: translateY(18px);
+      transform: translateY(6px);
       animation: none;
     }
 
@@ -1972,52 +1944,19 @@
     }
 
     @keyframes openingInvitationFade {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes openingNameReveal {
-      from {
-        clip-path: inset(0 0 100% 0);
-        transform: translateY(18px);
-      }
-      to {
-        clip-path: inset(0 0 0 0);
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes openingFirstNameReveal {
-      from {
-        clip-path: inset(-8px 0 calc(100% + 8px) 0);
-        transform: translateY(18px);
-      }
-      to {
-        clip-path: inset(-8px 0 0 0);
-        transform: translateY(0);
-      }
     }
 
     @media (prefers-reduced-motion: reduce) {
       html.standalone-invitation.opening-animation-ready .reference-invite .hero-formal-copy p,
       html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span,
-      html.standalone-invitation.opening-animation-ready .reference-name-motif,
       html.standalone-invitation.opening-animation-ready .reference-date-row,
-      html.standalone-invitation.opening-animation-ready .reference-city {
-        opacity: 1;
-        clip-path: inset(0);
-        transform: none;
-        animation: none;
-      }
-
+      html.standalone-invitation.opening-animation-ready .reference-city,
       html.standalone-invitation.opening-animation-ready .reference-scroll {
         opacity: 1;
         transform: none;
         animation: none;
-      }
-
-      html.standalone-invitation.opening-animation-ready .reference-invite .couple-names > span:first-child {
-        clip-path: inset(-8px 0 0);
       }
     }
 

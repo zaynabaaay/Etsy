@@ -199,7 +199,7 @@ test('Opening, Ceremony, and The Day retain approved authored data after fallbac
     sections: Object.fromEntries(existingSectionIds.map((id) => [id, authored.sections[id]])),
     elements: Object.fromEntries(Object.entries(authored.elements).filter(([, element]) => existingSectionIds.includes(element.sectionId)))
   };
-  assert.equal(digest(existing), 'db10b737314e247c1a233fbbc8354b2744684713494b5dfd70c55ac5f88a0680');
+  assert.equal(digest(existing), '2d84bb526f1c2a9ca74ba80b438795b7e7384bdf83e672bf0254b51dd895536c');
 });
 
 test('Details participates in generic responsive mutation, Reset, and persistence', () => {

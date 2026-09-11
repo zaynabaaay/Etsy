@@ -66,10 +66,13 @@ test('Opening resolves measured Mobile, iPad, and Desktop composition sparsely',
   assert.equal(ipad.sections.opening.height, 1024);
   assert.equal(desktop.sections.opening.height, 1000);
   assert.deepEqual(plain(mobile.elements['opening-isabella'].frame), { x: 43.31, y: 295.67, width: 303.34, height: 53.55 });
-  assert.equal(mobile.elements['opening-isabella'].style.fontSize, 58.2);
-  assert.equal(ipad.elements['opening-isabella'].style.fontSize, 57.6);
+  assert.equal(mobile.elements['opening-isabella'].style.fontSize, 54.7);
+  assert.equal(ipad.elements['opening-isabella'].style.fontSize, 54.1);
   assert.deepEqual(plain(ipad.elements['opening-isabella'].frame), { x: 233.84, y: 371.47, width: 300.31, height: 52.98 });
-  assert.equal(desktop.elements['opening-isabella'].style.fontSize, 101.376);
+  assert.equal(desktop.elements['opening-isabella'].style.fontSize, 95.3);
+  assert.equal(mobile.elements['opening-julian'].style.fontSize, 57.5);
+  assert.equal(ipad.elements['opening-julian'].style.fontSize, 57.8);
+  assert.equal(desktop.elements['opening-julian'].style.fontSize, 101.75);
   assert.deepEqual(plain(desktop.elements['opening-julian'].frame), { x: 391.2, y: 456.84, width: 417.58, height: 99.56 });
   assert.deepEqual(plain(authored.elements['opening-date'].responsive.overrides.ipad), { frame: { x: 151.97, y: 554.52, width: 464.06 } });
   assert.equal(authored.elements['opening-date'].responsive.overrides.ipad.style, undefined);
@@ -79,7 +82,7 @@ test('Opening resolves measured Mobile, iPad, and Desktop composition sparsely',
 test('Opening typography uses only existing live font families and shared content', () => {
   assert.equal(authored.elements['opening-isabella'].style.fontFamily, 'Baskervville');
   assert.equal(authored.elements['opening-julian'].style.fontFamily, 'Baskervville');
-  assert.equal(authored.elements['opening-and'].style.fontFamily, 'Instrument Serif');
+  assert.equal(authored.elements['opening-and'].style.fontFamily, 'Cormorant Garamond');
   assert.equal(authored.elements['opening-and'].style.fontStyle, 'italic');
   ['opening-intro-1', 'opening-intro-2', 'opening-date', 'opening-location', 'opening-scroll'].forEach((id) => {
     assert.equal(authored.elements[id].style.fontFamily, 'Instrument Sans');

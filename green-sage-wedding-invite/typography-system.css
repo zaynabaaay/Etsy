@@ -250,7 +250,7 @@
 .reference-invite .couple-names {
   gap: clamp(8px, .9vw, 12px) !important;
   font-family: "Baskervville", Baskerville, Georgia, serif !important;
-  font-size: clamp(60px, 8.8vw, 106px) !important;
+  font-size: clamp(56.4px, 8.27vw, 99.64px) !important;
   line-height: .92 !important;
   letter-spacing: .018em !important;
   text-indent: .018em !important;
@@ -259,7 +259,7 @@
 .reference-invite .couple-names .ampersand {
   margin: .04em 0 .02em !important;
   color: rgba(98, 103, 83, .76) !important;
-  font-family: "Instrument Serif", Georgia, serif !important;
+  font-family: "Cormorant Garamond", Garamond, Georgia, serif !important;
   font-size: .32em !important;
   font-style: italic !important;
 }
@@ -319,6 +319,6 @@
 
 @media (min-width: 760px) and (max-width: 1100px) {
   .reference-invite .couple-names {
-    font-size: clamp(60px, 7.8vw, 86px) !important;
+    font-size: clamp(56.4px, 7.33vw, 80.84px) !important;
   }
 }
