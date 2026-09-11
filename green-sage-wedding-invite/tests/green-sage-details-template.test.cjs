@@ -15,6 +15,7 @@ const template = context.GreenSageVisualTemplate;
 const loader = context.StorielVisualTemplateLoader;
 const plain = (value) => JSON.parse(JSON.stringify(value));
 const digest = (value) => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+const fileDigest = (value) => crypto.createHash('sha256').update(value).digest('hex');
 const authored = model.normalize(template.cloneDefault());
 const groups = [
   ['dress-code', 'Dress Code', 'Formal attire', 'details-icon-dress-code'],
@@ -142,16 +143,30 @@ test('divider visibility changes from the Mobile grid to the wide grid without c
 });
 
 test('Details icon assets are safe, crisp, consistently recolorable SVGs', () => {
+  const tablerAssets = {
+    'details-icon-dress-code': ['hanger', '4a6fd3263a43866f3814453ea461aa51b9a562967ee941f7d279ca4ec2329f78'],
+    'details-icon-parking': ['parking-circle', '2c474202db9677bd8aeddac913bdc673d70883a424cfd546e574f22fdfaa8e2b'],
+    'details-icon-adults-only': ['users', '6be2152f8347e55f818455dafc2e0f6086785252256b43c3df08f3e3565ac11e'],
+    'details-icon-accommodation': ['bed', '85ddae66a3e09c34447eda0cea3d23a9ed15672f1dd327bbd6e0c4496242f8c7'],
+    'details-icon-transportation': ['bus', '557950898a6864543c8c4fa52dec487d2b9a893a687ac86d02973b728e79c406'],
+    'details-icon-gifts': ['gift', 'fe7c43d416de8e4b46e8a4c2fff4fd70fbebf7f7b65bbfaabec7e97d1ae94f70']
+  };
   groups.forEach(([, , , assetId]) => {
     const asset = model.getTemplateAsset(assetId);
     assert.deepEqual([asset.kind, asset.width, asset.height], ['decorative', 24, 24]);
     assert.deepEqual([asset.recolorable, asset.defaultColor], [true, '#626753']);
     const svg = fs.readFileSync(path.join(__dirname, '..', asset.url), 'utf8');
+    assert.ok(tablerAssets[assetId], assetId);
+    assert.equal(fileDigest(svg), tablerAssets[assetId][1], `${assetId} must retain the reviewed Tabler ${tablerAssets[assetId][0]} artwork`);
     assert.match(svg, /viewBox="0 0 24 24"/);
+    assert.match(svg, /fill="none"/);
     assert.match(svg, /stroke="#626753"/);
-    assert.match(svg, /stroke-width="1\.4"/);
+    assert.match(svg, /stroke-width="1\.5"/);
+    assert.match(svg, /stroke-linecap="round"/);
+    assert.match(svg, /stroke-linejoin="round"/);
     assert.doesNotMatch(svg, /<script|<foreignObject|javascript:|<image|\shref=/i);
   });
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'TABLER-ICONS-LICENSE.txt'), 'utf8'), /MIT License[\s\S]*Copyright \(c\) 2020-2026 Paweł Kuna/);
 });
 
 test('Details uses only approved palette roles and established typography', () => {
