@@ -1,7 +1,8 @@
 :root { color-scheme: light; --ink:#34362e; --muted:#73766a; --line:#deddd6; --panel:#fffefa; --paper:#f5f3ee; --sage:#747963; --sage-soft:#e9ebe4; --danger:#8f4740; --bar-height:56px; --context-height:58px; --rail-width:72px; --panel-width:286px; }
 * { box-sizing: border-box; }
 html, body { width:100%; height:100%; min-height:0; margin:0; overflow:hidden; overscroll-behavior:none; }
-body { color:var(--ink); background:var(--paper); font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
+/* Keep iOS elastic overscroll from turning the parent document into a movable app surface. */
+body { position:fixed; inset:0; color:var(--ink); background:var(--paper); font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
 button,input,select { color:inherit; font:inherit; }
 button { cursor:pointer; }
 button:focus-visible,input:focus-visible,select:focus-visible { outline:2px solid rgba(116,121,99,.62); outline-offset:2px; }
