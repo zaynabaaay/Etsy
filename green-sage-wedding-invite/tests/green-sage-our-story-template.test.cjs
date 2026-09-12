@@ -22,35 +22,30 @@ const storage = () => {
   return { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, String(value)) };
 };
 
-const publicCopy = [
+const storyCopy = [
   'OUR STORY',
   'How We Met',
-  'We met the way the best things often happen — unexpectedly, and at exactly the right time.',
-  'What started with easy conversation became long walks, shared plans, and the kind of everyday moments that quietly turn into a life together.',
-  'Now we get to celebrate the next chapter with the people who have been part of our story along the way.',
+  'We first met unexpectedly, and what started as an easy conversation quickly turned into hours together. After that came long walks, shared dinners, and the kind of friendship that slowly became something more.',
+  'A few years later, we’re beginning our next chapter together — and we’re so happy to celebrate it with the people we love most.',
   'With love, Isabella & Julian'
 ];
-const copyIds = ['our-story-label', 'our-story-heading', 'our-story-body-1', 'our-story-body-2', 'our-story-body-3', 'our-story-signoff'];
+const copyIds = ['our-story-label', 'our-story-heading', 'our-story-body-1', 'our-story-body-2', 'our-story-signoff'];
 const offsetIds = ['our-story-offset-top', 'our-story-offset-right', 'our-story-offset-bottom', 'our-story-offset-left'];
 const borderIds = ['our-story-border-top', 'our-story-border-right', 'our-story-border-bottom', 'our-story-border-left'];
 
-test('Our Story exists after Details in the public invitation order without RSVP', () => {
+test('Our Story remains after Details in visual-document order without RSVP', () => {
   assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
   assert.equal(section.name, 'Our Story');
   assert.equal(authored.sections.rsvp, undefined);
-  const publicSource = read('invitation.js');
-  assert.ok(publicSource.indexOf("document.querySelector('.details-section')") < publicSource.indexOf('our-story-section'));
-  assert.ok(publicSource.indexOf('our-story-section') < publicSource.indexOf('rsvp-section'));
 });
 
-test('Our Story preserves the public copy exactly', () => {
-  assert.deepEqual(copyIds.map((id) => authored.elements[id].content), publicCopy);
-  const publicSource = read('invitation.js').replaceAll('&amp;', '&');
-  assert.ok(publicSource.includes('>Our Story<')); // Public CSS renders this source label uppercase.
-  publicCopy.slice(1).forEach((copy) => assert.ok(publicSource.includes(copy), `missing public copy: ${copy}`));
+test('Our Story uses the exact concise first-person copy in two paragraphs', () => {
+  assert.deepEqual(copyIds.map((id) => authored.elements[id].content), storyCopy);
+  assert.equal(authored.elements['our-story-body-3'], undefined);
+  assert.equal(storyCopy.filter((copy) => copy.startsWith('We ') || copy.startsWith('A few years')).length, 2);
 });
 
-test('Our Story photo is a normal editable image with the public source and centered 4:5 cover crop', () => {
+test('Our Story photo keeps its editable identity and uses the supplied near-4:5 portrait', () => {
   const photo = authored.elements['our-story-photo'];
   assert.equal(photo.type, 'image');
   assert.equal(photo.assetKind, 'template');
@@ -59,19 +54,20 @@ test('Our Story photo is a normal editable image with the public source and cent
   assert.ok(Math.abs(photo.frame.width / photo.frame.height - 0.8) < 0.001);
   assert.deepEqual(plain(model.getTemplateAsset('our-story-photo')), {
     id: 'our-story-photo', name: 'Our Story Photo', kind: 'image',
-    url: 'https://images.unsplash.com/photo-1616687818402-c768b3638374?auto=format&fit=crop&fm=jpg&q=90&w=1800', width: 1800, height: 1200
+    url: 'invitation-assets/couple-portrait-optimized.jpg', width: 1122, height: 1402
   });
+  assert.ok(fs.existsSync(path.join(root, 'invitation-assets/couple-portrait-optimized.jpg')));
 });
 
-test('photo border and offset outline are separate editable geometry in explicit layer order', () => {
+test('photo border and every offset-frame element are completely removed', () => {
   [...offsetIds, ...borderIds].forEach((id) => {
-    assert.equal(authored.elements[id].type, 'divider');
-    assert.equal(authored.elements[id].permissions.editable, true);
-    assert.equal(authored.elements[id].permissions.movable, true);
-    assert.equal(authored.elements[id].permissions.resizable, true);
+    assert.equal(authored.elements[id], undefined);
+    assert.equal(section.elementOrder.includes(id), false);
   });
-  assert.ok(Math.max(...offsetIds.map((id) => section.elementOrder.indexOf(id))) < section.elementOrder.indexOf('our-story-photo'));
-  assert.ok(section.elementOrder.indexOf('our-story-photo') < Math.min(...borderIds.map((id) => section.elementOrder.indexOf(id))));
+  assert.deepEqual(plain(section.elementOrder), [
+    'our-story-label', 'our-story-motif', 'our-story-heading',
+    'our-story-body-1', 'our-story-body-2', 'our-story-signoff', 'our-story-photo'
+  ]);
 });
 
 test('exact public line and four-point-star motif is a normal editable decorative element', () => {
@@ -87,7 +83,7 @@ test('exact public line and four-point-star motif is a normal editable decorativ
   assert.match(svg, /<line x1="129" y1="9" x2="220" y2="9"/);
 });
 
-test('responsive composition matches public stacked mobile and split iPad/Desktop layouts', () => {
+test('responsive composition remains stacked on Mobile and split on iPad/Desktop', () => {
   const mobilePhoto = resolve('mobile', 'our-story-photo').frame;
   const mobileSignoff = resolve('mobile', 'our-story-signoff').frame;
   assert.ok(mobilePhoto.y > mobileSignoff.y + mobileSignoff.height);
@@ -97,7 +93,8 @@ test('responsive composition matches public stacked mobile and split iPad/Deskto
     assert.ok(photo.x > copy.x + copy.width);
     assert.ok(photo.y < resolve(view, 'our-story-signoff').frame.y);
   }
-  assert.deepEqual(plain(section.responsive.overrides), { ipad: { height: 1024 }, desktop: { height: 1000 } });
+  assert.deepEqual(plain(section.responsive.overrides), { ipad: { height: 650 }, desktop: { height: 760 } });
+  assert.equal(section.height, 1030);
   assert.equal(section.background.kind, 'color');
   assert.equal(section.background.color, '#F3F2ED');
 });
@@ -115,12 +112,24 @@ test('all required Our Story frames remain inside authored section bounds at eve
   }
 });
 
-test('typography maps public roles to supported editor fonts', () => {
-  assert.equal(authored.elements['our-story-label'].style.fontFamily, 'Libre Baskerville');
+test('typography establishes a quiet label, restrained heading, breathable body, and soft sign-off', () => {
+  assert.equal(authored.elements['our-story-label'].style.fontFamily, 'Instrument Sans');
+  assert.equal(authored.elements['our-story-label'].style.fontSize, 10);
+  assert.equal(authored.elements['our-story-label'].style.letterSpacing, 3.4);
   assert.equal(authored.elements['our-story-heading'].style.fontFamily, 'Cormorant Garamond');
-  ['our-story-body-1', 'our-story-body-2', 'our-story-body-3'].forEach((id) => assert.equal(authored.elements[id].style.fontFamily, 'Libre Baskerville'));
+  assert.deepEqual(['mobile', 'ipad', 'desktop'].map((view) => resolve(view, 'our-story-heading').style.fontSize), [42, 44, 50]);
+  ['our-story-body-1', 'our-story-body-2'].forEach((id) => assert.equal(authored.elements[id].style.fontFamily, 'Libre Baskerville'));
+  assert.deepEqual(['mobile', 'ipad', 'desktop'].map((view) => resolve(view, 'our-story-body-1').style.fontSize), [14, 13.5, 14]);
+  assert.deepEqual(['mobile', 'ipad', 'desktop'].map((view) => resolve(view, 'our-story-body-1').style.lineHeight), [1.72, 1.7, 1.72]);
+  assert.deepEqual(['mobile', 'ipad', 'desktop'].map((view) => resolve(view, 'our-story-body-1').frame.width), [326, 280, 430]);
   assert.equal(authored.elements['our-story-signoff'].style.fontFamily, 'Allura');
+  assert.deepEqual(['mobile', 'ipad', 'desktop'].map((view) => resolve(view, 'our-story-signoff').style.fontSize), [22, 20, 20]);
   copyIds.forEach((id) => assert.ok(model.fontCatalog.some((font) => font.name === authored.elements[id].style.fontFamily)));
+});
+
+test('visual-document refinement has no dependency on legacy public invitation files', () => {
+  const sources = [read('green-sage-visual-template.js'), read('visual-document.js')].join('\n');
+  assert.doesNotMatch(sources, /invitation\.html|invitation\.js/);
 });
 
 test('Opening refinement and unchanged Ceremony, The Day, and Details match approved document-model objects', () => {

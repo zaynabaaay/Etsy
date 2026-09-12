@@ -16,7 +16,7 @@ const plain = (value) => JSON.parse(JSON.stringify(value));
 
 const expectedIncludedAssets = [
   { id: 'background-green-sage-opening', name: 'Green Sage Opening', kind: 'background', url: 'invitation-assets/green-sage-opening-background.jpg', width: 853, height: 1280 },
-  { id: 'our-story-photo', name: 'Our Story Photo', kind: 'image', url: 'https://images.unsplash.com/photo-1616687818402-c768b3638374?auto=format&fit=crop&fm=jpg&q=90&w=1800', width: 1800, height: 1200 },
+  { id: 'our-story-photo', name: 'Our Story Photo', kind: 'image', url: 'invitation-assets/couple-portrait-optimized.jpg', width: 1122, height: 1402 },
   { id: 'our-story-motif', name: 'Our Story Motif', kind: 'decorative', url: 'invitation-assets/our-story-motif.svg', width: 220, height: 18, recolorable: true, defaultColor: '#626753' },
   { id: 'venue-glasshouse', name: 'Glasshouse', kind: 'decorative', url: 'invitation-assets/venue-glasshouse.svg', width: 1796, height: 876, recolorable: true, defaultColor: '#605D42' },
   { id: 'venue-mansion', name: 'Mansion', kind: 'decorative', url: 'invitation-assets/venue-mansion.svg', width: 1536, height: 768, recolorable: true, defaultColor: '#8C887C' },

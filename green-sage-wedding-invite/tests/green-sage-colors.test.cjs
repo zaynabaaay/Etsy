@@ -42,7 +42,7 @@ test('Green Sage authored colors use the reconciled restrained palette', () => {
   });
 });
 
-test('Opening fallback reuses the primary ivory while Our Story contributes only its public colors', () => {
+test('Opening fallback reuses the primary ivory while Our Story contributes only its refined colors', () => {
   assert.equal(
     digest(fs.readFileSync(path.join(root, 'invitation-assets/green-sage-opening-background.jpg'))),
     '08f15870be58403ee5093b2a1ea170bf35e657c2f9fffbde285407535d81dfff'
@@ -50,7 +50,7 @@ test('Opening fallback reuses the primary ivory while Our Story contributes only
   assert.equal(authored.sections.opening.background.color, '#F4EFE7');
 
   const normalized = model.normalize(authored);
-  assert.deepEqual(plain(normalized.document.colors), ['#F4EFE7', '#EFECE7', '#858977', '#626753', '#44463D', '#5F6051', '#F3F2ED', '#AD9B78', '#3F4037', '#D2CEC5']);
+  assert.deepEqual(plain(normalized.document.colors), ['#F4EFE7', '#EFECE7', '#858977', '#626753', '#44463D', '#5F6051', '#F3F2ED', '#3F4037']);
   assert.equal(normalized.document.colors.includes('#ECE6DF'), false);
 });
 
@@ -76,7 +76,7 @@ test('authored geometry retains the approved sections plus Details and Our Story
       sectionId: element.sectionId, frame: element.frame, responsive: element.responsive
     }]))
   };
-  assert.equal(digest(JSON.stringify(geometry)), 'bb96c861b23d147e83cf40b13788cc4927a23e9a65b4df4cee4e69cf4520ae95');
+  assert.equal(digest(JSON.stringify(geometry)), '3da505e69a4c188a69bd783b7a3f7e1470f74bb2c416ac7b6b22a3848f79e379');
 });
 
 test('authored asset references and crops match the approved template including Our Story', () => {
