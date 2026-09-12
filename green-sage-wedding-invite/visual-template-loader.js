@@ -14,6 +14,24 @@
       && Array.isArray(value.document.sectionOrder) && value.document.sectionOrder.length > 0;
   };
   const normalizeDefault = (resource) => model.normalize(resource.cloneDefault());
+  const applyTemplateMigrations = (resource, source) => {
+    const currentRevision = Number.isInteger(resource.templateRevision) ? resource.templateRevision : 0;
+    const completedRevision = Number.isInteger(source.document?.templateRevision) ? source.document.templateRevision : 0;
+    if (completedRevision >= currentRevision) return { state: source, migrated: false };
+    const migrations = [...(resource.templateMigrations || [])].sort((left, right) => left.revision - right.revision);
+    let state = source;
+    let revision = completedRevision;
+    while (revision < currentRevision) {
+      const nextRevision = revision + 1;
+      const migration = migrations.find((candidate) => candidate.revision === nextRevision);
+      if (!migration || typeof migration.migrate !== 'function') throw new Error(`Missing ${resource.templateId} template migration ${nextRevision}`);
+      state = migration.migrate(state);
+      if (!state?.document || state.document.templateId !== resource.templateId) throw new Error(`Invalid ${resource.templateId} template migration ${nextRevision}`);
+      state.document.templateRevision = nextRevision;
+      revision = nextRevision;
+    }
+    return { state, migrated: true };
+  };
   const load = (templateId, storage = globalThis.localStorage) => {
     const resource = getTemplate(templateId);
     if (!resource) throw new Error(`Unknown visual template: ${templateId}`);
@@ -23,8 +41,15 @@
       if (!serialized) return fallback;
       const parsed = JSON.parse(serialized);
       if (!supportedSavedState(parsed, templateId)) return fallback;
-      const normalized = model.normalize(parsed);
-      return normalized.document.templateId === templateId ? normalized : fallback;
+      const schemaMigrated = model.migrate(parsed);
+      if (!supportedSavedState(schemaMigrated, templateId)) return fallback;
+      const templateResult = applyTemplateMigrations(resource, schemaMigrated);
+      const normalized = model.normalize(templateResult.state);
+      if (normalized.document.templateId !== templateId) return fallback;
+      if (templateResult.migrated) {
+        try { storage?.setItem(resource.storageKey, JSON.stringify(normalized)); } catch { /* Return the upgraded in-memory state even when persistence is unavailable. */ }
+      }
+      return normalized;
     } catch {
       return fallback;
     }
@@ -35,5 +60,5 @@
     storage?.setItem(resource.storageKey, JSON.stringify(authoredState));
     return true;
   };
-  globalThis.StorielVisualTemplateLoader = Object.freeze({ getTemplate, load, save });
+  globalThis.StorielVisualTemplateLoader = Object.freeze({ getTemplate, load, save, applyTemplateMigrations });
 })();

@@ -1,4 +1,5 @@
 (() => {
+  const TEMPLATE_REVISION = 1;
   const permissions = { editable: true, movable: true, resizable: true, deletable: true, locked: false };
   const text = (id, content, frame, style, overrides = {}) => {
     const { opacity = 1, ...textStyle } = style;
@@ -63,10 +64,135 @@
       permissions: { ...permissions }
     };
   };
+  const cloneValue = (value) => JSON.parse(JSON.stringify(value));
+  const valuesEqual = (left, right) => {
+    if (Object.is(left, right)) return true;
+    if (!left || !right || typeof left !== 'object' || typeof right !== 'object') return false;
+    if (Array.isArray(left) || Array.isArray(right)) {
+      return Array.isArray(left) && Array.isArray(right)
+        && left.length === right.length
+        && left.every((value, index) => valuesEqual(value, right[index]));
+    }
+    const leftKeys = Object.keys(left).sort();
+    const rightKeys = Object.keys(right).sort();
+    return valuesEqual(leftKeys, rightKeys) && leftKeys.every((key) => valuesEqual(left[key], right[key]));
+  };
+  const readPath = (target, path) => path.reduce((value, key) => value?.[key], target);
+  const writePath = (target, path, value) => {
+    let cursor = target;
+    path.slice(0, -1).forEach((key) => {
+      if (!cursor[key] || typeof cursor[key] !== 'object' || Array.isArray(cursor[key])) cursor[key] = {};
+      cursor = cursor[key];
+    });
+    cursor[path[path.length - 1]] = cloneValue(value);
+  };
+  const migrateValue = (target, path, historicalValue, authoredValue) => {
+    if (valuesEqual(readPath(target, path), historicalValue)) writePath(target, path, authoredValue);
+  };
+  const migrateLeaves = (target, path, historicalValue, authoredValue) => {
+    const bothObjects = historicalValue && authoredValue
+      && typeof historicalValue === 'object' && typeof authoredValue === 'object'
+      && !Array.isArray(historicalValue) && !Array.isArray(authoredValue);
+    if (!bothObjects) {
+      migrateValue(target, path, historicalValue, authoredValue);
+      return;
+    }
+    [...new Set([...Object.keys(historicalValue), ...Object.keys(authoredValue)])]
+      .forEach((key) => migrateLeaves(target, [...path, key], historicalValue[key], authoredValue[key]));
+  };
+  const historicalStoryText = (id, content, frame, style, overrides = {}) => storyText(id, content, frame, style, overrides);
+  const historicalStoryDivider = (id, frame, opacity, color, overrides) => ({
+    id, sectionId: 'our-story', type: 'divider', frame, rotation: 0, opacity,
+    style: { color }, responsive: { strategy: 'scale', anchorX: 'center', overrides },
+    permissions: { ...permissions }
+  });
+  const historicalBody3 = historicalStoryText(
+    'our-story-body-3',
+    'Now we get to celebrate the next chapter with the people who have been part of our story along the way.',
+    { x: 24, y: 401.13, width: 342, height: 75 },
+    { fontFamily: 'Libre Baskerville', fontSize: 14, color: '#3F4037', lineHeight: 1.78, letterSpacing: 0 },
+    {
+      ipad: { frame: { x: 56, y: 447.36, width: 280.27, height: 77 }, style: { lineHeight: 1.82 } },
+      desktop: { frame: { x: 84, y: 511.13, width: 457.91, height: 51 }, style: { lineHeight: 1.82 } }
+    }
+  );
+  const historicalFrameElements = {
+    'our-story-offset-top': historicalStoryDivider('our-story-offset-top', { x: 39.3, y: 581.27, width: 335.4, height: 1 }, 0.38, '#AD9B78', { ipad: { frame: { x: 404.27, y: 150.02, width: 320 } }, desktop: { frame: { x: 664, y: 126, width: 470 } } }),
+    'our-story-offset-right': historicalStoryDivider('our-story-offset-right', { x: 373.7, y: 581.27, width: 1, height: 419.24 }, 0.38, '#AD9B78', { ipad: { frame: { x: 723.27, y: 150.02, height: 400 } }, desktop: { frame: { x: 1133, y: 126, height: 587.5 } } }),
+    'our-story-offset-bottom': historicalStoryDivider('our-story-offset-bottom', { x: 39.3, y: 999.51, width: 335.4, height: 1 }, 0.38, '#AD9B78', { ipad: { frame: { x: 404.27, y: 549.02, width: 320 } }, desktop: { frame: { x: 664, y: 712.5, width: 470 } } }),
+    'our-story-offset-left': historicalStoryDivider('our-story-offset-left', { x: 39.3, y: 581.27, width: 1, height: 419.24 }, 0.38, '#AD9B78', { ipad: { frame: { x: 404.27, y: 150.02, height: 400 } }, desktop: { frame: { x: 664, y: 126, height: 587.5 } } }),
+    'our-story-border-top': historicalStoryDivider('our-story-border-top', { x: 27.3, y: 569.27, width: 335.4, height: 1 }, 1, '#D2CEC5', { ipad: { frame: { x: 386.27, y: 132.02, width: 320 } }, desktop: { frame: { x: 646, y: 108, width: 470 } } }),
+    'our-story-border-right': historicalStoryDivider('our-story-border-right', { x: 361.7, y: 569.27, width: 1, height: 419.24 }, 1, '#D2CEC5', { ipad: { frame: { x: 705.27, y: 132.02, height: 400 } }, desktop: { frame: { x: 1115, y: 108, height: 587.5 } } }),
+    'our-story-border-bottom': historicalStoryDivider('our-story-border-bottom', { x: 27.3, y: 987.51, width: 335.4, height: 1 }, 1, '#D2CEC5', { ipad: { frame: { x: 386.27, y: 531.02, width: 320 } }, desktop: { frame: { x: 646, y: 694.5, width: 470 } } }),
+    'our-story-border-left': historicalStoryDivider('our-story-border-left', { x: 27.3, y: 569.27, width: 1, height: 419.24 }, 1, '#D2CEC5', { ipad: { frame: { x: 386.27, y: 132.02, height: 400 } }, desktop: { frame: { x: 646, y: 108, height: 587.5 } } })
+  };
+  const storyElementChanges = {
+    'our-story-label': {
+      historical: { frame: { x: 24, y: 82, width: 342, height: 18 }, opacity: 1, style: { fontFamily: 'Libre Baskerville' }, responsive: { overrides: { ipad: { frame: { x: 56, y: 88, width: 280.27 } }, desktop: { frame: { x: 84, y: 185.16, width: 457.91 } } } } },
+      authored: { frame: { x: 32, y: 64, width: 326, height: 18 }, opacity: 0.92, style: { fontFamily: 'Instrument Sans' }, responsive: { overrides: { ipad: { frame: { x: 56, y: 88, width: 280 } }, desktop: { frame: { x: 84, y: 114, width: 430 } } } } }
+    },
+    'our-story-motif': {
+      historical: { frame: { x: 24, y: 112.34, width: 118, height: 9.65 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 118.5 } }, desktop: { frame: { x: 84, y: 217.66, width: 132, height: 10.8 } } } } },
+      authored: { frame: { x: 32, y: 96, width: 118, height: 9.65 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 118.5 } }, desktop: { frame: { x: 84, y: 146, width: 132, height: 10.8 } } } } }
+    },
+    'our-story-heading': {
+      historical: { frame: { x: 24, y: 145.98, width: 342, height: 58 }, style: { fontSize: 50.7, lineHeight: 0.94, letterSpacing: -1.2675 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 156.15, width: 280.27 }, style: { fontSize: 52, letterSpacing: -1.3 } }, desktop: { frame: { x: 84, y: 258.46, width: 457.91, height: 64 }, style: { fontSize: 61.8, letterSpacing: -1.545 } } } } },
+      authored: { frame: { x: 32, y: 128, width: 326, height: 50 }, style: { fontSize: 42, lineHeight: 0.98, letterSpacing: -1.05 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 151, width: 280 }, style: { fontSize: 44, letterSpacing: -1.1 } }, desktop: { frame: { x: 84, y: 178, width: 430, height: 58 }, style: { fontSize: 50, letterSpacing: -1.25 } } } } }
+    },
+    'our-story-body-1': {
+      historical: { content: 'We met the way the best things often happen — unexpectedly, and at exactly the right time.', frame: { x: 24, y: 219.64, width: 342, height: 50 }, style: { lineHeight: 1.78 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 233.02, width: 280.27, height: 77 }, style: { lineHeight: 1.82 } }, desktop: { frame: { x: 84, y: 347.74, width: 457.91, height: 51 }, style: { lineHeight: 1.82 } } } } },
+      authored: { content: 'We first met unexpectedly, and what started as an easy conversation quickly turned into hours together. After that came long walks, shared dinners, and the kind of friendship that slowly became something more.', frame: { x: 32, y: 198, width: 326, height: 145 }, style: { lineHeight: 1.72 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 220, width: 280, height: 170 }, style: { lineHeight: 1.7 } }, desktop: { frame: { x: 84, y: 260, width: 430, height: 104 }, style: { lineHeight: 1.72 } } } } }
+    },
+    'our-story-body-2': {
+      historical: { content: 'What started with easy conversation became long walks, shared plans, and the kind of everyday moments that quietly turn into a life together.', frame: { x: 24, y: 285.47, width: 342, height: 100 }, style: { lineHeight: 1.78 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 327.45, width: 280.27, height: 102 }, style: { lineHeight: 1.82 } }, desktop: { frame: { x: 84, y: 416.7, width: 457.91, height: 77 }, style: { lineHeight: 1.82 } } } } },
+      authored: { content: 'A few years later, we’re beginning our next chapter together — and we’re so happy to celebrate it with the people we love most.', frame: { x: 32, y: 365, width: 326, height: 121 }, style: { lineHeight: 1.72 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 412, width: 280, height: 100 }, style: { lineHeight: 1.7 } }, desktop: { frame: { x: 84, y: 386, width: 430, height: 104 }, style: { lineHeight: 1.72 } } } } }
+    },
+    'our-story-signoff': {
+      historical: { frame: { x: 24, y: 499.87, width: 342, height: 36 }, style: { fontSize: 28 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 549.79, width: 280.27 }, style: { fontSize: 25 } }, desktop: { frame: { x: 84, y: 592.08, width: 457.91 }, style: { fontSize: 25 } } } } },
+      authored: { frame: { x: 32, y: 510, width: 326, height: 32 }, style: { fontSize: 22 }, responsive: { overrides: { ipad: { frame: { x: 56, y: 536, width: 280 }, style: { fontSize: 20 } }, desktop: { frame: { x: 84, y: 516, width: 430 }, style: { fontSize: 20 } } } } }
+    },
+    'our-story-photo': {
+      historical: { frame: { x: 27.3, y: 569.27, width: 335.4, height: 419.24 }, responsive: { overrides: { ipad: { frame: { x: 386.27, y: 132.02, width: 320, height: 400 } }, desktop: { frame: { x: 646, y: 108, width: 470, height: 587.5 } } } } },
+      authored: { frame: { x: 32, y: 574, width: 326, height: 407.5 }, responsive: { overrides: { ipad: { frame: { x: 400, y: 130, width: 320, height: 400 } }, desktop: { frame: { x: 646, y: 100, width: 470, height: 587.5 } } } } }
+    }
+  };
+  const migrateResponsiveFontSize = (element, breakpoint, historicalValue, authoredValue) => {
+    const override = element?.responsive?.overrides?.[breakpoint]?.style;
+    const effective = override && Object.prototype.hasOwnProperty.call(override, 'fontSize') ? override.fontSize : element?.style?.fontSize;
+    if (valuesEqual(effective, historicalValue)) {
+      if (!element.responsive) element.responsive = { strategy: 'scale', anchorX: 'center' };
+      if (!element.responsive.overrides) element.responsive.overrides = {};
+      if (!element.responsive.overrides[breakpoint]) element.responsive.overrides[breakpoint] = {};
+      if (!element.responsive.overrides[breakpoint].style) element.responsive.overrides[breakpoint].style = {};
+      element.responsive.overrides[breakpoint].style.fontSize = authoredValue;
+    }
+  };
+  const migrateOurStoryRefinement = (source) => {
+    const next = cloneValue(source);
+    const section = next.sections?.['our-story'];
+    if (!section || !next.elements) return next;
+    migrateLeaves(section, [],
+      { height: 1081, responsive: { overrides: { ipad: { height: 1024 }, desktop: { height: 1000 } } } },
+      { height: 1030, responsive: { overrides: { ipad: { height: 650 }, desktop: { height: 760 } } } });
+    Object.entries(storyElementChanges).forEach(([id, change]) => {
+      if (next.elements[id]) migrateLeaves(next.elements[id], [], change.historical, change.authored);
+    });
+    ['our-story-body-1', 'our-story-body-2'].forEach((id) => {
+      if (next.elements[id]) migrateResponsiveFontSize(next.elements[id], 'ipad', 14, 13.5);
+    });
+    const removable = { 'our-story-body-3': historicalBody3, ...historicalFrameElements };
+    Object.entries(removable).forEach(([id, historicalDefinition]) => {
+      if (!valuesEqual(next.elements[id], historicalDefinition)) return;
+      delete next.elements[id];
+      section.elementOrder = section.elementOrder.filter((elementId) => elementId !== id);
+    });
+    return next;
+  };
   const defaultDocument = {
     schemaVersion: 4,
     document: {
       id: 'green-sage-visual-template', templateId: 'green-sage', title: 'Green Sage invitation',
+      templateRevision: TEMPLATE_REVISION,
       colors: ['#F4EFE7', '#EFECE7', '#858977', '#626753', '#44463D', '#5F6051'],
       canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 },
       sectionOrder: ['opening', 'ceremony', 'the-day', 'details', 'our-story'], media: { audio: null }
@@ -320,6 +446,8 @@
   };
   const clone = () => JSON.parse(JSON.stringify(defaultDocument));
   globalThis.GreenSageVisualTemplate = Object.freeze({
-    templateId: 'green-sage', storageKey: 'storiel-visual-document:green-sage:v1', defaultDocument: Object.freeze(defaultDocument), cloneDefault: clone
+    templateId: 'green-sage', storageKey: 'storiel-visual-document:green-sage:v1', templateRevision: TEMPLATE_REVISION,
+    templateMigrations: Object.freeze([{ revision: 1, migrate: migrateOurStoryRefinement }]),
+    defaultDocument: Object.freeze(defaultDocument), cloneDefault: clone
   });
 })();

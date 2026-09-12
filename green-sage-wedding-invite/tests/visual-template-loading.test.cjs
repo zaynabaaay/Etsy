@@ -29,6 +29,7 @@ test('Green Sage and proof have separate stable schema-4 identities', () => {
   assert.equal(greenSage.defaultDocument.document.templateId, 'green-sage');
   assert.equal(greenSage.defaultDocument.document.id, 'green-sage-visual-template');
   assert.equal(greenSage.defaultDocument.document.title, 'Green Sage invitation');
+  assert.equal(greenSage.defaultDocument.document.templateRevision, greenSage.templateRevision);
   assert.equal(proof.templateId, 'visual-proof');
   assert.notEqual(proof.storageKey, greenSage.storageKey);
   assert.ok(proof.defaultDocument.sections['proof-section']);
