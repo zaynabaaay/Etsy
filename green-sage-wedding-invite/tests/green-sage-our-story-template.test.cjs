@@ -33,10 +33,10 @@ const copyIds = ['our-story-label', 'our-story-heading', 'our-story-body-1', 'ou
 const offsetIds = ['our-story-offset-top', 'our-story-offset-right', 'our-story-offset-bottom', 'our-story-offset-left'];
 const borderIds = ['our-story-border-top', 'our-story-border-right', 'our-story-border-bottom', 'our-story-border-left'];
 
-test('Our Story remains after Details in visual-document order without RSVP', () => {
-  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
+test('Our Story remains after Details and before RSVP in visual-document order', () => {
+  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story', 'rsvp']);
   assert.equal(section.name, 'Our Story');
-  assert.equal(authored.sections.rsvp, undefined);
+  assert.equal(authored.document.sectionOrder.indexOf('rsvp'), authored.document.sectionOrder.indexOf('our-story') + 1);
 });
 
 test('Our Story uses the exact concise first-person copy in two paragraphs', () => {

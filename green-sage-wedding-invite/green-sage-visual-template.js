@@ -1,5 +1,5 @@
 (() => {
-  const TEMPLATE_REVISION = 2;
+  const TEMPLATE_REVISION = 3;
   const permissions = { editable: true, movable: true, resizable: true, deletable: true, locked: false };
   const text = (id, content, frame, style, overrides = {}) => {
     const { opacity = 1, ...textStyle } = style;
@@ -60,6 +60,15 @@
     return {
       id, sectionId: 'our-story', type: 'text', content, frame, rotation: 0, opacity,
       style: { fontWeight: 400, fontStyle: 'normal', textAlign: 'left', ...textStyle },
+      responsive: { strategy: 'scale', anchorX: 'center', ...(Object.keys(overrides).length ? { overrides } : {}) },
+      permissions: { ...permissions }
+    };
+  };
+  const rsvpText = (id, content, frame, style, overrides = {}) => {
+    const { opacity = 1, ...textStyle } = style;
+    return {
+      id, sectionId: 'rsvp', type: 'text', content, frame, rotation: 0, opacity,
+      style: { fontWeight: 400, fontStyle: 'normal', textAlign: 'center', ...textStyle },
       responsive: { strategy: 'scale', anchorX: 'center', ...(Object.keys(overrides).length ? { overrides } : {}) },
       permissions: { ...permissions }
     };
@@ -214,6 +223,73 @@
     });
     return next;
   };
+  // Revision 3 is the immutable authored RSVP addition. Future RSVP refinements
+  // should add a new revision instead of changing these historical values.
+  const rsvpRevision3Section = {
+    id: 'rsvp', name: 'RSVP', height: 474.02, heightPreset: 'custom',
+    background: { kind: 'color', color: '#E6E3DC', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+    elementOrder: [
+      'rsvp-label', 'rsvp-motif', 'rsvp-heading', 'rsvp-body',
+      'rsvp-deadline-prefix', 'rsvp-deadline', 'rsvp-deadline-period',
+      'rsvp-respond', 'rsvp-respond-underline'
+    ],
+    responsive: { overrides: { ipad: { height: 798.72 }, desktop: { height: 780 } } }
+  };
+  const rsvpRevision3Elements = {
+    'rsvp-label': rsvpText('rsvp-label', 'RSVP', { x: 24, y: 68, width: 342, height: 32 },
+      { fontFamily: 'Libre Baskerville', fontSize: 9, color: '#626753', lineHeight: 1.45, letterSpacing: 3.06 },
+      { ipad: { frame: { x: 53.75, width: 660.5 }, style: { fontSize: 10, letterSpacing: 3.4 } }, desktop: { frame: { x: 240, y: 89.27, width: 720 }, style: { fontSize: 11.232, letterSpacing: 3.81888 } } }),
+    'rsvp-motif': {
+      id: 'rsvp-motif', sectionId: 'rsvp', type: 'decorative', assetId: 'our-story-motif', assetKind: 'template', alt: '',
+      frame: { x: 132, y: 85.2, width: 126, height: 32 }, rotation: 0, opacity: 0.56, svgColor: '#626753',
+      crop: { flipX: false, flipY: false, fit: 'contain', focalX: 50, focalY: 50, zoom: 1 },
+      responsive: { strategy: 'scale', anchorX: 'center', overrides: {
+        ipad: { frame: { x: 325, y: 86.32, width: 118 } },
+        desktop: { frame: { x: 525, y: 110.69, width: 150 } }
+      } },
+      permissions: { ...permissions }
+    },
+    'rsvp-heading': rsvpText('rsvp-heading', 'Will You Join Us?', { x: 24, y: 133.34, width: 342, height: 44.64 },
+      { fontFamily: 'Cormorant Garamond', fontSize: 46.02, color: '#3F4037', lineHeight: 0.97, letterSpacing: -0.9204 },
+      { ipad: { frame: { x: 53.75, y: 137.14, width: 660.5, height: 46.56 }, style: { fontSize: 48, letterSpacing: -0.96 } }, desktop: { frame: { x: 240, y: 168.81, width: 720, height: 64.02 }, style: { fontSize: 66, letterSpacing: -1.32 } } }),
+    'rsvp-body': rsvpText('rsvp-body', 'We would be so honored to celebrate this day with you.', { x: 24, y: 205.97, width: 342, height: 48.03 },
+      { fontFamily: 'Libre Baskerville', fontSize: 13.5, color: '#3F4037', lineHeight: 1.78, letterSpacing: 0 },
+      { ipad: { frame: { x: 124, y: 213.69, width: 520, height: 32 }, style: { fontSize: 13, lineHeight: 1.82 } }, desktop: { frame: { x: 340, y: 270.83, width: 520, height: 32 }, style: { fontSize: 13.824, lineHeight: 1.82 } } }),
+    'rsvp-deadline-prefix': rsvpText('rsvp-deadline-prefix', 'Please reply by ', { x: 93.52, y: 264, width: 106.91, height: 32 },
+      { fontFamily: 'Libre Baskerville', fontSize: 13.5, color: '#3F4037', textAlign: 'left', lineHeight: 1.78, letterSpacing: 0 },
+      { ipad: { frame: { x: 286.27, y: 248.34, width: 102.94 }, style: { fontSize: 13, lineHeight: 1.82 } }, desktop: { frame: { x: 496.11, y: 306.98, width: 109.44 }, style: { fontSize: 13.824, lineHeight: 1.82 } } }),
+    'rsvp-deadline': rsvpText('rsvp-deadline', 'June 30, 2027', { x: 200.42, y: 264, width: 100.49, height: 32 },
+      { fontFamily: 'Libre Baskerville', fontSize: 13.5, color: '#626753', textAlign: 'left', lineHeight: 1.78, letterSpacing: 0 },
+      { ipad: { frame: { x: 389.2, y: 248.34, width: 97.07 }, style: { fontSize: 13, lineHeight: 1.82 } }, desktop: { frame: { x: 605.55, y: 306.98, width: 102.67 }, style: { fontSize: 13.824, lineHeight: 1.82 } } }),
+    'rsvp-deadline-period': rsvpText('rsvp-deadline-period', '.', { x: 292.91, y: 264, width: 40, height: 32 },
+      { fontFamily: 'Libre Baskerville', fontSize: 13.5, color: '#3F4037', textAlign: 'left', lineHeight: 1.78, letterSpacing: 0 },
+      { ipad: { frame: { x: 478.27, y: 248.34 }, style: { fontSize: 13, lineHeight: 1.82 } }, desktop: { frame: { x: 700.22, y: 306.98 }, style: { fontSize: 13.824, lineHeight: 1.82 } } }),
+    'rsvp-respond': rsvpText('rsvp-respond', 'Respond Here', { x: 141.45, y: 320.02, width: 107.08, height: 32 },
+      { fontFamily: 'Libre Baskerville', fontSize: 9, color: '#626753', lineHeight: 1.4, letterSpacing: 2.16 },
+      { ipad: { frame: { x: 330.45, y: 306 } }, desktop: { frame: { x: 538.36, y: 372.14, width: 123.28 }, style: { fontSize: 10.368, letterSpacing: 2.48832 } } }),
+    'rsvp-respond-underline': {
+      id: 'rsvp-respond-underline', sectionId: 'rsvp', type: 'divider',
+      frame: { x: 161.8, y: 377.02, width: 66.39, height: 1 }, rotation: 0, opacity: 0.34,
+      style: { color: '#626753' }, responsive: { strategy: 'scale', anchorX: 'center', overrides: {
+        ipad: { frame: { x: 350.79, y: 363, width: 66.39 } },
+        desktop: { frame: { x: 561.79, y: 429.14, width: 76.43 } }
+      } }, permissions: { ...permissions }
+    }
+  };
+  const migrateRsvpAddition = (source) => {
+    const next = cloneValue(source);
+    if (!next.document || !next.sections || !next.elements) return next;
+    const persistedRsvp = next.sections.rsvp
+      || Object.values(next.elements).some((element) => element?.sectionId === 'rsvp');
+    if (persistedRsvp) return next;
+    next.sections.rsvp = cloneValue(rsvpRevision3Section);
+    Object.assign(next.elements, cloneValue(rsvpRevision3Elements));
+    const order = Array.isArray(next.document.sectionOrder) ? next.document.sectionOrder : [];
+    const storyIndex = order.indexOf('our-story');
+    order.splice(storyIndex >= 0 ? storyIndex + 1 : order.length, 0, 'rsvp');
+    next.document.sectionOrder = order;
+    return next;
+  };
   const defaultDocument = {
     schemaVersion: 4,
     document: {
@@ -221,7 +297,7 @@
       templateRevision: TEMPLATE_REVISION,
       colors: ['#F4EFE7', '#EFECE7', '#858977', '#626753', '#44463D', '#5F6051'],
       canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 },
-      sectionOrder: ['opening', 'ceremony', 'the-day', 'details', 'our-story'], media: { audio: null }
+      sectionOrder: ['opening', 'ceremony', 'the-day', 'details', 'our-story', 'rsvp'], media: { audio: null }
     },
     sections: {
       opening: {
@@ -274,7 +350,8 @@
           'our-story-photo'
         ],
         responsive: { overrides: { ipad: { height: 630 }, desktop: { height: 740 } } }
-      }
+      },
+      rsvp: cloneValue(rsvpRevision3Section)
     },
     elements: {
       'opening-intro-1': openingText('opening-intro-1', 'Together with their families', { x: 32.38, y: 232.58, width: 325.23, height: 32 },
@@ -467,7 +544,8 @@
           desktop: { frame: { x: 646, y: 100, width: 470, height: 587.5 } }
         } },
         permissions: { ...permissions }
-      }
+      },
+      ...cloneValue(rsvpRevision3Elements)
     }
   };
   const clone = () => JSON.parse(JSON.stringify(defaultDocument));
@@ -475,7 +553,8 @@
     templateId: 'green-sage', storageKey: 'storiel-visual-document:green-sage:v1', templateRevision: TEMPLATE_REVISION,
     templateMigrations: Object.freeze([
       { revision: 1, migrate: migrateOurStoryRefinement },
-      { revision: 2, migrate: migrateOurStorySpacing }
+      { revision: 2, migrate: migrateOurStorySpacing },
+      { revision: 3, migrate: migrateRsvpAddition }
     ]),
     defaultDocument: Object.freeze(defaultDocument), cloneDefault: clone
   });

@@ -47,6 +47,9 @@ const historicalFrames = () => ({
 const preRefinementDocument = () => {
   const document = template.cloneDefault();
   delete document.document.templateRevision;
+  document.document.sectionOrder = document.document.sectionOrder.filter((id) => id !== 'rsvp');
+  delete document.sections.rsvp;
+  Object.keys(document.elements).forEach((id) => { if (document.elements[id].sectionId === 'rsvp') delete document.elements[id]; });
   document.sections['our-story'] = {
     id: 'our-story', name: 'Our Story', height: 1081, heightPreset: 'custom',
     background: { kind: 'color', color: '#F3F2ED', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
@@ -85,11 +88,19 @@ const preRefinementDocument = () => {
   delete normalized.document.templateRevision;
   return normalized;
 };
+const revisionTwoDocument = () => {
+  const document = template.cloneDefault();
+  document.document.templateRevision = 2;
+  document.document.sectionOrder = document.document.sectionOrder.filter((id) => id !== 'rsvp');
+  delete document.sections.rsvp;
+  Object.keys(document.elements).forEach((id) => { if (document.elements[id].sectionId === 'rsvp') delete document.elements[id]; });
+  return model.normalize(document);
+};
 
 test('new Green Sage documents start at the current template revision without changing schema or storage identity', () => {
-  assert.equal(template.templateRevision, 2);
+  assert.equal(template.templateRevision, 3);
   assert.equal(template.defaultDocument.schemaVersion, 4);
-  assert.equal(template.defaultDocument.document.templateRevision, 2);
+  assert.equal(template.defaultDocument.document.templateRevision, 3);
   assert.equal(template.storageKey, 'storiel-visual-document:green-sage:v1');
 });
 
@@ -130,7 +141,7 @@ test('spacing revision updates untouched lower rhythm and preserves individually
   saved.elements['our-story-photo'].frame.y = 574;
   saved.elements['our-story-signoff'].responsive.overrides.ipad.frame.y = 529;
   const migrated = loader.load('green-sage', storage(saved));
-  assert.equal(migrated.document.templateRevision, 2);
+  assert.equal(migrated.document.templateRevision, 3);
   assert.equal(migrated.sections['our-story'].height, 1004);
   assert.equal(migrated.sections['our-story'].responsive.overrides.ipad.height, 630);
   assert.equal(migrated.sections['our-story'].responsive.overrides.desktop.height, 740);
@@ -141,6 +152,46 @@ test('spacing revision updates untouched lower rhythm and preserves individually
   assert.equal(migrated.elements['our-story-signoff'].responsive.overrides.ipad.frame.y, 529);
   assert.equal(migrated.elements['our-story-signoff'].responsive.overrides.desktop.frame.y, 500);
   assert.equal(migrated.elements['our-story-photo'].frame.y, 548);
+  assert.ok(migrated.sections.rsvp);
+});
+
+test('revision-2 Green Sage documents receive RSVP after Our Story without changing existing state', () => {
+  const saved = revisionTwoDocument();
+  saved.elements['opening-intro-1'].content = 'Customer-edited introduction';
+  saved.elements['our-story-photo'].frame.x = 47;
+  const existingBefore = plain({
+    order: saved.document.sectionOrder,
+    sections: saved.sections,
+    elements: saved.elements
+  });
+  const store = storage(saved);
+  const migrated = loader.load('green-sage', store);
+  assert.deepEqual(plain(migrated.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story', 'rsvp']);
+  assert.equal(migrated.document.templateRevision, 3);
+  assert.equal(JSON.parse(store.value()).document.templateRevision, 3);
+  assert.deepEqual(plain(migrated.document.sectionOrder.slice(0, -1)), existingBefore.order);
+  Object.keys(existingBefore.sections).forEach((id) => assert.deepEqual(plain(migrated.sections[id]), existingBefore.sections[id], id));
+  Object.keys(existingBefore.elements).forEach((id) => assert.deepEqual(plain(migrated.elements[id]), existingBefore.elements[id], id));
+  assert.equal(migrated.elements['opening-intro-1'].content, 'Customer-edited introduction');
+  assert.equal(migrated.elements['our-story-photo'].frame.x, 47);
+  assert.deepEqual(plain(migrated.sections.rsvp), plain(model.normalize(template.cloneDefault()).sections.rsvp));
+});
+
+test('revision-3 RSVP migration is idempotent and preserves pre-existing user RSVP state', () => {
+  const store = storage(revisionTwoDocument());
+  const first = loader.load('green-sage', store);
+  const serialized = JSON.stringify(first);
+  assert.equal(store.writes(), 1);
+  assert.equal(JSON.stringify(loader.load('green-sage', store)), serialized);
+  assert.equal(store.writes(), 1);
+
+  const custom = revisionTwoDocument();
+  custom.sections.rsvp = { id: 'rsvp', name: 'Customer RSVP', height: 300, heightPreset: 'custom', background: { kind: 'color', color: '#123ABC' }, elementOrder: [], responsive: {} };
+  custom.document.sectionOrder.push('rsvp');
+  const preserved = loader.load('green-sage', storage(custom));
+  assert.equal(preserved.sections.rsvp.name, 'Customer RSVP');
+  assert.equal(preserved.sections.rsvp.height, 300);
+  assert.deepEqual(plain(preserved.sections.rsvp.elementOrder), []);
 });
 
 test('an exact pre-refinement schema-4 document migrates to the current authored Our Story and persists revision', () => {
@@ -151,8 +202,8 @@ test('an exact pre-refinement schema-4 document migrates to the current authored
   const current = model.normalize(template.cloneDefault());
   assert.deepEqual(plain(migrated.sections['our-story']), plain(current.sections['our-story']));
   assert.deepEqual(plain(Object.fromEntries(Object.entries(migrated.elements).filter(([, element]) => element.sectionId === 'our-story'))), plain(Object.fromEntries(Object.entries(current.elements).filter(([, element]) => element.sectionId === 'our-story'))));
-  assert.equal(migrated.document.templateRevision, 2);
-  assert.equal(JSON.parse(store.value()).document.templateRevision, 2);
+  assert.equal(migrated.document.templateRevision, 3);
+  assert.equal(JSON.parse(store.value()).document.templateRevision, 3);
   assert.equal(store.writes(), 1);
   ['our-story-body-3', ...Object.keys(historicalFrames())].forEach((id) => {
     assert.equal(migrated.elements[id], undefined);

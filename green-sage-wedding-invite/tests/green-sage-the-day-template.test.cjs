@@ -31,8 +31,8 @@ const storage = () => {
 };
 
 test('Green Sage keeps The Day before the migrated Details and Our Story sections', () => {
-  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
-  assert.deepEqual(Object.keys(authored.sections), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
+  assert.deepEqual(plain(authored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story', 'rsvp']);
+  assert.deepEqual(Object.keys(authored.sections), ['opening', 'ceremony', 'the-day', 'details', 'our-story', 'rsvp']);
   assert.equal(authored.sections['the-day'].background.color, '#858977');
 });
 
@@ -134,7 +134,7 @@ test('Opening, Ceremony, and The Day survive persistence with stable sparse data
   const store = storage();
   assert.equal(loader.save('green-sage', authored, store), true);
   const restored = loader.load('green-sage', store);
-  assert.deepEqual(plain(restored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
+  assert.deepEqual(plain(restored.document.sectionOrder), ['opening', 'ceremony', 'the-day', 'details', 'our-story', 'rsvp']);
   assert.deepEqual(plain(restored.sections['the-day'].elementOrder), plain(authored.sections['the-day'].elementOrder));
   allIds.forEach((id) => assert.equal(restored.elements[id].id, id));
   dividerIds.forEach((id) => assert.deepEqual(plain(restored.elements[id].responsive), plain(authored.elements[id].responsive)));

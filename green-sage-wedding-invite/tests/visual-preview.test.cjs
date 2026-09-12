@@ -41,7 +41,7 @@ test('Preview renders the persisted current document in exact section order', ()
   vm.runInNewContext(read('visual-document.js'), context);
   vm.runInNewContext(read('green-sage-visual-template.js'), context);
   const state = context.GreenSageVisualDocument.normalize(context.GreenSageVisualTemplate.cloneDefault());
-  assert.deepEqual(JSON.parse(JSON.stringify(state.document.sectionOrder)), ['opening', 'ceremony', 'the-day', 'details', 'our-story']);
+  assert.deepEqual(JSON.parse(JSON.stringify(state.document.sectionOrder)), ['opening', 'ceremony', 'the-day', 'details', 'our-story', 'rsvp']);
   assert.match(canvas, /state\.document\.sectionOrder\.map\(\(id\) => createSection\(state\.sections\[id\]\)\)/);
 });
 
