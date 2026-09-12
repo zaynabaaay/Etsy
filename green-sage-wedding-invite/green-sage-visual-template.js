@@ -73,7 +73,7 @@
     schemaVersion: 4,
     document: {
       id: 'green-sage-visual-template', templateId: 'green-sage', title: 'Green Sage invitation',
-      colors: ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051'],
+      colors: ['#F4EFE7', '#EFECE7', '#858977', '#626753', '#44463D', '#5F6051'],
       canvas: { baseWidth: 390, maxRenderedWidth: 560, viewportBackground: '#F4EFE7', safeMargin: 20 },
       sectionOrder: ['opening', 'ceremony', 'the-day', 'details', 'our-story'], media: { audio: null }
     },
@@ -86,8 +86,8 @@
       },
       ceremony: {
         id: 'ceremony', name: 'Ceremony', height: 844, heightPreset: 'full',
-        background: { kind: 'color', color: '#E6E5DF', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
-        elementOrder: ['ceremony-label', 'ceremony-time', 'ceremony-glasshouse', 'ceremony-venue', 'ceremony-address', 'ceremony-note'],
+        background: { kind: 'color', color: '#EFECE7', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+        elementOrder: ['ceremony-label', 'ceremony-glasshouse', 'ceremony-venue', 'ceremony-time', 'ceremony-address'],
         responsive: { overrides: { ipad: { height: 1024 }, desktop: { height: 1000 } } }
       },
       'the-day': {
@@ -160,9 +160,9 @@
       'ceremony-label': text('ceremony-label', 'CEREMONY', { x: 95, y: 228, width: 200, height: 32 },
         { fontFamily: 'Instrument Sans', fontSize: 10, color: '#626753', lineHeight: 1.5, letterSpacing: 3, opacity: 0.92 },
         { ipad: { frame: { x: 284, y: 321 } }, desktop: { frame: { x: 500, y: 278 } } }),
-      'ceremony-time': text('ceremony-time', '3:00 PM', { x: 95, y: 264, width: 200, height: 32 },
+      'ceremony-time': text('ceremony-time', '3:00 PM', { x: 95, y: 545, width: 200, height: 32 },
         { fontFamily: 'Instrument Sans', fontSize: 13, color: '#626753', lineHeight: 1.5, letterSpacing: 2.34, opacity: 0.92 },
-        { ipad: { frame: { x: 284, y: 363 } }, desktop: { frame: { x: 500, y: 318 } } }),
+        { ipad: { frame: { x: 284, y: 686 } }, desktop: { frame: { x: 500, y: 747 }, style: { fontSize: 14 } } }),
       'ceremony-glasshouse': {
         id: 'ceremony-glasshouse', sectionId: 'ceremony', type: 'decorative', assetId: 'venue-glasshouse', assetKind: 'template', alt: 'Glasshouse illustration',
         frame: { x: 30, y: 306, width: 330, height: 160.875 }, rotation: 0, opacity: 0.58,
@@ -179,12 +179,9 @@
           ipad: { frame: { x: 224, y: 618 }, style: { fontSize: 48, letterSpacing: 0.48 } },
           desktop: { frame: { x: 350, y: 661, width: 500, height: 74 }, style: { fontSize: 62.4, letterSpacing: 0.624 } }
         }),
-      'ceremony-address': text('ceremony-address', '123 Example Street\nOttawa, Ontario', { x: 70, y: 545, width: 250, height: 52 },
-        { fontFamily: 'Instrument Sans', fontSize: 11, color: '#44463D', lineHeight: 2, letterSpacing: 0.88, opacity: 0.82 },
-        { ipad: { frame: { x: 259, y: 690 } }, desktop: { frame: { x: 475, y: 743 } } }),
-      'ceremony-note': text('ceremony-note', 'Please arrive 15 minutes early.', { x: 65, y: 612, width: 260, height: 32 },
-        { fontFamily: 'Instrument Serif', fontSize: 15, fontStyle: 'italic', color: '#44463D', lineHeight: 1.45, letterSpacing: 0.15, opacity: 0.86 },
-        { ipad: { frame: { x: 254, y: 757 } }, desktop: { frame: { x: 470, y: 810 } } }),
+      'ceremony-address': text('ceremony-address', '123 Example Street\nOttawa, Ontario', { x: 70, y: 579, width: 250, height: 52 },
+        { fontFamily: 'Instrument Sans', fontSize: 12, color: '#44463D', lineHeight: 2, letterSpacing: 0.88, opacity: 0.82 },
+        { ipad: { frame: { x: 259, y: 720 } }, desktop: { frame: { x: 475, y: 781 }, style: { fontSize: 13 } } }),
       'the-day-label': dayText('the-day-label', 'THE DAY', { x: 24, y: 96, width: 342, height: 32 },
         { fontFamily: 'Instrument Sans', fontSize: 10, color: '#F4EFE7', lineHeight: 1.5, letterSpacing: 3.4, opacity: 0.94 },
         { ipad: { frame: { x: 48, y: 160.5, width: 672 } }, desktop: { frame: { x: 48, y: 173.7, width: 1104 } } }),

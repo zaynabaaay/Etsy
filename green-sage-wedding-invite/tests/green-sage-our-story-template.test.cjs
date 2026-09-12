@@ -126,7 +126,7 @@ test('typography maps public roles to supported editor fonts', () => {
 test('Opening refinement and unchanged Ceremony, The Day, and Details match approved document-model objects', () => {
   const expected = {
     opening: '52cb6c6bd4e8a903ec8245089da74c3772f61342985395e63a133373639353f7',
-    ceremony: 'd4c0637d23ee291ec449348ae3926d93cd5558442d69bb86f766390a630305ae',
+    ceremony: 'fb3e715216faf5fc4bb7af38ba5f08b2c17368f94350e3c8a759bf0d73cc361d',
     'the-day': 'c76c5c20412e0d508591268f18d75abd3d99b2308a11228f17bbaad697d5ae6b',
     details: '5f8a903d8bb1e1d3f6967e0acf9969205757e0ef6d1f02900de24138164c075b'
   };

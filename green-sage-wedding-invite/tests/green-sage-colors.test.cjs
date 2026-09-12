@@ -17,9 +17,9 @@ const plain = (value) => JSON.parse(JSON.stringify(value));
 const digest = (value) => crypto.createHash('sha256').update(value).digest('hex');
 
 test('Green Sage authored colors use the reconciled restrained palette', () => {
-  assert.deepEqual(plain(authored.document.colors), ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051']);
+  assert.deepEqual(plain(authored.document.colors), ['#F4EFE7', '#EFECE7', '#858977', '#626753', '#44463D', '#5F6051']);
   assert.deepEqual(plain(model.templatePalette.map(({ name, value }) => ({ name, value }))), [
-    { name: 'Main Ivory', value: '#F4EFE7' }, { name: 'Cool Stone', value: '#E6E5DF' },
+    { name: 'Main Ivory', value: '#F4EFE7' }, { name: 'Soft Paper', value: '#EFECE7' },
     { name: 'Muted Sage', value: '#858977' }, { name: 'Deep Olive', value: '#626753' },
     { name: 'Deep Neutral', value: '#44463D' }, { name: 'Quiet Olive', value: '#5F6051' }
   ]);
@@ -30,10 +30,10 @@ test('Green Sage authored colors use the reconciled restrained palette', () => {
     'opening-intro-1': '#5F6051', 'opening-intro-2': '#5F6051', 'opening-isabella': '#44463D', 'opening-and': '#626753',
     'opening-julian': '#44463D', 'opening-date': '#44463D', 'opening-location': '#5F6051', 'opening-scroll': '#5F6051'
   });
-  assert.equal(authored.sections.ceremony.background.color, '#E6E5DF');
-  assert.deepEqual(colors(['ceremony-label', 'ceremony-time', 'ceremony-venue', 'ceremony-address', 'ceremony-note']), {
+  assert.equal(authored.sections.ceremony.background.color, '#EFECE7');
+  assert.deepEqual(colors(['ceremony-label', 'ceremony-time', 'ceremony-venue', 'ceremony-address']), {
     'ceremony-label': '#626753', 'ceremony-time': '#626753', 'ceremony-venue': '#44463D',
-    'ceremony-address': '#44463D', 'ceremony-note': '#44463D'
+    'ceremony-address': '#44463D'
   });
   assert.equal(authored.sections['the-day'].background.color, '#858977');
   Object.values(authored.elements).filter((element) => element.sectionId === 'the-day').forEach((element) => {
@@ -50,7 +50,7 @@ test('Opening fallback reuses the primary ivory while Our Story contributes only
   assert.equal(authored.sections.opening.background.color, '#F4EFE7');
 
   const normalized = model.normalize(authored);
-  assert.deepEqual(plain(normalized.document.colors), ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051', '#F3F2ED', '#AD9B78', '#3F4037', '#D2CEC5']);
+  assert.deepEqual(plain(normalized.document.colors), ['#F4EFE7', '#EFECE7', '#858977', '#626753', '#44463D', '#5F6051', '#F3F2ED', '#AD9B78', '#3F4037', '#D2CEC5']);
   assert.equal(normalized.document.colors.includes('#ECE6DF'), false);
 });
 
@@ -76,7 +76,7 @@ test('authored geometry retains the approved sections plus Details and Our Story
       sectionId: element.sectionId, frame: element.frame, responsive: element.responsive
     }]))
   };
-  assert.equal(digest(JSON.stringify(geometry)), 'f252cbdbe3b201ec00575bfb730e9f2c33325823a983742bcdea9fc7e18efa91');
+  assert.equal(digest(JSON.stringify(geometry)), '3bf72aef9da7dea0ead4d12525e67dd223a3168ebf54a31f0f3c6c2970e3fdab');
 });
 
 test('authored asset references and crops match the approved template including Our Story', () => {
@@ -94,9 +94,9 @@ test('authored asset references and crops match the approved template including 
   assert.equal(model.getTemplateAsset('venue-glasshouse').url, 'invitation-assets/venue-glasshouse.svg');
 });
 
-test('venue SVG sources remain byte-identical while recoloring stays non-destructive', () => {
+test('venue SVG source strengths remain approved while recoloring stays non-destructive', () => {
   const expected = {
-    'venue-glasshouse.svg': '8ca3f725913251a229b1381e759181df3833a1725ab2b72c8b2df68b86747e9b',
+    'venue-glasshouse.svg': '67c7e02b7d0504951f0476c7ff52e010eab0e381603d9d5ee1441dc1051c4010',
     'venue-mansion.svg': '24ad2a846bddc5c39f8e7a2f3a4e7ef9236ad3989c2cb7850b8edfc1077e52ff',
     'venue-pergola.svg': '1e0fb492bbe3343965eb8cb4e2288ec5952b126d06b0ad80888593f488be3e41',
     'venue-barn.svg': 'eef4c0aeac988be687f3f077e4121063590e7962afd11e2850eee2201d554fa0'

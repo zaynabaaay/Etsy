@@ -178,7 +178,7 @@ test('Details uses only approved palette roles and established typography', () =
     assert.equal(authored.elements[`details-${key}-title`].style.fontFamily, 'Instrument Serif');
     assert.equal(authored.elements[`details-${key}-copy`].style.fontFamily, 'Instrument Sans');
   });
-  assert.deepEqual(plain(template.cloneDefault().document.colors), ['#F4EFE7', '#E6E5DF', '#858977', '#626753', '#44463D', '#5F6051']);
+  assert.deepEqual(plain(template.cloneDefault().document.colors), ['#F4EFE7', '#EFECE7', '#858977', '#626753', '#44463D', '#5F6051']);
 });
 
 test('responsive authoring remains sparse and never duplicates content', () => {
@@ -199,7 +199,7 @@ test('Opening refinement, Ceremony, and The Day retain approved authored data af
     sections: Object.fromEntries(existingSectionIds.map((id) => [id, authored.sections[id]])),
     elements: Object.fromEntries(Object.entries(authored.elements).filter(([, element]) => existingSectionIds.includes(element.sectionId)))
   };
-  assert.equal(digest(existing), '34060b48855fc85635d92257ce23f0e9b0eaac55d639075929d3d856273ddc94');
+  assert.equal(digest(existing), '811b35dbd9100d319706bd3f82583184f37db3dac1a458f17218e6eef424b763');
 });
 
 test('Details participates in generic responsive mutation, Reset, and persistence', () => {

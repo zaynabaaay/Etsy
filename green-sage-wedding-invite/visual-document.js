@@ -41,7 +41,7 @@
   ].map((font) => Object.freeze({ ...font, weights: Object.freeze(font.weights), styles: Object.freeze(font.styles), italicWeights: Object.freeze(font.italicWeights || font.weights) })));
   const FONT_BY_NAME = Object.freeze(Object.fromEntries(FONT_CATALOG.map((font) => [font.name, font])));
   const TEMPLATE_PALETTE = Object.freeze([
-    Object.freeze({ name: 'Main Ivory', value: '#F4EFE7' }), Object.freeze({ name: 'Cool Stone', value: '#E6E5DF' }),
+    Object.freeze({ name: 'Main Ivory', value: '#F4EFE7' }), Object.freeze({ name: 'Soft Paper', value: '#EFECE7' }),
     Object.freeze({ name: 'Muted Sage', value: '#858977' }), Object.freeze({ name: 'Deep Olive', value: '#626753' }),
     Object.freeze({ name: 'Deep Neutral', value: '#44463D' }), Object.freeze({ name: 'Quiet Olive', value: '#5F6051' })
   ]);

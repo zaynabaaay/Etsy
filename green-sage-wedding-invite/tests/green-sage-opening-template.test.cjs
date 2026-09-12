@@ -15,7 +15,7 @@ const loader = context.StorielVisualTemplateLoader;
 const plain = (value) => JSON.parse(JSON.stringify(value));
 const authored = model.normalize(template.cloneDefault());
 const ids = ['opening-intro-1', 'opening-intro-2', 'opening-isabella', 'opening-and', 'opening-julian', 'opening-date', 'opening-location', 'opening-scroll'];
-const ceremonyIds = ['ceremony-label', 'ceremony-time', 'ceremony-glasshouse', 'ceremony-venue', 'ceremony-address', 'ceremony-note'];
+const ceremonyIds = ['ceremony-label', 'ceremony-glasshouse', 'ceremony-venue', 'ceremony-time', 'ceremony-address'];
 const storage = () => {
   const values = new Map();
   return { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, String(value)) };
@@ -116,12 +116,12 @@ test('test-only Opening override resets without deleting either section', () => 
 test('Ceremony identity and styling remain unchanged around its refined geometry', () => {
   assert.deepEqual(plain(authored.sections.ceremony), {
     id: 'ceremony', name: 'Ceremony', height: 844, heightPreset: 'full',
-    background: { kind: 'color', color: '#E6E5DF', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
+    background: { kind: 'color', color: '#EFECE7', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
     elementOrder: ceremonyIds,
     responsive: { overrides: { ipad: { height: 1024 }, desktop: { height: 1000 } } }
   });
   assert.deepEqual(plain(authored.elements['ceremony-glasshouse'].frame), { x: 30, y: 306, width: 330, height: 160.875 });
   assert.equal(authored.elements['ceremony-venue'].content, 'The Glasshouse');
   assert.equal(authored.elements['ceremony-venue'].style.fontSize, 46.8);
-  assert.equal(authored.elements['ceremony-note'].content, 'Please arrive 15 minutes early.');
+  assert.equal(authored.elements['ceremony-note'], undefined);
 });
