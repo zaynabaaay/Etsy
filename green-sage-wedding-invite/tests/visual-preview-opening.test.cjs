@@ -26,12 +26,26 @@ test('transient envelope uses approved assets and no legacy iframe or navigation
     'invitation-assets/envelope-paper-greige.jpg',
     'invitation-assets/envelope-liner-optimized.jpg',
     'invitation-assets/wax-seal-blank-optimized.png'
-  ]) assert.match(runtime + css, new RegExp(asset.replaceAll('.', '\\.'), 'g'));
-  assert.match(runtime, /dataset\.recipientEnvelope/);
-  assert.match(runtime, /recipient-envelope-flap-front/);
-  assert.match(runtime, /recipient-envelope-flap-back/);
-  assert.match(runtime, /recipient-envelope-card/);
+  ]) assert.match(preview + runtime + css, new RegExp(asset.replaceAll('.', '\\.'), 'g'));
+  assert.match(preview, /data-recipient-envelope/);
+  assert.match(preview, /recipient-envelope-flap-front/);
+  assert.match(preview, /recipient-envelope-flap-back/);
+  assert.match(preview, /recipient-envelope-card/);
   assert.doesNotMatch(runtime + preview, /<iframe|location\.(?:assign|replace)|window\.open/);
+});
+
+test('closed envelope is present and styled in the first HTML frame', () => {
+  assert.match(preview, /<style id="recipientOpeningFirstFrame">/);
+  assert.match(preview, /<div class="recipient-envelope-overlay" data-recipient-envelope/);
+  assert.match(preview, /aria-busy="true"/);
+  assert.match(preview, /html\.recipient-envelope-active,html\.recipient-envelope-active body\{overflow:hidden/);
+  assert.match(preview, /\.recipient-envelope-overlay\{position:fixed;z-index:30000;inset:0;display:grid/);
+  assert.match(preview, /\.recipient-envelope-seal\{[^}]*pointer-events:none/);
+  assert.match(preview, /data-recipient-opening-ready/);
+  assert.equal((preview.match(/rel="preload"/g) || []).length, 3);
+  assert.doesNotMatch(runtime, /createElement\('div'\)|document\.body\.append\(overlay\)|overlay\.innerHTML/);
+  assert.match(runtime, /overlay\.dataset\.recipientOpeningReady = ''/);
+  assert.match(runtime, /overlay\.setAttribute\('aria-busy', 'false'\)/);
 });
 
 test('seal, flap, rise, turn, approach, and handoff retain approved timing', () => {

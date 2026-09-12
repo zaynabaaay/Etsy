@@ -208,10 +208,16 @@ html[data-editor-surface="preview"].recipient-opening-pending [data-section-id="
   aspect-ratio: 1;
   appearance: none;
   background: transparent;
-  cursor: pointer;
+  cursor: default;
+  pointer-events: none;
   touch-action: manipulation;
   transform: translate(-50%,-50%);
   transition: transform .22s ease, filter .22s ease, opacity .22s ease;
+}
+
+.recipient-envelope-overlay[data-recipient-opening-ready] .recipient-envelope-seal {
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .recipient-envelope-seal:active { filter: brightness(.96); transform: translate(-50%,-49%) scale(.94); }

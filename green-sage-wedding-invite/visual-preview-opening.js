@@ -2,7 +2,10 @@
   if (document.documentElement.dataset.editorSurface !== 'preview') return;
 
   const root = document.getElementById('canvasRoot');
-  if (!root || document.querySelector('[data-recipient-envelope]')) return;
+  const overlay = document.querySelector('[data-recipient-envelope]');
+  if (!root || !overlay || overlay.dataset.recipientOpeningReady !== undefined) return;
+  overlay.dataset.recipientOpeningReady = '';
+  overlay.setAttribute('aria-busy', 'false');
 
   const openingAnimations = Object.freeze({
     'opening-intro-1': { duration: 720, delay: 180 },
@@ -20,37 +23,6 @@
   let openingStarted = false;
   let copyStartedAt = 0;
   let copyCompletionTimer = 0;
-
-  const overlay = document.createElement('div');
-  overlay.className = 'recipient-envelope-overlay';
-  overlay.dataset.recipientEnvelope = '';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-label', 'Private invitation');
-  overlay.innerHTML = `
-    <section class="recipient-envelope-artboard">
-      <h1 class="recipient-envelope-heading"><small>A Private</small>Invitation</h1>
-      <div class="recipient-envelope-wrap">
-        <div class="recipient-envelope-body" aria-hidden="true"></div>
-        <div class="recipient-envelope-liner" aria-hidden="true"></div>
-        <div class="recipient-envelope-card" aria-hidden="true"></div>
-        <div class="recipient-envelope-pocket" aria-hidden="true"><span class="recipient-envelope-pocket-bottom"></span></div>
-        <div class="recipient-envelope-flap" aria-hidden="true">
-          <div class="recipient-envelope-flap-face recipient-envelope-flap-front"></div>
-          <div class="recipient-envelope-flap-face recipient-envelope-flap-back"></div>
-        </div>
-        <button class="recipient-envelope-seal" type="button" aria-label="Open the private invitation">
-          <img src="invitation-assets/wax-seal-blank-optimized.png" alt="" aria-hidden="true">
-          <span class="recipient-envelope-seal-initials" aria-hidden="true">
-            <span class="recipient-envelope-seal-initial" data-recipient-initial="first">I</span>
-            <span class="recipient-envelope-seal-rule"></span>
-            <span class="recipient-envelope-seal-initial" data-recipient-initial="second">J</span>
-          </span>
-        </button>
-      </div>
-      <p class="recipient-envelope-prompt">Tap the seal to open</p>
-      <p class="sr-only" role="status" aria-live="polite" data-recipient-status></p>
-    </section>`;
-  document.body.append(overlay);
 
   const seal = overlay.querySelector('.recipient-envelope-seal');
   const flapBack = overlay.querySelector('.recipient-envelope-flap-back');
