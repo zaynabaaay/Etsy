@@ -148,7 +148,7 @@ test('Opening, The Day, Details, and Our Story remain byte-for-byte stable', () 
     opening: '52cb6c6bd4e8a903ec8245089da74c3772f61342985395e63a133373639353f7',
     'the-day': 'c76c5c20412e0d508591268f18d75abd3d99b2308a11228f17bbaad697d5ae6b',
     details: '5f8a903d8bb1e1d3f6967e0acf9969205757e0ef6d1f02900de24138164c075b',
-    'our-story': 'fc06daa673182099101d7d4df751406301c93eebc0b0030d290b033f7b1beee7'
+    'our-story': 'bbb0f47d631284770bae8754f9dd3e768a8d43b59cb010784079f22a9f554550'
   };
   Object.entries(expected).forEach(([id, digest]) => {
     const payload = { section: authored.sections[id], elements: authored.sections[id].elementOrder.map((elementId) => authored.elements[elementId]) };

@@ -87,9 +87,9 @@ const preRefinementDocument = () => {
 };
 
 test('new Green Sage documents start at the current template revision without changing schema or storage identity', () => {
-  assert.equal(template.templateRevision, 1);
+  assert.equal(template.templateRevision, 2);
   assert.equal(template.defaultDocument.schemaVersion, 4);
-  assert.equal(template.defaultDocument.document.templateRevision, 1);
+  assert.equal(template.defaultDocument.document.templateRevision, 2);
   assert.equal(template.storageKey, 'storiel-visual-document:green-sage:v1');
 });
 
@@ -116,6 +116,33 @@ test('template revisions run sequentially and skip every completed step', () => 
   assert.deepEqual(calls, []);
 });
 
+test('spacing revision updates untouched lower rhythm and preserves individually edited positions', () => {
+  const saved = template.cloneDefault();
+  saved.document.templateRevision = 1;
+  saved.sections['our-story'].height = 1030;
+  saved.sections['our-story'].responsive.overrides = { ipad: { height: 650 }, desktop: { height: 760 } };
+  saved.elements['our-story-body-2'].frame.y = 365;
+  saved.elements['our-story-body-2'].responsive.overrides.ipad.frame.y = 412;
+  saved.elements['our-story-body-2'].responsive.overrides.desktop.frame.y = 386;
+  saved.elements['our-story-signoff'].frame.y = 510;
+  saved.elements['our-story-signoff'].responsive.overrides.ipad.frame.y = 536;
+  saved.elements['our-story-signoff'].responsive.overrides.desktop.frame.y = 516;
+  saved.elements['our-story-photo'].frame.y = 574;
+  saved.elements['our-story-signoff'].responsive.overrides.ipad.frame.y = 529;
+  const migrated = loader.load('green-sage', storage(saved));
+  assert.equal(migrated.document.templateRevision, 2);
+  assert.equal(migrated.sections['our-story'].height, 1004);
+  assert.equal(migrated.sections['our-story'].responsive.overrides.ipad.height, 630);
+  assert.equal(migrated.sections['our-story'].responsive.overrides.desktop.height, 740);
+  assert.equal(migrated.elements['our-story-body-2'].frame.y, 361);
+  assert.equal(migrated.elements['our-story-body-2'].responsive.overrides.ipad.frame.y, 404);
+  assert.equal(migrated.elements['our-story-body-2'].responsive.overrides.desktop.frame.y, 380);
+  assert.equal(migrated.elements['our-story-signoff'].frame.y, 490);
+  assert.equal(migrated.elements['our-story-signoff'].responsive.overrides.ipad.frame.y, 529);
+  assert.equal(migrated.elements['our-story-signoff'].responsive.overrides.desktop.frame.y, 500);
+  assert.equal(migrated.elements['our-story-photo'].frame.y, 548);
+});
+
 test('an exact pre-refinement schema-4 document migrates to the current authored Our Story and persists revision', () => {
   const historical = preRefinementDocument();
   const neighboringBefore = ['opening', 'ceremony', 'the-day', 'details'].map((id) => JSON.stringify({ section: historical.sections[id], elements: Object.values(historical.elements).filter((element) => element.sectionId === id) }));
@@ -124,8 +151,8 @@ test('an exact pre-refinement schema-4 document migrates to the current authored
   const current = model.normalize(template.cloneDefault());
   assert.deepEqual(plain(migrated.sections['our-story']), plain(current.sections['our-story']));
   assert.deepEqual(plain(Object.fromEntries(Object.entries(migrated.elements).filter(([, element]) => element.sectionId === 'our-story'))), plain(Object.fromEntries(Object.entries(current.elements).filter(([, element]) => element.sectionId === 'our-story'))));
-  assert.equal(migrated.document.templateRevision, 1);
-  assert.equal(JSON.parse(store.value()).document.templateRevision, 1);
+  assert.equal(migrated.document.templateRevision, 2);
+  assert.equal(JSON.parse(store.value()).document.templateRevision, 2);
   assert.equal(store.writes(), 1);
   ['our-story-body-3', ...Object.keys(historicalFrames())].forEach((id) => {
     assert.equal(migrated.elements[id], undefined);
@@ -162,7 +189,7 @@ test('three-way migration preserves edited geometry and crop while updating unto
   assert.equal(migrated.elements['our-story-heading'].frame.y, 128);
   assert.equal(migrated.elements['our-story-photo'].crop.focalY, 72);
   assert.equal(migrated.elements['our-story-photo'].responsive.overrides.ipad.frame.x, 410);
-  assert.equal(migrated.elements['our-story-photo'].frame.y, 574);
+  assert.equal(migrated.elements['our-story-photo'].frame.y, 548);
   assert.equal(migrated.elements['our-story-photo'].assetId, 'our-story-photo');
   assert.equal(migrated.elements['our-story-photo'].assetKind, 'template');
 });

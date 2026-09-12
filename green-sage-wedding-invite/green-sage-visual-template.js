@@ -1,5 +1,5 @@
 (() => {
-  const TEMPLATE_REVISION = 1;
+  const TEMPLATE_REVISION = 2;
   const permissions = { editable: true, movable: true, resizable: true, deletable: true, locked: false };
   const text = (id, content, frame, style, overrides = {}) => {
     const { opacity = 1, ...textStyle } = style;
@@ -188,6 +188,32 @@
     });
     return next;
   };
+  const migrateOurStorySpacing = (source) => {
+    const next = cloneValue(source);
+    const section = next.sections?.['our-story'];
+    if (!section || !next.elements) return next;
+    migrateLeaves(section, [],
+      { height: 1030, responsive: { overrides: { ipad: { height: 650 }, desktop: { height: 760 } } } },
+      { height: 1004, responsive: { overrides: { ipad: { height: 630 }, desktop: { height: 740 } } } });
+    const changes = {
+      'our-story-body-2': {
+        historical: { frame: { y: 365 }, responsive: { overrides: { ipad: { frame: { y: 412 } }, desktop: { frame: { y: 386 } } } } },
+        authored: { frame: { y: 361 }, responsive: { overrides: { ipad: { frame: { y: 404 } }, desktop: { frame: { y: 380 } } } } }
+      },
+      'our-story-signoff': {
+        historical: { frame: { y: 510 }, responsive: { overrides: { ipad: { frame: { y: 536 } }, desktop: { frame: { y: 516 } } } } },
+        authored: { frame: { y: 490 }, responsive: { overrides: { ipad: { frame: { y: 516 } }, desktop: { frame: { y: 500 } } } } }
+      },
+      'our-story-photo': {
+        historical: { frame: { y: 574 } },
+        authored: { frame: { y: 548 } }
+      }
+    };
+    Object.entries(changes).forEach(([id, change]) => {
+      if (next.elements[id]) migrateLeaves(next.elements[id], [], change.historical, change.authored);
+    });
+    return next;
+  };
   const defaultDocument = {
     schemaVersion: 4,
     document: {
@@ -240,14 +266,14 @@
         responsive: { overrides: { ipad: { height: 760 }, desktop: { height: 760 } } }
       },
       'our-story': {
-        id: 'our-story', name: 'Our Story', height: 1030, heightPreset: 'custom',
+        id: 'our-story', name: 'Our Story', height: 1004, heightPreset: 'custom',
         background: { kind: 'color', color: '#F3F2ED', assetId: '', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
         elementOrder: [
           'our-story-label', 'our-story-motif',
           'our-story-heading', 'our-story-body-1', 'our-story-body-2', 'our-story-signoff',
           'our-story-photo'
         ],
-        responsive: { overrides: { ipad: { height: 650 }, desktop: { height: 760 } } }
+        responsive: { overrides: { ipad: { height: 630 }, desktop: { height: 740 } } }
       }
     },
     elements: {
@@ -426,15 +452,15 @@
       'our-story-body-1': storyText('our-story-body-1', 'We first met unexpectedly, and what started as an easy conversation quickly turned into hours together. After that came long walks, shared dinners, and the kind of friendship that slowly became something more.', { x: 32, y: 198, width: 326, height: 145 },
         { fontFamily: 'Libre Baskerville', fontSize: 14, color: '#3F4037', lineHeight: 1.72, letterSpacing: 0 },
         { ipad: { frame: { x: 56, y: 220, width: 280, height: 170 }, style: { fontSize: 13.5, lineHeight: 1.7 } }, desktop: { frame: { x: 84, y: 260, width: 430, height: 104 }, style: { lineHeight: 1.72 } } }),
-      'our-story-body-2': storyText('our-story-body-2', 'A few years later, we’re beginning our next chapter together — and we’re so happy to celebrate it with the people we love most.', { x: 32, y: 365, width: 326, height: 121 },
+      'our-story-body-2': storyText('our-story-body-2', 'A few years later, we’re beginning our next chapter together — and we’re so happy to celebrate it with the people we love most.', { x: 32, y: 361, width: 326, height: 121 },
         { fontFamily: 'Libre Baskerville', fontSize: 14, color: '#3F4037', lineHeight: 1.72, letterSpacing: 0 },
-        { ipad: { frame: { x: 56, y: 412, width: 280, height: 100 }, style: { fontSize: 13.5, lineHeight: 1.7 } }, desktop: { frame: { x: 84, y: 386, width: 430, height: 104 }, style: { lineHeight: 1.72 } } }),
-      'our-story-signoff': storyText('our-story-signoff', 'With love, Isabella & Julian', { x: 32, y: 510, width: 326, height: 32 },
+        { ipad: { frame: { x: 56, y: 404, width: 280, height: 100 }, style: { fontSize: 13.5, lineHeight: 1.7 } }, desktop: { frame: { x: 84, y: 380, width: 430, height: 104 }, style: { lineHeight: 1.72 } } }),
+      'our-story-signoff': storyText('our-story-signoff', 'With love, Isabella & Julian', { x: 32, y: 490, width: 326, height: 32 },
         { fontFamily: 'Allura', fontSize: 22, color: '#626753', lineHeight: 1.05, letterSpacing: 0 },
-        { ipad: { frame: { x: 56, y: 536, width: 280 }, style: { fontSize: 20 } }, desktop: { frame: { x: 84, y: 516, width: 430 }, style: { fontSize: 20 } } }),
+        { ipad: { frame: { x: 56, y: 516, width: 280 }, style: { fontSize: 20 } }, desktop: { frame: { x: 84, y: 500, width: 430 }, style: { fontSize: 20 } } }),
       'our-story-photo': {
         id: 'our-story-photo', sectionId: 'our-story', type: 'image', assetId: 'our-story-photo', assetKind: 'template', alt: 'Couple sharing a warm moment',
-        frame: { x: 32, y: 574, width: 326, height: 407.5 }, rotation: 0, opacity: 1,
+        frame: { x: 32, y: 548, width: 326, height: 407.5 }, rotation: 0, opacity: 1,
         crop: { flipX: false, flipY: false, fit: 'cover', focalX: 50, focalY: 50, zoom: 1 },
         responsive: { strategy: 'scale', anchorX: 'center', overrides: {
           ipad: { frame: { x: 400, y: 130, width: 320, height: 400 } },
@@ -447,7 +473,10 @@
   const clone = () => JSON.parse(JSON.stringify(defaultDocument));
   globalThis.GreenSageVisualTemplate = Object.freeze({
     templateId: 'green-sage', storageKey: 'storiel-visual-document:green-sage:v1', templateRevision: TEMPLATE_REVISION,
-    templateMigrations: Object.freeze([{ revision: 1, migrate: migrateOurStoryRefinement }]),
+    templateMigrations: Object.freeze([
+      { revision: 1, migrate: migrateOurStoryRefinement },
+      { revision: 2, migrate: migrateOurStorySpacing }
+    ]),
     defaultDocument: Object.freeze(defaultDocument), cloneDefault: clone
   });
 })();

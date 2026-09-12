@@ -93,10 +93,29 @@ test('responsive composition remains stacked on Mobile and split on iPad/Desktop
     assert.ok(photo.x > copy.x + copy.width);
     assert.ok(photo.y < resolve(view, 'our-story-signoff').frame.y);
   }
-  assert.deepEqual(plain(section.responsive.overrides), { ipad: { height: 650 }, desktop: { height: 760 } });
-  assert.equal(section.height, 1030);
+  assert.deepEqual(plain(section.responsive.overrides), { ipad: { height: 630 }, desktop: { height: 740 } });
+  assert.equal(section.height, 1004);
   assert.equal(section.background.kind, 'color');
   assert.equal(section.background.color, '#F3F2ED');
+});
+
+test('lower-half spacing uses independent restrained positions without changing photo dimensions', () => {
+  const expected = {
+    mobile: { height: 1004, bodyY: 361, signoffY: 490, photoY: 548, photoSize: [326, 407.5] },
+    ipad: { height: 630, bodyY: 404, signoffY: 516, photoY: 130, photoSize: [320, 400] },
+    desktop: { height: 740, bodyY: 380, signoffY: 500, photoY: 100, photoSize: [470, 587.5] }
+  };
+  Object.entries(expected).forEach(([view, values]) => {
+    const body = resolve(view, 'our-story-body-2').frame;
+    const signoff = resolve(view, 'our-story-signoff').frame;
+    const photo = resolve(view, 'our-story-photo').frame;
+    assert.equal(model.resolveSection(section, view).height, values.height);
+    assert.equal(body.y, values.bodyY);
+    assert.equal(signoff.y, values.signoffY);
+    assert.equal(photo.y, values.photoY);
+    assert.deepEqual([photo.width, photo.height], values.photoSize);
+    assert.ok(signoff.y - (body.y + body.height) >= 0 && signoff.y - (body.y + body.height) <= 16);
+  });
 });
 
 test('all required Our Story frames remain inside authored section bounds at every breakpoint', () => {
