@@ -13,7 +13,8 @@ const manifest = JSON.parse(read('visual-editor-version.json'));
 const criticalFiles = [
   'visual-editor.css', 'visual-document.js', 'green-sage-visual-template.js',
   'visual-template-loader.js', 'visual-assets.js', 'visual-editor.js',
-  'visual-canvas.html', 'visual-preview.html', 'visual-canvas.css', 'visual-canvas.js'
+  'visual-canvas.html', 'visual-preview.html', 'visual-canvas.css', 'visual-canvas.js',
+  'visual-preview-opening.js'
 ];
 
 test('one valid editor version manifest is the cache update point', () => {
@@ -51,6 +52,7 @@ test('the parent versions the iframe entry and the canvas versions its own depen
   for (const file of ['visual-canvas.css', 'visual-document.js', 'visual-canvas.js']) {
     assert.match(bootstrap, new RegExp(`['"]${file.replace('.', '\\.')}`));
   }
+  assert.match(bootstrap, /preview:[\s\S]*'visual-preview-opening\.js'/);
 });
 
 test('versioned URLs retain existing static GitHub Pages files', () => {

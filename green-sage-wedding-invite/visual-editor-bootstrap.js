@@ -11,7 +11,7 @@
     },
     preview: {
       stylesheet: 'visual-canvas.css',
-      scripts: ['visual-document.js', 'green-sage-visual-template.js', 'visual-template-loader.js', 'visual-assets.js', 'visual-canvas.js']
+      scripts: ['visual-document.js', 'green-sage-visual-template.js', 'visual-template-loader.js', 'visual-assets.js', 'visual-canvas.js', 'visual-preview-opening.js']
     }
   };
 
