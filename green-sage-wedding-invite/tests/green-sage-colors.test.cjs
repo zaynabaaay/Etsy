@@ -76,7 +76,7 @@ test('authored geometry retains the approved sections plus Details and Our Story
       sectionId: element.sectionId, frame: element.frame, responsive: element.responsive
     }]))
   };
-  assert.equal(digest(JSON.stringify(geometry)), '3bf72aef9da7dea0ead4d12525e67dd223a3168ebf54a31f0f3c6c2970e3fdab');
+  assert.equal(digest(JSON.stringify(geometry)), 'bb96c861b23d147e83cf40b13788cc4927a23e9a65b4df4cee4e69cf4520ae95');
 });
 
 test('authored asset references and crops match the approved template including Our Story', () => {
@@ -96,7 +96,7 @@ test('authored asset references and crops match the approved template including 
 
 test('venue SVG source strengths remain approved while recoloring stays non-destructive', () => {
   const expected = {
-    'venue-glasshouse.svg': '67c7e02b7d0504951f0476c7ff52e010eab0e381603d9d5ee1441dc1051c4010',
+    'venue-glasshouse.svg': '044a07def5be6dd9068f44b9f95324e2ccb716a63dd75c04fa3abb6ad0efeae3',
     'venue-mansion.svg': '24ad2a846bddc5c39f8e7a2f3a4e7ef9236ad3989c2cb7850b8edfc1077e52ff',
     'venue-pergola.svg': '1e0fb492bbe3343965eb8cb4e2288ec5952b126d06b0ad80888593f488be3e41',
     'venue-barn.svg': 'eef4c0aeac988be687f3f077e4121063590e7962afd11e2850eee2201d554fa0'

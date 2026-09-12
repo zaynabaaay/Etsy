@@ -122,6 +122,6 @@ test('Ceremony identity and styling remain unchanged around its refined geometry
   });
   assert.deepEqual(plain(authored.elements['ceremony-glasshouse'].frame), { x: 30, y: 306, width: 330, height: 160.875 });
   assert.equal(authored.elements['ceremony-venue'].content, 'The Glasshouse');
-  assert.equal(authored.elements['ceremony-venue'].style.fontSize, 46.8);
+  assert.equal(authored.elements['ceremony-venue'].style.fontSize, 44.5);
   assert.equal(authored.elements['ceremony-note'], undefined);
 });

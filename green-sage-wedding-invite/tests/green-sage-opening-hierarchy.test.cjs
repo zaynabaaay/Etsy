@@ -109,7 +109,7 @@ test('the public reveal is excluded from the editor and reduced motion is immedi
 
 test('Ceremony, The Day, Details, and Our Story remain byte-for-byte stable', () => {
   const expected = {
-    ceremony: 'fb3e715216faf5fc4bb7af38ba5f08b2c17368f94350e3c8a759bf0d73cc361d',
+    ceremony: 'a73f2d26a071e170327004a6c2cd9baba63d7296142c70498a757341fc8bf560',
     'the-day': 'c76c5c20412e0d508591268f18d75abd3d99b2308a11228f17bbaad697d5ae6b',
     details: '5f8a903d8bb1e1d3f6967e0acf9969205757e0ef6d1f02900de24138164c075b',
     'our-story': 'e045898bca9634a2eb414c4f7d2cbc19f7f8a09f4885585adcb06909cbe3f718'

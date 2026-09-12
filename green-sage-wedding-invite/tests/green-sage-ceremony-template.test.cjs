@@ -45,6 +45,7 @@ test('Glasshouse resolves to the exact supplied recolorable SVG metadata', () =>
   assert.match(svg, /<svg[^>]*width="1796"[^>]*height="876"[^>]*viewBox="0 0 1796 876"/);
   assert.match(svg, /fill="#[0-9a-f]{6}"/i);
   assert.match(svg, /<g[^>]*opacity="0\.240"/);
+  assert.match(svg, /<g[^>]*stroke="#605d42"[^>]*stroke-width="2\.5"[^>]*stroke-linejoin="round"/i);
   assert.doesNotMatch(svg, /<script|<foreignObject|javascript:|<image|\shref=/i);
 });
 
@@ -55,19 +56,19 @@ test('Ceremony responsive projection uses sparse measured overrides', () => {
   assert.equal(mobile.sections.ceremony.height, 844);
   assert.equal(ipad.sections.ceremony.height, 1024);
   assert.equal(desktop.sections.ceremony.height, 1000);
-  assert.equal(mobile.elements['ceremony-venue'].style.fontSize, 46.8);
-  assert.equal(ipad.elements['ceremony-venue'].style.fontSize, 48);
-  assert.equal(desktop.elements['ceremony-venue'].style.fontSize, 62.4);
-  assert.equal(mobile.elements['ceremony-time'].style.fontSize, 13);
-  assert.equal(ipad.elements['ceremony-time'].style.fontSize, 13);
-  assert.equal(desktop.elements['ceremony-time'].style.fontSize, 14);
-  assert.equal(mobile.elements['ceremony-address'].style.fontSize, 12);
-  assert.equal(ipad.elements['ceremony-address'].style.fontSize, 12);
-  assert.equal(desktop.elements['ceremony-address'].style.fontSize, 13);
+  assert.equal(mobile.elements['ceremony-venue'].style.fontSize, 44.5);
+  assert.equal(ipad.elements['ceremony-venue'].style.fontSize, 46);
+  assert.equal(desktop.elements['ceremony-venue'].style.fontSize, 59.5);
+  assert.equal(mobile.elements['ceremony-time'].style.fontSize, 14);
+  assert.equal(ipad.elements['ceremony-time'].style.fontSize, 14);
+  assert.equal(desktop.elements['ceremony-time'].style.fontSize, 15);
+  assert.equal(mobile.elements['ceremony-address'].style.fontSize, 13);
+  assert.equal(ipad.elements['ceremony-address'].style.fontSize, 13);
+  assert.equal(desktop.elements['ceremony-address'].style.fontSize, 14);
   assert.deepEqual(plain(authored.elements['ceremony-label'].responsive.overrides.ipad), { frame: { x: 284, y: 321 } });
   assert.equal(authored.elements['ceremony-label'].responsive.overrides.ipad.style, undefined);
   assert.deepEqual(plain(authored.elements['ceremony-glasshouse'].responsive.overrides.desktop.frame), { x: 300, y: 360, width: 600, height: 292.5 });
-  assert.deepEqual(plain(authored.elements['ceremony-address'].responsive.overrides.desktop.style), { fontSize: 13 });
+  assert.deepEqual(plain(authored.elements['ceremony-address'].responsive.overrides.desktop.style), { fontSize: 14 });
 });
 
 test('Ceremony text, background, and hierarchy match the refined authored composition', () => {
@@ -169,6 +170,6 @@ test('test-only Desktop edit resets to the authored Ceremony inheritance', () =>
   assert.equal(model.resolveElement(state.elements['ceremony-time'], 'desktop').style.fontSize, 18);
   assert.equal(model.resetResponsiveView(state, 'desktop'), true);
   assert.equal(state.elements['ceremony-time'].responsive.overrides?.desktop, undefined);
-  assert.equal(model.resolveElement(state.elements['ceremony-time'], 'desktop').style.fontSize, 13);
+  assert.equal(model.resolveElement(state.elements['ceremony-time'], 'desktop').style.fontSize, 14);
   assert.equal(state.elements['ceremony-time'].content, '3:00 PM');
 });

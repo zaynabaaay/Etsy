@@ -161,8 +161,8 @@
         { fontFamily: 'Instrument Sans', fontSize: 10, color: '#626753', lineHeight: 1.5, letterSpacing: 3, opacity: 0.92 },
         { ipad: { frame: { x: 284, y: 321 } }, desktop: { frame: { x: 500, y: 278 } } }),
       'ceremony-time': text('ceremony-time', '3:00 PM', { x: 95, y: 545, width: 200, height: 32 },
-        { fontFamily: 'Instrument Sans', fontSize: 13, color: '#626753', lineHeight: 1.5, letterSpacing: 2.34, opacity: 0.92 },
-        { ipad: { frame: { x: 284, y: 686 } }, desktop: { frame: { x: 500, y: 747 }, style: { fontSize: 14 } } }),
+        { fontFamily: 'Instrument Sans', fontSize: 14, color: '#626753', lineHeight: 1.5, letterSpacing: 2.34, opacity: 0.92 },
+        { ipad: { frame: { x: 284, y: 686 } }, desktop: { frame: { x: 500, y: 747 }, style: { fontSize: 15 } } }),
       'ceremony-glasshouse': {
         id: 'ceremony-glasshouse', sectionId: 'ceremony', type: 'decorative', assetId: 'venue-glasshouse', assetKind: 'template', alt: 'Glasshouse illustration',
         frame: { x: 30, y: 306, width: 330, height: 160.875 }, rotation: 0, opacity: 0.58,
@@ -174,14 +174,14 @@
         permissions: { ...permissions }
       },
       'ceremony-venue': text('ceremony-venue', 'The Glasshouse', { x: 35, y: 475, width: 320, height: 56 },
-        { fontFamily: 'Instrument Serif', fontSize: 46.8, color: '#44463D', lineHeight: 0.98, letterSpacing: 0.468 },
+        { fontFamily: 'Instrument Serif', fontSize: 44.5, color: '#44463D', lineHeight: 0.98, letterSpacing: 0.468 },
         {
-          ipad: { frame: { x: 224, y: 618 }, style: { fontSize: 48, letterSpacing: 0.48 } },
-          desktop: { frame: { x: 350, y: 661, width: 500, height: 74 }, style: { fontSize: 62.4, letterSpacing: 0.624 } }
+          ipad: { frame: { x: 224, y: 618 }, style: { fontSize: 46, letterSpacing: 0.48 } },
+          desktop: { frame: { x: 350, y: 661, width: 500, height: 74 }, style: { fontSize: 59.5, letterSpacing: 0.624 } }
         }),
       'ceremony-address': text('ceremony-address', '123 Example Street\nOttawa, Ontario', { x: 70, y: 579, width: 250, height: 52 },
-        { fontFamily: 'Instrument Sans', fontSize: 12, color: '#44463D', lineHeight: 2, letterSpacing: 0.88, opacity: 0.82 },
-        { ipad: { frame: { x: 259, y: 720 } }, desktop: { frame: { x: 475, y: 781 }, style: { fontSize: 13 } } }),
+        { fontFamily: 'Instrument Sans', fontSize: 13, color: '#44463D', lineHeight: 2, letterSpacing: 0.88, opacity: 0.82 },
+        { ipad: { frame: { x: 259, y: 720 } }, desktop: { frame: { x: 475, y: 781 }, style: { fontSize: 14 } } }),
       'the-day-label': dayText('the-day-label', 'THE DAY', { x: 24, y: 96, width: 342, height: 32 },
         { fontFamily: 'Instrument Sans', fontSize: 10, color: '#F4EFE7', lineHeight: 1.5, letterSpacing: 3.4, opacity: 0.94 },
         { ipad: { frame: { x: 48, y: 160.5, width: 672 } }, desktop: { frame: { x: 48, y: 173.7, width: 1104 } } }),

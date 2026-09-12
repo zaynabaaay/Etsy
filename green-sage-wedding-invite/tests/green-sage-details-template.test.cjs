@@ -199,7 +199,7 @@ test('Opening refinement, Ceremony, and The Day retain approved authored data af
     sections: Object.fromEntries(existingSectionIds.map((id) => [id, authored.sections[id]])),
     elements: Object.fromEntries(Object.entries(authored.elements).filter(([, element]) => existingSectionIds.includes(element.sectionId)))
   };
-  assert.equal(digest(existing), '811b35dbd9100d319706bd3f82583184f37db3dac1a458f17218e6eef424b763');
+  assert.equal(digest(existing), 'd1c1d139f698b3d36c4829f5766b47a1f05c41378e0775eb963be540a6ea4492');
 });
 
 test('Details participates in generic responsive mutation, Reset, and persistence', () => {
