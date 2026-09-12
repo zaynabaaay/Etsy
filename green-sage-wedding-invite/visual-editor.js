@@ -19,7 +19,7 @@
   const getCanvasMetrics = () => model.getCanvasMetrics(activeResponsiveView, { safeMargin: state.document.canvas.safeMargin });
   const ui = {
     canvas: $('visualCanvas'), previewFrame: $('previewFrame'), workspace: $('workspace'), panel: document.querySelector('.storiel-panel'), saveStatus: $('saveStatus'),
-    undo: $('undoButton'), redo: $('redoButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'), resetView: $('resetViewButton'), resetDialog: $('resetViewDialog'), resetTitle: $('resetViewTitle'), resetDescription: $('resetViewDescription'), resetCancel: $('cancelResetViewButton'), resetConfirm: $('confirmResetViewButton'),
+    undo: $('undoButton'), redo: $('redoButton'), recipientPreview: $('recipientPreviewButton'), previewButton: $('previewButton'), previewPopover: $('previewPopover'), resetView: $('resetViewButton'), resetDialog: $('resetViewDialog'), resetTitle: $('resetViewTitle'), resetDescription: $('resetViewDescription'), resetCancel: $('cancelResetViewButton'), resetConfirm: $('confirmResetViewButton'),
     contextEmpty: $('contextEmpty'), textContext: $('textContext'), imageContext: $('imageContext'), dividerContext: $('dividerContext'), sectionContext: $('sectionContext'), sectionContextName: $('sectionContextName'), backgroundEditContext: $('backgroundEditContext'), replaceBackground: $('replaceBackgroundButton'), backgroundFit: $('backgroundFitButton'), backgroundZoom: $('backgroundZoom'), doneBackgroundToolbar: $('doneBackgroundToolbarButton'),
     fontButton: $('fontPickerButton'), fontValue: $('fontPickerValue'), fontPopover: $('fontPickerPopover'), fontSearch: $('fontSearch'), fontFilters: $('fontCategoryFilters'), fontList: $('fontList'),
     fontSize: $('fontSize'), sizeMinus: $('fontSizeDecrease'), sizePlus: $('fontSizeIncrease'), sizePresets: $('fontSizePresets'), textColorButton: $('textColorButton'), textColorPopover: $('textColorPopover'), textColorPalette: $('textColorPalette'), textColor: $('textColor'), textColorHex: $('textColorHex'), textColorSwatch: $('textColorSwatch'), svgColorButton: $('svgColorButton'), svgColorSwatch: $('svgColorSwatch'), svgOriginalColor: $('svgOriginalColorButton'),
@@ -91,8 +91,8 @@
     updateHistory();
   };
 
-  const flushPendingSave = () => {
-    if (!saveTimer) return;
+  const flushPendingSave = (force = false) => {
+    if (!saveTimer && !force) return true;
     clearTimeout(saveTimer);
     saveTimer = 0;
     // Live transaction patches are previews; only persist committed authored state.
@@ -100,8 +100,9 @@
     try {
       if (!templateLoader.save(activeTemplate.templateId, committedState)) throw new Error('Template identity mismatch');
       ui.saveStatus.textContent = 'Saved';
+      return true;
     }
-    catch { ui.saveStatus.textContent = 'Draft not saved'; }
+    catch { ui.saveStatus.textContent = 'Draft not saved'; return false; }
   };
   const scheduleSave = () => {
     clearTimeout(saveTimer);
@@ -158,6 +159,11 @@
   const mutate = (label, callback, selection) => { const next = clone(state); callback(next); commit(next, label, selection); };
   const beginControlTransaction = (label) => { if (!transaction) transaction = { before: snapshot(label), label, source: 'control', responsiveView: activeResponsiveView }; };
   const previewMutation = (callback) => { const next = clone(state); callback(next); state = model.normalize(next); renderAll(); syncCanvas(); };
+  const openRecipientPreview = (event) => {
+    ui.canvas.contentWindow?.postMessage({ type: 'green-sage-visual:end-interaction' }, ORIGIN);
+    finishTransaction(false);
+    if (!flushPendingSave(true)) event.preventDefault();
+  };
   const transactionValue = (target, path) => String(path).split('.').reduce((value, key) => value?.[key], target);
   const routeTransactionProperty = (next, path, value) => {
     if (!transaction?.resolvedTarget) return;
@@ -753,6 +759,7 @@
   $$('[data-add-text]').forEach((button) => button.addEventListener('click', () => addText(button.dataset.addText)));
   ui.undo.addEventListener('click', () => applyHistory('undo')); ui.redo.addEventListener('click', () => applyHistory('redo'));
   ui.previewButton.addEventListener('click', () => togglePopover(ui.previewPopover, ui.previewButton));
+  ui.recipientPreview.addEventListener('click', openRecipientPreview);
   ui.previewPopover.addEventListener('click', (event) => { const button = event.target.closest('[data-responsive-view]'); if (button) setResponsiveView(button.dataset.responsiveView); });
   ui.resetView.addEventListener('click', openResetViewDialog);
   ui.resetConfirm.addEventListener('click', confirmResetView);

@@ -8,6 +8,10 @@
     canvas: {
       stylesheet: 'visual-canvas.css',
       scripts: ['visual-document.js', 'visual-canvas.js']
+    },
+    preview: {
+      stylesheet: 'visual-canvas.css',
+      scripts: ['visual-document.js', 'green-sage-visual-template.js', 'visual-template-loader.js', 'visual-assets.js', 'visual-canvas.js']
     }
   };
 

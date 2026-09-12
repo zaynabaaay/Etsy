@@ -17,6 +17,38 @@ body {
   margin: 0;
 }
 
+html[data-editor-surface="preview"],
+html[data-editor-surface="preview"] body {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  background: #f4efe7;
+}
+
+html[data-editor-surface="preview"] .canvas-page {
+  min-height: 100vh;
+  padding: 0;
+  touch-action: pan-y;
+}
+
+html[data-editor-surface="preview"] .section-canvas,
+html[data-editor-surface="preview"] .element-frame {
+  pointer-events: none;
+  touch-action: pan-y;
+}
+
+html[data-editor-surface="preview"] .object-quick-actions,
+html[data-editor-surface="preview"] .recovery-resize-handles,
+html[data-editor-surface="preview"] .resize-handle,
+html[data-editor-surface="preview"] .background-edit-indicator,
+html[data-editor-surface="preview"] .text-overflow-warning,
+html[data-editor-surface="preview"] .section-canvas::after,
+html[data-editor-surface="preview"] .element-frame::after {
+  display: none !important;
+}
+
 html {
   overflow-x: hidden;
   overflow-y: auto;

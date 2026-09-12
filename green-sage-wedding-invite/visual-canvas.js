@@ -1,6 +1,7 @@
 (() => {
   const model = globalThis.GreenSageVisualDocument;
   if (!model) return;
+  const previewMode = document.documentElement.dataset.editorSurface === 'preview';
   const root = document.getElementById('canvasRoot');
   const getCanvasMetrics = () => model.getCanvasMetrics(activeResponsiveView, { safeMargin: state.document.canvas.safeMargin });
   const quickActions = document.createElement('div');
@@ -32,18 +33,20 @@
   const quickMore = quickActionButton('more', 'ellipsis', 'More');
   quickMore.setAttribute('aria-haspopup', 'dialog');
   quickMore.setAttribute('aria-expanded', 'false');
-  document.body.append(quickActions);
+  if (!previewMode) document.body.append(quickActions);
   const recoveryHandles = document.createElement('div');
   recoveryHandles.className = 'recovery-resize-handles';
   recoveryHandles.hidden = true;
   recoveryHandles.setAttribute('aria-label', 'Off-canvas resize controls');
-  document.body.append(recoveryHandles);
+  if (!previewMode) document.body.append(recoveryHandles);
   const ORIGIN = window.location.origin === 'null' ? '*' : window.location.origin;
   const sameOrigin = (origin) => origin === window.location.origin || (origin === 'null' && window.location.origin === 'null');
   const resizeDirections = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
   const resizeDirectionsFor = (item) => item.type === 'decorative' ? ['nw', 'ne', 'se', 'sw'] : item.type === 'divider' ? ['n', 'e', 's', 'w'] : resizeDirections;
   const post = (message) => window.parent.postMessage(message, ORIGIN);
   let state = null;
+  let previewAuthoredState = null;
+  let previewObjectUrls = [];
   let activeResponsiveView = 'mobile';
   let selectedSectionId = null;
   let selectedElementId = null;
@@ -65,6 +68,7 @@
   const calculateScale = () => {
     if (!state) return 1;
     const canvas = getCanvasMetrics();
+    if (previewMode) return Math.min(window.innerWidth / canvas.logicalWidth, 1);
     return Math.min(window.innerWidth / canvas.logicalWidth, state.document.canvas.maxRenderedWidth / canvas.logicalWidth);
   };
   const canPointer = (event) => event.isPrimary && (event.pointerType !== 'mouse' || event.button === 0);
@@ -532,7 +536,43 @@
     const fonts = Object.values(state.elements).filter((item) => item.type === 'text').map((item) => model.loadFont(item.style.fontFamily, { document, weight: item.style.fontWeight, style: item.style.fontStyle, size: item.style.fontSize, sample: item.content }));
     await Promise.allSettled(fonts); await document.fonts?.ready; if (token !== renderToken) return;
     root.replaceChildren(...state.document.sectionOrder.map((id) => createSection(state.sections[id])));
-    requestAnimationFrame(() => requestAnimationFrame(() => { if (token !== renderToken) return; window.scrollTo(0, scrollY); Object.values(state.elements).forEach(updateOverflow); renderRecoveryHandles(); positionQuickActions(); }));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (token !== renderToken) return;
+      window.scrollTo(0, scrollY);
+      if (!previewMode) { Object.values(state.elements).forEach(updateOverflow); renderRecoveryHandles(); positionQuickActions(); }
+    }));
+  };
+
+  const responsiveViewForWidth = (width) => width >= 1101 ? 'desktop' : width >= 760 ? 'ipad' : 'mobile';
+  const renderPreviewViewport = () => {
+    if (!previewAuthoredState) return;
+    activeResponsiveView = responsiveViewForWidth(window.innerWidth);
+    state = model.resolveDocument(previewAuthoredState, activeResponsiveView);
+    render();
+  };
+  const loadPreviewAssetUrls = async () => {
+    const previewAssets = globalThis.StorielVisualAssets;
+    if (!previewAssets) return {};
+    const urls = {};
+    const records = await previewAssets.list();
+    records.forEach((record) => {
+      try {
+        const url = URL.createObjectURL(previewAssets.getRecordBlob(record));
+        previewObjectUrls.push(url); urls[record.id] = url;
+      } catch (error) {
+        console.error('Preview upload asset could not be prepared.', { id: record?.id, name: error?.name, message: error?.message });
+      }
+    });
+    return urls;
+  };
+  const startPreview = async () => {
+    const loader = globalThis.StorielVisualTemplateLoader;
+    const template = loader?.getTemplate('green-sage');
+    if (!loader || !template) throw new Error('Visual preview dependencies are unavailable.');
+    previewAuthoredState = loader.load(template.templateId);
+    assetUrls = await loadPreviewAssetUrls();
+    root.style.background = previewAuthoredState.document.canvas.viewportBackground;
+    renderPreviewViewport();
   };
 
   window.addEventListener('message', (event) => {
@@ -562,19 +602,27 @@
     if (event.data.type === 'green-sage-visual:object-action-expanded' && event.data.action === 'more') quickMore.setAttribute('aria-expanded', String(event.data.expanded === true));
     if (event.data.type === 'green-sage-visual:focus-object-action' && event.data.action === 'more') quickMore.focus({ preventScroll: true });
   });
-  window.addEventListener('resize', render);
+  window.addEventListener('resize', previewMode ? renderPreviewViewport : render);
   window.addEventListener('scroll', () => { positionQuickActions(); positionRecoveryHandles(); }, { passive: true });
   window.visualViewport?.addEventListener('resize', positionQuickActions);
   window.visualViewport?.addEventListener('scroll', positionQuickActions);
   window.visualViewport?.addEventListener('resize', positionRecoveryHandles);
   window.visualViewport?.addEventListener('scroll', positionRecoveryHandles);
-  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.object-quick-actions')) post({ type: 'green-sage-visual:canvas-interaction' }); }, true);
-  document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.element-frame')) { lastTextTap = null; exitEdit(); } });
-  document.addEventListener('keydown', (event) => {
-    if (!['Delete', 'Backspace'].includes(event.key) || editingElementId || event.target.closest('input, textarea, [contenteditable="true"], [contenteditable="plaintext-only"]')) return;
-    const selected = state?.elements[selectedElementId]; if (!selected || selected.permissions.locked || !selected.permissions.deletable) return;
-    event.preventDefault(); post({ type: 'green-sage-visual:delete-selected' });
-  });
+  if (!previewMode) {
+    document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.object-quick-actions')) post({ type: 'green-sage-visual:canvas-interaction' }); }, true);
+    document.addEventListener('pointerdown', (event) => { if (!event.target.closest('.element-frame')) { lastTextTap = null; exitEdit(); } });
+    document.addEventListener('keydown', (event) => {
+      if (!['Delete', 'Backspace'].includes(event.key) || editingElementId || event.target.closest('input, textarea, [contenteditable="true"], [contenteditable="plaintext-only"]')) return;
+      const selected = state?.elements[selectedElementId]; if (!selected || selected.permissions.locked || !selected.permissions.deletable) return;
+      event.preventDefault(); post({ type: 'green-sage-visual:delete-selected' });
+    });
+  }
   root.innerHTML = '<div class="canvas-loading">Preparing your invitation canvas…</div>';
-  post({ type: 'green-sage-visual:ready' });
+  if (previewMode) {
+    startPreview().catch((error) => {
+      console.error('Storiel visual preview could not start.', error);
+      root.innerHTML = '<p class="canvas-loading" role="alert">The invitation preview could not load. Close this tab and try again.</p>';
+    });
+    window.addEventListener('pagehide', () => { previewObjectUrls.forEach((url) => URL.revokeObjectURL(url)); previewObjectUrls = []; });
+  } else post({ type: 'green-sage-visual:ready' });
 })();

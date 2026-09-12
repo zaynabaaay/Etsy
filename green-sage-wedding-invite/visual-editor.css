@@ -26,6 +26,7 @@ button:disabled,.is-disabled { cursor:not-allowed; opacity:.42; }
 .icon-button,.global-button { min-height:42px; border:1px solid var(--line); border-radius:8px; background:#fff; }
 .icon-button { width:42px; padding:0; font-size:18px; }
 .global-button { padding:8px 13px; font-size:11px; }
+a.global-button { display:inline-flex; align-items:center; color:inherit; text-decoration:none; }
 .view-reset-button { color:#6f5148; background:#fffdfa; }
 .toolbar-popover-anchor { position:relative; }
 
