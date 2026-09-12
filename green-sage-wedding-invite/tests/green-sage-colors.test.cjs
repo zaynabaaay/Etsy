@@ -76,7 +76,7 @@ test('authored geometry retains the approved sections plus Details and Our Story
       sectionId: element.sectionId, frame: element.frame, responsive: element.responsive
     }]))
   };
-  assert.equal(digest(JSON.stringify(geometry)), '9e848c034acd42020ed2057ef507923c9ca32d3982ea18db16789a3a878613ec');
+  assert.equal(digest(JSON.stringify(geometry)), 'f252cbdbe3b201ec00575bfb730e9f2c33325823a983742bcdea9fc7e18efa91');
 });
 
 test('authored asset references and crops match the approved template including Our Story', () => {

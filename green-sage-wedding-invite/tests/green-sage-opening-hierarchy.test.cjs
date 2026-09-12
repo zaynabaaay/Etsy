@@ -29,7 +29,7 @@ test('Opening names use the restrained six-percent hierarchy adjustment at every
   assert.ok(model.fontCatalog.some((font) => font.name === 'Cormorant Garamond' && font.styles.includes('italic')));
 });
 
-test('Opening geometry, supporting typography, background, and section heights remain unchanged', () => {
+test('Opening keeps its geometry while supporting copy receives the restrained readability adjustment', () => {
   assert.deepEqual(plain(authored.sections.opening), {
     id: 'opening', name: 'Opening', height: 844, heightPreset: 'full',
     background: { kind: 'image', color: '#F4EFE7', assetId: 'background-green-sage-opening', assetKind: 'template', focalX: 50, focalY: 50, zoom: 1 },
@@ -55,10 +55,24 @@ test('Opening geometry, supporting typography, background, and section heights r
     assert.deepEqual(plain(model.resolveElement(authored.elements['opening-julian'], view).frame), frames.julian);
   });
   const supporting = ['opening-intro-1', 'opening-intro-2', 'opening-date', 'opening-location', 'opening-scroll'];
-  const expectedSizes = { mobile: [11, 11, 12, 10, 8], ipad: [11, 11, 12, 10, 8], desktop: [12, 12, 12, 10, 8] };
+  const expectedSizes = { mobile: [12, 12, 13, 11, 8], ipad: [12, 12, 13, 11, 8], desktop: [13, 13, 13, 11, 8] };
   Object.entries(expectedSizes).forEach(([view, sizes]) => supporting.forEach((id, index) => {
     assert.equal(model.resolveElement(authored.elements[id], view).style.fontSize, sizes[index]);
   }));
+});
+
+test('every Opening text frame remains inside its authored section bounds', () => {
+  ['mobile', 'ipad', 'desktop'].forEach((view) => {
+    const resolved = model.resolveDocument(authored, view);
+    const sectionHeight = resolved.sections.opening.height;
+    resolved.sections.opening.elementOrder.forEach((id) => {
+      const frame = resolved.elements[id].frame;
+      assert.ok(frame.x >= 0, `${view} ${id} left`);
+      assert.ok(frame.y >= 0, `${view} ${id} top`);
+      assert.ok(frame.x + frame.width <= model.getCanvasMetrics(view).logicalWidth, `${view} ${id} right`);
+      assert.ok(frame.y + frame.height <= sectionHeight, `${view} ${id} bottom`);
+    });
+  });
 });
 
 test('public Opening uses one calm grouped sequence that settles in 3.12 seconds', () => {

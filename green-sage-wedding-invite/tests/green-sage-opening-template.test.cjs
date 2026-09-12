@@ -108,7 +108,7 @@ test('test-only Opening override resets without deleting either section', () => 
   assert.equal(model.writeAuthoredProperty(state, { targetType: 'element', targetId: 'opening-date', path: 'style.fontSize', value: 18, scope: 'responsive', responsiveView: 'ipad' }), true);
   assert.equal(model.resolveElement(state.elements['opening-date'], 'ipad').style.fontSize, 18);
   assert.equal(model.resetResponsiveView(state, 'ipad'), true);
-  assert.equal(model.resolveElement(state.elements['opening-date'], 'ipad').style.fontSize, 12);
+  assert.equal(model.resolveElement(state.elements['opening-date'], 'ipad').style.fontSize, 13);
   assert.ok(state.sections.opening); assert.ok(state.sections.ceremony);
   assert.deepEqual(plain(state.sections.ceremony.elementOrder), ceremonyIds);
 });

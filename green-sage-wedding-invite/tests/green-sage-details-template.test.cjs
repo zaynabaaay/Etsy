@@ -193,13 +193,13 @@ test('responsive authoring remains sparse and never duplicates content', () => {
   });
 });
 
-test('Opening, Ceremony, and The Day retain approved authored data after fallback reconciliation', () => {
+test('Opening refinement, Ceremony, and The Day retain approved authored data after fallback reconciliation', () => {
   const existingSectionIds = ['opening', 'ceremony', 'the-day'];
   const existing = {
     sections: Object.fromEntries(existingSectionIds.map((id) => [id, authored.sections[id]])),
     elements: Object.fromEntries(Object.entries(authored.elements).filter(([, element]) => existingSectionIds.includes(element.sectionId)))
   };
-  assert.equal(digest(existing), '2d84bb526f1c2a9ca74ba80b438795b7e7384bdf83e672bf0254b51dd895536c');
+  assert.equal(digest(existing), '34060b48855fc85635d92257ce23f0e9b0eaac55d639075929d3d856273ddc94');
 });
 
 test('Details participates in generic responsive mutation, Reset, and persistence', () => {
