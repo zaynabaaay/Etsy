@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="invitation-assets/envelope-paper-greige.jpg" as="image">
-  <link rel="preload" href="invitation-assets/envelope-liner-optimized.jpg" as="image">
   <link rel="preload" href="invitation-assets/wax-seal-blank-optimized.png" as="image">
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
   <style id="recipientOpeningFirstFrame">
@@ -17,11 +16,11 @@
     .recipient-envelope-artboard{position:relative;isolation:isolate;container-type:inline-size;width:min(100vw,56.2724svh);aspect-ratio:942/1674;overflow:hidden}
     .recipient-envelope-heading{position:absolute;z-index:5;top:15.45%;left:0;width:100%;margin:0;color:#45402b;font:400 4.65cqw/.94 "Instrument Serif",Georgia,serif;letter-spacing:.22em;text-align:center;text-indent:.22em;text-transform:uppercase}.recipient-envelope-heading small{display:block;margin-bottom:1.55%;font:inherit;font-size:.303em;line-height:1;letter-spacing:.38em}
     .recipient-envelope-wrap{position:absolute;z-index:4;top:calc(28.25% - 13px);left:5.52%;width:88.96%;height:41.40%;perspective:1200px;transform-style:preserve-3d;box-shadow:0 17px 22px rgba(70,66,58,.14),0 4px 8px rgba(70,66,58,.08)}
-    .recipient-envelope-body,.recipient-envelope-liner,.recipient-envelope-card,.recipient-envelope-pocket,.recipient-envelope-flap,.recipient-envelope-flap-face{position:absolute}.recipient-envelope-body{z-index:0;inset:0;border:1px solid rgba(145,140,130,.34);background:linear-gradient(rgba(255,250,242,.22),rgba(221,216,207,.16)),url("invitation-assets/envelope-paper-greige.jpg") center/cover no-repeat,#f8f5ee}.recipient-envelope-liner{z-index:1;inset:0;opacity:0;clip-path:polygon(0 0,100% 0,100% 8%,62% 56%,57% 69%,43% 69%,38% 56%,0 8%);background:linear-gradient(rgba(255,252,247,.54),rgba(244,239,230,.48)),url("invitation-assets/envelope-liner-optimized.jpg") center 36%/cover no-repeat}.recipient-envelope-card{z-index:2;top:9%;left:2%;width:96%;height:82%;background:linear-gradient(105deg,rgba(255,255,255,.26),transparent 34%,rgba(116,84,48,.025)),#f5f1e9;box-shadow:0 3px 5px rgba(75,49,25,.09),0 10px 18px rgba(67,44,24,.08)}
-    .recipient-envelope-pocket{z-index:3;inset:0;overflow:hidden;pointer-events:none}.recipient-envelope-pocket:before,.recipient-envelope-pocket:after,.recipient-envelope-pocket-bottom{position:absolute;background:linear-gradient(132deg,rgba(255,250,242,.38),rgba(218,212,202,.28)),url("invitation-assets/envelope-paper-greige.jpg") center/cover no-repeat;content:""}.recipient-envelope-pocket:before{inset:0 42% 0 0;clip-path:polygon(0 0,73% 45%,0 100%)}.recipient-envelope-pocket:after{inset:0 0 0 42%;clip-path:polygon(100% 0,27% 45%,100% 100%)}.recipient-envelope-pocket-bottom{z-index:1;inset:43% 0 0;clip-path:polygon(40% 0,60% 0,100% 82%,100% 100%,0 100%,0 82%)}
-    .recipient-envelope-flap{z-index:6;top:0;left:0;width:100%;height:60.6%;pointer-events:none;transform-style:preserve-3d}.recipient-envelope-flap-face{inset:0;transform-origin:50% 0;transform-style:preserve-3d;backface-visibility:visible;clip-path:polygon(0 0,100% 0,53.4% 94%,50% 100%,46.6% 94%);background:linear-gradient(132deg,rgba(255,250,242,.34),rgba(219,213,203,.28)),url("invitation-assets/envelope-paper-greige.jpg") center top/cover no-repeat;filter:drop-shadow(0 4px 3px rgba(70,66,58,.12))}.recipient-envelope-flap-front{z-index:2;opacity:1;transform:rotateX(0)}.recipient-envelope-flap-back{z-index:1;opacity:0;transform:rotateX(90deg)}
+    .recipient-envelope-body,.recipient-envelope-liner,.recipient-envelope-card,.recipient-envelope-pocket,.recipient-envelope-flap,.recipient-envelope-flap-face{position:absolute}.recipient-envelope-body{z-index:0;inset:0;display:block;width:100%;height:100%;overflow:visible}.recipient-envelope-liner{z-index:1;inset:0;opacity:0;clip-path:polygon(0 0,100% 0,100% 8%,62% 56%,57% 69%,43% 69%,38% 56%,0 8%);background:linear-gradient(rgba(255,249,239,.10),rgba(112,101,83,.08)),url("invitation-assets/envelope-paper-greige.jpg") center 36%/cover no-repeat}.recipient-envelope-card{z-index:2;top:9%;left:2%;width:96%;height:82%;transform-origin:50% 50%;background:linear-gradient(105deg,rgba(255,255,255,.26),transparent 34%,rgba(116,84,48,.025)),#f5f1e9;box-shadow:0 3px 5px rgba(75,49,25,.09),0 10px 18px rgba(67,44,24,.08)}
+    .recipient-envelope-pocket{z-index:3;inset:0;display:block;width:100%;height:100%;overflow:visible;pointer-events:none}
+    .recipient-envelope-flap{top:0;left:0;width:100%;height:60.6%;pointer-events:none}.recipient-envelope-flap-face{z-index:6;inset:0;transform-origin:50% 0;transform-style:preserve-3d;backface-visibility:visible;filter:drop-shadow(0 4px 3px rgba(70,66,58,.12))}.recipient-envelope-flap-face svg{display:block;width:100%;height:100%;overflow:visible}.recipient-envelope-flap-front{opacity:1;transform:rotateX(0)}.recipient-envelope-flap-back{z-index:1;opacity:0;transform:rotateX(90deg)}
     .recipient-envelope-seal{position:absolute;z-index:7;top:63.6%;left:50%;width:25%;padding:0;border:0;border-radius:50%;aspect-ratio:1;appearance:none;background:transparent;pointer-events:none;transform:translate(-50%,-50%)}.recipient-envelope-overlay[data-recipient-opening-ready] .recipient-envelope-seal{pointer-events:auto;cursor:pointer}.recipient-envelope-seal img{display:block;width:100%;height:100%;object-fit:contain;transform:rotate(-3deg);filter:grayscale(1) sepia(1) saturate(.65) hue-rotate(35deg) brightness(2.05) contrast(.78) drop-shadow(0 8px 7px rgba(49,53,40,.34))}.recipient-envelope-seal-initials{position:absolute;inset:24%;display:grid;grid-template-rows:1fr auto 1fr;place-items:center;color:#f4e6c8;font:400 clamp(20px,6.6cqw,42px)/.78 "Instrument Serif",Georgia,serif;pointer-events:none;text-shadow:0 1px 0 rgba(70,56,30,.82),0 -1px 0 rgba(255,243,205,.40),1px 2px 2px rgba(49,41,24,.52)}.recipient-envelope-seal-rule{width:82%;height:1px;background:#f4e6c8}.recipient-envelope-seal-initial:first-child{align-self:end;transform:translateY(-.1em)}.recipient-envelope-seal-initial:last-child{align-self:start;transform:translateY(.1em)}
-    .recipient-envelope-prompt{position:absolute;z-index:5;top:76.62%;left:0;width:100%;margin:calc(19.8% - 40px) 0 0;color:#454437;font-size:1.41cqw;line-height:1;letter-spacing:.54em;text-align:center;text-transform:uppercase;white-space:nowrap}.recipient-envelope-overlay .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0}
+    .recipient-envelope-prompt{position:absolute;z-index:5;top:76.62%;left:0;width:100%;margin:calc(19.8% - 40px) 0 0;color:#454437;font-size:1.41cqw;line-height:1;letter-spacing:.54em;text-align:center;text-transform:uppercase;white-space:nowrap}.recipient-envelope-paper-texture{position:absolute;z-index:30;inset:0;width:100%;height:100%;opacity:.18;mix-blend-mode:multiply;pointer-events:none}.recipient-envelope-overlay .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0}
     @media(min-width:900px){.recipient-envelope-artboard{width:100vw;height:100svh;aspect-ratio:auto}.recipient-envelope-heading{top:15.3%;font-size:clamp(36px,3.55vw,52px)}.recipient-envelope-heading small{margin-bottom:1%;font-size:clamp(9.5px,.86vw,12.6px)}.recipient-envelope-wrap{top:calc(34.2% - 13px);right:0;left:0;width:min(45.8vw,53.625svh);height:auto;margin-inline:auto;aspect-ratio:5/4}.recipient-envelope-prompt{top:82.6%;margin-top:calc(1.45vw + min(6.27vw,85.8px) - 40px);font-size:clamp(9.5px,.8vw,11.6px)}}
     @media(min-width:900px) and (max-width:1366px) and (max-height:1050px){.recipient-envelope-prompt{top:80.6%;margin-top:calc(min(6.27vw,85.8px) - 40px)}}
   </style>
@@ -32,13 +31,79 @@
     <section class="recipient-envelope-artboard">
       <h1 class="recipient-envelope-heading"><small>A Private</small>Invitation</h1>
       <div class="recipient-envelope-wrap">
-        <div class="recipient-envelope-body" aria-hidden="true"></div>
+        <svg class="recipient-envelope-body" viewBox="0 0 838 693" preserveAspectRatio="none" role="img" aria-label="A large white floral lace envelope">
+          <defs>
+            <linearGradient id="recipientBodyPaper" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fffefb"/>
+              <stop offset=".48" stop-color="#faf9f5"/>
+              <stop offset="1" stop-color="#efeee9"/>
+            </linearGradient>
+            <pattern id="recipientBodyPaperPattern" width="838" height="693" patternUnits="userSpaceOnUse">
+              <image x="0" y="-72" width="838" height="838" href="invitation-assets/envelope-paper-greige.jpg" preserveAspectRatio="xMidYMid slice"/>
+            </pattern>
+          </defs>
+          <rect x="1" y="1" width="836" height="691" rx="1" fill="url(#recipientBodyPaper)" stroke="#c9c6bf" stroke-opacity=".46" stroke-width="2"/>
+          <rect x="1" y="1" width="836" height="691" rx="1" fill="url(#recipientBodyPaperPattern)" opacity=".84"/>
+          <rect x="1" y="1" width="836" height="691" rx="1" fill="#fff4e6" opacity=".10"/>
+        </svg>
         <div class="recipient-envelope-liner" aria-hidden="true"></div>
         <div class="recipient-envelope-card" aria-hidden="true"></div>
-        <div class="recipient-envelope-pocket" aria-hidden="true"><span class="recipient-envelope-pocket-bottom"></span></div>
+        <svg class="recipient-envelope-pocket" viewBox="0 0 838 693" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="recipientPocketSideLeft" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fffaf2" stop-opacity=".58"/>
+              <stop offset="1" stop-color="#ddd8cf" stop-opacity=".34"/>
+            </linearGradient>
+            <linearGradient id="recipientPocketSideRight" x1="1" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff9f0" stop-opacity=".48"/>
+              <stop offset="1" stop-color="#d9d4ca" stop-opacity=".42"/>
+            </linearGradient>
+            <linearGradient id="recipientPocketLower" x1=".12" y1="0" x2=".82" y2="1">
+              <stop offset="0" stop-color="#fffaf2" stop-opacity=".54"/>
+              <stop offset=".55" stop-color="#f7f2e9" stop-opacity=".36"/>
+              <stop offset="1" stop-color="#dad4ca" stop-opacity=".44"/>
+            </linearGradient>
+            <pattern id="recipientPocketPaperPattern" width="838" height="693" patternUnits="userSpaceOnUse">
+              <image x="0" y="-72" width="838" height="838" href="invitation-assets/envelope-paper-greige.jpg" preserveAspectRatio="xMidYMid slice"/>
+            </pattern>
+          </defs>
+          <path d="M1 1 352 315 1 693Z" fill="url(#recipientPocketPaperPattern)"/>
+          <path d="M1 1 352 315 1 693Z" fill="url(#recipientPocketSideLeft)" stroke="#c7c3bb" stroke-opacity=".34" stroke-width="1.6"/>
+          <path d="M837 1 486 315 837 693Z" fill="url(#recipientPocketPaperPattern)"/>
+          <path d="M837 1 486 315 837 693Z" fill="url(#recipientPocketSideRight)" stroke="#bdbab3" stroke-opacity=".30" stroke-width="1.3"/>
+          <path d="M1 693V646Q5 615 29 581L335 299H503L809 581Q833 615 837 646V693Z" fill="url(#recipientPocketPaperPattern)"/>
+          <path d="M1 693V646Q5 615 29 581L335 299H503L809 581Q833 615 837 646V693Z" fill="url(#recipientPocketLower)" stroke="#c7c3bb" stroke-opacity=".36" stroke-width="2"/>
+          <path d="M1 693V646Q5 615 29 581L335 299" fill="none" stroke="#d3cdc4" stroke-opacity=".28" stroke-width="1.35"/>
+          <path d="M837 693V646Q833 615 809 581L503 299" fill="none" stroke="#d3cdc4" stroke-opacity=".28" stroke-width="1.35"/>
+        </svg>
         <div class="recipient-envelope-flap" aria-hidden="true">
-          <div class="recipient-envelope-flap-face recipient-envelope-flap-front"></div>
-          <div class="recipient-envelope-flap-face recipient-envelope-flap-back"></div>
+          <div class="recipient-envelope-flap-face recipient-envelope-flap-front">
+            <svg viewBox="0 0 838 420" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="recipientClosedFlap" x1=".08" y1="0" x2=".86" y2="1">
+                  <stop offset="0" stop-color="#fffaf2" stop-opacity=".58"/>
+                  <stop offset=".49" stop-color="#fcf7ee" stop-opacity=".34"/>
+                  <stop offset="1" stop-color="#dbd5cb" stop-opacity=".42"/>
+                </linearGradient>
+                <pattern id="recipientFlapFrontPaperPattern" width="838" height="420" patternUnits="userSpaceOnUse">
+                  <image x="0" y="-209" width="838" height="838" href="invitation-assets/envelope-paper-greige.jpg" preserveAspectRatio="xMidYMid slice"/>
+                </pattern>
+              </defs>
+              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#recipientFlapFrontPaperPattern)" stroke="#c8c4bc" stroke-opacity=".38" stroke-width="1.5"/>
+              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#recipientClosedFlap)"/>
+            </svg>
+          </div>
+          <div class="recipient-envelope-flap-face recipient-envelope-flap-back">
+            <svg viewBox="0 0 838 420" preserveAspectRatio="none">
+              <defs>
+                <pattern id="recipientFlapBackPaperPattern" width="838" height="420" patternUnits="userSpaceOnUse">
+                  <image x="0" y="-160" width="838" height="838" href="invitation-assets/envelope-paper-greige.jpg" preserveAspectRatio="xMidYMid slice"/>
+                </pattern>
+              </defs>
+              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="url(#recipientFlapBackPaperPattern)" stroke="#c8c4bc" stroke-opacity=".34" stroke-width="1.4"/>
+              <path d="M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z" fill="#fff4e6" opacity=".09"/>
+            </svg>
+          </div>
         </div>
         <button class="recipient-envelope-seal" type="button" aria-label="Open the private invitation">
           <img src="invitation-assets/wax-seal-blank-optimized.png" alt="" aria-hidden="true">
@@ -50,6 +115,15 @@
         </button>
       </div>
       <p class="recipient-envelope-prompt">Tap the seal to open</p>
+      <svg class="recipient-envelope-paper-texture" viewBox="0 0 942 1674" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <filter id="recipientPagePaper" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence type="fractalNoise" baseFrequency=".012 .34" numOctaves="5" seed="31" result="recipientPaperFibers"/>
+            <feColorMatrix in="recipientPaperFibers" type="matrix" values=".22 0 0 0 .58  0 .22 0 0 .57  0 0 .20 0 .54  0 0 0 .24 0"/>
+          </filter>
+        </defs>
+        <rect width="942" height="1674" fill="#d2cec5" filter="url(#recipientPagePaper)" opacity=".46"/>
+      </svg>
       <p class="sr-only" role="status" aria-live="polite" data-recipient-status></p>
     </section>
   </div>

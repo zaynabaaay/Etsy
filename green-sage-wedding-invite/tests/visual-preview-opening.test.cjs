@@ -21,17 +21,42 @@ test('recipient opening runtime is loaded only by the visual-document Preview', 
   assert.doesNotMatch(runtime + preview, /index\.html|invitation\.html|invitation\.js|openControl|sessionStorage|localStorage/);
 });
 
-test('transient envelope uses approved assets and no legacy iframe or navigation', () => {
+test('transient envelope uses the legacy paper and seal assets with no legacy iframe or navigation', () => {
   for (const asset of [
     'invitation-assets/envelope-paper-greige.jpg',
-    'invitation-assets/envelope-liner-optimized.jpg',
     'invitation-assets/wax-seal-blank-optimized.png'
   ]) assert.match(preview + runtime + css, new RegExp(asset.replaceAll('.', '\\.'), 'g'));
+  assert.doesNotMatch(preview + css, /envelope-liner-optimized\.jpg/);
   assert.match(preview, /data-recipient-envelope/);
   assert.match(preview, /recipient-envelope-flap-front/);
   assert.match(preview, /recipient-envelope-flap-back/);
   assert.match(preview, /recipient-envelope-card/);
   assert.doesNotMatch(runtime + preview, /<iframe|location\.(?:assign|replace)|window\.open/);
+});
+
+test('Preview ports the exact legacy SVG envelope, pocket, flap, and paper texture construction', () => {
+  assert.match(preview, /class="recipient-envelope-body" viewBox="0 0 838 693" preserveAspectRatio="none"/);
+  assert.match(preview, /<image x="0" y="-72" width="838" height="838" href="invitation-assets\/envelope-paper-greige\.jpg" preserveAspectRatio="xMidYMid slice"/);
+  assert.match(preview, /class="recipient-envelope-pocket" viewBox="0 0 838 693" preserveAspectRatio="none"/);
+  assert.match(preview, /M1 1 352 315 1 693Z/);
+  assert.match(preview, /M837 1 486 315 837 693Z/);
+  assert.match(preview, /M1 693V646Q5 615 29 581L335 299H503L809 581Q833 615 837 646V693Z/);
+  assert.match(preview, /M837 693V646Q833 615 809 581L503 299/);
+  assert.equal((preview.match(/viewBox="0 0 838 420" preserveAspectRatio="none"/g) || []).length, 2);
+  assert.equal((preview.match(/M1 1H837Q832 48 823 67 813 88 789 107L447 392Q419 426 391 392L49 107Q25 88 15 67 6 48 1 1Z/g) || []).length, 4);
+  assert.match(preview, /<image x="0" y="-209" width="838" height="838"/);
+  assert.match(preview, /<image x="0" y="-160" width="838" height="838"/);
+  assert.match(preview, /class="recipient-envelope-paper-texture" viewBox="0 0 942 1674" preserveAspectRatio="none"/);
+  assert.doesNotMatch(preview + css, /recipient-envelope-pocket::before|recipient-envelope-pocket-bottom|recipient-envelope-flap-face[^}]*clip-path/);
+});
+
+test('Preview preserves legacy sibling-level flap, card, and pocket stacking', () => {
+  const flapRule = css.match(/\.recipient-envelope-flap \{[\s\S]*?\n\}/)?.[0] || '';
+  assert.doesNotMatch(flapRule, /z-index/);
+  assert.match(css, /\.recipient-envelope-flap-face \{[\s\S]*?z-index: 6/);
+  assert.match(css, /\.recipient-envelope-flap-back \{[\s\S]*?z-index: 1/);
+  assert.match(css, /\.recipient-envelope-card \{[\s\S]*?z-index: 2/);
+  assert.match(css, /\.recipient-envelope-pocket \{[\s\S]*?z-index: 3/);
 });
 
 test('closed envelope is present and styled in the first HTML frame', () => {
@@ -42,7 +67,7 @@ test('closed envelope is present and styled in the first HTML frame', () => {
   assert.match(preview, /\.recipient-envelope-overlay\{position:fixed;z-index:30000;inset:0;display:grid/);
   assert.match(preview, /\.recipient-envelope-seal\{[^}]*pointer-events:none/);
   assert.match(preview, /data-recipient-opening-ready/);
-  assert.equal((preview.match(/rel="preload"/g) || []).length, 3);
+  assert.equal((preview.match(/rel="preload"/g) || []).length, 2);
   assert.doesNotMatch(runtime, /createElement\('div'\)|document\.body\.append\(overlay\)|overlay\.innerHTML/);
   assert.match(runtime, /overlay\.dataset\.recipientOpeningReady = ''/);
   assert.match(runtime, /overlay\.setAttribute\('aria-busy', 'false'\)/);
